@@ -1,0 +1,11 @@
+packages:
+  - apps/*
+  - packages/*
+
+# ADD THIS BLOCK
+allowBuilds:
+  '@prisma/engines': true
+  esbuild: true
+  prisma: true
+  sharp: true
+  unrs-resolver: true
