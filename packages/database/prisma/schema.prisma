@@ -1,13 +1,84 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Get a free hosted Postgres database in seconds: `npx create-db`
-
 generator client {
-  provider = "prisma-client"
+  provider = "prisma-client-js"
   output   = "../generated/prisma"
 }
 
 datasource db {
   provider = "postgresql"
+}
+
+enum UserRole {
+  ADMIN
+  TEAM_LEADER
+  TEAM_MEMBER
+}
+
+enum EventType {
+  LESSON
+  TOURNAMENT
+  CHECK_IN
+  WORK_SESSION
+}
+
+enum DocType {
+  PROGRAMMING
+  CAD
+  HARDWARE
+  GENERAL
+}
+
+model User {
+  id           String          @id @default(uuid())
+  firstName    String
+  lastName     String
+  email        String          @unique
+  authUserId   String?         @unique // Maps to Supabase auth.users.id
+  discordId    String          @unique // Critical for Discord Bot synchronization
+  role         UserRole        @default(TEAM_MEMBER)
+  teamId       String?
+  team         Team?           @relation(fields: [teamId], references: [id])
+  authoredDocs Documentation[] @relation("AuthoredDocs")
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+}
+
+model Team {
+  id              String          @id @default(uuid())
+  name            String          // e.g., "Talos"
+  number          String          @unique // e.g., "82855T"
+  discordServerId String?         @unique // The unique Guild ID for the team's server
+  discordRoleId   String?         @unique // The role ID to ping (like @Everyone or a specific @Dev role)
+  slidesUrl       String?         // Google Slides publish-to-web link for dashboard iframe
+  members         User[]
+  events          Event[]         @relation("TeamEvents")
+  createdAt       DateTime        @default(now())
+}
+
+model Event {
+  id          String    @id @default(uuid())
+  name        String
+  description String?
+  location    String
+  type        EventType @default(WORK_SESSION)
+  startDate   DateTime
+  endDate     DateTime
+  teams       Team[]    @relation("TeamEvents") // Implicit many-to-many join table
+  createdAt   DateTime  @default(now())
+}
+
+model Folder {
+  id   String          @id @default(uuid())
+  name String
+  docs Documentation[]
+}
+
+model Documentation {
+  id        String   @id @default(uuid())
+  title     String
+  type      DocType
+  content   String   // Markdown text
+  folderId  String
+  folder    Folder   @relation(fields: [folderId], references: [id])
+  authors   User[]   @relation("AuthoredDocs")
+  createdAt DateTime @default(now())
 }

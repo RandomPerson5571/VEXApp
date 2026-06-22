@@ -128,3 +128,28 @@
     @apply font-sans;
   }
 }
+
+.dashboard-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: #0f172a transparent;
+}
+
+.dashboard-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+
+.dashboard-scroll::-webkit-scrollbar-thumb {
+  background-color: #0f172a;
+  border-radius: 9999px;
+}
+
+.auth-bg-grid {
+  background-size: 24px 41.5px;
+  background-image:
+    linear-gradient(30deg, #1e293b 25%, transparent 25%),
+    linear-gradient(150deg, #1e293b 25%, transparent 25%),
+    linear-gradient(270deg, #1e293b 25%, transparent 25%),
+    linear-gradient(330deg, transparent 75%, #1e293b 75%),
+    linear-gradient(90deg, transparent 75%, #1e293b 75%),
+    linear-gradient(210deg, transparent 75%, #1e293b 75%);
+}

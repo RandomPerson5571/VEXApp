@@ -10,6 +10,9 @@
 !.yarn/releases
 !.yarn/versions
 
+*.obj
+*.stl
+
 # testing
 /coverage
 
