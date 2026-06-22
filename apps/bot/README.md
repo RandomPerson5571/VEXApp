@@ -1,0 +1,36 @@
+# Discord Bot (Basic Setup)
+
+This bot uses TypeScript + discord.js with a simple architecture:
+
+- `src/commands`: Slash commands
+- `src/events`: Event handlers
+- `src/loaders.ts`: Dynamic loading for commands/events
+- `src/deploy-commands.ts`: Slash command registration script
+
+## 1) Environment variables
+
+Copy `.env.example` and fill in your values:
+
+- `DISCORD_TOKEN` (required)
+- `DISCORD_CLIENT_ID` (required)
+- `DISCORD_GUILD_ID` (optional, for guild-scoped command registration)
+
+## 2) Register slash commands
+
+```bash
+pnpm --filter bot register:commands
+```
+
+If `DISCORD_GUILD_ID` is set, commands are registered to that guild.
+Otherwise commands are registered globally.
+
+## 3) Run the bot
+
+```bash
+pnpm --filter bot dev
+```
+
+## Built-in commands
+
+- `/ping`
+- `/server`
