@@ -2,8 +2,8 @@
 
 import { redirect } from "next/navigation";
 
-import { getSiteUrl } from "@/app/(auth)/lib/site-url";
 import { createClient } from "@/lib/supabase/server";
+import { ensureUserProfile } from "@/lib/supabase/wrappers";
 
 export type LoginState = {
   error: string;
@@ -33,6 +33,14 @@ export async function signInWithCredentials(
 
   if (error) {
     return { error: error.message };
+  }
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (user) {
+    await ensureUserProfile(supabase, user);
   }
 
   redirect("/dashboard");
