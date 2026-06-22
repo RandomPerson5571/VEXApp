@@ -3,21 +3,27 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
-
   "packageManager": "pnpm@11.8.0",
   "scripts": {
     "dev": "turbo run dev",
     "dev:web": "turbo run dev --filter=web",
     "dev:bot": "turbo run dev --filter=bot",
+
     "lint": "turbo run lint",
     "check-types": "turbo run check-types",
     "format": "prettier --write \"**/*.{ts,tsx,md,json}\"",
+
+    "supabase:start": "supabase start",
+    "supabase:stop": "supabase stop",
+    "supabase:status": "supabase status",
+    "supabase:deploy": "supabase functions deploy",
+
     "db:generate": "turbo run db:generate",
     "db:migrate": "turbo run db:migrate --filter=@stlvex/database",
     "db:push": "turbo run db:push --filter=@stlvex/database",
+
     "clean": "turbo run clean && rimraf node_modules"
   },
-
   "keywords": [],
   "author": "",
   "license": "ISC",
@@ -30,6 +36,7 @@
   },
   "type": "module",
   "devDependencies": {
+    "supabase": "^2.107.0",
     "turbo": "^2.9.18"
   }
 }

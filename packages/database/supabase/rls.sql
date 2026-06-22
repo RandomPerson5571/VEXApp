@@ -1,6 +1,6 @@
 -- Supabase RLS policies for Prisma-managed tables.
 -- Apply manually in the Supabase SQL editor or via `supabase db execute`.
--- Requires authUserId on "User" and implicit join tables _TeamEvents / _AuthoredDocs.
+-- Requires user.id to match auth.uid() and implicit join tables _TeamEvents / _AuthoredDocs.
 
 CREATE OR REPLACE FUNCTION public.current_user_team_id()
 RETURNS text
@@ -11,7 +11,7 @@ SET search_path = public
 AS $$
   SELECT "teamId"
   FROM "User"
-  WHERE "authUserId" = auth.uid()::text
+  WHERE "id" = auth.uid()::text
   LIMIT 1;
 $$;
 
@@ -24,7 +24,7 @@ SET search_path = public
 AS $$
   SELECT role::text
   FROM "User"
-  WHERE "authUserId" = auth.uid()::text
+  WHERE "id" = auth.uid()::text
   LIMIT 1;
 $$;
 
@@ -44,7 +44,7 @@ ALTER TABLE "User" ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "user_select_own" ON "User";
 CREATE POLICY "user_select_own" ON "User"
   FOR SELECT
-  USING ("authUserId" = auth.uid()::text);
+  USING ("id" = auth.uid()::text);
 
 DROP POLICY IF EXISTS "user_select_teammates" ON "User";
 CREATE POLICY "user_select_teammates" ON "User"
@@ -57,13 +57,13 @@ CREATE POLICY "user_select_teammates" ON "User"
 DROP POLICY IF EXISTS "user_insert_own" ON "User";
 CREATE POLICY "user_insert_own" ON "User"
   FOR INSERT
-  WITH CHECK ("authUserId" = auth.uid()::text);
+  WITH CHECK ("id" = auth.uid()::text);
 
 DROP POLICY IF EXISTS "user_update_own" ON "User";
 CREATE POLICY "user_update_own" ON "User"
   FOR UPDATE
-  USING ("authUserId" = auth.uid()::text)
-  WITH CHECK ("authUserId" = auth.uid()::text);
+  USING ("id" = auth.uid()::text)
+  WITH CHECK ("id" = auth.uid()::text);
 
 -- Team
 ALTER TABLE "Team" ENABLE ROW LEVEL SECURITY;
@@ -182,7 +182,7 @@ CREATE POLICY "documentation_update_author_or_leader" ON "Documentation"
       SELECT "A"
       FROM "_AuthoredDocs"
       WHERE "B" IN (
-        SELECT id FROM "User" WHERE "authUserId" = auth.uid()::text
+        SELECT id FROM "User" WHERE "id" = auth.uid()::text
       )
     )
   );
@@ -204,5 +204,36 @@ DROP POLICY IF EXISTS "authored_docs_insert_author" ON "_AuthoredDocs";
 CREATE POLICY "authored_docs_insert_author" ON "_AuthoredDocs"
   FOR INSERT
   WITH CHECK (
-    "B" IN (SELECT id FROM "User" WHERE "authUserId" = auth.uid()::text)
+    "B" IN (SELECT id FROM "User" WHERE "id" = auth.uid()::text)
   );
+
+-- NotebookLog
+ALTER TABLE "NotebookLog" ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "notebook_log_select_team" ON "NotebookLog";
+CREATE POLICY "notebook_log_select_team" ON "NotebookLog"
+  FOR SELECT
+  USING (
+    "teamId" = public.current_user_team_id()
+    OR "userId" = auth.uid()::text
+    OR public.current_user_role() = 'ADMIN'
+  );
+
+DROP POLICY IF EXISTS "notebook_log_insert_author" ON "NotebookLog";
+CREATE POLICY "notebook_log_insert_author" ON "NotebookLog"
+  FOR INSERT
+  WITH CHECK (
+    "userId" = auth.uid()::text
+    AND (
+      "teamId" = public.current_user_team_id()
+      OR public.current_user_role() IN ('ADMIN', 'TEAM_LEADER')
+    )
+  );
+
+-- Invite
+ALTER TABLE "Invite" ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "invite_select_leader" ON "Invite";
+CREATE POLICY "invite_select_leader" ON "Invite"
+  FOR SELECT
+  USING (public.is_team_leader_or_admin());

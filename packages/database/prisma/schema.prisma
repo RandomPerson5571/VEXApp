@@ -27,30 +27,38 @@ enum DocType {
   GENERAL
 }
 
+enum InviteRole {
+  ADMIN
+  TEAM_LEADER
+  TEAM_MEMBER
+}
+
 model User {
-  id           String          @id @default(uuid())
+  id           String          @id // Must match Supabase Auth UUID 1:1
   firstName    String
   lastName     String
   email        String          @unique
-  authUserId   String?         @unique // Maps to Supabase auth.users.id
-  discordId    String          @unique // Critical for Discord Bot synchronization
+  discordId    String?         @unique // Optional at signup, can be linked later
   role         UserRole        @default(TEAM_MEMBER)
   teamId       String?
   team         Team?           @relation(fields: [teamId], references: [id])
   authoredDocs Documentation[] @relation("AuthoredDocs")
+  notebookLogs NotebookLog[]
   createdAt    DateTime        @default(now())
   updatedAt    DateTime        @updatedAt
 }
 
 model Team {
   id              String          @id @default(uuid())
-  name            String          // e.g., "Talos"
+  name            String
   number          String          @unique // e.g., "82855T"
-  discordServerId String?         @unique // The unique Guild ID for the team's server
-  discordRoleId   String?         @unique // The role ID to ping (like @Everyone or a specific @Dev role)
-  slidesUrl       String?         // Google Slides publish-to-web link for dashboard iframe
+  discordServerId String?         @unique
+  discordRoleId   String?         @unique
+  slidesUrl       String?
   members         User[]
   events          Event[]         @relation("TeamEvents")
+  notebookLogs    NotebookLog[]
+  invites         Invite[]
   createdAt       DateTime        @default(now())
 }
 
@@ -76,9 +84,31 @@ model Documentation {
   id        String   @id @default(uuid())
   title     String
   type      DocType
-  content   String   // Markdown text
+  content   String
   folderId  String
   folder    Folder   @relation(fields: [folderId], references: [id])
   authors   User[]   @relation("AuthoredDocs")
   createdAt DateTime @default(now())
+}
+
+model NotebookLog {
+  id          String   @id @default(uuid())
+  description String
+  teamId      String
+  team        Team     @relation(fields: [teamId], references: [id])
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  createdAt   DateTime @default(now())
+}
+
+model Invite {
+  id          String     @id @default(uuid())
+  code        String     @unique // Token slug used in join URL
+  role        InviteRole @default(TEAM_MEMBER)
+  teamId      String?
+  team        Team?      @relation(fields: [teamId], references: [id])
+  maxUses     Int        @default(1)
+  uses        Int        @default(0)
+  expiresAt   DateTime
+  createdAt   DateTime   @default(now())
 }

@@ -41,3 +41,7 @@ Thumbs.db
 
 # Testing
 coverage
+
+# Supabase local development files
+.supabase/
+supabase/.temp/
