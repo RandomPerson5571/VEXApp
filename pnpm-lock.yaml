@@ -214,8 +214,39 @@ importers:
         specifier: ^2.9.18
         version: 2.9.18
 
+  apps/api-server:
+    dependencies:
+      '@hono/node-server':
+        specifier: ^1.11.0
+        version: 1.19.14(hono@4.12.26)
+      '@stlvex/database':
+        specifier: workspace:*
+        version: link:../../packages/database
+      dotenv:
+        specifier: ^17.4.2
+        version: 17.4.2
+      events.vex:
+        specifier: ^7.0.0
+        version: 7.0.0
+      hono:
+        specifier: ^4.4.0
+        version: 4.12.26
+    devDependencies:
+      '@types/node':
+        specifier: ^20.0.0
+        version: 20.19.43
+      tsx:
+        specifier: ^4.0.0
+        version: 4.22.4
+      typescript:
+        specifier: ^5.0.0
+        version: 5.9.3
+
   apps/bot:
     dependencies:
+      '@stlvex/database':
+        specifier: workspace:*
+        version: link:../../packages/database
       discord.js:
         specifier: ^14.26.4
         version: 14.26.4
@@ -3348,6 +3379,10 @@ packages:
   eventemitter3@5.0.4:
     resolution: {integrity: sha512-mlsTRyGaPBjPedk6Bvw+aqbsXDtoAyAzm5MO7JgU+yVRyMQ5O8bD4Kcci7BS85f93veegeCPkL8R4GLClnjLFw==}
 
+  events.vex@7.0.0:
+    resolution: {integrity: sha512-6T72R8tdtXW0+8/f4CXfjvposmdTT6/b6CPrdqHWQbPUFj/fCSsUQGSBvf53DzAU0ocuF8rjDczDwl/0cbTLmg==}
+    engines: {node: '>=18'}
+
   eventsource-parser@3.1.0:
     resolution: {integrity: sha512-kJezFj9YFAMLeORyi7aCLxLbD5/qWMQnoMVlVPyHIll7lgRJCc3JVln9Vgl9nwQi0YkMnhdGTMNn7CkRRAptMg==}
     engines: {node: '>=18.0.0'}
@@ -4275,6 +4310,12 @@ packages:
   open@8.4.2:
     resolution: {integrity: sha512-7x81NCL719oNbsq/3mh+hVrAWmFuEYUqrq/Iw3kUzH8ReypT9QQ0BLoJS7/G9k6N81XjW4qHWtjWwe/9eLy1EQ==}
     engines: {node: '>=12'}
+
+  openapi-fetch@0.11.3:
+    resolution: {integrity: sha512-r18fERgpxFrI4pv79ABD1dqFetWz7pTfwRd7jQmRm/lFdCDpWF43kvHUiOqOZu+tWsMydDJMpJN1hlZ9inRvfA==}
+
+  openapi-typescript-helpers@0.0.13:
+    resolution: {integrity: sha512-z44WK2e7ygW3aUtAtiurfEACohf/Qt9g6BsejmIYgEoY4REHeRzgFJmO3ium0libsuzPc145I+8lE9aiiZrQvQ==}
 
   optionator@0.9.4:
     resolution: {integrity: sha512-6IpQ7mKUxRcZNLIObR0hz7lxsapSSIYNZJwXPGeF0mTVqGKFIXj1DQcMoT22S3ROcLyY/rz0PWaWZ9ayWmad9g==}
@@ -7155,7 +7196,7 @@ snapshots:
 
   '@types/pg@8.20.0':
     dependencies:
-      '@types/node': 26.0.0
+      '@types/node': 20.19.43
       pg-protocol: 1.15.0
       pg-types: 2.2.0
 
@@ -7186,7 +7227,7 @@ snapshots:
 
   '@types/ws@8.18.1':
     dependencies:
-      '@types/node': 26.0.0
+      '@types/node': 20.19.43
 
   '@typescript-eslint/eslint-plugin@8.61.1(@typescript-eslint/parser@8.61.1(eslint@9.39.4(jiti@2.7.0))(typescript@5.9.3))(eslint@9.39.4(jiti@2.7.0))(typescript@5.9.3)':
     dependencies:
@@ -8241,6 +8282,10 @@ snapshots:
 
   eventemitter3@5.0.4: {}
 
+  events.vex@7.0.0:
+    dependencies:
+      openapi-fetch: 0.11.3
+
   eventsource-parser@3.1.0: {}
 
   eventsource@3.0.7:
@@ -9134,6 +9179,12 @@ snapshots:
       define-lazy-prop: 2.0.0
       is-docker: 2.2.1
       is-wsl: 2.2.0
+
+  openapi-fetch@0.11.3:
+    dependencies:
+      openapi-typescript-helpers: 0.0.13
+
+  openapi-typescript-helpers@0.0.13: {}
 
   optionator@0.9.4:
     dependencies:

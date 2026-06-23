@@ -7,7 +7,7 @@ export const data = new SlashCommandBuilder()
   .setDescription("Fetches and displays upcoming events from the database")
   .addStringOption((option) =>
     option
-      .setName("range")
+      .setName("time-range")
       .setDescription("The range of events to fetch (defaults to week)")
       .setRequired(false)
       .addChoices(
