@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { useState } from "react";
 import {
-  Bell,
   ChevronDown,
   Settings as SettingsIcon,
   ShieldCheck,
@@ -11,24 +10,27 @@ import {
 } from "lucide-react";
 
 import { LogoutButton } from "@/components/auth/LogoutButton";
+import { useUser } from "@/components/providers/UserProvider";
+import type { UserRole } from "@stlvex/database/types";
 
-const mockTeam = { name: "Iron Reign Robotics", number: "604A" };
-const mockUser = {
-  name: "Jackson D.",
-  email: "jackson.d@vexrobotics.com",
-  role: "Scouting Lead",
-  initials: "JD",
-};
+function formatRole(role: UserRole): string {
+  return role
+    .split("_")
+    .map((word) => word.charAt(0) + word.slice(1).toLowerCase())
+    .join(" ");
+}
 
-const mockNotifications = [
-  { id: 1, text: "Match 24 scouting log completed by Jackson D.", time: "2 mins ago", unread: true },
-  { id: 2, text: "Week 2 Intake Redesign Design notebook approved.", time: "1 hour ago", unread: true },
-  { id: 3, text: "V5 Smart Cable quantity fell below threshold alert.", time: "2 hours ago", unread: true },
-];
+function getInitials(firstName: string, lastName: string): string {
+  return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
+}
 
 export function AppHeader() {
-  const [showNotifications, setShowNotifications] = useState(false);
+  const { profile, team } = useUser();
   const [showUserDropdown, setShowUserDropdown] = useState(false);
+
+  const displayName = `${profile.firstName} ${profile.lastName}`.trim();
+  const initials = getInitials(profile.firstName, profile.lastName);
+  const roleLabel = formatRole(profile.role);
 
   return (
     <header className="h-16 border-b border-slate-900/60 bg-[#070b13] flex items-center justify-between px-6 select-none font-sans z-30">
@@ -37,15 +39,19 @@ export function AppHeader() {
           <ShieldCheck className="h-4.5 w-4.5" />
         </div>
         <div className="flex flex-col pr-1">
-          <span className="text-xs font-black text-slate-100 leading-none">{mockTeam.name}</span>
-          <span className="text-[10px] text-slate-400 font-semibold tracking-wide">
-            Team {mockTeam.number}
+          <span className="text-xs font-black text-slate-100 leading-none">
+            {team?.name ?? "No team assigned"}
           </span>
+          {team ? (
+            <span className="text-[10px] text-slate-400 font-semibold tracking-wide">
+              Team {team.number}
+            </span>
+          ) : null}
         </div>
       </div>
 
       <div className="flex items-center gap-4">
-        <div className="relative">
+        {/*<div className="relative">
           <button
             type="button"
             onClick={() => setShowNotifications((open) => !open)}
@@ -88,7 +94,7 @@ export function AppHeader() {
               </div>
             </>
           )}
-        </div>
+        </div> */}
 
         <div className="relative">
           <button
@@ -97,12 +103,14 @@ export function AppHeader() {
             className="flex items-center gap-3.5 px-3 py-1.5 rounded-lg hover:bg-slate-900/45 text-left cursor-pointer transition select-none"
           >
             <div className="h-8.5 w-8.5 rounded-full bg-gradient-to-tr from-blue-700 to-indigo-800 border border-blue-500/30 font-bold text-xs text-white flex items-center justify-center uppercase shadow-md shadow-blue-500/10">
-              {mockUser.initials}
+              {initials}
             </div>
             <div className="hidden md:flex flex-col">
-              <span className="text-xs font-black text-slate-200 leading-none">{mockUser.name}</span>
+              <span className="text-xs font-black text-slate-200 leading-none">
+                {displayName}
+              </span>
               <span className="text-[9.5px] font-bold text-slate-500 mt-1 uppercase tracking-wider">
-                {mockUser.role}
+                {roleLabel}
               </span>
             </div>
             <ChevronDown className="h-3.5 w-3.5 text-slate-500" />
@@ -118,8 +126,12 @@ export function AppHeader() {
               />
               <div className="absolute right-0 mt-2 w-52 rounded-xl bg-[#090e18] border border-slate-900 shadow-2xl z-50 p-1.5 text-xs text-slate-300">
                 <div className="px-2.5 py-2 border-b border-slate-900 mb-1">
-                  <span className="font-black text-slate-100 block">{mockUser.name}</span>
-                  <span className="text-[10px] text-slate-500 block break-all">{mockUser.email}</span>
+                  <span className="font-black text-slate-100 block">
+                    {displayName}
+                  </span>
+                  <span className="text-[10px] text-slate-500 block break-all">
+                    {profile.email}
+                  </span>
                 </div>
                 <Link
                   href="/settings"

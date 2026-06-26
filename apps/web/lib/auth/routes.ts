@@ -8,6 +8,10 @@ export const PROTECTED_ROUTE_PREFIXES = [
   "/inventory",
   "/members",
   "/settings",
+  "/team-management",
+  "/organization-management",
+  "/admin",
+  "/onboarding",
 ] as const;
 
 /** Auth pages that signed-in users should not access. */
@@ -30,6 +34,7 @@ export function isAuthRoute(pathname: string): boolean {
 export function isPublicRoute(pathname: string): boolean {
   return (
     pathname === "/" ||
+    pathname.startsWith("/join/") ||
     pathname.startsWith("/auth/callback") ||
     isAuthRoute(pathname)
   );

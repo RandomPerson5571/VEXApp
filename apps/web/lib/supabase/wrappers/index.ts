@@ -50,7 +50,6 @@ export {
   getUserByAuthId,
   getUserByEmail,
   getUserWithTeam,
-  linkAuthUserToProfile,
   updateUserProfile,
   type CreateUserProfileInput,
   type UserProfileUpdate,

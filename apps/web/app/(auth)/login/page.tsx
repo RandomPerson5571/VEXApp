@@ -1,13 +1,43 @@
 import { redirect } from "next/navigation";
 
 import { getUser } from "@/app/(auth)/lib/session";
+import { lookupUserProfile } from "@/lib/auth/profile";
 import { LoginClient } from "./login-client";
 
-export default async function LoginPage() {
+type LoginPageProps = {
+  searchParams?: Promise<{ redirectTo?: string; message?: string; error?: string }>;
+};
+
+export default async function LoginPage({ searchParams }: LoginPageProps) {
   const user = await getUser();
+  let dbUnavailable = false;
+
   if (user) {
-    redirect("/dashboard");
+    const profile = await lookupUserProfile(user.id);
+
+    if (profile.status === "found") {
+      redirect("/dashboard");
+    }
+
+    if (profile.status === "missing") {
+      redirect("/onboarding");
+    }
+
+    dbUnavailable = true;
   }
 
-  return <LoginClient />;
+  const resolvedSearchParams = searchParams ? await searchParams : undefined;
+  const message = dbUnavailable
+    ? "Unable to reach the database. Check your connection settings and try again."
+    : resolvedSearchParams?.message;
+
+  return (
+    <LoginClient
+      searchParams={
+        resolvedSearchParams || message
+          ? { ...resolvedSearchParams, message }
+          : undefined
+      }
+    />
+  );
 }

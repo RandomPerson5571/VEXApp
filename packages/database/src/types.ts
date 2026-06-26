@@ -11,7 +11,6 @@ export type {
 export type {
   DocType,
   EventType,
-  InviteRole,
   UserRole,
 } from "../generated/prisma/index.js";
 

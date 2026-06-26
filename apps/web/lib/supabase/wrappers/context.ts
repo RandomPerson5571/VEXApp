@@ -4,7 +4,6 @@ import {
   createUserProfile,
   getUserByAuthId,
   getUserByEmail,
-  linkAuthUserToProfile,
 } from "./users";
 import type { User } from "./types";
 
@@ -65,12 +64,8 @@ export async function ensureUserProfile(
 
   const byEmail = await getUserByEmail(supabase, email);
   if (byEmail) {
-    if (byEmail.authUserId && byEmail.authUserId !== authUser.id) {
+    if (byEmail.id !== authUser.id) {
       throw new Error("Email is already linked to another account");
-    }
-
-    if (!byEmail.authUserId) {
-      return linkAuthUserToProfile(supabase, byEmail.id, authUser.id);
     }
 
     return byEmail;
@@ -86,10 +81,9 @@ export async function ensureUserProfile(
   const { firstName, lastName } = splitName(metadataName, email);
 
   return createUserProfile(supabase, {
-    authUserId: authUser.id,
+    id: authUser.id,
     email,
     firstName,
     lastName,
-    discordId: `auth:${authUser.id}`,
   });
 }

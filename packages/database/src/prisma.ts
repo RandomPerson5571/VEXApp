@@ -1,6 +1,6 @@
 import { PrismaPg } from "@prisma/adapter-pg";
-import { PrismaClient } from "../generated/prisma/index.js";
-import { normalizeDatabaseUrl } from "./normalize-database-url.js";
+import { PrismaClient } from "../generated/prisma/index";
+import { normalizeDatabaseUrl } from "./normalize-database-url";
 import { Pool } from "pg";
 
 const rawDatabaseUrl = process.env.DATABASE_URL;

@@ -4,6 +4,7 @@ declare global {
       PORT: string;
       DATABASE_URL: string;
       API_KEY: string;
+      VEX_API_TOKEN: string;
       NODE_ENV: 'development' | 'production';
     }
   }

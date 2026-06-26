@@ -4,19 +4,32 @@ import Link from "next/link";
 import { useState } from "react";
 import { Mail, Lock, Eye, EyeOff, ShieldAlert } from "lucide-react";
 import STLRoboticsLogoComponent from "../Logo";
+import DiscordIconComponent from "@/public/logos/discord-icon.svg";
+import Image from "next/image";
 
 export type LoginFormProps = {
   error?: string | null;
+  message?: string | null;
   loginAction: (formData: FormData) => void;
+  discordAction: (formData: FormData) => void;
+  redirectTo?: string;
   pending?: boolean;
+  discordPending?: boolean;
+  discordError?: string | null;
 };
 
 export function LoginForm({
   error,
+  message,
   loginAction,
+  discordAction,
+  redirectTo,
   pending = false,
+  discordPending = false,
+  discordError,
 }: LoginFormProps) {
   const [showPassword, setShowPassword] = useState(false);
+  const activeError = error ?? discordError;
 
   return (
     <div className="w-full max-w-md rounded-2xl bg-[#090e18]/80 border border-slate-900 shadow-2xl p-8 backdrop-blur-md relative">
@@ -25,16 +38,30 @@ export function LoginForm({
         <h2 className="text-xl font-bold tracking-tight text-white mt-1">
           STL VEX Robotics Login
         </h2>
+        <p className="text-xs font-medium text-slate-500 max-w-xs leading-relaxed">
+          Sign in with your verified email and password, or use Discord if your
+          account is linked.
+        </p>
       </div>
 
-      {error && (
+      {activeError && (
         <div className="mb-5 flex items-start gap-2.5 p-3 rounded-lg bg-red-950/20 border border-red-900/40 text-red-400 text-xs">
-          <ShieldAlert className="h-4.5 w-4.5 flex-shrink-0 mt-0.5" />
-          <span className="font-semibold leading-snug">{error}</span>
+          <ShieldAlert className="h-4.5 w-4.5 shrink-0 mt-0.5" />
+          <span className="font-semibold leading-snug">{activeError}</span>
+        </div>
+      )}
+
+      {message && !activeError && (
+        <div className="mb-5 flex items-start gap-2.5 p-3 rounded-lg bg-emerald-950/20 border border-emerald-900/40 text-emerald-300 text-xs">
+          <ShieldAlert className="h-4.5 w-4.5 shrink-0 mt-0.5" />
+          <span className="font-semibold leading-snug">{message}</span>
         </div>
       )}
 
       <form action={loginAction} className="space-y-5">
+        {redirectTo ? (
+          <input type="hidden" name="redirectTo" value={redirectTo} />
+        ) : null}
         <div className="space-y-1.5">
           <label
             htmlFor="email"
@@ -50,6 +77,7 @@ export function LoginForm({
               id="email"
               name="email"
               type="email"
+              autoComplete="email"
               required
               placeholder="name@team.com"
               className="w-full pl-10 pr-4 py-2.5 rounded-lg bg-slate-950 border border-slate-900/60 text-slate-200 text-xs font-semibold placeholder-slate-600 focus:outline-none focus:border-slate-800 focus:ring-1 focus:ring-slate-800 transition"
@@ -80,6 +108,7 @@ export function LoginForm({
               id="password"
               name="password"
               type={showPassword ? "text" : "password"}
+              autoComplete="current-password"
               required
               placeholder="••••••••"
               className="w-full pl-10 pr-10 py-2.5 rounded-lg bg-slate-950 border border-slate-900/60 text-slate-200 text-xs font-semibold placeholder-slate-600 focus:outline-none focus:border-slate-800 focus:ring-1 focus:ring-slate-800 transition"
@@ -101,22 +130,53 @@ export function LoginForm({
 
         <button
           type="submit"
-          disabled={pending}
+          disabled={pending || discordPending}
           className="w-full py-2.5 rounded-lg bg-blue-600 hover:bg-blue-500 disabled:opacity-60 disabled:cursor-not-allowed font-bold text-xs tracking-wide text-white transition-all shadow-[0_0_20px_rgba(37,99,235,0.25)] hover:shadow-[0_0_25px_rgba(37,99,235,0.4)] cursor-pointer"
         >
-          {pending ? "Logging in..." : "Login"}
+          {pending ? "Logging in..." : "Sign in with email"}
+        </button>
+      </form>
+
+      <div className="relative my-6">
+        <div className="absolute inset-0 flex items-center" aria-hidden="true">
+          <div className="w-full border-t border-slate-800" />
+        </div>
+        <div className="relative flex justify-center">
+          <span className="bg-[#090e18] px-3 text-[10px] font-bold uppercase tracking-wider text-slate-500">
+            or
+          </span>
+        </div>
+      </div>
+
+      <form action={discordAction}>
+        {redirectTo ? (
+          <input type="hidden" name="redirectTo" value={redirectTo} />
+        ) : null}
+        <button
+          type="submit"
+          disabled={pending || discordPending}
+          className="w-full py-3 rounded-lg bg-[#5865F2] hover:bg-[#4752C4] disabled:opacity-60 disabled:cursor-not-allowed font-bold text-sm tracking-wide text-white transition-all shadow-[0_0_24px_rgba(88,101,242,0.35)] hover:shadow-[0_0_28px_rgba(88,101,242,0.5)] cursor-pointer flex items-center justify-center gap-2.5"
+        >
+          <Image src={DiscordIconComponent} alt="Discord" width={20} height={20} />
+          {discordPending ? "Redirecting to Discord..." : "Continue with Discord"}
         </button>
       </form>
 
       <div className="mt-6 text-center">
         <span className="text-[11px] text-slate-500 font-semibold">
           Don&apos;t have an account?{" "}
-          <Link href="/signup" className="text-blue-500 hover:underline font-bold">
+          <Link
+            href={
+              redirectTo
+                ? `/signup?redirectTo=${encodeURIComponent(redirectTo)}`
+                : "/signup"
+            }
+            className="text-blue-500 hover:underline font-bold"
+          >
             Sign up
           </Link>
         </span>
       </div>
-
     </div>
   );
 }

@@ -1,6 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 
-import { getAuthenticatedUser } from "./context";
 import { parseDates, unwrap } from "./result";
 import { TABLES } from "./tables";
 import type { Team, TeamWithMembers, User } from "./types";
@@ -57,12 +56,11 @@ export async function getTeamWithMembers(
 
 export async function getTeamForCurrentUser(
   supabase: SupabaseClient,
+  teamId: string | null | undefined,
 ): Promise<Team | null> {
-  const { profile } = await getAuthenticatedUser(supabase);
-
-  if (!profile?.teamId) {
+  if (!teamId) {
     return null;
   }
 
-  return getTeamById(supabase, profile.teamId);
+  return getTeamById(supabase, teamId);
 }

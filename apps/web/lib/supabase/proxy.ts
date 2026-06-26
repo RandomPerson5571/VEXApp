@@ -2,9 +2,10 @@ import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
 import {
-  isAuthRoute,
-  isProtectedRoute,
-} from "@/lib/auth/routes";
+  PROXY_AUTH_USER_ID_HEADER,
+  PROXY_AUTH_VALIDATED_HEADER,
+} from "@/lib/auth/session";
+import { isAuthRoute, isProtectedRoute } from "@/lib/auth/routes";
 import {
   getSupabaseAnonKey,
   getSupabaseUrl,
@@ -17,13 +18,34 @@ function copySupabaseCookies(from: NextResponse, to: NextResponse) {
   });
 }
 
+function nextWithAuthHeaders(
+  request: NextRequest,
+  userId: string | null,
+): NextResponse {
+  const requestHeaders = new Headers(request.headers);
+
+  if (userId) {
+    requestHeaders.set(PROXY_AUTH_VALIDATED_HEADER, "1");
+    requestHeaders.set(PROXY_AUTH_USER_ID_HEADER, userId);
+  } else {
+    requestHeaders.set(PROXY_AUTH_VALIDATED_HEADER, "0");
+    requestHeaders.delete(PROXY_AUTH_USER_ID_HEADER);
+  }
+
+  return NextResponse.next({
+    request: {
+      headers: requestHeaders,
+    },
+  });
+}
+
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
     request,
   });
 
   if (!hasSupabaseEnv) {
-    return supabaseResponse;
+    return nextWithAuthHeaders(request, null);
   }
 
   const supabase = createServerClient(getSupabaseUrl(), getSupabaseAnonKey(), {
@@ -51,6 +73,8 @@ export async function updateSession(request: NextRequest) {
   } = await supabase.auth.getUser();
 
   const { pathname } = request.nextUrl;
+  const passThrough = nextWithAuthHeaders(request, user?.id ?? null);
+  copySupabaseCookies(supabaseResponse, passThrough);
 
   if (!user && isProtectedRoute(pathname)) {
     const url = request.nextUrl.clone();
@@ -71,5 +95,5 @@ export async function updateSession(request: NextRequest) {
     return redirectResponse;
   }
 
-  return supabaseResponse;
+  return passThrough;
 }

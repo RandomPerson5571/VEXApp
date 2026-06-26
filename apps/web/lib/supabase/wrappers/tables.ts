@@ -4,6 +4,8 @@ export const TABLES = {
   event: "Event",
   folder: "Folder",
   documentation: "Documentation",
+  notebookLog: "NotebookLog",
+  invite: "Invite",
   teamEvents: "_TeamEvents",
   authoredDocs: "_AuthoredDocs",
 } as const;

@@ -22,7 +22,7 @@ export async function getUserByAuthId(
   const { data, error } = await supabase
     .from(TABLES.user)
     .select("*")
-    .eq("authUserId", authUserId)
+    .eq("id", authUserId)
     .maybeSingle();
 
   const row = unwrapNullable(data as UserRow | null, error, TABLES.user);
@@ -84,11 +84,13 @@ export async function updateUserProfile(
 }
 
 export type CreateUserProfileInput = {
-  authUserId: string;
+  id: string;
   email: string;
   firstName: string;
   lastName: string;
-  discordId: string;
+  discordId?: string | null;
+  role?: User["role"];
+  teamId?: string | null;
 };
 
 export async function createUserProfile(
@@ -98,22 +100,6 @@ export async function createUserProfile(
   const { data, error } = await supabase
     .from(TABLES.user)
     .insert(input)
-    .select("*")
-    .single();
-
-  return parseUser(unwrap(data as UserRow, error, TABLES.user));
-}
-
-export async function linkAuthUserToProfile(
-  supabase: SupabaseClient,
-  userId: string,
-  authUserId: string,
-): Promise<User> {
-  const { data, error } = await supabase
-    .from(TABLES.user)
-    .update({ authUserId })
-    .eq("id", userId)
-    .is("authUserId", null)
     .select("*")
     .single();
 

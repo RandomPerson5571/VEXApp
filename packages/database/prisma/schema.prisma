@@ -27,10 +27,10 @@ enum DocType {
   GENERAL
 }
 
-enum InviteRole {
-  ADMIN
-  TEAM_LEADER
-  TEAM_MEMBER
+enum VerificationMethod {
+  EMAIL
+  DISCORD
+  UNVERIFIED
 }
 
 model User {
@@ -38,14 +38,30 @@ model User {
   firstName    String
   lastName     String
   email        String          @unique
-  discordId    String?         @unique // Optional at signup, can be linked later
-  role         UserRole        @default(TEAM_MEMBER)
-  teamId       String?
-  team         Team?           @relation(fields: [teamId], references: [id])
-  authoredDocs Documentation[] @relation("AuthoredDocs")
-  notebookLogs NotebookLog[]
-  createdAt    DateTime        @default(now())
-  updatedAt    DateTime        @updatedAt
+  discordId          String?            @unique // Optional at signup, can be linked later
+  role               UserRole           @default(TEAM_MEMBER)
+  isAdmin            Boolean            @default(false)
+  verificationMethod VerificationMethod @default(UNVERIFIED)
+  isVerified         Boolean            @default(false)
+  teamId             String?
+  team               Team?              @relation(fields: [teamId], references: [id])
+  discordAccount     DiscordAccount?
+  authoredDocs       Documentation[]    @relation("AuthoredDocs")
+  notebookLogs       NotebookLog[]
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+}
+
+model DiscordAccount {
+  id              String   @id @default(cuid())
+  userId          String   @unique
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  discordId       String   @unique
+  discordUsername String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([discordId])
 }
 
 model Team {
@@ -54,7 +70,6 @@ model Team {
   number          String          @unique // e.g., "82855T"
   discordServerId String?         @unique
   discordRoleId   String?         @unique
-  slidesUrl       String?
   members         User[]
   events          Event[]         @relation("TeamEvents")
   notebookLogs    NotebookLog[]
@@ -102,13 +117,21 @@ model NotebookLog {
 }
 
 model Invite {
-  id          String     @id @default(uuid())
-  code        String     @unique // Token slug used in join URL
-  role        InviteRole @default(TEAM_MEMBER)
-  teamId      String?
-  team        Team?      @relation(fields: [teamId], references: [id])
-  maxUses     Int        @default(1)
-  uses        Int        @default(0)
-  expiresAt   DateTime
-  createdAt   DateTime   @default(now())
+  id        String     @id // Invite code used in join URL
+  teamId    String
+  team      Team       @relation(fields: [teamId], references: [id])
+  maxUses   Int        @default(1)
+  usesCount Int        @default(0)
+  expiresAt DateTime
+  createdAt DateTime   @default(now())
+
+  @@index([teamId])
+}
+
+model AuthRateLimit {
+  key       String   @id
+  count     Int      @default(1)
+  expiresAt DateTime
+
+  @@index([expiresAt])
 }
