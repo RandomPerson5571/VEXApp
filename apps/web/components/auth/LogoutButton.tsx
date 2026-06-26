@@ -2,8 +2,8 @@
 
 import { LogOut } from "lucide-react";
 import { useTransition } from "react";
+import { useRouter } from "next/navigation";
 
-import { signOut } from "@/app/(auth)/actions/auth";
 import { createClient } from "@/lib/supabase/client";
 
 type LogoutButtonProps = {
@@ -24,13 +24,14 @@ export function LogoutButton({
   onSignOut,
 }: LogoutButtonProps) {
   const [pending, startTransition] = useTransition();
+  const router = useRouter();
 
   const handleSignOut = () => {
     onSignOut?.();
     startTransition(async () => {
       const supabase = createClient();
       await supabase.auth.signOut();
-      await signOut();
+      router.push("/");
     });
   };
 

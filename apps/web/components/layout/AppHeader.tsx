@@ -7,6 +7,7 @@ import {
   Settings as SettingsIcon,
   ShieldCheck,
   User,
+  Link as LinkIcon,
 } from "lucide-react";
 
 import { LogoutButton } from "@/components/auth/LogoutButton";
@@ -27,10 +28,48 @@ function getInitials(firstName: string, lastName: string): string {
 export function AppHeader() {
   const { profile, team } = useUser();
   const [showUserDropdown, setShowUserDropdown] = useState(false);
+  const [inviteStatus, setInviteStatus] = useState<"idle" | "pending" | "success" | "error">("idle");
+  const [inviteMessage, setInviteMessage] = useState<string | null>(null);
 
   const displayName = `${profile.firstName} ${profile.lastName}`.trim();
   const initials = getInitials(profile.firstName, profile.lastName);
   const roleLabel = formatRole(profile.role);
+
+  async function handleGenerateInvite() {
+    if (!team) {
+      setInviteStatus("error");
+      setInviteMessage("Join a team to generate an invite link.");
+      return;
+    }
+
+    setInviteStatus("pending");
+    setInviteMessage(null);
+
+    try {
+      const response = await fetch("/api/auth/create-invite", {
+        method: "POST",
+      });
+
+      const payload = (await response.json()) as { inviteId?: string; error?: string };
+
+      if (!response.ok || !payload.inviteId) {
+        throw new Error(payload.error ?? "Unable to generate invite link.");
+      }
+
+      const inviteUrl = `${window.location.origin}/join/${payload.inviteId}`;
+      await navigator.clipboard.writeText(inviteUrl);
+
+      setInviteStatus("success");
+      setInviteMessage("Invite link copied to clipboard.");
+    } catch (error) {
+      setInviteStatus("error");
+      setInviteMessage(
+        error instanceof Error
+          ? error.message
+          : "Unable to generate invite link.",
+      );
+    }
+  }
 
   return (
     <header className="h-16 border-b border-slate-900/60 bg-[#070b13] flex items-center justify-between px-6 select-none font-sans z-30">
@@ -141,6 +180,20 @@ export function AppHeader() {
                   <User className="h-4.5 w-4.5 text-slate-500" />
                   Personal Profile
                 </Link>
+                <button
+                  type="button"
+                  disabled={inviteStatus === "pending"}
+                  onClick={handleGenerateInvite}
+                  className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg hover:bg-slate-900/60 text-slate-300 font-semibold text-left"
+                >
+                  <LinkIcon className="h-4.5 w-4.5 text-slate-500" />
+                  {inviteStatus === "pending" ? "Generating invite…" : "Invite"}
+                </button>
+                {inviteMessage ? (
+                  <div className="px-2.5 py-2 text-[10px] font-semibold leading-snug text-slate-400">
+                    {inviteMessage}
+                  </div>
+                ) : null}
                 <Link
                   href="/members"
                   className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg hover:bg-slate-900/60 text-slate-300 font-semibold"
