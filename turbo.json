@@ -35,13 +35,17 @@
         "dependsOn": ["^build", "db:generate"],
         "outputs": []
       },
+      "test": {
+        "dependsOn": ["^build", "db:generate"],
+        "outputs": []
+      },
       "clean": {
         "cache": false
       },
       "db:generate": {
         "cache": true,
         "inputs": ["prisma/schema.prisma"],
-        "outputs": ["node_modules/.prisma/**"]
+        "outputs": ["generated/prisma/**"]
       },
       "db:migrate": {
         "cache": false

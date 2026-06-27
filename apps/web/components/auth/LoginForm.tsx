@@ -160,6 +160,9 @@ export function LoginForm({
           <Image src={DiscordIconComponent} alt="Discord" width={20} height={20} />
           {discordPending ? "Redirecting to Discord..." : "Continue with Discord"}
         </button>
+        <p className="mt-2 text-center text-[10px] font-medium text-slate-500 leading-relaxed">
+          For existing linked accounts only. New members need a team invite link.
+        </p>
       </form>
 
       <div className="mt-6 text-center">

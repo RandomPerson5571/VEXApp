@@ -4,6 +4,7 @@ export type {
   Invite,
   Folder,
   NotebookLog,
+  Prisma,
   Team,
   User,
 } from "../generated/prisma/index.js";
@@ -13,5 +14,3 @@ export type {
   EventType,
   UserRole,
 } from "../generated/prisma/index.js";
-
-export { Prisma } from "../generated/prisma/index.js";

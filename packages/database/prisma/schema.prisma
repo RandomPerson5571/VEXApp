@@ -117,15 +117,18 @@ model NotebookLog {
 }
 
 model Invite {
-  id        String     @id // Invite code used in join URL
-  teamId    String
-  team      Team       @relation(fields: [teamId], references: [id])
-  maxUses   Int        @default(1)
-  usesCount Int        @default(0)
-  expiresAt DateTime
-  createdAt DateTime   @default(now())
+  id               String    @id // Invite code used in join URL
+  teamId           String
+  team             Team      @relation(fields: [teamId], references: [id])
+  maxUses          Int       @default(1)
+  usesCount        Int       @default(0)
+  expiresAt        DateTime
+  reservedByUserId String?
+  reservedAt       DateTime?
+  createdAt        DateTime  @default(now())
 
   @@index([teamId])
+  @@index([reservedByUserId])
 }
 
 model AuthRateLimit {

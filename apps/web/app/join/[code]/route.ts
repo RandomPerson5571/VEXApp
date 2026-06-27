@@ -1,7 +1,12 @@
 import { prisma } from "@stlvex/database";
 import { NextResponse } from "next/server";
 
-import { INVITE_COOKIE, isInviteUsable } from "@/lib/auth/invite";
+import {
+  clearInviteCookieFromResponse,
+  getInviteCookieMaxAgeSeconds,
+  getInviteJoinFailureReason,
+  INVITE_COOKIE,
+} from "@/lib/auth/invite";
 import { getRequestClientIp } from "@/lib/security/client-ip";
 import {
   consumeRateLimit,
@@ -26,29 +31,42 @@ export async function GET(
 
   const { code } = await params;
   const requestUrl = new URL(request.url);
-  const signupUrl = new URL("/signup", requestUrl.origin);
+  const secure = requestUrl.protocol === "https:";
   const invite = await prisma.invite.findUnique({
     where: { id: code },
-    select: { id: true, expiresAt: true, usesCount: true, maxUses: true },
+    select: {
+      id: true,
+      expiresAt: true,
+      usesCount: true,
+      maxUses: true,
+      reservedByUserId: true,
+      reservedAt: true,
+    },
   });
 
-  if (!invite || !isInviteUsable(invite)) {
-    signupUrl.searchParams.set("message", "Invite code is invalid or expired.");
-    return NextResponse.redirect(signupUrl);
+  const failureReason = getInviteJoinFailureReason(invite);
+
+  if (failureReason) {
+    const invalidUrl = new URL("/invite-invalid", requestUrl.origin);
+    invalidUrl.searchParams.set("reason", failureReason);
+
+    return clearInviteCookieFromResponse(
+      NextResponse.redirect(invalidUrl),
+      secure,
+    );
   }
 
-  signupUrl.searchParams.set("redirectTo", "/onboarding");
-  signupUrl.searchParams.set("message", "Invite saved. Finish your profile.");
+  const onboardingUrl = new URL("/onboarding", requestUrl.origin);
+  const response = NextResponse.redirect(onboardingUrl);
 
-  const response = NextResponse.redirect(signupUrl);
   response.cookies.set({
     name: INVITE_COOKIE,
-    value: invite.id,
+    value: invite!.id,
     httpOnly: true,
     sameSite: "lax",
-    secure: requestUrl.protocol === "https:",
+    secure,
     path: "/",
-    maxAge: 60 * 60 * 24 * 7,
+    maxAge: getInviteCookieMaxAgeSeconds(invite!.expiresAt),
   });
 
   return response;

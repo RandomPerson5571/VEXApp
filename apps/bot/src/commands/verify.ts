@@ -1,5 +1,6 @@
-import { prisma, type Prisma } from "@stlvex/database";
+import { findUserByDiscordId } from "@stlvex/database";
 import { SlashCommandBuilder } from "discord.js";
+import { config } from "../config.js";
 import type { SlashCommand } from "../types.js";
 
 const verify: SlashCommand = {
@@ -17,13 +18,7 @@ const verify: SlashCommand = {
 
     const discordId = interaction.user.id;
 
-    const dbUser = await prisma.user.findUnique({
-      where: { discordId },
-      include: { team: true },
-    });
-
-    type VerifiedUser = Prisma.UserGetPayload<{ include: { team: true } }>;
-    const user: VerifiedUser | null = dbUser;
+    const user = await findUserByDiscordId(discordId);
 
     if (!user) {
       await interaction.reply({
@@ -44,8 +39,6 @@ const verify: SlashCommand = {
     const fullName = `${user.firstName} ${user.lastName}`.trim();
     const nickname = `${fullName} | ${user.team.number}`.slice(0, 32);
 
-    const generalMemberRoleId = process.env.GENERAL_MEMBER_ROLE_ID;
-
     try {
       const member = await interaction.guild.members.fetch(interaction.user.id);
       await member.setNickname(nickname, "Verified user sync");
@@ -54,12 +47,7 @@ const verify: SlashCommand = {
       }
 
       await member.roles.add(user.team.discordRoleId, "Verified user sync");
-
-      if(!generalMemberRoleId) {
-        throw new Error("Missing GENERAL_MEMBER_ROLE_ID environment variable");
-      }
-      
-      await member.roles.add(generalMemberRoleId, "Verified user sync");
+      await member.roles.add(config.generalMemberRoleId, "Verified user sync");
 
       await interaction.reply({
         content: `Verified. Your nickname is now: ${nickname}`,

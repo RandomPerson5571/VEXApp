@@ -1,5 +1,5 @@
 import type { UserContextValue } from "@/components/providers/UserProvider";
-import type { User, UserRole } from "@/lib/supabase/wrappers/types";
+import type { User, UserRole } from "@stlvex/database/types";
 
 export type TeamRole = "TEAM_LEADER" | "MEMBER";
 export type GlobalPermission = {

@@ -5,8 +5,11 @@ import { redirect } from "next/navigation";
 import { getSiteUrl } from "@/app/(auth)/lib/site-url";
 import { verifyEmailCredentialIdentity } from "@/lib/auth/identity";
 import {
+  getInviteByCode,
+  getInviteJoinFailureReason,
   getValidInviteFromCookies,
   INVITE_REQUIRED_MESSAGE,
+  type ValidInvite,
 } from "@/lib/auth/invite";
 import { getSafeRedirectPath } from "@/lib/auth/redirect";
 import { createClient } from "@/lib/supabase/server";
@@ -31,6 +34,42 @@ async function shouldOnboard(userId: string): Promise<boolean> {
   });
 
   return !profile;
+}
+
+async function revalidateSignupInvite(): Promise<
+  { ok: true; invite: ValidInvite } | { ok: false; error: string }
+> {
+  const invite = await getValidInviteFromCookies();
+
+  if (!invite) {
+    return { ok: false, error: INVITE_REQUIRED_MESSAGE };
+  }
+
+  const freshInvite = await getInviteByCode(invite.id);
+
+  if (freshInvite) {
+    return { ok: true, invite: freshInvite };
+  }
+
+  const rawInvite = await prisma.invite.findUnique({
+    where: { id: invite.id },
+    select: {
+      expiresAt: true,
+      usesCount: true,
+      maxUses: true,
+      reservedByUserId: true,
+      reservedAt: true,
+    },
+  });
+
+  if (getInviteJoinFailureReason(rawInvite) === "reserved") {
+    return {
+      ok: false,
+      error: "This invite is currently reserved by another user.",
+    };
+  }
+
+  return { ok: false, error: INVITE_REQUIRED_MESSAGE };
 }
 
 export async function signInWithCredentials(
@@ -76,7 +115,7 @@ export async function signInWithCredentials(
   }
 
   if (await shouldOnboard(user.id)) {
-    const invite = await getValidInviteFromCookies();
+    const invite = await getValidInviteFromCookies(user.id);
 
     if (!invite) {
       await supabase.auth.signOut();
@@ -97,10 +136,16 @@ export async function signInWithDiscord(
   const supabase = await createClient();
   const siteUrl = await getSiteUrl();
 
+  // Login flow: no invite required upfront. Existing profiles proceed at callback;
+  // new users without an invite are signed out in the callback.
+  const callbackUrl = new URL("/auth/callback", siteUrl);
+  callbackUrl.searchParams.set("next", redirectTo);
+  callbackUrl.searchParams.set("flow", "login");
+
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: "discord",
     options: {
-      redirectTo: `${siteUrl}/auth/callback?next=${encodeURIComponent(redirectTo)}`,
+      redirectTo: callbackUrl.toString(),
     },
   });
 
@@ -119,11 +164,13 @@ export async function signUpWithCredentials(
   _prevState: AuthState,
   formData: FormData,
 ): Promise<AuthState> {
-  const invite = await getValidInviteFromCookies();
+  const inviteResult = await revalidateSignupInvite();
 
-  if (!invite) {
-    return { error: INVITE_REQUIRED_MESSAGE };
+  if (!inviteResult.ok) {
+    return { error: inviteResult.error };
   }
+
+  const invite = inviteResult.invite;
 
   const email = formData.get("email");
   const password = formData.get("password");
@@ -147,15 +194,13 @@ export async function signUpWithCredentials(
 
   const supabase = await createClient();
   const siteUrl = await getSiteUrl();
-  const emailRedirectTo = `${siteUrl}/auth/callback?next=${encodeURIComponent(
-    redirectTo,
-  )}`;
 
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
     options: {
-      emailRedirectTo,
+      data: { invite_code: invite.id },
+      emailRedirectTo: `${siteUrl}/auth/callback?next=/onboarding`,
     },
   });
 
@@ -174,9 +219,9 @@ export async function signUpWithCredentials(
   }
 
   redirect(
-    `/login?message=${encodeURIComponent(
+    `/onboarding?message=${encodeURIComponent(
       "Check your email to confirm your account.",
-    )}&redirectTo=${encodeURIComponent(redirectTo)}`,
+    )}&next=${encodeURIComponent(redirectTo)}`,
   );
 }
 
@@ -184,13 +229,36 @@ export async function signUpWithDiscord(
   _prevState: AuthState,
   formData: FormData,
 ): Promise<AuthState> {
-  const invite = await getValidInviteFromCookies();
+  const inviteResult = await revalidateSignupInvite();
 
-  if (!invite) {
-    return { error: INVITE_REQUIRED_MESSAGE };
+  if (!inviteResult.ok) {
+    return { error: inviteResult.error };
   }
 
-  return signInWithDiscord(_prevState, formData);
+  const invite = inviteResult.invite;
+  const supabase = await createClient();
+  const siteUrl = await getSiteUrl();
+
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: "discord",
+    options: {
+      redirectTo: `${siteUrl}/auth/callback?next=/onboarding`,
+      data: { invite_code: invite.id },
+    } as {
+      redirectTo: string;
+      data: { invite_code: string };
+    },
+  });
+
+  if (error) {
+    return { error: error.message };
+  }
+
+  if (!data.url) {
+    return { error: "Discord sign-in did not return a login URL." };
+  }
+
+  redirect(data.url);
 }
 
 export async function signOut() {

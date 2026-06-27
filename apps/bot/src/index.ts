@@ -4,31 +4,6 @@ import { config } from "./config.js";
 import { loadCommands, loadEvents } from "./loaders.js";
 import type { BotClient } from "./types.js";
 import { srcDirectory } from "./utils/paths.js";
-import { REST, Routes } from "discord.js";
-
-
-
-const commandsDir = path.join(srcDirectory, "commands");
-const loaded = await loadCommands(commandsDir);
-
-// Convert your command structures into JSON data Discord understands
-const commandsJSON = Array.from(loaded.values()).map(cmd => cmd.data.toJSON());
-
-const rest = new REST({ version: "10" }).setToken(config.token);
-
-try {
-  console.log("Started refreshing application (/) commands.");
-
-  // For instant testing, deploy to a specific test server (Guild)
-  await rest.put(
-    Routes.applicationCommands(config.clientId),
-    { body: commandsJSON }
-  );
-
-  console.log("Successfully reloaded application (/) commands.");
-} catch (error) {
-  console.error(error);
-}
 
 // Instantiated outside the function so process event listeners can access it
 const client = new Client({

@@ -4,10 +4,11 @@
   "description": "VEX STL server Discord bot with slash commands and event handlers",
   "main": "src/index.ts",
   "scripts": {
+    "predev": "tsx src/deploy-commands.ts",
     "dev": "tsx watch src/index.ts",
     "start": "tsx src/index.ts",
     "register:commands": "tsx src/deploy-commands.ts",
-    "typecheck": "tsc --noEmit"
+    "check-types": "tsc --noEmit"
   },
   "keywords": [],
   "author": "",

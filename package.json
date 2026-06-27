@@ -5,23 +5,16 @@
   "main": "index.js",
   "packageManager": "pnpm@11.8.0",
   "scripts": {
-    "dev": "turbo run dev",
+    "dev": "turbo run dev --filter=!./apps/api-server",
     "dev:web": "turbo run dev --filter=web",
     "dev:bot": "turbo run dev --filter=bot",
-
     "lint": "turbo run lint",
     "check-types": "turbo run check-types",
     "format": "prettier --write \"**/*.{ts,tsx,md,json}\"",
-
-    "supabase:start": "supabase start",
-    "supabase:stop": "supabase stop",
-    "supabase:status": "supabase status",
-    "supabase:deploy": "supabase functions deploy",
-
+    "test": "turbo run test --filter=web",
     "db:generate": "turbo run db:generate",
     "db:migrate": "turbo run db:migrate --filter=@stlvex/database",
     "db:push": "turbo run db:push --filter=@stlvex/database",
-
     "clean": "turbo run clean && rimraf node_modules"
   },
   "keywords": [],
@@ -36,7 +29,12 @@
   },
   "type": "module",
   "devDependencies": {
+    "prettier": "^3.8.1",
+    "rimraf": "^6.1.3",
     "supabase": "^2.107.0",
     "turbo": "^2.9.18"
+  },
+  "dependencies": {
+    "skills": "^1.5.13"
   }
 }
