@@ -31,8 +31,9 @@ export function SignupForm({
   const activeError = error ?? discordError;
 
   return (
-    <div className="w-full max-w-md rounded-2xl bg-[#090e18]/80 border border-slate-900 shadow-2xl p-8 backdrop-blur-md relative">
-      <div className="flex flex-col items-center gap-2 mb-8 text-center">
+    <div className="w-full max-w-md">
+      <div className="w-full max-w-md rounded-2xl bg-[#090e18]/80 border border-slate-900 shadow-2xl p-8 backdrop-blur-md relative">
+        <div className="flex flex-col items-center gap-2 mb-8 text-center">
         <STLRoboticsLogoComponent width={100} height={100} />
         <h2 className="text-xl font-bold tracking-tight text-white mt-1">
           Create your account
@@ -189,20 +190,21 @@ export function SignupForm({
         </button>
       </form>
 
-      <div className="mt-6 text-center">
-        <span className="text-[11px] text-slate-500 font-semibold">
-          Already have an account?{" "}
-          <Link
-            href={
-              redirectTo
-                ? `/login?redirectTo=${encodeURIComponent(redirectTo)}`
-                : "/login"
-            }
-            className="text-blue-500 hover:underline font-bold"
-          >
-            Log in
-          </Link>
-        </span>
+        <div className="mt-6 text-center">
+          <span className="text-[11px] text-slate-500 font-semibold">
+            Already have an account?{" "}
+            <Link
+              href={
+                redirectTo
+                  ? `/login?redirectTo=${encodeURIComponent(redirectTo)}`
+                  : "/login"
+              }
+              className="text-blue-500 hover:underline font-bold"
+            >
+              Log in
+            </Link>
+          </span>
+        </div>
       </div>
     </div>
   );
