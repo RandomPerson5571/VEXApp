@@ -42,7 +42,7 @@ export default async function AdminPage() {
   ]);
 
   return (
-    <div className="flex-1 overflow-y-auto px-8 py-6">
+    <div className="admin-scroll flex-1 overflow-y-auto overflow-x-hidden px-8 py-6">
       <div className="mb-6">
         <h1 className="text-2xl font-black tracking-tight text-slate-100">
           Platform administration

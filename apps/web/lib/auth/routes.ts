@@ -34,6 +34,7 @@ export function isPublicRoute(pathname: string): boolean {
   return (
     pathname === "/" ||
     pathname === "/invite-invalid" ||
+    pathname === "/update-password" ||
     pathname.startsWith("/join/") ||
     pathname.startsWith("/auth/callback") ||
     isAuthRoute(pathname)

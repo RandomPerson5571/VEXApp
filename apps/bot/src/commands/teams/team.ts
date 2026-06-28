@@ -1,6 +1,6 @@
 import { prisma, type Prisma } from "@stlvex/database";
 import { SlashCommandBuilder, EmbedBuilder, inlineCode, userMention, roleMention } from "discord.js";
-import type { SlashCommand } from "../types.js";
+import type { SlashCommand } from "../../types.js";
 
 export const data = new SlashCommandBuilder()
   .setName("team")
@@ -37,7 +37,7 @@ const verify: SlashCommand = {
 
     if (!dbUser) {
       await interaction.editReply({
-        content: `❌ No matching account was found for ${targetUser}. Ask a team lead or admin to link this Discord ID first.`,
+        content: `❌ No matching account was found for ${targetUser}. Please link your discord account first.`,
       });
       return;
     }
@@ -56,7 +56,7 @@ const verify: SlashCommand = {
 
     // Format the list of team members into dynamic mentions or standard names
     const formattedRoster = teamMembers.map((member) => {
-      return member.discordId ? userMention(member.discordId) : `• ${member.firstName + " " + member.lastName || "Unknown User"}`;
+      return member.discordId ? userMention(member.discordId) : `• ${member.firstName + " " + member.lastName + " (Unverified)" || "Unknown User"}`;
     }).join("\n") || "*No members assigned*";
 
     // Build a pretty rich embed layout

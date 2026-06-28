@@ -1,9 +1,14 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { Building2, Users } from "lucide-react";
 
 import { AdminTeamManagementTable } from "./AdminTeamManagementTable";
 import { AdminUserManagementTable } from "./AdminUserManagementTable";
+import {
+  AdminErrorAlert,
+  AdminTabSwitcher,
+} from "./AdminPanelPrimitives";
 import {
   sortTeams,
   sortUsersByTeam,
@@ -26,6 +31,11 @@ type AdminUserPermissionsTableProps = {
 
 type AdminTab = "users" | "teams";
 
+const ADMIN_TABS = [
+  { id: "users" as const, label: "Users", icon: Users },
+  { id: "teams" as const, label: "Teams", icon: Building2 },
+];
+
 export function AdminUserPermissionsTable({
   users: initialUsers,
   teams: initialTeams,
@@ -37,6 +47,16 @@ export function AdminUserPermissionsTable({
   const [error, setError] = useState<string | null>(null);
 
   const teamOptions = useMemo(() => teams.map(toTeamOption), [teams]);
+
+  const tabDescription =
+    activeTab === "users"
+      ? "Edit user profiles, team assignments, and platform administrator access."
+      : "Create teams and manage team identity and Discord integration settings.";
+
+  function handleTabChange(tab: AdminTab) {
+    setError(null);
+    setActiveTab(tab);
+  }
 
   function handleTeamUpdated(updatedTeam: AdminTeamRow) {
     const option = toTeamOption(updatedTeam);
@@ -61,67 +81,66 @@ export function AdminUserPermissionsTable({
   }
 
   return (
-    <div className="rounded-2xl border border-slate-900 bg-[#090e18]/80 p-6 shadow-md">
-      <div className="mb-5 flex flex-col gap-4 border-b border-slate-900 pb-3.5 sm:flex-row sm:items-end sm:justify-between">
+    <section className="relative rounded-2xl border border-slate-800/80 bg-[#090e18]/80 p-6 shadow-lg shadow-black/20 backdrop-blur-sm">
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 overflow-hidden rounded-2xl"
+      >
+        <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-blue-500/35 to-transparent" />
+        <div
+          className="absolute inset-0 opacity-[0.03] mix-blend-overlay"
+          style={{
+            backgroundImage:
+              "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")",
+          }}
+        />
+      </div>
+
+      <div className="relative mb-5 flex flex-col gap-4 border-b border-slate-800/80 pb-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h2 className="text-sm font-black uppercase tracking-wide text-slate-200">
+          <p className="text-[10.5px] font-black uppercase tracking-widest text-slate-500">
+            Control plane
+          </p>
+          <h2 className="mt-1 text-sm font-black uppercase tracking-wide text-slate-200">
             Platform administration
           </h2>
-          <p className="mt-0.5 text-[11px] font-semibold text-slate-500">
-            {activeTab === "users"
-              ? "Edit user profiles, team assignments, and platform administrator access."
-              : "Create teams and manage team identity and Discord integration settings."}
+          <p className="mt-1 max-w-xl text-xs font-medium leading-relaxed text-slate-500">
+            {tabDescription}
           </p>
         </div>
 
-        <div className="flex items-center gap-1 self-start rounded-lg border border-slate-900 bg-slate-950 p-1">
-          <button
-            type="button"
-            onClick={() => setActiveTab("users")}
-            className={`cursor-pointer rounded px-3 py-1 text-xs font-bold transition ${
-              activeTab === "users"
-                ? "bg-blue-600 text-white shadow"
-                : "text-slate-400 hover:text-slate-200"
-            }`}
-          >
-            Users
-          </button>
-          <button
-            type="button"
-            onClick={() => setActiveTab("teams")}
-            className={`cursor-pointer rounded px-3 py-1 text-xs font-bold transition ${
-              activeTab === "teams"
-                ? "bg-blue-600 text-white shadow"
-                : "text-slate-400 hover:text-slate-200"
-            }`}
-          >
-            Teams
-          </button>
-        </div>
+        <AdminTabSwitcher
+          tabs={ADMIN_TABS}
+          active={activeTab}
+          onChange={handleTabChange}
+        />
       </div>
 
       {error ? (
-        <p className="mb-4 rounded-lg border border-red-500/20 bg-red-500/10 px-3 py-2 text-xs font-semibold text-red-400">
-          {error}
-        </p>
+        <AdminErrorAlert message={error} onDismiss={() => setError(null)} />
       ) : null}
 
-      {activeTab === "users" ? (
-        <AdminUserManagementTable
-          users={users}
-          teamOptions={teamOptions}
-          currentUserId={currentUserId}
-          onUsersChange={setUsers}
-          onError={setError}
-        />
-      ) : (
-        <AdminTeamManagementTable
-          teams={teams}
-          onTeamCreated={handleTeamCreated}
-          onTeamUpdated={handleTeamUpdated}
-          onError={setError}
-        />
-      )}
-    </div>
+      <div
+        key={activeTab}
+        className="relative motion-safe:animate-in motion-safe:fade-in-0 motion-safe:slide-in-from-bottom-2 motion-safe:duration-300 motion-reduce:animate-none"
+      >
+        {activeTab === "users" ? (
+          <AdminUserManagementTable
+            users={users}
+            teamOptions={teamOptions}
+            currentUserId={currentUserId}
+            onUsersChange={setUsers}
+            onError={setError}
+          />
+        ) : (
+          <AdminTeamManagementTable
+            teams={teams}
+            onTeamCreated={handleTeamCreated}
+            onTeamUpdated={handleTeamUpdated}
+            onError={setError}
+          />
+        )}
+      </div>
+    </section>
   );
 }

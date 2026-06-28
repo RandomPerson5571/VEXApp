@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   Calendar,
+  ClipboardList,
   FileCode,
   LayoutDashboard,
   Package,
@@ -11,7 +12,6 @@ import {
   ShieldCheck,
   Swords,
   Users2,
-  Wrench,
 } from "lucide-react";
 import { useOptionalUser } from "@/components/providers/UserProvider";
 import { isGlobalAdmin } from "@/lib/auth/auth-guards";
@@ -20,13 +20,10 @@ import STLRoboticsLogoComponent from "../Logo";
 
 const menuItems: SidebarItem[] = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/matches", label: "Matches", icon: Swords },
-  // { href: "/scouting", label: "Scouting", icon: Search, badge: "New" },
-  { href: "/build-logs", label: "Build Logs", icon: Wrench },
   { href: "/inventory", label: "Inventory", icon: Package },
   { href: "/calendar", label: "Calendar", icon: Calendar },
+  { href: "/task-list", label: "Task List", icon: ClipboardList },
   { href: "/documents", label: "Documents", icon: FileCode },
-//  { href: "/media", label: "Media", icon: Image },
   { href: "/team-management", label: "Members", icon: Users2 },
   { href: "/settings", label: "Settings", icon: Settings },
 ];

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-import { syncDiscordIdToProfile } from "@/lib/auth/identity";
+import { syncDiscordIdToProfile, resolveAuthUserWithIdentities } from "@/lib/auth/identity";
 import { createClient } from "@/lib/supabase/server";
 
 export async function POST() {
@@ -13,7 +13,9 @@ export async function POST() {
     return NextResponse.json({ error: "Not authenticated." }, { status: 401 });
   }
 
-  const result = await syncDiscordIdToProfile(user);
+  const result = await syncDiscordIdToProfile(
+    await resolveAuthUserWithIdentities(supabase, user),
+  );
 
   if (!result.ok) {
     const status =

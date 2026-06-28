@@ -1,6 +1,6 @@
 import { prisma, type Prisma } from "@stlvex/database";
 import { SlashCommandBuilder, EmbedBuilder, inlineCode, time, bold } from "discord.js";
-import type { SlashCommand } from "../types.js";
+import type { SlashCommand } from "../../types.js";
 
 export const data = new SlashCommandBuilder()
   .setName("events")
@@ -72,7 +72,10 @@ const eventsCommand: SlashCommand = {
             id: dbUser.teamId,
           },
         },
-        date: dateFilter,
+        startDate: {
+          gte: dateFilter.gte,
+          lte: dateFilter.lte,
+        },
       },
       orderBy: { startDate: "asc" },
     });

@@ -1,3 +1,5 @@
+import "server-only";
+
 import { prisma } from "@stlvex/database";
 import type { Event } from "@stlvex/database/types";
 

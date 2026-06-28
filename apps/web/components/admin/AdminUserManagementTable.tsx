@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, type ChangeEvent, type FocusEvent } from "react";
+import { useMemo, useState, type ChangeEvent, type CSSProperties, type FocusEvent } from "react";
 import {
   Crown,
   Mail,
@@ -8,13 +8,12 @@ import {
   Shield,
   UserRound,
   Users,
+  X,
 } from "lucide-react";
 
 import type { UserRole } from "@stlvex/database/types";
 import { cn } from "@stlvex/ui";
 
-import { Avatar, AvatarFallback } from "@stlvex/ui/components/avatar";
-import { badgeVariants } from "@stlvex/ui/components/badge";
 import { Input } from "@stlvex/ui/components/input";
 import {
   Select,
@@ -41,6 +40,17 @@ import {
 } from "@stlvex/ui/components/tooltip";
 
 import {
+  AdminEmptyState,
+  AdminStatChip,
+  AdminTableFrame,
+  adminInlineInputClassName,
+  adminSelectContentClassName,
+  adminSelectItemClassName,
+  adminSwitchClassName,
+  adminTableHeadClassName,
+  adminTableRowClassName,
+} from "./AdminPanelPrimitives";
+import {
   formatRole,
   formatTeamLabel,
   sortUsersByTeam,
@@ -51,6 +61,12 @@ import {
 const ROLE_OPTIONS: UserRole[] = ["ADMIN", "TEAM_LEADER", "TEAM_MEMBER"];
 
 const NO_TEAM_VALUE = "__none__";
+
+const ROLE_ACCENT: Record<UserRole, string> = {
+  ADMIN: "text-amber-300",
+  TEAM_LEADER: "text-blue-300",
+  TEAM_MEMBER: "text-slate-300",
+};
 
 type AdminUserManagementTableProps = {
   users: AdminUserRow[];
@@ -99,6 +115,9 @@ export function AdminUserManagementTable({
       return haystack.includes(query);
     });
   }, [searchQuery, sortedUsers]);
+
+  const adminCount = users.filter((user) => user.isAdmin).length;
+  const hasActiveSearch = searchQuery.trim().length > 0;
 
   async function updateUser(
     userId: string,
@@ -204,61 +223,90 @@ export function AdminUserManagementTable({
       <div className="flex flex-col gap-4">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex flex-wrap items-center gap-2">
-            <span
-              className={cn(
-                badgeVariants({ variant: "secondary" }),
-                "inline-flex items-center gap-1.5 px-2.5 py-1",
-              )}
-            >
-              <Users data-icon="inline-start" />
-              {users.length} users
-            </span>
-            <span
-              className={cn(
-                badgeVariants({ variant: "outline" }),
-                "inline-flex items-center gap-1.5 px-2.5 py-1",
-              )}
-            >
-              <Shield data-icon="inline-start" />
-              {users.filter((user) => user.isAdmin).length} platform admins
-            </span>
+            <AdminStatChip
+              icon={Users}
+              label={
+                hasActiveSearch
+                  ? `${filteredUsers.length} of ${users.length} users`
+                  : `${users.length} user${users.length === 1 ? "" : "s"}`
+              }
+              variant="accent"
+            />
+            <AdminStatChip
+              icon={Shield}
+              label={`${adminCount} platform admin${adminCount === 1 ? "" : "s"}`}
+              variant={adminCount > 0 ? "success" : "default"}
+            />
           </div>
 
           <div className="relative w-full sm:max-w-xs">
-            <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
+            <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-slate-500" />
             <Input
               value={searchQuery}
               onChange={(event: ChangeEvent<HTMLInputElement>) =>
                 setSearchQuery(event.target.value)
               }
               placeholder="Search users…"
-              className="pl-9"
+              className={cn(adminInlineInputClassName, "pl-9 pr-9")}
               aria-label="Search users"
             />
+            {hasActiveSearch ? (
+              <button
+                type="button"
+                onClick={() => setSearchQuery("")}
+                className="absolute top-1/2 right-2.5 -translate-y-1/2 rounded-md p-0.5 text-slate-500 transition hover:bg-slate-800/80 hover:text-slate-300"
+                aria-label="Clear search"
+              >
+                <X className="size-3.5" />
+              </button>
+            ) : null}
           </div>
         </div>
 
-        <div className="overflow-hidden rounded-xl border border-border/60 bg-card/40 shadow-sm backdrop-blur-sm">
-          <Table>
+        <AdminTableFrame>
+          <Table className="min-w-[56rem]">
             <TableHeader>
-              <TableRow className="border-border/60 hover:bg-transparent">
-                <TableHead className="w-[14rem]">Member</TableHead>
-                <TableHead className="w-[12rem]">Team</TableHead>
-                <TableHead className="w-[9rem]">First name</TableHead>
-                <TableHead className="w-[9rem]">Last name</TableHead>
-                <TableHead>Email</TableHead>
-                <TableHead className="w-[10rem]">Role</TableHead>
-                <TableHead className="w-[8rem] text-right">Admin</TableHead>
+              <TableRow className="border-slate-800/80 hover:bg-transparent">
+                <TableHead className={cn(adminTableHeadClassName, "w-[14rem]")}>
+                  Member
+                </TableHead>
+                <TableHead className={cn(adminTableHeadClassName, "w-[12rem]")}>
+                  Team
+                </TableHead>
+                <TableHead className={cn(adminTableHeadClassName, "w-[9rem]")}>
+                  First name
+                </TableHead>
+                <TableHead className={cn(adminTableHeadClassName, "w-[9rem]")}>
+                  Last name
+                </TableHead>
+                <TableHead className={adminTableHeadClassName}>Email</TableHead>
+                <TableHead className={cn(adminTableHeadClassName, "w-[10rem]")}>
+                  Role
+                </TableHead>
+                <TableHead className={cn(adminTableHeadClassName, "w-[8rem] text-right")}>
+                  Admin
+                </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredUsers.length === 0 ? (
+              {users.length === 0 ? (
                 <TableRow className="hover:bg-transparent">
-                  <TableCell colSpan={7} className="h-28 text-center">
-                    <div className="flex flex-col items-center gap-2 text-muted-foreground">
-                      <UserRound className="size-8 opacity-40" />
-                      <p className="text-sm font-medium">No users match your search</p>
-                    </div>
+                  <TableCell colSpan={7}>
+                    <AdminEmptyState
+                      icon={Users}
+                      title="No users in the platform"
+                      description="Users will appear here once they sign up and verify their accounts."
+                    />
+                  </TableCell>
+                </TableRow>
+              ) : filteredUsers.length === 0 ? (
+                <TableRow className="hover:bg-transparent">
+                  <TableCell colSpan={7}>
+                    <AdminEmptyState
+                      icon={UserRound}
+                      title="No users match your search"
+                      description="Try a different name, email, team, or role keyword."
+                    />
                   </TableCell>
                 </TableRow>
               ) : (
@@ -270,43 +318,30 @@ export function AdminUserManagementTable({
                   return (
                     <TableRow
                       key={user.id}
-                      className={cn(
-                        "border-border/40 transition-colors",
-                        "animate-in fade-in-0 slide-in-from-bottom-1 fill-mode-backwards duration-300",
-                        isPending && "opacity-70",
-                      )}
-                      style={{ animationDelay: `${index * 35}ms` }}
+                      className={cn(adminTableRowClassName, isPending && "opacity-60")}
+                      style={{ animationDelay: `${index * 35}ms` } as CSSProperties}
                     >
                       <TableCell>
                         <div className="flex items-center gap-3">
-                          <Avatar className="size-9 border border-border/60">
-                            <AvatarFallback className="bg-primary/10 text-xs font-bold text-primary">
-                              {getInitials(user.firstName, user.lastName)}
-                            </AvatarFallback>
-                          </Avatar>
+                          <div
+                            className="flex size-9 shrink-0 items-center justify-center rounded-full border-2 border-slate-800 bg-gradient-to-br from-blue-700 to-indigo-800 text-[10px] font-bold text-white shadow-sm"
+                            aria-hidden
+                          >
+                            {getInitials(user.firstName, user.lastName)}
+                          </div>
                           <div className="min-w-0">
-                            <p className="truncate text-sm font-semibold text-foreground">
+                            <p className="truncate text-sm font-bold text-slate-100">
                               {fullName}
                             </p>
-                            <div className="mt-0.5 flex flex-wrap items-center gap-1.5">
+                            <div className="mt-1 flex flex-wrap items-center gap-1.5">
                               {isSelf ? (
-                                <span
-                                  className={cn(
-                                    badgeVariants({ variant: "secondary" }),
-                                    "inline-flex h-5 items-center px-1.5 text-[10px]",
-                                  )}
-                                >
+                                <span className="inline-flex h-5 items-center rounded-md border border-slate-700/80 bg-slate-900/60 px-1.5 text-[10px] font-bold text-slate-400">
                                   You
                                 </span>
                               ) : null}
                               {user.isAdmin ? (
-                                <span
-                                  className={cn(
-                                    badgeVariants({ variant: "default" }),
-                                    "inline-flex h-5 items-center gap-1 px-1.5 text-[10px]",
-                                  )}
-                                >
-                                  <Crown data-icon="inline-start" />
+                                <span className="inline-flex h-5 items-center gap-1 rounded-md border border-amber-500/25 bg-amber-500/10 px-1.5 text-[10px] font-bold text-amber-300">
+                                  <Crown className="size-3" aria-hidden />
                                   Admin
                                 </span>
                               ) : null}
@@ -317,7 +352,7 @@ export function AdminUserManagementTable({
 
                       <TableCell>
                         {isPending ? (
-                          <Skeleton className="h-9 w-full rounded-md" />
+                          <Skeleton className="h-9 w-full rounded-md bg-slate-800/60" />
                         ) : (
                           <Select
                             value={user.teamId ?? NO_TEAM_VALUE}
@@ -332,13 +367,31 @@ export function AdminUserManagementTable({
                               void updateUser(user.id, { teamId: nextTeamId });
                             }}
                           >
-                            <SelectTrigger className="w-full">
+                            <SelectTrigger
+                              className={cn(
+                                adminInlineInputClassName,
+                                "w-full font-semibold",
+                              )}
+                            >
                               <SelectValue placeholder="Assign team" />
                             </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value={NO_TEAM_VALUE}>No team</SelectItem>
+                            <SelectContent
+                              position="popper"
+                              sideOffset={4}
+                              className={adminSelectContentClassName}
+                            >
+                              <SelectItem
+                                value={NO_TEAM_VALUE}
+                                className={adminSelectItemClassName}
+                              >
+                                No team
+                              </SelectItem>
                               {teamOptions.map((team) => (
-                                <SelectItem key={team.id} value={team.id}>
+                                <SelectItem
+                                  key={team.id}
+                                  value={team.id}
+                                  className={adminSelectItemClassName}
+                                >
                                   {formatTeamLabel(team)}
                                 </SelectItem>
                               ))}
@@ -349,7 +402,7 @@ export function AdminUserManagementTable({
 
                       <TableCell>
                         {isPending ? (
-                          <Skeleton className="h-9 w-full rounded-md" />
+                          <Skeleton className="h-9 w-full rounded-md bg-slate-800/60" />
                         ) : (
                           <Input
                             defaultValue={user.firstName}
@@ -357,7 +410,7 @@ export function AdminUserManagementTable({
                             onBlur={(event: FocusEvent<HTMLInputElement>) =>
                               handleNameBlur(user, "firstName", event.target.value)
                             }
-                            className="h-9"
+                            className={adminInlineInputClassName}
                             aria-label={`First name for ${user.email}`}
                           />
                         )}
@@ -365,7 +418,7 @@ export function AdminUserManagementTable({
 
                       <TableCell>
                         {isPending ? (
-                          <Skeleton className="h-9 w-full rounded-md" />
+                          <Skeleton className="h-9 w-full rounded-md bg-slate-800/60" />
                         ) : (
                           <Input
                             defaultValue={user.lastName}
@@ -373,22 +426,24 @@ export function AdminUserManagementTable({
                             onBlur={(event: FocusEvent<HTMLInputElement>) =>
                               handleNameBlur(user, "lastName", event.target.value)
                             }
-                            className="h-9"
+                            className={adminInlineInputClassName}
                             aria-label={`Last name for ${user.email}`}
                           />
                         )}
                       </TableCell>
 
                       <TableCell>
-                        <div className="flex min-w-[10rem] items-center gap-2 text-muted-foreground">
-                          <Mail className="size-3.5 shrink-0 opacity-70" />
-                          <span className="truncate text-xs font-medium">{user.email}</span>
+                        <div className="flex min-w-[10rem] items-center gap-2 text-slate-400">
+                          <Mail className="size-3.5 shrink-0 opacity-70" aria-hidden />
+                          <span className="truncate text-xs font-semibold">
+                            {user.email}
+                          </span>
                         </div>
                       </TableCell>
 
                       <TableCell>
                         {isPending ? (
-                          <Skeleton className="h-9 w-full rounded-md" />
+                          <Skeleton className="h-9 w-full rounded-md bg-slate-800/60" />
                         ) : (
                           <Select
                             value={user.role}
@@ -402,12 +457,30 @@ export function AdminUserManagementTable({
                               void updateUser(user.id, { role: nextRole });
                             }}
                           >
-                            <SelectTrigger className="w-full">
+                            <SelectTrigger
+                              className={cn(
+                                adminInlineInputClassName,
+                                "w-full font-bold",
+                                ROLE_ACCENT[user.role],
+                              )}
+                            >
                               <SelectValue />
                             </SelectTrigger>
-                            <SelectContent>
+                            <SelectContent
+                              position="popper"
+                              sideOffset={4}
+                              className={adminSelectContentClassName}
+                            >
                               {ROLE_OPTIONS.map((role) => (
-                                <SelectItem key={role} value={role}>
+                                <SelectItem
+                                  key={role}
+                                  value={role}
+                                  className={cn(
+                                    adminSelectItemClassName,
+                                    "font-semibold",
+                                    ROLE_ACCENT[role],
+                                  )}
+                                >
                                   {formatRole(role)}
                                 </SelectItem>
                               ))}
@@ -419,18 +492,17 @@ export function AdminUserManagementTable({
                       <TableCell className="text-right">
                         <Tooltip>
                           <TooltipTrigger asChild>
-                            <div className="inline-flex items-center justify-end gap-2">
-                              <Switch
-                                checked={user.isAdmin}
-                                disabled={isPending}
-                                onCheckedChange={(checked: boolean) =>
-                                  handleToggle(user.id, checked)
-                                }
-                                aria-label={`${user.isAdmin ? "Revoke" : "Grant"} platform admin access for ${fullName}`}
-                              />
-                            </div>
+                            <Switch
+                              checked={user.isAdmin}
+                              disabled={isPending}
+                              onCheckedChange={(checked: boolean) =>
+                                handleToggle(user.id, checked)
+                              }
+                              className={adminSwitchClassName}
+                              aria-label={`${user.isAdmin ? "Revoke" : "Grant"} platform admin access for ${fullName}`}
+                            />
                           </TooltipTrigger>
-                          <TooltipContent side="left">
+                          <TooltipContent side="left" className="text-xs font-semibold">
                             {user.isAdmin
                               ? "Revoke platform administrator access"
                               : "Grant platform administrator access"}
@@ -443,7 +515,7 @@ export function AdminUserManagementTable({
               )}
             </TableBody>
           </Table>
-        </div>
+        </AdminTableFrame>
       </div>
     </TooltipProvider>
   );

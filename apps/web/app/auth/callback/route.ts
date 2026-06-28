@@ -15,12 +15,28 @@ import {
 import { resolveSameOriginRedirect } from "@/lib/auth/redirect";
 import { lookupUserProfile } from "@/lib/auth/profile";
 import {
+  getDiscordIdFromAuthUser,
   isDiscordAuthUser,
+  resolveAuthUserWithIdentities,
   syncDiscordIdToProfile,
   verifyDiscordAuthIdentity,
   verifySessionIdentity,
 } from "@/lib/auth/identity";
 import { createClient } from "@/lib/supabase/server";
+
+function discordLinkFlowRedirect(
+  origin: string,
+  next: string,
+  error: string,
+): NextResponse {
+  const url = new URL(
+    resolveSameOriginRedirect(next, origin, "/settings/integrations"),
+    origin,
+  );
+  url.searchParams.delete("message");
+  url.searchParams.set("error", error);
+  return NextResponse.redirect(url);
+}
 
 function inviteInvalidRedirect(
   origin: string,
@@ -44,26 +60,36 @@ export async function GET(request: Request) {
   const flow = requestUrl.searchParams.get("flow");
 
   const supabase = await createClient();
+  const isLinkFlow = flow === "link";
+  let authUser = null;
 
   if (code) {
-    const { error } = await supabase.auth.exchangeCodeForSession(code);
+    const { data, error } = await supabase.auth.exchangeCodeForSession(code);
 
     if (error) {
       return NextResponse.redirect(
         `${origin}/login?error=${encodeURIComponent(error.message)}`,
       );
     }
+
+    authUser = data.session?.user ?? null;
   }
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  if (!authUser) {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    authUser = user;
+  }
 
-  if (!user) {
+  if (!authUser) {
     return NextResponse.redirect(`${origin}/login`);
   }
 
-  if (isDiscordAuthUser(user)) {
+  const user = await resolveAuthUserWithIdentities(supabase, authUser);
+  const linkedDiscordId = getDiscordIdFromAuthUser(user);
+
+  if (linkedDiscordId) {
     const existingProfile = await prisma.user.findUnique({
       where: { id: user.id },
       select: { id: true },
@@ -71,20 +97,33 @@ export async function GET(request: Request) {
 
     if (existingProfile) {
       const syncResult = await syncDiscordIdToProfile(user);
-      const discordCheck = await verifyDiscordAuthIdentity(user);
 
-      if (!discordCheck.ok) {
-        const errorMessage =
-          !syncResult.ok &&
-          (syncResult.code === "conflict" || syncResult.code === "mismatch")
-            ? syncResult.error
-            : discordCheck.error;
+      if (isLinkFlow) {
+        if (!syncResult.ok) {
+          return discordLinkFlowRedirect(origin, next, syncResult.error);
+        }
+      } else if (isDiscordAuthUser(user)) {
+        const discordCheck = await verifyDiscordAuthIdentity(user);
 
-        return NextResponse.redirect(
-          `${origin}/settings?error=${encodeURIComponent(errorMessage)}`,
-        );
+        if (!discordCheck.ok) {
+          const errorMessage =
+            !syncResult.ok &&
+            (syncResult.code === "conflict" || syncResult.code === "mismatch")
+              ? syncResult.error
+              : discordCheck.error;
+
+          return NextResponse.redirect(
+            `${origin}/settings/integrations?error=${encodeURIComponent(errorMessage)}`,
+          );
+        }
       }
     }
+  } else if (isLinkFlow) {
+    return discordLinkFlowRedirect(
+      origin,
+      next,
+      "Discord account was not linked. Try connecting again.",
+    );
   }
 
   const sessionCheck = await verifySessionIdentity(user);

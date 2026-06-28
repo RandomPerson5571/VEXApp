@@ -76,6 +76,101 @@ export function getTodayDateStr(): string {
   return toDateStr(now.getFullYear(), now.getMonth(), now.getDate());
 }
 
+export function parseDateStr(dateStr: string): Date {
+  const [year, month, day] = dateStr.split("-").map(Number);
+  return new Date(year, month - 1, day);
+}
+
+export function addDaysToDateStr(dateStr: string, delta: number): string {
+  const date = parseDateStr(dateStr);
+  date.setDate(date.getDate() + delta);
+  return toDateStr(date.getFullYear(), date.getMonth(), date.getDate());
+}
+
+export function getDaysInWeek(anchorDateStr: string): CalendarDayCell[] {
+  const anchor = parseDateStr(anchorDateStr);
+  const startOfWeek = new Date(anchor);
+  startOfWeek.setDate(anchor.getDate() - anchor.getDay());
+
+  const days: CalendarDayCell[] = [];
+  for (let i = 0; i < 7; i++) {
+    const date = new Date(startOfWeek);
+    date.setDate(startOfWeek.getDate() + i);
+    days.push({
+      day: date.getDate(),
+      isCurrentMonth: true,
+      dateStr: toDateStr(date.getFullYear(), date.getMonth(), date.getDate()),
+    });
+  }
+  return days;
+}
+
+export function formatWeekRange(anchorDateStr: string): string {
+  const weekDays = getDaysInWeek(anchorDateStr);
+  const start = parseDateStr(weekDays[0].dateStr);
+  const end = parseDateStr(weekDays[6].dateStr);
+
+  const startLabel = start.toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+  });
+  const endLabel = end.toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+
+  if (start.getMonth() === end.getMonth() && start.getFullYear() === end.getFullYear()) {
+    return `${start.toLocaleDateString("en-US", { month: "long" })} ${start.getDate()} – ${end.getDate()}, ${end.getFullYear()}`;
+  }
+
+  return `${startLabel} – ${endLabel}`;
+}
+
+export function parseTimeToMinutes(timeStr: string): number {
+  const match = timeStr.trim().match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
+  if (!match) return 0;
+
+  let hours = Number.parseInt(match[1], 10);
+  const minutes = Number.parseInt(match[2], 10);
+  const period = match[3].toUpperCase();
+
+  if (period === "PM" && hours !== 12) hours += 12;
+  if (period === "AM" && hours === 12) hours = 0;
+
+  return hours * 60 + minutes;
+}
+
+export const SCHEDULE_HOUR_START = 6;
+export const SCHEDULE_HOUR_END = 22;
+export const SCHEDULE_HOUR_HEIGHT = 52;
+
+export function getScheduleHours(): number[] {
+  const hours: number[] = [];
+  for (let hour = SCHEDULE_HOUR_START; hour <= SCHEDULE_HOUR_END; hour++) {
+    hours.push(hour);
+  }
+  return hours;
+}
+
+export function getEventTimePosition(
+  startTime: string,
+  endTime: string,
+): { top: number; height: number } {
+  const startMinutes = parseTimeToMinutes(startTime);
+  const endMinutes = parseTimeToMinutes(endTime);
+  const gridStart = SCHEDULE_HOUR_START * 60;
+  const gridEnd = (SCHEDULE_HOUR_END + 1) * 60;
+  const totalMinutes = gridEnd - gridStart;
+
+  const clampedStart = Math.max(startMinutes, gridStart);
+  const clampedEnd = Math.min(Math.max(endMinutes, clampedStart + 15), gridEnd);
+  const top = ((clampedStart - gridStart) / totalMinutes) * 100;
+  const height = ((clampedEnd - clampedStart) / totalMinutes) * 100;
+
+  return { top, height: Math.max(height, 2.5) };
+}
+
 export function getEventStyle(type: EventType): EventStyle {
   switch (type) {
     case "championship":

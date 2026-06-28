@@ -1,8 +1,10 @@
 import type {
+  AutocompleteInteraction,
   ChatInputCommandInteraction,
   Client,
   ClientEvents,
   Collection,
+  ModalSubmitInteraction,
   SlashCommandBuilder,
   SlashCommandOptionsOnlyBuilder,
   SlashCommandSubcommandsOnlyBuilder,
@@ -13,6 +15,8 @@ export type SlashCommand = {
     | SlashCommandOptionsOnlyBuilder 
     | SlashCommandSubcommandsOnlyBuilder;
   execute: (interaction: ChatInputCommandInteraction) => Promise<void>;
+  autocomplete?: (interaction: AutocompleteInteraction) => Promise<void>;
+  modalSubmit?: (interaction: ModalSubmitInteraction) => Promise<void>;
 };
 
 export type BotEvent<K extends keyof ClientEvents = keyof ClientEvents> = {

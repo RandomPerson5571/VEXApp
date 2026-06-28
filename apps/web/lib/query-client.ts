@@ -18,8 +18,7 @@ export const queryKeys = {
     detail: (id: string) => ["teams", "detail", id] as const,
   },
   events: {
-    all: ["events"] as const,
-    detail: (id: string) => ["events", "detail", id] as const,
+    forTeam: (teamId: string) => ["events", "team", teamId] as const,
   },
   docs: {
     all: ["docs"] as const,

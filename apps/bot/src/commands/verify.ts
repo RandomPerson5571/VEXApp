@@ -22,7 +22,7 @@ const verify: SlashCommand = {
 
     if (!user) {
       await interaction.reply({
-        content: "No matching account was found. Ask a team lead/admin to link your Discord ID first.",
+        content: "No matching account was found. Please link your discord account first.",
         ephemeral: true,
       });
       return;

@@ -1,17 +1,10 @@
-import type { Event } from "@stlvex/database/types";
+import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 
 import { CalendarView } from "@/components/calendar/CalendarView";
 import { getCurrentUser } from "@/lib/auth/current-user";
-import { listEventsForTeam } from "@/lib/data/events";
-import { toCalendarEvents } from "@/lib/mappers/events";
-
-function todayIsoDate(): string {
-  const now = new Date();
-  const year = now.getFullYear();
-  const month = String(now.getMonth() + 1).padStart(2, "0");
-  const day = String(now.getDate()).padStart(2, "0");
-  return `${year}-${month}-${day}`;
-}
+import { prefetchTeamEvents } from "@/lib/queries/prefetch-team-events";
+import { createQueryClient } from "@/lib/query-client";
+import { getTodayDateStr } from "@/lib/utils/calendar";
 
 export default async function CalendarPage({
   searchParams,
@@ -19,22 +12,16 @@ export default async function CalendarPage({
   searchParams: Promise<{ date?: string }>;
 }) {
   const { date } = await searchParams;
+  const queryClient = createQueryClient();
+  const currentUser = await getCurrentUser();
 
-  let events: Event[] = [];
-
-  try {
-    const currentUser = await getCurrentUser();
-    if (currentUser?.profile.teamId) {
-      events = await listEventsForTeam(currentUser.profile.teamId);
-    }
-  } catch (error) {
-    console.error("Failed to load calendar events:", error);
+  if (currentUser?.profile.teamId) {
+    await prefetchTeamEvents(queryClient, currentUser.profile.teamId);
   }
 
   return (
-    <CalendarView
-      initialEvents={toCalendarEvents(events)}
-      initialSelectedDate={date ?? todayIsoDate()}
-    />
+    <HydrationBoundary state={dehydrate(queryClient)}>
+      <CalendarView initialSelectedDate={date ?? getTodayDateStr()} />
+    </HydrationBoundary>
   );
 }

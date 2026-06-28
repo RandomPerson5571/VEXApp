@@ -6,14 +6,14 @@ import type { BotEvent, SlashCommand } from "./types.js";
 
 const VALID_FILE_REGEX = /\.(ts|js)$/;
 
-async function getModuleFilePaths(dir: string): Promise<string[]> {
+export async function discoverModuleFilePaths(dir: string): Promise<string[]> {
   const entries = await fs.readdir(dir, { withFileTypes: true });
   const files = await Promise.all(
     entries.map(async (entry) => {
       const resolved = path.join(dir, entry.name);
 
       if (entry.isDirectory()) {
-        return getModuleFilePaths(resolved);
+        return discoverModuleFilePaths(resolved);
       }
 
       if (VALID_FILE_REGEX.test(entry.name) && !entry.name.endsWith(".d.ts")) {
@@ -29,7 +29,7 @@ async function getModuleFilePaths(dir: string): Promise<string[]> {
 
 export async function loadCommands(commandsDir: string): Promise<Collection<string, SlashCommand>> {
   const collection = new Collection<string, SlashCommand>();
-  const commandFiles = await getModuleFilePaths(commandsDir);
+  const commandFiles = await discoverModuleFilePaths(commandsDir);
 
   for (const commandFile of commandFiles) {
     const imported = await import(pathToFileURL(commandFile).href);
@@ -46,7 +46,7 @@ export async function loadCommands(commandsDir: string): Promise<Collection<stri
 }
 
 export async function loadEvents(eventsDir: string): Promise<BotEvent[]> {
-  const eventFiles = await getModuleFilePaths(eventsDir);
+  const eventFiles = await discoverModuleFilePaths(eventsDir);
   const events: BotEvent[] = [];
 
   for (const eventFile of eventFiles) {

@@ -1,5 +1,5 @@
 import { Prisma, prisma } from "@stlvex/database";
-import type { User as SupabaseUser } from "@supabase/supabase-js";
+import type { SupabaseClient, User as SupabaseUser } from "@supabase/supabase-js";
 
 export type IdentityVerificationResult =
   | { ok: true }
@@ -12,6 +12,34 @@ export type DiscordSyncResult =
       error: string;
       code: "not_linked" | "no_profile" | "mismatch" | "conflict";
     };
+
+/**
+ * Ensures linked OAuth providers are present on the user object. The JWT-backed
+ * `getUser()` payload can omit `identities` after `linkIdentity`, while the
+ * session returned from `exchangeCodeForSession` usually includes them.
+ */
+export async function resolveAuthUserWithIdentities(
+  supabase: SupabaseClient,
+  user: SupabaseUser,
+): Promise<SupabaseUser> {
+  const sessionIdentities = user.identities ?? [];
+
+  const { data: identityData } = await supabase.auth.getUserIdentities();
+  const fetchedIdentities = identityData?.identities ?? [];
+
+  const identities =
+    fetchedIdentities.length > sessionIdentities.length
+      ? fetchedIdentities
+      : sessionIdentities.length > 0
+        ? sessionIdentities
+        : fetchedIdentities;
+
+  if (identities.length === 0) {
+    return user;
+  }
+
+  return { ...user, identities };
+}
 
 export function getDiscordIdFromAuthUser(user: SupabaseUser): string | null {
   const discordIdentity = user.identities?.find(

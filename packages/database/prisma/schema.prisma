@@ -50,6 +50,9 @@ model User {
   notebookLogs       NotebookLog[]
   createdAt          DateTime           @default(now())
   updatedAt          DateTime           @updatedAt
+
+  createdTasks    Task[]           @relation("TaskCreator")
+  taskAssignments TaskAssignment[]
 }
 
 model DiscordAccount {
@@ -73,6 +76,7 @@ model Team {
   members         User[]
   events          Event[]         @relation("TeamEvents")
   notebookLogs    NotebookLog[]
+  tasks Task[]
   invites         Invite[]
   createdAt       DateTime        @default(now())
 }
@@ -137,4 +141,74 @@ model AuthRateLimit {
   expiresAt DateTime
 
   @@index([expiresAt])
+}
+
+enum TaskType {
+  Hardware
+  Software
+  CAD
+  Other
+}
+
+enum TaskPriority {
+  Low
+  Medium
+  High
+}
+
+enum TaskStatus {
+  NotStarted
+  InProgress
+  Done
+}
+
+// Main Task Model
+model Task {
+  id           String        @id @default(cuid()) // or @default(autoincrement()) depending on your preference
+  title        String
+  description  String?       @db.Text
+  type         TaskType
+  status       TaskStatus    @default(NotStarted)
+  priority     TaskPriority? @default(Medium)
+  dueDate      DateTime?     @map("due_date")
+  
+  // Multi-tenant and Ownership
+  teamId       String        @map("team_id")
+  team         Team          @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  
+  createdBy    String        @map("created_by")
+  creator      User          @relation("TaskCreator", fields: [createdBy], references: [id], onDelete: Restrict)
+
+  // Many-to-Many via Explicit Junction Table
+  assignments  TaskAssignment[]
+
+  // Self-referencing relationship for Sub-tasks
+  parentTaskId String?       @map("parent_task_id")
+  parentTask   Task?         @relation("SubTasks", fields: [parentTaskId], references: [id], onDelete: Cascade)
+  subTasks     Task[]        @relation("SubTasks")
+
+  // Timestamps
+  createdAt    DateTime      @default(now()) @map("created_at")
+  updatedAt    DateTime      @updatedAt @map("updated_at")
+
+  @@index([teamId])
+  @@index([createdBy])
+  @@index([parentTaskId])
+  @@map("tasks")
+}
+
+// Junction Table for Task Assignees
+model TaskAssignment {
+  taskId    String   @map("task_id")
+  userId    String   @map("user_id")
+  assignedAt DateTime @default(now()) @map("assigned_at")
+
+  // Relations
+  task      Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([taskId, userId]) // Composite primary key prevents duplicate assignments
+  @@index([userId])
+  @@index([taskId])
+  @@map("task_assignments")
 }

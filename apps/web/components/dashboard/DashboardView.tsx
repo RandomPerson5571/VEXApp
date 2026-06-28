@@ -1,10 +1,8 @@
 import type {
   Activity,
   BuildStatusComponent,
-  CalendarEvent,
   DashboardSummaryStats,
   MatchRecord,
-  UpcomingMatch,
 } from "@/lib/types/team";
 import { BuildStatusCard } from "./BuildStatusWidget";
 import { DashboardHeader } from "./Header";
@@ -19,8 +17,6 @@ export interface DashboardViewProps {
   buildComponents: BuildStatusComponent[];
   activities: Activity[];
   matches: MatchRecord[];
-  events: CalendarEvent[];
-  upcomingMatches: UpcomingMatch[];
   robotLabel: string;
 }
 
@@ -29,8 +25,6 @@ export function DashboardView({
   buildComponents,
   activities,
   matches,
-  events,
-  upcomingMatches,
   robotLabel,
 }: DashboardViewProps) {
   return (
@@ -46,8 +40,8 @@ export function DashboardView({
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         <MatchPerformanceChart matches={matches} />
         <div className="lg:col-span-4 space-y-6">
-          <TeamCalendarWidget events={events} />
-          <UpcomingMatchesList matches={upcomingMatches} />
+          <TeamCalendarWidget />
+          <UpcomingMatchesList />
         </div>
       </div>
     </div>

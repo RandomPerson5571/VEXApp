@@ -8,10 +8,14 @@
     "dev": "turbo run dev --filter=!./apps/api-server",
     "dev:web": "turbo run dev --filter=web",
     "dev:bot": "turbo run dev --filter=bot",
+
+    "register:commands": "turbo run register:commands --filter=bot",
+
     "lint": "turbo run lint",
     "check-types": "turbo run check-types",
     "format": "prettier --write \"**/*.{ts,tsx,md,json}\"",
     "test": "turbo run test --filter=web",
+
     "db:generate": "turbo run db:generate",
     "db:migrate": "turbo run db:migrate --filter=@stlvex/database",
     "db:push": "turbo run db:push --filter=@stlvex/database",
