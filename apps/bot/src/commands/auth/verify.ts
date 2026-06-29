@@ -1,7 +1,7 @@
 import { findUserByDiscordId } from "@stlvex/database";
 import { SlashCommandBuilder } from "discord.js";
-import { config } from "../config.js";
-import type { SlashCommand } from "../types.js";
+import { config } from "../../config.js";
+import type { SlashCommand } from "../../types.js";
 
 const verify: SlashCommand = {
   data: new SlashCommandBuilder()

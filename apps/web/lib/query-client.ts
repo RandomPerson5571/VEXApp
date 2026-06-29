@@ -31,7 +31,7 @@ export const queryKeys = {
     summary: (teamId: string) => ["dashboard", "summary", teamId] as const,
   },
   docs: {
-    all: ["docs"] as const,
+    tree: (teamId: string) => ["docs", "tree", teamId] as const,
     detail: (id: string) => ["docs", "detail", id] as const,
   },
   notebookLogs: {

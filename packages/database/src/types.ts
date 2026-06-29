@@ -63,3 +63,28 @@ export type TeamInventoryItem = import("../generated/prisma/index.js").Prisma.In
 
 export type TeamInventorySignOut = TeamInventoryItem["signOuts"][number];
 export type TeamInventoryBorrower = TeamInventorySignOut["user"];
+
+export const folderWithDocsInclude = {
+  docs: {
+    select: { id: true, title: true, type: true, folderId: true, createdAt: true },
+    orderBy: { createdAt: "desc" as const },
+  },
+} satisfies import("../generated/prisma/index.js").Prisma.FolderInclude;
+
+/** Folder with document summaries — matches the documentation tree query shape. */
+export type FolderWithDocs = import("../generated/prisma/index.js").Prisma.FolderGetPayload<{
+  include: typeof folderWithDocsInclude;
+}>;
+
+export const documentationDetailInclude = {
+  authors: { select: { id: true, firstName: true, lastName: true } },
+  folder: { select: { id: true, name: true } },
+} satisfies import("../generated/prisma/index.js").Prisma.DocumentationInclude;
+
+/** Full documentation record with authors and folder — matches the detail query shape. */
+export type DocumentationDetail = import("../generated/prisma/index.js").Prisma.DocumentationGetPayload<{
+  include: typeof documentationDetailInclude;
+}>;
+
+export type FolderDocSummary = FolderWithDocs["docs"][number];
+export type DocumentationAuthor = DocumentationDetail["authors"][number];

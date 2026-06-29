@@ -1,9 +1,10 @@
+import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 import { FileText } from "lucide-react";
 
 import { DocsView } from "@/components/documents/DocsView";
 import { getCurrentUser } from "@/lib/auth/current-user";
-import { getLatestDocumentationForTeam } from "@/lib/data/documentation";
-import { toDesignNotebookEntry } from "@/lib/mappers/documentation";
+import { prefetchTeamDocumentation } from "@/lib/queries/prefetch-team-documentation";
+import { createQueryClient } from "@/lib/query-client";
 
 function DocumentsFallback({
   title,
@@ -37,18 +38,12 @@ export default async function DocumentsPage() {
     );
   }
 
-  try {
-    const doc = await getLatestDocumentationForTeam(currentUser.profile.teamId);
+  const queryClient = createQueryClient();
+  await prefetchTeamDocumentation(queryClient, currentUser.profile.teamId);
 
-    return <DocsView notebookEntry={doc ? toDesignNotebookEntry(doc) : null} />;
-  } catch (error) {
-    console.error("Failed to load documentation:", error);
-
-    return (
-      <DocumentsFallback
-        title="Unable to load documents"
-        description="Something went wrong while loading your team's documentation. Please try again later."
-      />
-    );
-  }
+  return (
+    <HydrationBoundary state={dehydrate(queryClient)}>
+      <DocsView />
+    </HydrationBoundary>
+  );
 }

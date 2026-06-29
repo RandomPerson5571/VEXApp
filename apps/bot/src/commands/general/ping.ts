@@ -1,5 +1,5 @@
 import { SlashCommandBuilder } from "discord.js";
-import type { SlashCommand } from "../types.js";
+import type { SlashCommand } from "../../types.js";
 
 const ping: SlashCommand = {
   data: new SlashCommandBuilder().setName("ping").setDescription("Replies with Pong!"),
