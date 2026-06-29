@@ -1,26 +1,35 @@
-import { AlertTriangle, Award, Package, Search, TrendingUp, Wrench } from "lucide-react";
-import type { DashboardSummaryStats } from "@/lib/types/team";
+"use client";
+
+import { AlertTriangle, Award, Calendar, Package, Wrench } from "lucide-react";
+
+import { useDashboardSummary } from "@/lib/hooks/use-dashboard-summary";
 import { SummaryStatCard } from "./Header";
 
-export function SummaryStatsGrid({ stats }: { stats: DashboardSummaryStats }) {
+export function SummaryStatsGrid() {
+  const { data: stats, isLoading } = useDashboardSummary();
+
+  if (!stats) {
+    return (
+      <div
+        className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4.5 mb-7 transition-opacity ${isLoading ? "opacity-50" : "opacity-100"}`}
+      />
+    );
+  }
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4.5 mb-7">
       <SummaryStatCard
-        label="Build Progress"
-        value={`${stats.buildProgress}%`}
-        delta={stats.buildProgressDelta}
-        deltaTone="blue"
-        subtitle="Upcoming trends higher"
+        label="Incomplete Tasks"
+        value={stats.incompleteTasks}
+        subtitle={`${stats.completedTasks} completed`}
         icon={Wrench}
         iconTone="blue"
       />
       <SummaryStatCard
-        label="Matches Scouted"
-        value={stats.matchesScouted}
-        delta={stats.matchesScoutedDelta}
-        deltaTone="green"
-        subtitle="Since last regional"
-        icon={Search}
+        label="Next Event"
+        value={stats.nextEvent}
+        subtitle={stats.nextEventDate}
+        icon={Calendar}
         iconTone="indigo"
       />
       <SummaryStatCard
@@ -41,7 +50,7 @@ export function SummaryStatsGrid({ stats }: { stats: DashboardSummaryStats }) {
         warning={stats.inventoryWarning}
       />
       <SummaryStatCard
-        label="Team Rank (Local)"
+        label="Team Rank"
         value={stats.teamRank}
         delta={stats.teamRankDelta}
         deltaTone="green"

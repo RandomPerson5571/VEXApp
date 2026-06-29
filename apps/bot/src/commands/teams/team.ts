@@ -1,5 +1,5 @@
 import { prisma, type Prisma } from "@stlvex/database";
-import { SlashCommandBuilder, EmbedBuilder, inlineCode, userMention, roleMention } from "discord.js";
+import { SlashCommandBuilder, EmbedBuilder, inlineCode, userMention, roleMention, MessageFlags } from "discord.js";
 import type { SlashCommand } from "../../types.js";
 
 export const data = new SlashCommandBuilder()
@@ -15,16 +15,9 @@ export const data = new SlashCommandBuilder()
 const verify: SlashCommand = {
   data: data,
   async execute(interaction) {
-    if (!interaction.inGuild() || !interaction.guild) {
-      await interaction.reply({
-        content: "This command can only be used in a server.",
-        ephemeral: true,
-      });
-      return;
-    }
 
     // Acknowledge the interaction immediately to prevent timeouts if DB is slow
-    await interaction.deferReply({ ephemeral: true });
+    await interaction.deferReply();
 
     // Fallback to the command executor if no target user is supplied
     const targetUser = interaction.options.getUser("user") || interaction.user;

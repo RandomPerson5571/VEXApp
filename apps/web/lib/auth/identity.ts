@@ -41,23 +41,52 @@ export async function resolveAuthUserWithIdentities(
   return { ...user, identities };
 }
 
+export function isDiscordAuthUser(user: SupabaseUser): boolean {
+  return (
+    user.app_metadata?.provider === "discord" ||
+    user.identities?.some((identity) => identity.provider === "discord") ===
+      true
+  );
+}
+
+function readDiscordIdFromMetadata(user: SupabaseUser): string | null {
+  const providerId = user.user_metadata?.provider_id;
+  if (
+    typeof providerId === "string" &&
+    providerId.length > 0 &&
+    providerId !== user.id
+  ) {
+    return providerId;
+  }
+
+  const sub = user.user_metadata?.sub;
+  if (typeof sub === "string" && sub.length > 0 && sub !== user.id) {
+    return sub;
+  }
+
+  return null;
+}
+
 export function getDiscordIdFromAuthUser(user: SupabaseUser): string | null {
   const discordIdentity = user.identities?.find(
     (identity) => identity.provider === "discord",
   );
 
-  if (discordIdentity?.id) {
-    return discordIdentity.id;
+  if (discordIdentity) {
+    const identitySub = discordIdentity.identity_data?.sub;
+    if (typeof identitySub === "string" && identitySub.length > 0) {
+      return identitySub;
+    }
+
+    if (discordIdentity.id && discordIdentity.id !== user.id) {
+      return discordIdentity.id;
+    }
   }
 
-  const providerId = user.user_metadata?.provider_id;
-  if (typeof providerId === "string" && providerId.length > 0) {
-    return providerId;
-  }
-
-  const sub = user.user_metadata?.sub;
-  if (typeof sub === "string" && sub.length > 0) {
-    return sub;
+  // Email/password accounts also carry `user_metadata.sub` (the Supabase UUID).
+  // Only read provider metadata for Discord-primary sign-in sessions.
+  if (isDiscordAuthUser(user)) {
+    return readDiscordIdFromMetadata(user);
   }
 
   return null;
@@ -115,14 +144,6 @@ async function writeDiscordLink(
   });
 }
 
-export function isDiscordAuthUser(user: SupabaseUser): boolean {
-  return (
-    user.app_metadata?.provider === "discord" ||
-    user.identities?.some((identity) => identity.provider === "discord") ===
-      true
-  );
-}
-
 /**
  * Persists the Discord ID from a verified Supabase OAuth identity onto the
  * user's profile. Never accepts a caller-supplied ID — only provider metadata.
@@ -132,7 +153,7 @@ export async function syncDiscordIdToProfile(
 ): Promise<DiscordSyncResult> {
   const discordId = getDiscordIdFromAuthUser(authUser);
 
-  if (!discordId) {
+  if (!discordId || discordId === authUser.id) {
     return {
       ok: false,
       error: "No Discord identity is linked to this session.",

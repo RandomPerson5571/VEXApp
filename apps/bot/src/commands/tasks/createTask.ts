@@ -1,7 +1,7 @@
 import { findUserByDiscordId, prisma } from "@stlvex/database";
 import type { TaskPriority, TaskType } from "@stlvex/database/types";
 import {
-  ActionRowBuilder,
+  LabelBuilder,
   ModalBuilder,
   TextInputBuilder,
   TextInputStyle,
@@ -63,32 +63,35 @@ function buildCreateTaskModal(taskType: TaskType, priority: TaskPriority): Modal
   return new ModalBuilder()
     .setCustomId(buildModalCustomId(taskType, priority))
     .setTitle("Create Task")
-    .addComponents(
-      new ActionRowBuilder<TextInputBuilder>().addComponents(
-        new TextInputBuilder()
-          .setCustomId("task-title")
-          .setLabel("Title")
-          .setStyle(TextInputStyle.Short)
-          .setRequired(true)
-          .setMaxLength(200),
-      ),
-      new ActionRowBuilder<TextInputBuilder>().addComponents(
-        new TextInputBuilder()
-          .setCustomId("task-description")
-          .setLabel("Description")
-          .setStyle(TextInputStyle.Paragraph)
-          .setRequired(true)
-          .setMaxLength(1000),
-      ),
-      new ActionRowBuilder<TextInputBuilder>().addComponents(
-        new TextInputBuilder()
-          .setCustomId("task-due-date")
-          .setLabel("Due Date & Time (optional)")
-          .setStyle(TextInputStyle.Short)
-          .setPlaceholder(datePlaceholder)
-          .setRequired(false)
-          .setMaxLength(32),
-      ),
+    .addLabelComponents(
+      new LabelBuilder()
+        .setLabel("Title")
+        .setTextInputComponent(
+          new TextInputBuilder()
+            .setCustomId("task-title")
+            .setStyle(TextInputStyle.Short)
+            .setRequired(true)
+            .setMaxLength(200),
+        ),
+      new LabelBuilder()
+        .setLabel("Description")
+        .setTextInputComponent(
+          new TextInputBuilder()
+            .setCustomId("task-description")
+            .setStyle(TextInputStyle.Paragraph)
+            .setRequired(true)
+            .setMaxLength(1000),
+        ),
+      new LabelBuilder()
+        .setLabel("Due Date & Time (optional)")
+        .setTextInputComponent(
+          new TextInputBuilder()
+            .setCustomId("task-due-date")
+            .setStyle(TextInputStyle.Short)
+            .setPlaceholder(datePlaceholder)
+            .setRequired(false)
+            .setMaxLength(32),
+        ),
     );
 }
 

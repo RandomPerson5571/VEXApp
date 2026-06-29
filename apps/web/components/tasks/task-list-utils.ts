@@ -2,8 +2,71 @@ import type {
   TaskListAssignee,
   TaskListSubTask,
   TaskListTask,
+  TaskPriority,
   TaskStatus,
+  TaskType,
 } from "@stlvex/database/types";
+
+export type CreateTaskFormValues = {
+  title: string;
+  description: string;
+  type: TaskType;
+  priority: TaskPriority;
+  dueDate: string;
+  assigneeIds: string[];
+};
+
+type TaskPerson = {
+  id: string;
+  firstName: string;
+  lastName: string;
+};
+
+export function parseDueDateFromForm(dueDate: string): Date | null {
+  if (!dueDate.trim()) return null;
+  return new Date(`${dueDate.trim()}T17:00:00.000Z`);
+}
+
+export function buildLocalTaskFromForm(
+  values: CreateTaskFormValues,
+  options: {
+    teamId: string;
+    creator: TaskPerson;
+    roster: TaskPerson[];
+  },
+): TaskListTask {
+  const now = new Date();
+  const taskId = `local-${crypto.randomUUID()}`;
+  const dueDate = parseDueDateFromForm(values.dueDate);
+
+  const rosterById = new Map(options.roster.map((person) => [person.id, person]));
+  const selectedAssignees = values.assigneeIds
+    .map((id) => rosterById.get(id))
+    .filter((person): person is TaskPerson => person !== undefined);
+
+  return {
+    id: taskId,
+    title: values.title.trim(),
+    description: values.description.trim() || null,
+    type: values.type,
+    status: "NotStarted",
+    priority: values.priority,
+    dueDate,
+    teamId: options.teamId,
+    createdBy: options.creator.id,
+    parentTaskId: null,
+    creator: options.creator,
+    assignments: selectedAssignees.map((user) => ({
+      taskId,
+      userId: user.id,
+      assignedAt: now,
+      user,
+    })),
+    createdAt: now,
+    updatedAt: now,
+    subTasks: [],
+  };
+}
 
 export function getTaskAssignees(
   task: Pick<TaskListTask, "assignments"> | Pick<TaskListSubTask, "assignments">,
@@ -22,10 +85,16 @@ export function formatPersonName(person: {
   return `${person.firstName} ${person.lastName}`;
 }
 
-export function formatDueDate(dueDate: Date | null): string | null {
-  if (!dueDate) return null;
+function toDate(value: Date | string | null): Date | null {
+  if (!value) return null;
+  return value instanceof Date ? value : new Date(value);
+}
 
-  return dueDate.toLocaleDateString(undefined, {
+export function formatDueDate(dueDate: Date | string | null): string | null {
+  const date = toDate(dueDate);
+  if (!date) return null;
+
+  return date.toLocaleDateString(undefined, {
     month: "short",
     day: "numeric",
     year: "numeric",
@@ -33,11 +102,12 @@ export function formatDueDate(dueDate: Date | null): string | null {
 }
 
 export function isOverdue(
-  dueDate: Date | null,
+  dueDate: Date | string | null,
   status: TaskStatus,
 ): boolean {
-  if (!dueDate || status === "Done") return false;
-  return dueDate.getTime() < Date.now();
+  const date = toDate(dueDate);
+  if (!date || status === "Done") return false;
+  return date.getTime() < Date.now();
 }
 
 export function getSubtaskProgress(subTasks: TaskListSubTask[]): {

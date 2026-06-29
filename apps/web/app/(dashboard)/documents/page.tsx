@@ -40,16 +40,7 @@ export default async function DocumentsPage() {
   try {
     const doc = await getLatestDocumentationForTeam(currentUser.profile.teamId);
 
-    if (!doc) {
-      return (
-        <DocumentsFallback
-          title="No documents yet"
-          description="Your team has not published any design notebook entries."
-        />
-      );
-    }
-
-    return <DocsView notebookEntry={toDesignNotebookEntry(doc)} />;
+    return <DocsView notebookEntry={doc ? toDesignNotebookEntry(doc) : null} />;
   } catch (error) {
     console.error("Failed to load documentation:", error);
 

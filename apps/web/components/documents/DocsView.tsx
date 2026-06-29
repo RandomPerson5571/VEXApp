@@ -37,17 +37,19 @@ const TABLE_OF_CONTENTS = [
 ] as const;
 
 export interface DocsViewProps {
-  notebookEntry: DesignNotebookEntry;
+  notebookEntry?: DesignNotebookEntry | null;
 }
 
-export function DocsView({ notebookEntry }: DocsViewProps) {
+export function DocsView({ notebookEntry = null }: DocsViewProps) {
   const [designNotebookOpen, setDesignNotebookOpen] = useState(true);
   const [buildLogsOpen, setBuildLogsOpen] = useState(true);
   const [seasonOpen, setSeasonOpen] = useState(true);
   const [selectedDocId, setSelectedDocId] = useState(ACTIVE_DOC_ID);
   const [activeTocSegment, setActiveTocSegment] = useState("introduction");
 
-  const isActiveDoc = selectedDocId === ACTIVE_DOC_ID;
+  const hasNotebookEntry = notebookEntry != null;
+  const isActiveDoc = hasNotebookEntry && selectedDocId === ACTIVE_DOC_ID;
+  const selectedSeasonDoc = SEASON_DOCS.find((doc) => doc.id === selectedDocId);
 
   const scrollToSection = (sectionId: string) => {
     setActiveTocSegment(sectionId);
@@ -198,15 +200,28 @@ export function DocsView({ notebookEntry }: DocsViewProps) {
       <div className="flex-1 overflow-y-auto px-10 py-8 bg-[#03070e] text-slate-300 dashboard-scroll">
         <div className="text-[11px] font-bold text-slate-500 uppercase tracking-widest flex items-center gap-1.5 mb-2 font-mono">
           <span>Documentation</span>
-          <ChevronRight className="h-3 w-3" />
-          <span>Build Logs</span>
-          <ChevronRight className="h-3 w-3" />
-          <span>Season 2024-2025</span>
-          <ChevronRight className="h-3 w-3 text-blue-500" />
-          <span className="text-blue-500">Week 2: Intake Redesign</span>
+          {selectedSeasonDoc ? (
+            <>
+              <ChevronRight className="h-3 w-3" />
+              <span>Build Logs</span>
+              <ChevronRight className="h-3 w-3" />
+              <span>Season 2024-2025</span>
+              <ChevronRight className="h-3 w-3 text-blue-500" />
+              <span className="text-blue-500">{selectedSeasonDoc.title}</span>
+            </>
+          ) : null}
         </div>
 
-        {!isActiveDoc ? (
+        {!hasNotebookEntry ? (
+          <div className="border border-slate-900 bg-[#090e18]/45 p-12 rounded-2xl text-center max-w-2xl mx-auto my-12 shadow-xl select-none">
+            <FileText className="h-10 w-10 text-slate-500 mx-auto mb-3" />
+            <p className="text-sm font-bold text-slate-300">No documents yet</p>
+            <p className="text-xs text-slate-600 mt-1">
+              Your team has not published any design notebook entries. The directory and outline will populate
+              here once documentation is available.
+            </p>
+          </div>
+        ) : !isActiveDoc ? (
           <div className="border border-slate-900 bg-[#090e18]/45 p-12 rounded-2xl text-center max-w-2xl mx-auto my-12 shadow-xl select-none">
             <FileText className="h-10 w-10 text-slate-500 mx-auto mb-3" />
             <p className="text-sm font-bold text-slate-300">Document is currently archived offline.</p>
@@ -294,10 +309,10 @@ export function DocsView({ notebookEntry }: DocsViewProps) {
               <button
                 key={toc.id}
                 type="button"
-                disabled={!isActiveDoc}
+                disabled={!hasNotebookEntry || !isActiveDoc}
                 onClick={() => scrollToSection(toc.id)}
                 className={`w-full text-left px-2 py-1.5 rounded-md text-[11px] font-semibold leading-normal transition flex items-center gap-1.5 ${
-                  !isActiveDoc
+                  !hasNotebookEntry || !isActiveDoc
                     ? "text-slate-700 cursor-not-allowed"
                     : isSelected
                       ? "bg-blue-600/10 text-blue-400 font-bold border-l border-blue-500 cursor-pointer"

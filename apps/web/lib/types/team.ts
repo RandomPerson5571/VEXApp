@@ -57,10 +57,10 @@ export interface UpcomingMatch {
 }
 
 export interface DashboardSummaryStats {
-  buildProgress: number;
-  buildProgressDelta: string;
-  matchesScouted: number;
-  matchesScoutedDelta: string;
+  incompleteTasks: number;
+  completedTasks: number;
+  nextEvent: string;
+  nextEventDate: string;
   inventoryItems: number;
   inventoryWarning: boolean;
   teamRank: string;

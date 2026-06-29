@@ -58,9 +58,23 @@ export async function GET(request: Request) {
     origin,
   );
   const flow = requestUrl.searchParams.get("flow");
+  const oauthError = requestUrl.searchParams.get("error");
+  const oauthErrorCode = requestUrl.searchParams.get("error_code");
+  const oauthErrorDescription = requestUrl.searchParams.get("error_description");
 
   const supabase = await createClient();
   const isLinkFlow = flow === "link";
+
+  if (isLinkFlow && oauthError) {
+    const message =
+      oauthErrorCode === "identity_already_exists"
+        ? "That Discord account is already linked to another user. Sign in with the account that owns it, or ask a team lead for help."
+        : oauthErrorDescription?.replace(/\+/g, " ") ??
+          oauthError.replace(/\+/g, " ");
+
+    return discordLinkFlowRedirect(origin, next, message);
+  }
+
   let authUser = null;
 
   if (code) {

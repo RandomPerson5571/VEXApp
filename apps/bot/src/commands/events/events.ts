@@ -88,7 +88,7 @@ const eventsCommand: SlashCommand = {
       .setTimestamp();
 
     if (events.length === 0) {
-      embed.setDescription(`📅 No upcoming events found for ${inlineCode(range.toUpperCase())}. You're all clear!`);
+      embed.setDescription(`No upcoming events found for the ${inlineCode(range.toUpperCase())}. You're all clear!`);
       
       await interaction.editReply({ embeds: [embed] });
       return;

@@ -117,10 +117,14 @@ const inviteUsersCommand: SlashCommand = {
       },
     });
 
+    const inviteLink = `${process.env.NEXT_PUBLIC_APP_URL}/join/${invite.id}`;
+
     const embed = new EmbedBuilder()
       .setColor(0x57F287)
       .setTitle("✅ Invite Created")
-      .setDescription(`Created invite ${bold(invite.id)} for team ${inlineCode(targetTeam.teamNumber)}.`)
+      .setDescription(`Created invite for team ${inlineCode(targetTeam.teamNumber)}.`)
+      .setDescription(`Invite link: ${bold(inviteLink)}`)
+      .setDescription(`WARNING: This message will dissapear, please make sure you have copied the invite code and stored it safely.`)
       .addFields(
         {
           name: "Expires",

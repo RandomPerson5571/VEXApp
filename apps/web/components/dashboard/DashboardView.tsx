@@ -1,40 +1,26 @@
-import type {
-  Activity,
-  BuildStatusComponent,
-  DashboardSummaryStats,
-  MatchRecord,
-} from "@/lib/types/team";
-import { BuildStatusCard } from "./BuildStatusWidget";
+import type { MatchRecord } from "@/lib/types/team";
+
 import { DashboardHeader } from "./Header";
 import { MatchPerformanceChart } from "./PerformanceWidget";
-import { RecentActivityFeed } from "./RecentActivityWidget";
 import { SummaryStatsGrid } from "./SummaryWidget";
 import { TeamCalendarWidget } from "./CalendarWidget";
 import { UpcomingMatchesList } from "./MatchesWidget";
+import { InventoryTrackerWidget } from "./InventoryTrackerWidget";
+import { TaskListWidget } from "./TaskListWidget";
 
 export interface DashboardViewProps {
-  stats: DashboardSummaryStats;
-  buildComponents: BuildStatusComponent[];
-  activities: Activity[];
   matches: MatchRecord[];
-  robotLabel: string;
 }
 
-export function DashboardView({
-  stats,
-  buildComponents,
-  activities,
-  matches,
-  robotLabel,
-}: DashboardViewProps) {
+export function DashboardView({ matches }: DashboardViewProps) {
   return (
     <div className="flex-1 overflow-y-auto px-8 py-6 bg-[#03070e] font-sans dashboard-scroll">
       <DashboardHeader />
-      <SummaryStatsGrid stats={stats} />
+      <SummaryStatsGrid />
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-7">
-        <BuildStatusCard components={buildComponents} robotLabel={robotLabel} />
-        <RecentActivityFeed activities={activities} />
+        <TaskListWidget />
+        <InventoryTrackerWidget />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">

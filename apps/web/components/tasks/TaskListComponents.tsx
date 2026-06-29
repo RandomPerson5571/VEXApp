@@ -17,10 +17,12 @@ import type {
   TaskListAssignee,
   TaskListSubTask,
   TaskListTask,
+  TaskStatus,
 } from "@stlvex/database/types";
+import { InlineEdit } from "@/components/InlineEdit";
 import {
   TaskPriorityBadge,
-  TaskStatusBadge,
+  TaskStatusPicker,
   TaskStatusDot,
   TaskTypeBadge,
 } from "./TaskBadges";
@@ -123,9 +125,20 @@ function SubtaskRow({ task }: { task: TaskListSubTask }) {
 type TaskCardProps = {
   task: TaskListTask;
   defaultExpanded?: boolean;
+  onUpdateTitle: (title: string) => Promise<void>;
+  onUpdateDescription: (description: string) => Promise<void>;
+  onUpdateStatus: (status: TaskStatus) => Promise<void>;
+  isStatusUpdating?: boolean;
 };
 
-export function TaskCard({ task, defaultExpanded = false }: TaskCardProps) {
+export function TaskCard({
+  task,
+  defaultExpanded = false,
+  onUpdateTitle,
+  onUpdateDescription,
+  onUpdateStatus,
+  isStatusUpdating = false,
+}: TaskCardProps) {
   const [expanded, setExpanded] = useState(defaultExpanded);
   const dueLabel = formatDueDate(task.dueDate);
   const overdue = isOverdue(task.dueDate, task.status);
@@ -141,18 +154,31 @@ export function TaskCard({ task, defaultExpanded = false }: TaskCardProps) {
             <div className="flex flex-wrap items-center gap-2">
               <TaskTypeBadge type={task.type} />
               <TaskPriorityBadge priority={task.priority} />
-              <TaskStatusBadge status={task.status} />
+              <TaskStatusPicker
+                status={task.status}
+                onStatusChange={onUpdateStatus}
+                disabled={isStatusUpdating}
+              />
             </div>
 
             <h3 className="mt-3 text-lg font-black tracking-tight text-slate-100">
-              {task.title}
+              <InlineEdit
+                value={task.title}
+                placeholder="Task title"
+                onSave={onUpdateTitle}
+                className="text-lg font-black tracking-tight"
+              />
             </h3>
 
-            {task.description ? (
-              <p className="mt-2 max-w-3xl text-sm leading-relaxed text-slate-400">
-                {task.description}
-              </p>
-            ) : null}
+            <div className="mt-2 max-w-3xl">
+              <InlineEdit
+                value={task.description ?? ""}
+                placeholder="Add a description..."
+                allowEmpty
+                onSave={onUpdateDescription}
+                className="text-sm leading-relaxed text-slate-400"
+              />
+            </div>
 
             <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 text-xs">
               <div className="flex items-center gap-2">

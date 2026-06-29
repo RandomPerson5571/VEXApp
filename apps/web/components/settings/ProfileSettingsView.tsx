@@ -228,7 +228,7 @@ export function ProfileSettingsView({
             <button
               type="submit"
               disabled={!isDirty || isSaving}
-              className="px-5 py-2 rounded-lg bg-blue-600 text-white text-xs font-bold tracking-wide transition hover:bg-blue-500 disabled:cursor-not-allowed disabled:bg-blue-600/40 disabled:text-blue-200/70"
+              className="cursor-pointer px-5 py-2 rounded-lg bg-blue-600 text-white text-xs font-bold tracking-wide transition hover:bg-blue-500 disabled:cursor-not-allowed disabled:bg-blue-600/40 disabled:text-blue-200/70"
             >
               {isSaving ? "Saving..." : "Save Changes"}
             </button>
@@ -236,7 +236,7 @@ export function ProfileSettingsView({
               type="button"
               onClick={resetDraft}
               disabled={!isDirty || isSaving}
-              className="px-4 py-2 rounded-lg border border-slate-900 text-xs font-semibold text-slate-400 hover:text-slate-200 hover:border-slate-800 transition disabled:cursor-not-allowed disabled:opacity-50"
+              className="cursor-pointer px-4 py-2 rounded-lg border border-slate-900 text-xs font-semibold text-slate-400 hover:text-slate-200 hover:border-slate-800 transition disabled:cursor-not-allowed disabled:opacity-50"
             >
               Reset
             </button>
@@ -310,7 +310,7 @@ export function ProfileSettingsView({
               </p>
             </div>
             <DeleteAccountButton
-              className="inline-flex items-center gap-2 rounded-lg border border-red-500/25 bg-red-500/10 px-4 py-2 text-xs font-bold text-red-400 hover:bg-red-500/20 hover:text-red-300 transition shrink-0 disabled:cursor-not-allowed disabled:opacity-60"
+              className="cursor-pointer inline-flex items-center gap-2 rounded-lg border border-red-500/25 bg-red-500/10 px-4 py-2 text-xs font-bold text-red-400 hover:bg-red-500/20 hover:text-red-300 transition shrink-0 disabled:cursor-not-allowed disabled:opacity-60"
             />
           </div>
 
@@ -323,7 +323,7 @@ export function ProfileSettingsView({
             </div>
             <LogoutButton
               label="Log Out"
-              className="inline-flex items-center gap-2 rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-2 text-xs font-bold text-red-400 hover:bg-red-500/20 hover:text-red-300 transition shrink-0"
+              className="cursor-pointer inline-flex items-center gap-2 rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-2 text-xs font-bold text-red-400 hover:bg-red-500/20 hover:text-red-300 transition shrink-0"
               iconClassName="h-4 w-4"
             />
           </div>

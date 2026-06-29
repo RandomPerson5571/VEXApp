@@ -13,6 +13,8 @@ import { LogoutButton } from "@/components/auth/LogoutButton";
 import { useUser } from "@/components/providers/UserProvider";
 import type { UserRole } from "@stlvex/database/types";
 
+import VEXV5Logo from "@/public/logos/VEXV5-icon.svg";
+
 function formatRole(role: UserRole): string {
   return role
     .split("_")
@@ -35,9 +37,7 @@ export function AppHeader() {
   return (
     <header className="h-16 border-b border-slate-900/60 bg-[#070b13] flex items-center justify-between px-6 select-none font-sans z-30">
       <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-950 border border-slate-900 shadow-sm">
-        <div className="flex h-7 w-7 items-center justify-center rounded bg-blue-600/10 border border-blue-500/20 text-blue-400">
-          <ShieldCheck className="h-4.5 w-4.5" />
-        </div>
+          <img src={VEXV5Logo.src} alt="VEX V5 Logo" width={30} height={30} />
         <div className="flex flex-col pr-1">
           <span className="text-xs font-black text-slate-100 leading-none">
             {team?.name ?? "No team assigned"}

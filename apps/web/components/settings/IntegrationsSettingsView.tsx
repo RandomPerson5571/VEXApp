@@ -3,6 +3,8 @@ import Image from "next/image";
 
 import Github from "@/public/logos/github-icon.svg";
 import Onshape from "@/public/logos/onshape-icon.svg";
+import Notion from "@/public/logos/notion-icon.svg";
+import Fusion360 from "@/public/logos/fusion360-icon.svg";
 
 import { SettingsSection } from "./SettingsSection";
 
@@ -33,6 +35,24 @@ const integrations: IntegrationOption[] = [
     icon: Github.src,
     accentClassName: "bg-slate-500/10 border-slate-500/20",
     borderClassName: "hover:border-slate-700/60",
+  },
+  {
+    id: "fusion360",
+    name: "Fusion 360",
+    description:
+      "Connect Fusion 360 to your team's workspace to sync CAD documents, release versions, and part metadata.",
+    icon: Fusion360.src,
+    accentClassName: "bg-blue-500/10 border-blue-500/20",
+    borderClassName: "hover:border-blue-500/20",
+  },
+  {
+    id: "notion",
+    name: "Notion",
+    description:
+      "Connect Notion to your team's workspace to sync project management, task lists, and documentation.",
+    icon: Notion.src,
+    accentClassName: "bg-purple-500/10 border-purple-500/20",
+    borderClassName: "hover:border-purple-500/20",
   },
 ];
 
@@ -109,7 +129,7 @@ export function IntegrationsSettingsView({
         </div>
 
         <p className="mt-5 text-[10px] font-semibold uppercase tracking-wide text-slate-600">
-          Onshape and GitHub integrations are coming soon.
+          Integrations are coming soon.
         </p>
       </SettingsSection>
     </div>

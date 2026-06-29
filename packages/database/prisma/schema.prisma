@@ -48,6 +48,7 @@ model User {
   discordAccount     DiscordAccount?
   authoredDocs       Documentation[]    @relation("AuthoredDocs")
   notebookLogs       NotebookLog[]
+  inventorySignOuts InventoryItemSignOut[]
   createdAt          DateTime           @default(now())
   updatedAt          DateTime           @updatedAt
 
@@ -76,6 +77,7 @@ model Team {
   members         User[]
   events          Event[]         @relation("TeamEvents")
   notebookLogs    NotebookLog[]
+  inventorySignOuts InventoryItemSignOut[]
   tasks Task[]
   invites         Invite[]
   createdAt       DateTime        @default(now())
@@ -211,4 +213,36 @@ model TaskAssignment {
   @@index([userId])
   @@index([taskId])
   @@map("task_assignments")
+}
+
+model InventoryItem {
+  id          String   @id @default(cuid())
+  imageUrl    String?
+  name        String
+  description String?
+  totalStock  Int      // Total units the organization owns
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  signOuts    InventoryItemSignOut[]
+}
+
+model InventoryItemSignOut {
+  id              String        @id @default(cuid())
+  inventoryItemId String
+  teamId          String
+  userId          String        // The specific person who physically grabbed it
+  quantity        Int           @default(1) // How many they signed out
+  signedOutAt     DateTime      @default(now())
+  returnedAt      DateTime?     // Nullable: if null, the item is currently checked out
+
+  // Relations
+  item            InventoryItem @relation(fields: [inventoryItemId], references: [id], onDelete: Cascade)
+  team            Team          @relation(fields: [teamId], references: [id])
+  user            User          @relation(fields: [userId], references: [id])
+
+  @@index([inventoryItemId])
+  @@index([teamId])
+  @@index([userId])
 }

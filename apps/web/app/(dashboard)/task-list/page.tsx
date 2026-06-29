@@ -1,7 +1,11 @@
+import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 import { ClipboardList } from "lucide-react";
 
 import { TaskListView } from "@/components/tasks/TaskListView";
 import { getCurrentUser } from "@/lib/auth/current-user";
+import { prefetchTeamMembers } from "@/lib/queries/prefetch-team-members";
+import { prefetchTeamTasks } from "@/lib/queries/prefetch-team-tasks";
+import { createQueryClient } from "@/lib/query-client";
 
 function TaskListFallback({
   title,
@@ -35,5 +39,15 @@ export default async function TaskListPage() {
     );
   }
 
-  return <TaskListView />;
+  const queryClient = createQueryClient();
+  await Promise.all([
+    prefetchTeamTasks(queryClient, currentUser.profile.teamId),
+    prefetchTeamMembers(queryClient, currentUser.profile.teamId),
+  ]);
+
+  return (
+    <HydrationBoundary state={dehydrate(queryClient)}>
+      <TaskListView />
+    </HydrationBoundary>
+  );
 }
