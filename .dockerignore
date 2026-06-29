@@ -1,0 +1,51 @@
+# Dependencies & build outputs
+**/node_modules
+**/.next
+**/dist
+**/build
+**/.turbo
+**/generated
+
+# Git & IDE
+.git
+.gitignore
+.github
+.vscode
+.cursor
+**/.DS_Store
+
+# Environment & secrets (injected at runtime)
+.env
+.env.*
+!.env.example
+!**/.env.example
+
+# Docker (avoid recursive context)
+docker-compose*.yml
+**/Dockerfile*
+**/.dockerignore
+
+# Docs & misc
+**/*.md
+LICENSE
+.editorconfig
+.prettierrc*
+.prettierignore
+
+# Tests & coverage
+**/coverage
+**/__tests__
+**/tests
+**/*.test.ts
+**/*.test.tsx
+**/*.spec.ts
+**/*.spec.tsx
+**/vitest.config.*
+**/eslint.config.*
+
+# Logs & temp
+**/*.log
+**/npm-debug.log*
+**/pnpm-debug.log*
+**/tmp
+**/temp

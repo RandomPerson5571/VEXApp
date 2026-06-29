@@ -1,0 +1,53 @@
+FROM node:20-alpine AS base
+RUN apk add --no-cache libc6-compat openssl
+RUN corepack enable && corepack prepare pnpm@11.8.0 --activate
+WORKDIR /app
+
+FROM base AS deps
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml turbo.json ./
+COPY apps/web/package.json ./apps/web/
+COPY apps/api-server/package.json ./apps/api-server/
+COPY apps/bot/package.json ./apps/bot/
+COPY packages/database/package.json ./packages/database/
+COPY packages/ui/package.json ./packages/ui/
+RUN pnpm install --frozen-lockfile
+
+FROM base AS builder
+ARG NEXT_PUBLIC_SUPABASE_URL
+ARG NEXT_PUBLIC_SUPABASE_ANON_KEY
+ARG NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
+ARG NEXT_PUBLIC_SITE_URL
+ARG NEXT_PUBLIC_APP_URL
+ENV NEXT_PUBLIC_SUPABASE_URL=$NEXT_PUBLIC_SUPABASE_URL
+ENV NEXT_PUBLIC_SUPABASE_ANON_KEY=$NEXT_PUBLIC_SUPABASE_ANON_KEY
+ENV NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=$NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
+ENV NEXT_PUBLIC_SITE_URL=$NEXT_PUBLIC_SITE_URL
+ENV NEXT_PUBLIC_APP_URL=$NEXT_PUBLIC_APP_URL
+
+COPY --from=deps /app/node_modules ./node_modules
+COPY . .
+RUN pnpm --filter @stlvex/database db:generate
+RUN pnpm --filter web build
+
+FROM base AS runner
+ENV NODE_ENV=production
+WORKDIR /app
+
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml turbo.json ./
+COPY apps/web/package.json ./apps/web/
+COPY apps/api-server/package.json ./apps/api-server/
+COPY apps/bot/package.json ./apps/bot/
+COPY packages/database/package.json ./packages/database/
+COPY packages/ui/package.json ./packages/ui/
+
+COPY --from=deps /app/node_modules ./node_modules
+COPY --from=builder /app/packages/database/generated ./packages/database/generated
+COPY apps/web ./apps/web
+COPY packages/database ./packages/database
+COPY packages/ui ./packages/ui
+COPY --from=builder /app/apps/web/.next ./apps/web/.next
+COPY --from=builder /app/apps/web/public ./apps/web/public
+
+EXPOSE 3000
+
+CMD ["sh", "-c", "pnpm --filter @stlvex/database exec prisma migrate deploy && pnpm --filter web start"]
