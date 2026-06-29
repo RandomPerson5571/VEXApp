@@ -54,10 +54,10 @@ export function CalendarEventModal({
   }
 
   return (
-    <div className="fixed inset-0 bg-[#000]/70 flex items-center justify-center p-4 z-50 backdrop-blur-sm select-none">
-      <div className="w-full max-w-md rounded-2xl bg-[#090e18] border border-slate-900 p-6 shadow-2xl relative font-sans">
-        <h3 className="text-md font-bold text-slate-100 border-b border-slate-900 pb-3 mb-4 flex items-center gap-2">
-          <Calendar className="h-5 w-5 text-blue-500" />
+    <div className="fixed inset-0 bg-slate-950/40 dark:bg-[#000]/70 flex items-center justify-center p-4 z-50 backdrop-blur-sm select-none">
+      <div className="w-full max-w-md rounded-2xl bg-white dark:bg-[#090e18] border border-slate-200 dark:border-slate-900 p-6 shadow-2xl relative font-sans">
+        <h3 className="text-md font-bold text-slate-900 dark:text-slate-100 border-b border-slate-200 dark:border-slate-900 pb-3 mb-4 flex items-center gap-2">
+          <Calendar className="h-5 w-5 text-orange-500" />
           <span>Add Calendar Schedule</span>
         </h3>
 
@@ -65,7 +65,7 @@ export function CalendarEventModal({
           <div className="space-y-1">
             <label
               htmlFor="event-title"
-              className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block"
+              className="text-[10px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest block"
             >
               Event Title
             </label>
@@ -76,7 +76,7 @@ export function CalendarEventModal({
               placeholder="e.g. Chassis Assembly Redesign"
               value={title}
               onChange={(e) => onTitleChange(e.target.value)}
-              className="w-full px-3 py-2 text-xs font-semibold bg-slate-950 border border-slate-900 rounded-lg text-slate-200 focus:outline-none focus:border-slate-800 focus:ring-1 focus:ring-slate-800"
+              className="w-full px-3 py-2 text-xs font-semibold bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-900 rounded-lg text-slate-900 dark:text-slate-200 focus:outline-none focus:border-orange-500 dark:focus:border-slate-800 focus:ring-1 focus:ring-orange-500 dark:focus:ring-slate-800"
             />
           </div>
 
@@ -84,7 +84,7 @@ export function CalendarEventModal({
             <div className="space-y-1">
               <label
                 htmlFor="event-date"
-                className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block"
+                className="text-[10px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest block"
               >
                 Date
               </label>
@@ -94,13 +94,13 @@ export function CalendarEventModal({
                 required
                 value={eventDate}
                 onChange={(e) => onDateChange(e.target.value)}
-                className="w-full px-3 py-2 text-xs font-sans bg-slate-950 border border-slate-900 rounded-lg text-slate-200 focus:outline-none focus:border-slate-800"
+                className="w-full px-3 py-2 text-xs font-sans bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-900 rounded-lg text-slate-900 dark:text-slate-200 focus:outline-none focus:border-orange-500 dark:focus:border-slate-800"
               />
             </div>
             <div className="space-y-1">
               <label
                 htmlFor="event-type"
-                className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block"
+                className="text-[10px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest block"
               >
                 Event Category
               </label>
@@ -108,7 +108,7 @@ export function CalendarEventModal({
                 id="event-type"
                 value={type}
                 onChange={(e) => onTypeChange(e.target.value as EventType)}
-                className="w-full px-3 py-2 text-xs font-semibold bg-slate-950 border border-slate-900 rounded-lg text-slate-200 focus:outline-none focus:border-slate-800"
+                className="w-full px-3 py-2 text-xs font-semibold bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-900 rounded-lg text-slate-900 dark:text-slate-200 focus:outline-none focus:border-orange-500 dark:focus:border-slate-800"
               >
                 {EVENT_TYPE_OPTIONS.map((option) => (
                   <option key={option.value} value={option.value}>
@@ -123,7 +123,7 @@ export function CalendarEventModal({
             <div className="space-y-1">
               <label
                 htmlFor="event-start"
-                className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block"
+                className="text-[10px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest block"
               >
                 Start Time
               </label>
@@ -134,13 +134,13 @@ export function CalendarEventModal({
                 placeholder="e.g. 4:30 PM"
                 value={startTime}
                 onChange={(e) => onStartTimeChange(e.target.value)}
-                className="w-full px-3 py-2 text-xs font-sans bg-slate-950 border border-slate-900 rounded-lg text-slate-200 focus:outline-none focus:border-slate-800"
+                className="w-full px-3 py-2 text-xs font-sans bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-900 rounded-lg text-slate-900 dark:text-slate-200 focus:outline-none focus:border-orange-500 dark:focus:border-slate-800"
               />
             </div>
             <div className="space-y-1">
               <label
                 htmlFor="event-end"
-                className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block"
+                className="text-[10px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest block"
               >
                 End Time
               </label>
@@ -151,7 +151,7 @@ export function CalendarEventModal({
                 placeholder="e.g. 6:30 PM"
                 value={endTime}
                 onChange={(e) => onEndTimeChange(e.target.value)}
-                className="w-full px-3 py-2 text-xs font-sans bg-slate-950 border border-slate-900 rounded-lg text-slate-200 focus:outline-none focus:border-slate-800"
+                className="w-full px-3 py-2 text-xs font-sans bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-900 rounded-lg text-slate-900 dark:text-slate-200 focus:outline-none focus:border-orange-500 dark:focus:border-slate-800"
               />
             </div>
           </div>
@@ -159,7 +159,7 @@ export function CalendarEventModal({
           <div className="space-y-1">
             <label
               htmlFor="event-location"
-              className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block"
+              className="text-[10px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest block"
             >
               Location Room
             </label>
@@ -170,14 +170,14 @@ export function CalendarEventModal({
               placeholder="e.g. Room 404 Workshop"
               value={location}
               onChange={(e) => onLocationChange(e.target.value)}
-              className="w-full px-3 py-2 text-xs font-semibold bg-slate-950 border border-slate-900 rounded-lg text-slate-200 focus:outline-none focus:border-slate-800"
+              className="w-full px-3 py-2 text-xs font-semibold bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-900 rounded-lg text-slate-900 dark:text-slate-200 focus:outline-none focus:border-orange-500 dark:focus:border-slate-800"
             />
           </div>
 
           <div className="space-y-1">
             <label
               htmlFor="event-description"
-              className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block"
+              className="text-[10px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest block"
             >
               Task Notes
             </label>
@@ -187,21 +187,21 @@ export function CalendarEventModal({
               value={description}
               onChange={(e) => onDescriptionChange(e.target.value)}
               rows={2}
-              className="w-full px-3 py-2 text-xs font-semibold bg-slate-950 border border-slate-900 rounded-lg text-slate-200 focus:outline-none focus:border-slate-800"
+              className="w-full px-3 py-2 text-xs font-semibold bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-900 rounded-lg text-slate-900 dark:text-slate-200 focus:outline-none focus:border-orange-500 dark:focus:border-slate-800"
             />
           </div>
 
-          <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-900">
+          <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-200 dark:border-slate-900">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 rounded-lg bg-[#0e1724] hover:bg-slate-900 text-xs font-semibold text-slate-400 hover:text-white transition cursor-pointer"
+              className="px-4 py-2 rounded-lg bg-slate-100 dark:bg-[#0e1724] hover:bg-slate-200 dark:hover:bg-slate-900 text-xs font-semibold text-slate-700 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition cursor-pointer"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="px-5 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-xs font-bold text-white shadow-lg cursor-pointer"
+              className="px-5 py-2 rounded-lg bg-orange-600 hover:bg-orange-500 text-xs font-bold text-white shadow-lg cursor-pointer"
             >
               Save Schedule
             </button>

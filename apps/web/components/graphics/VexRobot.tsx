@@ -14,8 +14,8 @@ export function VexRobotSvg({
     >
       <defs>
         <radialGradient id="glow" cx="50%" cy="50%" r="50%">
-          <stop offset="0%" stopColor="#3b82f6" stopOpacity="0.12" />
-          <stop offset="100%" stopColor="#3b82f6" stopOpacity="0" />
+          <stop offset="0%" stopColor="#f97316" stopOpacity="0.12" />
+          <stop offset="100%" stopColor="#f97316" stopOpacity="0" />
         </radialGradient>
         <linearGradient id="metal-primary" x1="0%" y1="0%" x2="100%" y2="100%">
           <stop offset="0%" stopColor="#94a3b8" />
@@ -35,8 +35,8 @@ export function VexRobotSvg({
         ))}
       </g>
 
-      <circle cx="250" cy="250" r="180" stroke="#3b82f6" strokeOpacity="0.15" strokeWidth="1" strokeDasharray="5 10" />
-      <circle cx="250" cy="250" r="140" stroke="#3b82f6" strokeOpacity="0.25" strokeWidth="2" />
+      <circle cx="250" cy="250" r="180" stroke="#f97316" strokeOpacity="0.15" strokeWidth="1" strokeDasharray="5 10" />
+      <circle cx="250" cy="250" r="140" stroke="#f97316" strokeOpacity="0.25" strokeWidth="2" />
       <circle cx="250" cy="250" r="100" stroke="#10b981" strokeOpacity="0.2" strokeWidth="1" strokeDasharray="1 4" />
 
       <rect x="110" y="160" width="40" height="180" rx="12" stroke="#64748b" strokeWidth="3" fill="#1e293b" />
@@ -75,7 +75,7 @@ export function VexRobotSvg({
         </g>
       ))}
 
-      <g stroke="#3b82f6" strokeWidth="3">
+      <g stroke="#f97316" strokeWidth="3">
         <line x1="200" y1="250" x2="180" y2="110" className={animated ? "animate-pulse" : undefined} />
         <line x1="300" y1="250" x2="320" y2="110" />
         <line x1="180" y1="110" x2="320" y2="110" strokeWidth="4" />
@@ -86,13 +86,13 @@ export function VexRobotSvg({
       <circle cx="300" cy="250" r="24" fill="#15803d" stroke="#22c55e" strokeWidth="2" />
       <circle cx="300" cy="250" r="12" fill="#020617" stroke="#64748b" />
 
-      <circle cx="180" cy="110" r="15" fill="#3b82f6" fillOpacity="0.2" stroke="#60a5fa" strokeWidth="2" />
-      <line x1="180" y1="110" x2="160" y2="80" stroke="#3b82f6" strokeWidth="2" />
-      <circle cx="320" cy="110" r="15" fill="#3b82f6" fillOpacity="0.2" stroke="#60a5fa" strokeWidth="2" />
-      <line x1="320" y1="110" x2="340" y2="80" stroke="#3b82f6" strokeWidth="2" />
+      <circle cx="180" cy="110" r="15" fill="#f97316" fillOpacity="0.2" stroke="#fb923c" strokeWidth="2" />
+      <line x1="180" y1="110" x2="160" y2="80" stroke="#f97316" strokeWidth="2" />
+      <circle cx="320" cy="110" r="15" fill="#f97316" fillOpacity="0.2" stroke="#fb923c" strokeWidth="2" />
+      <line x1="320" y1="110" x2="340" y2="80" stroke="#f97316" strokeWidth="2" />
 
-      <rect x="220" y="85" width="60" height="40" rx="3" stroke="#2563eb" strokeWidth="2.5" fill="#1d4ed8" fillOpacity="0.1" />
-      <line x1="250" y1="85" x2="250" y2="125" stroke="#60a5fa" strokeWidth="1.5" />
+      <rect x="220" y="85" width="60" height="40" rx="3" stroke="#ea580c" strokeWidth="2.5" fill="#c2410c" fillOpacity="0.1" />
+      <line x1="250" y1="85" x2="250" y2="125" stroke="#fb923c" strokeWidth="1.5" />
 
       <circle cx="210" cy="235" r="4" fill="#22c55e" />
       <circle cx="290" cy="235" r="4" fill="#22c55e" />

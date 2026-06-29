@@ -27,7 +27,7 @@ export function PermissionToggle({
         aria-label={`${label}: ${enabled ? "On" : "Off"}`}
       >
         {enabled ? (
-          <div className="flex items-center gap-1 rounded border border-blue-500/20 bg-blue-600/10 px-2 py-0.5 text-[10px] font-bold text-blue-400">
+          <div className="flex items-center gap-1 rounded border border-orange-500/20 bg-orange-600/10 px-2 py-0.5 text-[10px] font-bold text-orange-400">
             <span>On</span>
             <ToggleRight className="h-5 w-5" />
           </div>

@@ -67,7 +67,7 @@ export function TeamSettingsPanel({
         <button
           type="button"
           onClick={onSave}
-          className="w-full cursor-pointer rounded-lg bg-blue-600 py-2 font-bold text-white hover:bg-blue-500"
+          className="w-full cursor-pointer rounded-lg bg-orange-600 py-2 font-bold text-white hover:bg-orange-500"
         >
           Save
         </button>

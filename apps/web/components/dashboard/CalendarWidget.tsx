@@ -53,7 +53,7 @@ export function TeamCalendarWidget({
         <h3 className="text-xs font-black text-slate-200 uppercase tracking-wider">Team Calendar</h3>
         <Link
           href="/calendar"
-          className="text-[10px] font-extrabold text-blue-500 hover:underline flex items-center gap-0.5"
+          className="text-[10px] font-extrabold text-orange-500 hover:underline flex items-center gap-0.5"
         >
           View Calendar
           <ChevronRight className="h-3 w-3" />
@@ -99,7 +99,7 @@ export function TeamCalendarWidget({
               href={`/calendar?date=${cell.dateStr}`}
               className={`h-7 rounded flex flex-col items-center justify-center p-0.5 relative text-[10px] font-bold hover:bg-slate-900/60 transition ${
                 cell.isCurrentMonth ? "text-slate-300" : "text-slate-600"
-              } ${isSelectedDay ? "bg-blue-600/20 text-blue-400 border border-blue-500/30" : ""}`}
+              } ${isSelectedDay ? "bg-orange-600/20 text-orange-400 border border-orange-500/30" : ""}`}
             >
               <span>{cell.day}</span>
               {dayEvents.length > 0 && (

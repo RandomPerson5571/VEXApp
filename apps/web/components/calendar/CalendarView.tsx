@@ -97,8 +97,8 @@ export function CalendarView({
   };
 
   return (
-    <div className="flex-1 flex overflow-hidden bg-[#03070e] font-sans">
-      <div className="flex-1 overflow-y-auto px-8 py-6 flex flex-col h-full dashboard-scroll border-r border-slate-900/60">
+    <div className="flex-1 flex overflow-hidden bg-slate-50 dark:bg-[#03070e] font-sans">
+      <div className="flex-1 overflow-y-auto px-8 py-6 flex flex-col h-full dashboard-scroll border-r border-slate-200 dark:border-slate-900/60">
         <CalendarHeader viewType={viewType} onViewTypeChange={setViewType} />
         <CalendarMonthToolbar
           currentMonth={currentMonth}

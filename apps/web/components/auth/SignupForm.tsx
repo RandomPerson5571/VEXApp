@@ -2,9 +2,11 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import Image from "next/image";
 import { Mail, Lock, Eye, EyeOff, ShieldAlert, UserPlus } from "lucide-react";
 
 import STLRoboticsLogoComponent from "../Logo";
+import DiscordIconComponent from "@/public/logos/discord-icon.svg";
 export type SignupFormProps = {
   error?: string | null;
   message?: string | null;
@@ -32,13 +34,13 @@ export function SignupForm({
 
   return (
     <div className="w-full max-w-md">
-      <div className="w-full max-w-md rounded-2xl bg-[#090e18]/80 border border-slate-900 shadow-2xl p-8 backdrop-blur-md relative">
+      <div className="w-full max-w-md rounded-2xl bg-white dark:bg-[#090e18]/80 border border-slate-200 dark:border-slate-900 shadow-2xl p-8 backdrop-blur-md relative">
         <div className="flex flex-col items-center gap-2 mb-8 text-center">
         <STLRoboticsLogoComponent width={100} height={100} />
-        <h2 className="text-xl font-bold tracking-tight text-white mt-1">
+        <h2 className="text-xl font-bold tracking-tight text-slate-900 dark:text-white mt-1">
           Create your account
         </h2>
-        <p className="text-xs font-medium text-slate-500 max-w-xs leading-relaxed">
+        <p className="text-xs font-medium text-slate-600 dark:text-slate-500 max-w-xs leading-relaxed">
           Join the team portal to manage events, documents, and robotics
           updates.
         </p>
@@ -66,13 +68,13 @@ export function SignupForm({
         <div className="space-y-1.5">
           <label
             htmlFor="email"
-            className="text-[11px] font-bold text-slate-400 tracking-wide uppercase"
+            className="text-[11px] font-bold text-slate-600 dark:text-slate-400 tracking-wide uppercase"
           >
             Email Address
           </label>
           <div className="relative">
             <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-              <Mail className="h-4 w-4 text-slate-500" />
+              <Mail className="h-4 w-4 text-slate-600 dark:text-slate-500" />
             </div>
             <input
               id="email"
@@ -80,7 +82,7 @@ export function SignupForm({
               type="email"
               required
               placeholder="name@team.com"
-              className="w-full pl-10 pr-4 py-2.5 rounded-lg bg-slate-950 border border-slate-900/60 text-slate-200 text-xs font-semibold placeholder-slate-600 focus:outline-none focus:border-slate-800 focus:ring-1 focus:ring-slate-800 transition"
+              className="w-full pl-10 pr-4 py-2.5 rounded-lg bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-900/60 text-slate-900 dark:text-slate-200 text-xs font-semibold placeholder-slate-500 dark:placeholder-slate-600 focus:outline-none focus:border-orange-500 dark:focus:border-slate-800 focus:ring-1 focus:ring-orange-500 dark:focus:ring-slate-800 transition"
             />
           </div>
         </div>
@@ -88,13 +90,13 @@ export function SignupForm({
         <div className="space-y-1.5">
           <label
             htmlFor="password"
-            className="text-[11px] font-bold text-slate-400 tracking-wide uppercase"
+            className="text-[11px] font-bold text-slate-600 dark:text-slate-400 tracking-wide uppercase"
           >
             Password
           </label>
           <div className="relative">
             <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-              <Lock className="h-4 w-4 text-slate-500" />
+              <Lock className="h-4 w-4 text-slate-600 dark:text-slate-500" />
             </div>
             <input
               id="password"
@@ -102,12 +104,12 @@ export function SignupForm({
               type={showPassword ? "text" : "password"}
               required
               placeholder="Create a password"
-              className="w-full pl-10 pr-10 py-2.5 rounded-lg bg-slate-950 border border-slate-900/60 text-slate-200 text-xs font-semibold placeholder-slate-600 focus:outline-none focus:border-slate-800 focus:ring-1 focus:ring-slate-800 transition"
+              className="w-full pl-10 pr-10 py-2.5 rounded-lg bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-900/60 text-slate-900 dark:text-slate-200 text-xs font-semibold placeholder-slate-500 dark:placeholder-slate-600 focus:outline-none focus:border-orange-500 dark:focus:border-slate-800 focus:ring-1 focus:ring-orange-500 dark:focus:ring-slate-800 transition"
             />
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-500 hover:text-slate-300 transition"
+              className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-600 dark:text-slate-500 hover:text-slate-900 dark:hover:text-slate-300 transition"
               aria-label={showPassword ? "Hide password" : "Show password"}
             >
               {showPassword ? (
@@ -122,13 +124,13 @@ export function SignupForm({
         <div className="space-y-1.5">
           <label
             htmlFor="confirmPassword"
-            className="text-[11px] font-bold text-slate-400 tracking-wide uppercase"
+            className="text-[11px] font-bold text-slate-600 dark:text-slate-400 tracking-wide uppercase"
           >
             Confirm Password
           </label>
           <div className="relative">
             <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-              <UserPlus className="h-4 w-4 text-slate-500" />
+              <UserPlus className="h-4 w-4 text-slate-600 dark:text-slate-500" />
             </div>
             <input
               id="confirmPassword"
@@ -136,7 +138,7 @@ export function SignupForm({
               type={showConfirmPassword ? "text" : "password"}
               required
               placeholder="Confirm your password"
-              className="w-full pl-10 pr-10 py-2.5 rounded-lg bg-slate-950 border border-slate-900/60 text-slate-200 text-xs font-semibold placeholder-slate-600 focus:outline-none focus:border-slate-800 focus:ring-1 focus:ring-slate-800 transition"
+              className="w-full pl-10 pr-10 py-2.5 rounded-lg bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-900/60 text-slate-900 dark:text-slate-200 text-xs font-semibold placeholder-slate-500 dark:placeholder-slate-600 focus:outline-none focus:border-orange-500 dark:focus:border-slate-800 focus:ring-1 focus:ring-orange-500 dark:focus:ring-slate-800 transition"
             />
             <button
               type="button"
@@ -160,7 +162,7 @@ export function SignupForm({
         <button
           type="submit"
           disabled={pending || discordPending}
-          className="w-full py-2.5 rounded-lg bg-blue-600 hover:bg-blue-500 disabled:opacity-60 disabled:cursor-not-allowed font-bold text-xs tracking-wide text-white transition-all shadow-[0_0_20px_rgba(37,99,235,0.25)] hover:shadow-[0_0_25px_rgba(37,99,235,0.4)] cursor-pointer"
+          className="w-full py-2.5 rounded-lg bg-orange-500 hover:bg-orange-600 disabled:opacity-60 disabled:cursor-not-allowed font-bold text-xs tracking-wide text-white transition-all shadow-[0_0_20px_rgba(249,115,22,0.25)] hover:shadow-[0_0_25px_rgba(249,115,22,0.4)] cursor-pointer"
         >
           {pending ? "Creating account..." : "Sign up"}
         </button>
@@ -168,10 +170,10 @@ export function SignupForm({
 
       <div className="relative my-6">
         <div className="absolute inset-0 flex items-center" aria-hidden="true">
-          <div className="w-full border-t border-slate-800" />
+          <div className="w-full border-t border-slate-200 dark:border-slate-800" />
         </div>
         <div className="relative flex justify-center">
-          <span className="bg-[#090e18] px-3 text-[10px] font-bold uppercase tracking-wider text-slate-500">
+          <span className="bg-white dark:bg-[#090e18] px-3 text-[10px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-500">
             or
           </span>
         </div>
@@ -184,14 +186,15 @@ export function SignupForm({
         <button
           type="submit"
           disabled={pending || discordPending}
-          className="w-full py-2.5 rounded-lg bg-[#5865F2] hover:bg-[#4752C4] disabled:opacity-60 disabled:cursor-not-allowed font-bold text-xs tracking-wide text-white transition-all shadow-[0_0_24px_rgba(88,101,242,0.35)] hover:shadow-[0_0_28px_rgba(88,101,242,0.5)] cursor-pointer"
+          className="w-full py-3 rounded-lg bg-[#5865F2] hover:bg-[#4752C4] disabled:opacity-60 disabled:cursor-not-allowed font-bold text-sm tracking-wide text-white transition-all shadow-[0_0_24px_rgba(88,101,242,0.35)] hover:shadow-[0_0_28px_rgba(88,101,242,0.5)] cursor-pointer flex items-center justify-center gap-2.5"
         >
+          <Image src={DiscordIconComponent} alt="Discord" width={20} height={20} />
           {discordPending ? "Redirecting to Discord..." : "Continue with Discord"}
         </button>
       </form>
 
         <div className="mt-6 text-center">
-          <span className="text-[11px] text-slate-500 font-semibold">
+          <span className="text-[11px] text-slate-600 dark:text-slate-500 font-semibold">
             Already have an account?{" "}
             <Link
               href={
@@ -199,7 +202,7 @@ export function SignupForm({
                   ? `/login?redirectTo=${encodeURIComponent(redirectTo)}`
                   : "/login"
               }
-              className="text-blue-500 hover:underline font-bold"
+              className="text-orange-500 hover:underline font-bold"
             >
               Log in
             </Link>

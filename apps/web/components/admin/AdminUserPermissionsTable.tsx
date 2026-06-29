@@ -80,7 +80,7 @@ export function AdminUserPermissionsTable({
             onClick={() => setActiveTab("users")}
             className={`cursor-pointer rounded px-3 py-1 text-xs font-bold transition ${
               activeTab === "users"
-                ? "bg-blue-600 text-white shadow"
+                ? "bg-orange-600 text-white shadow"
                 : "text-slate-400 hover:text-slate-200"
             }`}
           >
@@ -91,7 +91,7 @@ export function AdminUserPermissionsTable({
             onClick={() => setActiveTab("teams")}
             className={`cursor-pointer rounded px-3 py-1 text-xs font-bold transition ${
               activeTab === "teams"
-                ? "bg-blue-600 text-white shadow"
+                ? "bg-orange-600 text-white shadow"
                 : "text-slate-400 hover:text-slate-200"
             }`}
           >

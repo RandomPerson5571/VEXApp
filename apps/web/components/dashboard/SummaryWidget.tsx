@@ -9,10 +9,10 @@ export function SummaryStatsGrid({ stats }: { stats: DashboardSummaryStats }) {
         label="Build Progress"
         value={`${stats.buildProgress}%`}
         delta={stats.buildProgressDelta}
-        deltaTone="blue"
+        deltaTone="orange"
         subtitle="Upcoming trends higher"
         icon={Wrench}
-        iconTone="blue"
+        iconTone="orange"
       />
       <SummaryStatCard
         label="Matches Scouted"

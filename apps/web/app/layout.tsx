@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono, Inter } from "next/font/google";
 import "./globals.css";
 import { QueryProvider } from "@/components/providers/QueryProvider";
+import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { cn } from "@/lib/utils";
 
 const inter = Inter({subsets:['latin'],variable:'--font-sans'});
@@ -62,10 +63,29 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={cn("h-full", "antialiased", geistSans.variable, geistMono.variable, "font-sans", inter.variable)}
+      className={cn("h-full dark", "antialiased", geistSans.variable, geistMono.variable, "font-sans", inter.variable)}
     >
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                const theme = localStorage.getItem('theme') || 'dark';
+                if (theme === 'light') {
+                  document.documentElement.classList.remove('dark');
+                } else {
+                  document.documentElement.classList.add('dark');
+                }
+                document.documentElement.style.colorScheme = theme;
+              })();
+            `,
+          }}
+        />
+      </head>
       <body className="min-h-full flex flex-col">
-        <QueryProvider>{children}</QueryProvider>
+        <ThemeProvider>
+          <QueryProvider>{children}</QueryProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

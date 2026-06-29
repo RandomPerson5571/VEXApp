@@ -50,7 +50,7 @@ export function OnboardingClient() {
       <button
         type="submit"
         disabled={pending}
-        className="w-full rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white disabled:opacity-60"
+        className="w-full rounded-lg bg-orange-600 px-4 py-2.5 text-sm font-semibold text-white disabled:opacity-60"
       >
         {pending ? "Creating profile..." : "Continue to dashboard"}
       </button>

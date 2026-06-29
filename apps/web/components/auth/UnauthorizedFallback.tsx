@@ -18,7 +18,7 @@ export function UnauthorizedFallback() {
         </p>
         <Link
           href="/dashboard"
-          className="mt-6 inline-flex items-center justify-center rounded-lg bg-blue-600 px-4 py-2 text-xs font-bold text-white hover:bg-blue-500 transition"
+          className="mt-6 inline-flex items-center justify-center rounded-lg bg-orange-600 px-4 py-2 text-xs font-bold text-white hover:bg-orange-500 transition"
         >
           Back to dashboard
         </Link>

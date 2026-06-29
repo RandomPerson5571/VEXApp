@@ -18,7 +18,7 @@ export function BuildStatusCard({
             Mechanical and electrical integrity checks
           </p>
         </div>
-        <Link href="/build-logs" className="text-[10px] font-bold text-blue-500 hover:underline">
+        <Link href="/build-logs" className="text-[10px] font-bold text-orange-500 hover:underline">
           View Full Build Log →
         </Link>
       </div>

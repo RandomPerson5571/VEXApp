@@ -13,8 +13,8 @@ export function CalendarHeader({
   return (
     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
       <div>
-        <h1 className="text-2xl font-black text-slate-100 tracking-tight">Team Calendar</h1>
-        <p className="text-xs text-slate-400 font-semibold mt-1">
+        <h1 className="text-2xl font-black text-slate-900 dark:text-slate-100 tracking-tight">Team Calendar</h1>
+        <p className="text-xs text-slate-600 dark:text-slate-400 font-semibold mt-1">
           Configure meeting schedules, build blocks, and coordinate competition timelines.
         </p>
       </div>

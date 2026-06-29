@@ -117,7 +117,7 @@ export function TeamMemberDelegationTable({
                   <td className="px-4 py-4 font-black text-slate-100">
                     {member.firstName} {member.lastName}
                     {isSelf ? (
-                      <span className="ml-2 text-[10px] font-bold uppercase tracking-wide text-blue-400">
+                      <span className="ml-2 text-[10px] font-bold uppercase tracking-wide text-orange-400">
                         You
                       </span>
                     ) : null}
@@ -135,7 +135,7 @@ export function TeamMemberDelegationTable({
                           type="button"
                           disabled={isPending}
                           onClick={() => handlePromote(member.id)}
-                          className="inline-flex items-center gap-1.5 rounded-lg border border-blue-500/20 bg-blue-600/10 px-2.5 py-1 text-[10px] font-bold text-blue-400 transition hover:bg-blue-600/20 disabled:cursor-not-allowed disabled:opacity-60 cursor-pointer"
+                          className="inline-flex items-center gap-1.5 rounded-lg border border-orange-500/20 bg-orange-600/10 px-2.5 py-1 text-[10px] font-bold text-orange-400 transition hover:bg-orange-600/20 disabled:cursor-not-allowed disabled:opacity-60 cursor-pointer"
                           aria-label={`Promote ${member.firstName} ${member.lastName} to team leader`}
                         >
                           <ShieldCheck className="h-3.5 w-3.5" />

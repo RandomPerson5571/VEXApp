@@ -38,7 +38,7 @@ export default async function SignupPage({ searchParams }: SignupPageProps) {
           ) : null}
           <Link
             href="/login"
-            className="inline-block text-sm font-semibold text-blue-500 hover:underline"
+            className="inline-block text-sm font-semibold text-orange-500 hover:underline"
           >
             Back to login
           </Link>

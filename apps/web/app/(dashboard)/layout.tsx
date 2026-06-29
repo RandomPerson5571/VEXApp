@@ -26,7 +26,7 @@ export default async function DashboardLayout({
 
   return (
     <UserProvider value={userState.user}>
-      <div className="min-h-screen bg-[#03070e] text-slate-100 flex h-screen overflow-hidden selection:bg-blue-600/30 selection:text-blue-200">
+      <div className="min-h-screen bg-slate-50 dark:bg-[#03070e] text-slate-900 dark:text-slate-100 flex h-screen overflow-hidden selection:bg-orange-600/30 selection:text-orange-200">
         <AppSidebar />
         <div className="flex-1 flex flex-col h-full overflow-hidden">
           <AppHeader />

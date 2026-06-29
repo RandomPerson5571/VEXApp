@@ -11,10 +11,10 @@ import type {
 export const mockBuildComponents: BuildStatusComponent[] = [
   { id: "bc1", name: "Drivetrain", percentage: 100, colorClass: "bg-green-500" },
   { id: "bc2", name: "Intake System", percentage: 100, colorClass: "bg-green-500" },
-  { id: "bc3", name: "Lift Mechanism", percentage: 80, colorClass: "bg-blue-500" },
-  { id: "bc4", name: "Shooting System", percentage: 60, colorClass: "bg-blue-500" },
+  { id: "bc3", name: "Lift Mechanism", percentage: 80, colorClass: "bg-orange-500" },
+  { id: "bc4", name: "Shooting System", percentage: 60, colorClass: "bg-orange-500" },
   { id: "bc5", name: "Claw / End Effector", percentage: 40, colorClass: "bg-yellow-500" },
-  { id: "bc6", name: "Programming", percentage: 75, colorClass: "bg-blue-500" },
+  { id: "bc6", name: "Programming", percentage: 75, colorClass: "bg-orange-500" },
 ];
 
 export const mockActivities: Activity[] = [

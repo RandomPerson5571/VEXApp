@@ -9,7 +9,7 @@ export function RecentActivityFeed({ activities }: { activities: Activity[] }) {
           <h3 className="text-sm font-black text-slate-200 uppercase tracking-wide">Recent Activity</h3>
           <p className="text-[11px] text-slate-500 font-semibold mt-0.5">Platform audit log events</p>
         </div>
-        <Link href="/scouting" className="text-[10px] font-bold text-blue-500 hover:underline">
+        <Link href="/scouting" className="text-[10px] font-bold text-orange-500 hover:underline">
           View All →
         </Link>
       </div>

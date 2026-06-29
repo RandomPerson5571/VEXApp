@@ -35,7 +35,7 @@ export function EditMemberModal({
     <TeamManagementModal
       title={
         <>
-          <ShieldCheck className="h-5 w-5 text-blue-400" />
+          <ShieldCheck className="h-5 w-5 text-orange-400" />
           <span>Modify Roster Profile</span>
         </>
       }

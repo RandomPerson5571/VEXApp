@@ -42,7 +42,7 @@ export function TeamMembersPanel({
           <button
             type="button"
             onClick={onInvite}
-            className="flex cursor-pointer items-center gap-1.5 rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-bold text-white shadow-lg shadow-blue-500/10 transition hover:bg-blue-500"
+            className="flex cursor-pointer items-center gap-1.5 rounded-lg bg-orange-600 px-3 py-1.5 text-xs font-bold text-white shadow-lg shadow-orange-500/10 transition hover:bg-orange-500"
           >
             <Plus className="h-4 w-4" />
             <span>Invite Member</span>

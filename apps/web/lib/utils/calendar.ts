@@ -80,28 +80,28 @@ export function getEventStyle(type: EventType): EventStyle {
   switch (type) {
     case "championship":
       return {
-        bg: "bg-amber-600/10 border-amber-500/20 text-amber-400",
+        bg: "bg-amber-50 dark:bg-amber-600/10 border-amber-500/20 text-amber-700 dark:text-amber-400",
         dot: "bg-amber-400",
       };
     case "scrimmage":
       return {
-        bg: "bg-yellow-500/10 border-yellow-500/20 text-yellow-400",
+        bg: "bg-yellow-50 dark:bg-yellow-500/10 border-yellow-500/20 text-yellow-700 dark:text-yellow-400",
         dot: "bg-yellow-400",
       };
     case "practice_match":
       return {
-        bg: "bg-purple-600/10 border-purple-500/20 text-purple-400",
+        bg: "bg-purple-50 dark:bg-purple-600/10 border-purple-500/20 text-purple-700 dark:text-purple-400",
         dot: "bg-purple-400",
       };
     case "meeting":
       return {
-        bg: "bg-indigo-600/10 border-indigo-500/20 text-indigo-400",
+        bg: "bg-indigo-50 dark:bg-indigo-600/10 border-indigo-500/20 text-indigo-700 dark:text-indigo-400",
         dot: "bg-indigo-400",
       };
     case "build":
     default:
       return {
-        bg: "bg-cyan-600/10 border-cyan-500/20 text-cyan-400",
+        bg: "bg-cyan-50 dark:bg-cyan-600/10 border-cyan-500/20 text-cyan-700 dark:text-cyan-400",
         dot: "bg-cyan-400",
       };
   }
