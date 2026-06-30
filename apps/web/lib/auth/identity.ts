@@ -334,10 +334,10 @@ function discordOnlyAccountError(): IdentityVerificationResult {
   };
 }
 
-function verifyDiscordAuthIdentityWithProfile(
+async function verifyDiscordAuthIdentityWithProfile(
   authUser: SupabaseUser,
   profile: Pick<SessionProfile, "id" | "discordId">,
-): IdentityVerificationResult {
+): Promise<IdentityVerificationResult> {
   const discordId = getDiscordIdFromAuthUser(authUser);
 
   if (!discordId) {
@@ -367,7 +367,7 @@ function verifyDiscordAuthIdentityWithProfile(
     return { ok: true };
   }
 
-  return verifyDiscordAuthIdentity(authUser);
+  return await verifyDiscordAuthIdentity(authUser);
 }
 
 async function maybeConfirmProfileVerification(
@@ -399,7 +399,10 @@ async function maybeConfirmProfileVerification(
   }
 
   if (profile.verificationMethod === "DISCORD" && isDiscordAuthUser(authUser)) {
-    const discordCheck = verifyDiscordAuthIdentityWithProfile(authUser, profile);
+    const discordCheck = await verifyDiscordAuthIdentityWithProfile(
+      authUser,
+      profile,
+    );
 
     if (discordCheck.ok) {
       await prisma.user.update({
@@ -432,7 +435,7 @@ async function resolveSessionIdentity(
   );
 
   if (isDiscordAuthUser(authUser)) {
-    return verifyDiscordAuthIdentityWithProfile(authUser, profile);
+    return await verifyDiscordAuthIdentityWithProfile(authUser, profile);
   }
 
   if (profile.verificationMethod === "DISCORD") {

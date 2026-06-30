@@ -1,5 +1,3 @@
-import { redirect } from "next/navigation";
-
 import { ProfileSettingsView } from "@/components/settings/ProfileSettingsView";
 import { getCurrentUser } from "@/lib/auth/current-user";
 
@@ -13,13 +11,8 @@ type SettingsProfilePageProps = {
 export default async function SettingsProfilePage({
   searchParams,
 }: SettingsProfilePageProps) {
-  const user = await getCurrentUser();
+  const user = (await getCurrentUser())!;
   const params = await searchParams;
-
-  if (!user) {
-    redirect("/login");
-  }
-
   const { profile, team } = user;
   const message =
     params.message === "discord_linked"

@@ -120,3 +120,11 @@ export function canDelegateTeamLeaders(permissions: PermissionState): boolean {
 
   return permissions.role === "TEAM_LEADER";
 }
+
+/**
+ * Whether the user may create invite links.
+ * Global admins may invite to any team; team leaders only to their own.
+ */
+export function canCreateInvites(permissions: PermissionState): boolean {
+  return canDelegateTeamLeaders(permissions);
+}

@@ -5,4 +5,5 @@ export interface SidebarItem {
     label: string;
     icon: LucideIcon;
     badge?: string;
+    requiresInviteAccess?: boolean;
 }

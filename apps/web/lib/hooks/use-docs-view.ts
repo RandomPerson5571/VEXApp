@@ -20,7 +20,7 @@ import { toDesignNotebookEntry } from "@/lib/mappers/documentation";
 import {
   emptyDocumentFormValues,
   type DocumentFormValues,
-} from "./DocumentFormModal";
+} from "@/components/documents/DocumentFormModal";
 import {
   canEditDocumentation,
   findDocInTree,
@@ -28,7 +28,7 @@ import {
   findNextDocId,
   hasAnyDocsInTree,
   scrollToDocSection,
-} from "./docs-view-utils";
+} from "@/components/documents/docs-view-utils";
 
 export function useDocsView() {
   const user = useUser();
