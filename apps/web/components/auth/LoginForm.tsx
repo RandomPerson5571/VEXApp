@@ -95,7 +95,7 @@ export function LoginForm({
             </label>
             <Link
               href="/reset"
-              className="text-[10px] font-bold text-blue-500 hover:underline"
+              className="text-[10px] font-bold text-orange-500 hover:underline"
             >
               Forgot?
             </Link>
@@ -131,7 +131,7 @@ export function LoginForm({
         <button
           type="submit"
           disabled={pending || discordPending}
-          className="w-full py-2.5 rounded-lg bg-blue-600 hover:bg-blue-500 disabled:opacity-60 disabled:cursor-not-allowed font-bold text-xs tracking-wide text-white transition-all shadow-[0_0_20px_rgba(37,99,235,0.25)] hover:shadow-[0_0_25px_rgba(37,99,235,0.4)] cursor-pointer"
+          className="w-full py-2.5 rounded-lg bg-orange-600 hover:bg-orange-500 disabled:opacity-60 disabled:cursor-not-allowed font-bold text-xs tracking-wide text-white transition-all shadow-[0_0_20px_rgba(249,115,22,0.25)] hover:shadow-[0_0_25px_rgba(249,115,22,0.4)] cursor-pointer"
         >
           {pending ? "Logging in..." : "Sign in with email"}
         </button>
@@ -174,7 +174,7 @@ export function LoginForm({
                 ? `/signup?redirectTo=${encodeURIComponent(redirectTo)}`
                 : "/signup"
             }
-            className="text-blue-500 hover:underline font-bold"
+            className="text-orange-500 hover:underline font-bold"
           >
             Sign up
           </Link>

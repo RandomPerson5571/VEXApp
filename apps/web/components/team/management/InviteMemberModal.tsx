@@ -30,7 +30,7 @@ export function InviteMemberModal({
     <TeamManagementModal
       title={
         <>
-          <Users2 className="h-5 w-5 text-blue-400" />
+          <Users2 className="h-5 w-5 text-orange-400" />
           <span>Invite Team Member</span>
         </>
       }

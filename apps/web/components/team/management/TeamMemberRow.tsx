@@ -43,7 +43,7 @@ export function TeamMemberRow({
           <button
             type="button"
             onClick={() => onEdit(member)}
-            className="cursor-pointer font-bold text-blue-500 hover:underline"
+            className="cursor-pointer font-bold text-orange-500 hover:underline"
           >
             [Edit]
           </button>

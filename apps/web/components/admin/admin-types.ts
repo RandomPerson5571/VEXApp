@@ -22,7 +22,7 @@ export type AdminUserRow = {
 };
 
 export const ADMIN_FIELD_CLASS_NAME =
-  "w-full min-w-0 rounded border border-slate-800 bg-slate-950 px-2 py-1 text-xs font-semibold text-slate-100 outline-none transition focus:border-blue-500/40 disabled:cursor-not-allowed disabled:opacity-60";
+  "w-full min-w-0 rounded border border-slate-800 bg-slate-950 px-2 py-1 text-xs font-semibold text-slate-100 outline-none transition focus:border-orange-500/40 disabled:cursor-not-allowed disabled:opacity-60";
 
 export function formatRole(role: UserRole): string {
   return role

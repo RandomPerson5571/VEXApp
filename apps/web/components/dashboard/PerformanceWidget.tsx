@@ -86,7 +86,7 @@ export function MatchPerformanceChart({ matches }: { matches: MatchRecord[] }) {
                 if (!data) return null;
                 return (
                   <div className="p-3 bg-[#0c1424] border border-slate-800 rounded-lg shadow-xl text-xs font-sans text-slate-200">
-                    <p className="font-extrabold text-blue-400 mb-1">{data.name} Match Results</p>
+                    <p className="font-extrabold text-orange-400 mb-1">{data.name} Match Results</p>
                     <div className="h-px bg-slate-800 my-1.5" />
                     <p className="flex justify-between gap-4 font-semibold">
                       Total Score:{" "}
@@ -124,7 +124,7 @@ export function MatchPerformanceChart({ matches }: { matches: MatchRecord[] }) {
 
       <div className="flex items-center justify-between mt-4 bg-slate-950/40 p-3 rounded-lg border border-slate-900 text-xs">
         <span className="font-bold text-slate-400">Showing last 7 scouting records.</span>
-        <Link href="/scouting" className="text-blue-500 font-bold hover:underline">
+        <Link href="/scouting" className="text-orange-500 font-bold hover:underline">
           Manage Match Records →
         </Link>
       </div>

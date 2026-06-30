@@ -1,65 +1,77 @@
+import Link from "next/link";
 import Image from "next/image";
+import RoaryIcon from "@/components/roaryicon.png";
 
 export default function Home() {
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <main className="min-h-screen bg-[#0b0f16] font-sans">
+      {/* Hero */}
+      <section className="relative overflow-hidden bg-[#ffa800] text-[#1a1200]">
+        <div className="max-w-7xl mx-auto px-6 py-24 lg:py-32">
+          <div className="lg:flex lg:items-center lg:justify-between">
+            <div className="max-w-2xl">
+              <h1 className="text-4xl sm:text-5xl font-extrabold leading-tight">
+                Welcome to STL Robotics
+              </h1>
+              <p className="mt-4 text-lg text-[#3a2800]/80 max-w-xl">
+                Roary keeps match prep, team documents, calendar updates, and member coordination in one place for the STL VEX Robotics season.
+              </p>
+
+              <div className="mt-8 flex flex-wrap gap-3">
+                <Link
+                  href="/join"
+                  className="inline-flex items-center gap-3 rounded-full bg-[#1a1200] text-white font-semibold px-6 py-3 shadow-lg hover:bg-[#2b1d00]"
+                >
+                  <Image src={RoaryIcon} alt="" width={20} height={20} className="h-5 w-5" />
+                  Join by Invite
+                </Link>
+
+                <Link
+                  href="/dashboard"
+                  className="inline-flex items-center gap-2 rounded-full border border-[#1a1200]/25 px-5 py-3 text-[#1a1200] font-semibold hover:bg-white/20"
+                >
+                  Open Dashboard
+                </Link>
+              </div>
+            </div>
+
+            <div className="mt-10 lg:mt-0 lg:ml-10 flex-shrink-0">
+              <div className="flex h-56 w-96 max-w-full items-center justify-center">
+                <Image
+                  src={RoaryIcon}
+                  alt="Roary"
+                  priority
+                  className="h-full w-auto object-contain drop-shadow-2xl"
+                />
+              </div>
+            </div>
+          </div>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+      </section>
+
+      {/* Features */}
+      <section className="bg-[#0b0f16] text-slate-100">
+        <div className="max-w-7xl mx-auto px-6 py-16">
+          <h2 className="text-2xl font-extrabold mb-6">Built for competition season</h2>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="rounded-2xl border border-slate-800 bg-[#0f1720]/60 p-6">
+              <h3 className="font-bold text-lg">Match Readiness</h3>
+              <p className="mt-2 text-sm text-slate-400">Track upcoming matches, scouting notes, and the details your drive team needs before queueing.</p>
+            </div>
+
+            <div className="rounded-2xl border border-slate-800 bg-[#0f1720]/60 p-6">
+              <h3 className="font-bold text-lg">Team Coordination</h3>
+              <p className="mt-2 text-sm text-slate-400">Keep members, roles, invites, and permissions organized as the roster changes through the season.</p>
+            </div>
+
+            <div className="rounded-2xl border border-slate-800 bg-[#0f1720]/60 p-6">
+              <h3 className="font-bold text-lg">Build Resources</h3>
+              <p className="mt-2 text-sm text-slate-400">Centralize documents, schedules, and team resources so the whole team can find what matters fast.</p>
+            </div>
+          </div>
         </div>
-      </main>
-    </div>
+      </section>
+    </main>
   );
 }

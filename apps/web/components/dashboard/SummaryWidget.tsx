@@ -23,7 +23,7 @@ export function SummaryStatsGrid() {
         value={stats.incompleteTasks}
         subtitle={`${stats.completedTasks} completed`}
         icon={Wrench}
-        iconTone="blue"
+        iconTone="orange"
       />
       <SummaryStatCard
         label="Next Event"

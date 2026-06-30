@@ -41,7 +41,7 @@ export function ModalFormActions({
       </button>
       <button
         type="submit"
-        className="cursor-pointer rounded-lg bg-blue-600 px-5 py-2 text-xs font-bold text-white shadow-lg hover:bg-blue-500"
+        className="cursor-pointer rounded-lg bg-orange-600 px-5 py-2 text-xs font-bold text-white shadow-lg hover:bg-orange-500"
       >
         {submitLabel}
       </button>

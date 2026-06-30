@@ -1,10 +1,16 @@
 import type { Metadata } from "next";
-import { Geist_Mono, Inter } from "next/font/google";
+import { Geist, Geist_Mono, Inter } from "next/font/google";
 import "./globals.css";
 import { QueryProvider } from "@/components/providers/QueryProvider";
+import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { cn } from "@/lib/utils";
 
 const inter = Inter({subsets:['latin'],variable:'--font-sans'});
+
+const geistSans = Geist({
+  variable: "--font-geist-sans",
+  subsets: ["latin"],
+});
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
@@ -20,7 +26,7 @@ export const metadata: Metadata = {
     template: "%s | STL VEX Robotics",
   },
   description:
-    "Team hub for STL VEX Robotics. Manage matches, build logs, inventory, calendar, documents, and members for the 2026–2027 season.",
+    "Team hub for STL VEX Robotics. Manage matches, build logs, inventory, calendar, documents, and members for the 2026-2027 season.",
   keywords: [
     "VEX Robotics",
     "STL Robotics",
@@ -57,10 +63,29 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={cn("h-full", "antialiased", geistMono.variable, "font-sans", inter.variable)}
+      className={cn("h-full dark", "antialiased", geistSans.variable, geistMono.variable, "font-sans", inter.variable)}
     >
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                const theme = localStorage.getItem('theme') || 'dark';
+                if (theme === 'light') {
+                  document.documentElement.classList.remove('dark');
+                } else {
+                  document.documentElement.classList.add('dark');
+                }
+                document.documentElement.style.colorScheme = theme;
+              })();
+            `,
+          }}
+        />
+      </head>
       <body className="min-h-full flex flex-col">
-        <QueryProvider>{children}</QueryProvider>
+        <ThemeProvider>
+          <QueryProvider>{children}</QueryProvider>
+        </ThemeProvider>
       </body>
     </html>
   );
