@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo } from "react";
 import type { CSSProperties } from "react";
 import {
   AlertCircle,
@@ -11,42 +10,20 @@ import {
   ListTodo,
 } from "lucide-react";
 
-import type { TaskListAssignee, TaskListTask, TaskPriority } from "@stlvex/database/types";
-import { useTeamTasks } from "@/lib/hooks/use-team-tasks";
+import type { DashboardTask, TaskListAssignee } from "@stlvex/database/types";
+import { useDashboardSummary } from "@/lib/hooks/use-dashboard-summary";
+import { useDashboardTasks } from "@/lib/hooks/use-dashboard-tasks";
 import {
   TaskPriorityBadge,
   TaskStatusDot,
   TaskTypeBadge,
 } from "@/components/tasks/TaskBadges";
 import {
-  countOverdueTasks,
-  countTasksByStatus,
   formatDueDate,
   getInitials,
-  getSubtaskProgress,
   getTaskAssignees,
   isOverdue,
 } from "@/components/tasks/task-list-utils";
-
-const PRIORITY_ORDER: Record<TaskPriority, number> = {
-  High: 0,
-  Medium: 1,
-  Low: 2,
-};
-
-function sortTasksForDashboard(tasks: TaskListTask[]): TaskListTask[] {
-  return [...tasks]
-    .filter((task) => task.status !== "Done")
-    .sort((a, b) => {
-      const priorityDelta =
-        PRIORITY_ORDER[a.priority ?? "Low"] - PRIORITY_ORDER[b.priority ?? "Low"];
-      if (priorityDelta !== 0) return priorityDelta;
-
-      const dueA = a.dueDate?.getTime() ?? Number.POSITIVE_INFINITY;
-      const dueB = b.dueDate?.getTime() ?? Number.POSITIVE_INFINITY;
-      return dueA - dueB;
-    });
-}
 
 function AssigneeStack({ assignees }: { assignees: TaskListAssignee[] }) {
   if (assignees.length === 0) {
@@ -76,12 +53,10 @@ function AssigneeStack({ assignees }: { assignees: TaskListAssignee[] }) {
   );
 }
 
-function TaskRow({ task, index }: { task: TaskListTask; index: number }) {
+function TaskRow({ task, index }: { task: DashboardTask; index: number }) {
   const dueLabel = formatDueDate(task.dueDate);
   const overdue = isOverdue(task.dueDate, task.status);
   const assignees = getTaskAssignees(task);
-  const progress = getSubtaskProgress(task.subTasks);
-  const hasSubtasks = task.subTasks.length > 0;
 
   return (
     <Link
@@ -126,23 +101,6 @@ function TaskRow({ task, index }: { task: TaskListTask; index: number }) {
               </span>
             ) : null}
           </div>
-
-          {hasSubtasks ? (
-            <div className="mt-2.5">
-              <div className="flex items-center justify-between text-[9px] font-bold uppercase tracking-wide text-slate-600">
-                <span>Subtasks</span>
-                <span className="font-mono text-slate-500">
-                  {progress.completed}/{progress.total}
-                </span>
-              </div>
-              <div className="mt-1 h-1 overflow-hidden rounded-full bg-slate-900">
-                <div
-                  className="h-full rounded-full bg-gradient-to-r from-blue-600 to-indigo-500 transition-[width] duration-500"
-                  style={{ width: `${progress.percent}%` }}
-                />
-              </div>
-            </div>
-          ) : null}
         </div>
 
         <ChevronRight className="mt-1 h-4 w-4 shrink-0 text-slate-700 transition group-hover:text-slate-400" />
@@ -156,14 +114,13 @@ export type TaskListWidgetProps = {
 };
 
 export function TaskListWidget({ maxItems = 4 }: TaskListWidgetProps) {
-  const { data: tasks = [], isLoading } = useTeamTasks();
-  const statusCounts = useMemo(() => countTasksByStatus(tasks), [tasks]);
-  const overdueCount = useMemo(() => countOverdueTasks(tasks), [tasks]);
-  const displayTasks = useMemo(
-    () => sortTasksForDashboard(tasks).slice(0, maxItems),
-    [tasks, maxItems],
-  );
-  const activeCount = statusCounts.NotStarted + statusCounts.InProgress;
+  const { data: tasks = [], isLoading: tasksLoading } = useDashboardTasks();
+  const { data: summary, isLoading: summaryLoading } = useDashboardSummary();
+  const isLoading = tasksLoading || summaryLoading;
+  const displayTasks = tasks.slice(0, maxItems);
+  const activeCount = summary?.incompleteTasks ?? 0;
+  const overdueCount = summary?.overdueTasks ?? 0;
+  const completedCount = summary?.completedTasks ?? 0;
 
   return (
     <div
@@ -210,7 +167,7 @@ export function TaskListWidget({ maxItems = 4 }: TaskListWidgetProps) {
             </span>
           ) : null}
           <span className="inline-flex items-center gap-1.5 rounded-lg border border-emerald-500/20 bg-emerald-500/10 px-2.5 py-1 text-[10px] font-bold text-emerald-400">
-            {statusCounts.Done} completed
+            {completedCount} completed
           </span>
         </div>
 

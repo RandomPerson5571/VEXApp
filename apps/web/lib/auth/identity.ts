@@ -1,5 +1,6 @@
 import { Prisma, prisma } from "@stlvex/database";
 import type { SupabaseClient, User as SupabaseUser } from "@supabase/supabase-js";
+import { cache } from "react";
 
 export type IdentityVerificationResult =
   | { ok: true }
@@ -303,6 +304,8 @@ type SessionProfile = {
 };
 
 const SESSION_VERIFICATION_TTL_MS = 30_000;
+/** Verified sessions change rarely — longer TTL avoids repeat Prisma work across navigations. */
+const VERIFIED_SESSION_VERIFICATION_TTL_MS = 5 * 60_000;
 const sessionVerificationCache = new Map<
   string,
   { result: IdentityVerificationResult; expiresAt: number }
@@ -417,6 +420,39 @@ async function maybeConfirmProfileVerification(
   return profile;
 }
 
+/**
+ * Skips Discord re-verification and profile confirmation writes when the stored
+ * profile is already verified and matches the current session identity.
+ */
+function tryVerifiedProfileFastPath(
+  authUser: SupabaseUser,
+  profile: SessionProfile,
+): IdentityVerificationResult | null {
+  if (!profile.isVerified) {
+    return null;
+  }
+
+  if (isDiscordAuthUser(authUser)) {
+    const discordId = getDiscordIdFromAuthUser(authUser);
+
+    if (
+      discordId &&
+      profile.discordId === discordId &&
+      profile.id === authUser.id
+    ) {
+      return { ok: true };
+    }
+
+    return null;
+  }
+
+  if (profile.verificationMethod === "DISCORD") {
+    return null;
+  }
+
+  return { ok: true };
+}
+
 async function resolveSessionIdentity(
   authUser: SupabaseUser,
 ): Promise<IdentityVerificationResult> {
@@ -427,6 +463,11 @@ async function resolveSessionIdentity(
 
   if (!existingProfile) {
     return { ok: true };
+  }
+
+  const fastPath = tryVerifiedProfileFastPath(authUser, existingProfile);
+  if (fastPath) {
+    return fastPath;
   }
 
   const profile = await maybeConfirmProfileVerification(
@@ -449,29 +490,39 @@ async function resolveSessionIdentity(
   return { ok: true };
 }
 
+function getSessionVerificationCacheTtl(
+  result: IdentityVerificationResult,
+): number {
+  return result.ok
+    ? VERIFIED_SESSION_VERIFICATION_TTL_MS
+    : SESSION_VERIFICATION_TTL_MS;
+}
+
 /**
  * Authorizes an existing Supabase session for app access. Used by the OAuth
  * callback and server-side user resolution — not the request proxy.
+ *
+ * Wrapped in React `cache()` so layout + page share one pass per request.
  */
-export async function verifySessionIdentity(
-  authUser: SupabaseUser,
-): Promise<IdentityVerificationResult> {
-  const cacheKey = getSessionVerificationCacheKey(authUser);
-  const cached = sessionVerificationCache.get(cacheKey);
+export const verifySessionIdentity = cache(
+  async (authUser: SupabaseUser): Promise<IdentityVerificationResult> => {
+    const cacheKey = getSessionVerificationCacheKey(authUser);
+    const cached = sessionVerificationCache.get(cacheKey);
 
-  if (cached && cached.expiresAt > Date.now()) {
-    return cached.result;
-  }
+    if (cached && cached.expiresAt > Date.now()) {
+      return cached.result;
+    }
 
-  const result = await resolveSessionIdentity(authUser);
+    const result = await resolveSessionIdentity(authUser);
 
-  sessionVerificationCache.set(cacheKey, {
-    result,
-    expiresAt: Date.now() + SESSION_VERIFICATION_TTL_MS,
-  });
+    sessionVerificationCache.set(cacheKey, {
+      result,
+      expiresAt: Date.now() + getSessionVerificationCacheTtl(result),
+    });
 
-  return result;
-}
+    return result;
+  },
+);
 
 /**
  * Marks invite/onboarding profiles verified once the user completes the

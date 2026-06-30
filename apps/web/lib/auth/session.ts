@@ -11,8 +11,10 @@ export const PROXY_AUTH_USER_ID_HEADER = "x-auth-user-id";
 /**
  * Resolves the authenticated Supabase user once per request.
  *
- * When the proxy has already called `getUser()`, this reads the session from
- * cookies via `getSession()` instead of making a second Auth server round-trip.
+ * When the request proxy has already called `getUser()` (see `updateSession`),
+ * it sets `x-auth-validated` / `x-auth-user-id` on every matched route including
+ * dashboard navigations. This path reads the session from cookies via
+ * `getSession()` instead of making a second Auth server round-trip.
  */
 export const getAuthUser = cache(async (): Promise<AuthUser | null> => {
   const supabase = await createClient();

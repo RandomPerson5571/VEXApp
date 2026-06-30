@@ -46,6 +46,17 @@ export type TaskListSubTask = TaskListTask["subTasks"][number];
 
 export type TaskListAssignee = TaskListSubTask["assignments"][number]["user"];
 
+export const dashboardTaskInclude = {
+  assignments: {
+    include: { user: { select: { id: true, firstName: true, lastName: true } } },
+  },
+} satisfies import("../generated/prisma/index.js").Prisma.TaskInclude;
+
+/** Top-level task with assignees only — matches the dashboard widget query shape. */
+export type DashboardTask = import("../generated/prisma/index.js").Prisma.TaskGetPayload<{
+  include: typeof dashboardTaskInclude;
+}>;
+
 export const teamInventoryItemInclude = {
   signOuts: {
     where: { returnedAt: null },

@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 
 import type { TeamInventoryItem } from "@stlvex/database/types";
+import { useInventoryImageUrl } from "@/lib/hooks/use-inventory-image-url";
 import {
   type AvailabilityFilter,
   formatBorrowerName,
@@ -58,10 +59,12 @@ export function InventoryItemImage({
   item: TeamInventoryItem;
   className?: string;
 }) {
-  if (item.imageUrl) {
+  const { url, isLoading } = useInventoryImageUrl(item.imageUrl);
+
+  if (url) {
     return (
       <img
-        src={item.imageUrl}
+        src={url}
         alt=""
         className={`shrink-0 rounded-xl border border-slate-800 object-cover ${className}`}
       />
@@ -70,7 +73,7 @@ export function InventoryItemImage({
 
   return (
     <div
-      className={`flex shrink-0 items-center justify-center rounded-xl border border-yellow-500/20 bg-yellow-500/10 ${className}`}
+      className={`flex shrink-0 items-center justify-center rounded-xl border border-yellow-500/20 bg-yellow-500/10 ${className} ${isLoading ? "motion-safe:animate-pulse" : ""}`}
     >
       <Package className="h-4 w-4 text-yellow-400" />
     </div>

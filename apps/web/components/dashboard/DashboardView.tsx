@@ -1,7 +1,7 @@
 import type { MatchRecord } from "@/lib/types/team";
 
 import { DashboardHeader } from "./Header";
-import { MatchPerformanceChart } from "./PerformanceWidget";
+import { MatchPerformanceChartDynamic } from "./MatchPerformanceChartDynamic";
 import { SummaryStatsGrid } from "./SummaryWidget";
 import { TeamCalendarWidget } from "./CalendarWidget";
 import { UpcomingMatchesList } from "./MatchesWidget";
@@ -24,7 +24,7 @@ export function DashboardView({ matches }: DashboardViewProps) {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        <MatchPerformanceChart matches={matches} />
+        <MatchPerformanceChartDynamic matches={matches} />
         <div className="lg:col-span-4 space-y-6">
           <TeamCalendarWidget />
           <UpcomingMatchesList />

@@ -74,6 +74,7 @@ export async function updateSession(request: NextRequest) {
   } = await supabase.auth.getUser();
 
   const { pathname } = request.nextUrl;
+  // Forward validated user id to RSC/API so getAuthUser() can skip getUser().
   const passThrough = nextWithAuthHeaders(request, user?.id ?? null);
   copySupabaseCookies(supabaseResponse, passThrough);
 
@@ -88,6 +89,7 @@ export async function updateSession(request: NextRequest) {
   }
 
   if (user && isAuthRoute(pathname)) {
+    // Profile lookup is auth-route only; dashboard/protected paths skip this DB call.
     const profile = await lookupUserProfile(user.id);
 
     if (profile.status === "found" || profile.status === "missing") {

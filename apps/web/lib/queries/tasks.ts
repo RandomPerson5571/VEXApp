@@ -1,5 +1,5 @@
 import { queryKeys } from "@/lib/query-client";
-import type { TaskPriority, TaskListTask, TaskStatus, TaskType } from "@stlvex/database/types";
+import type { DashboardTask, TaskPriority, TaskListTask, TaskStatus, TaskType } from "@stlvex/database/types";
 
 export type CreateTaskPayload = {
   title: string;
@@ -25,6 +25,16 @@ export async function fetchTeamTasksFromApi(): Promise<TaskListTask[]> {
   }
 
   return response.json() as Promise<TaskListTask[]>;
+}
+
+export async function fetchDashboardTasksFromApi(): Promise<DashboardTask[]> {
+  const response = await fetch("/api/dashboard/tasks");
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch dashboard tasks.");
+  }
+
+  return response.json() as Promise<DashboardTask[]>;
 }
 
 export async function createTeamTaskFromApi(
@@ -74,5 +84,12 @@ export function teamTasksQueryOptions(teamId: string) {
   return {
     queryKey: queryKeys.tasks.forTeam(teamId),
     queryFn: fetchTeamTasksFromApi,
+  };
+}
+
+export function dashboardTasksQueryOptions(teamId: string) {
+  return {
+    queryKey: queryKeys.dashboard.tasks(teamId),
+    queryFn: fetchDashboardTasksFromApi,
   };
 }

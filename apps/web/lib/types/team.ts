@@ -59,6 +59,7 @@ export interface UpcomingMatch {
 export interface DashboardSummaryStats {
   incompleteTasks: number;
   completedTasks: number;
+  overdueTasks: number;
   nextEvent: string;
   nextEventDate: string;
   inventoryItems: number;

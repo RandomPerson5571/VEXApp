@@ -29,6 +29,7 @@ export const queryKeys = {
   },
   dashboard: {
     summary: (teamId: string) => ["dashboard", "summary", teamId] as const,
+    tasks: (teamId: string) => ["dashboard", "tasks", teamId] as const,
   },
   docs: {
     tree: (teamId: string) => ["docs", "tree", teamId] as const,

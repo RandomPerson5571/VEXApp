@@ -85,12 +85,16 @@ export function formatPersonName(person: {
   return `${person.firstName} ${person.lastName}`;
 }
 
-function toDate(value: Date | string | null): Date | null {
+export function toDate(
+  value: Date | string | null | undefined,
+): Date | null {
   if (!value) return null;
   return value instanceof Date ? value : new Date(value);
 }
 
-export function formatDueDate(dueDate: Date | string | null): string | null {
+export function formatDueDate(
+  dueDate: Date | string | null | undefined,
+): string | null {
   const date = toDate(dueDate);
   if (!date) return null;
 
@@ -102,7 +106,7 @@ export function formatDueDate(dueDate: Date | string | null): string | null {
 }
 
 export function isOverdue(
-  dueDate: Date | string | null,
+  dueDate: Date | string | null | undefined,
   status: TaskStatus,
 ): boolean {
   const date = toDate(dueDate);

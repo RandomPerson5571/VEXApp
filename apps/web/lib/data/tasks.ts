@@ -2,7 +2,9 @@ import "server-only";
 
 import { prisma } from "@stlvex/database";
 import {
+  dashboardTaskInclude,
   taskListTaskInclude,
+  type DashboardTask,
   type TaskListTask,
   type TaskPriority,
   type TaskStatus,
@@ -33,6 +35,22 @@ export async function listTasksForTeam(teamId: string): Promise<TaskListTask[]> 
     where: { teamId, parentTaskId: null },
     include: taskListTaskInclude,
     orderBy: [{ dueDate: "asc" }],
+  });
+}
+
+export async function listDashboardTasksForTeam(
+  teamId: string,
+  limit = 4,
+): Promise<DashboardTask[]> {
+  return prisma.task.findMany({
+    where: {
+      teamId,
+      parentTaskId: null,
+      status: { not: "Done" },
+    },
+    include: dashboardTaskInclude,
+    orderBy: [{ priority: "desc" }, { dueDate: "asc" }],
+    take: limit,
   });
 }
 
