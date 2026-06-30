@@ -1,24 +1,23 @@
-import { DashboardView } from "@/components/dashboard/DashboardView";
-import {
-  mockActivities,
-  mockBuildComponents,
-  mockEvents,
-  mockMatches,
-  mockRobotLabel,
-  mockSummaryStats,
-  mockUpcomingMatches,
-} from "@/lib/mock/dashboard";
+import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 
-export default function DashboardPage() {
+import { DashboardView } from "@/components/dashboard/DashboardView";
+import { getCurrentUser } from "@/lib/auth/current-user";
+import { mockMatches } from "@/lib/mock/dashboard";
+import { prefetchDashboard } from "@/lib/queries/prefetch-dashboard";
+import { createQueryClient } from "@/lib/query-client";
+
+export default async function DashboardPage() {
+  const currentUser = await getCurrentUser();
+  const queryClient = createQueryClient();
+  const teamId = currentUser?.profile.teamId;
+
+  if (teamId) {
+    await prefetchDashboard(queryClient, teamId);
+  }
+
   return (
-    <DashboardView
-      stats={mockSummaryStats}
-      buildComponents={mockBuildComponents}
-      activities={mockActivities}
-      matches={mockMatches}
-      events={mockEvents}
-      upcomingMatches={mockUpcomingMatches}
-      robotLabel={mockRobotLabel}
-    />
+    <HydrationBoundary state={dehydrate(queryClient)}>
+      <DashboardView matches={mockMatches} />
+    </HydrationBoundary>
   );
 }

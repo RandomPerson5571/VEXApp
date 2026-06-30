@@ -1,6 +1,7 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
+import { lookupUserProfile } from "@/lib/auth/profile";
 import {
   PROXY_AUTH_USER_ID_HEADER,
   PROXY_AUTH_VALIDATED_HEADER,
@@ -73,6 +74,7 @@ export async function updateSession(request: NextRequest) {
   } = await supabase.auth.getUser();
 
   const { pathname } = request.nextUrl;
+  // Forward validated user id to RSC/API so getAuthUser() can skip getUser().
   const passThrough = nextWithAuthHeaders(request, user?.id ?? null);
   copySupabaseCookies(supabaseResponse, passThrough);
 
@@ -87,12 +89,20 @@ export async function updateSession(request: NextRequest) {
   }
 
   if (user && isAuthRoute(pathname)) {
-    const url = request.nextUrl.clone();
-    url.pathname = "/dashboard";
+    // Profile lookup is auth-route only; dashboard/protected paths skip this DB call.
+    const profile = await lookupUserProfile(user.id);
 
-    const redirectResponse = NextResponse.redirect(url);
-    copySupabaseCookies(supabaseResponse, redirectResponse);
-    return redirectResponse;
+    if (profile.status === "found" || profile.status === "missing") {
+      const url = request.nextUrl.clone();
+      url.pathname = profile.status === "found" ? "/dashboard" : "/onboarding";
+
+      const redirectResponse = NextResponse.redirect(url);
+      copySupabaseCookies(supabaseResponse, redirectResponse);
+      return redirectResponse;
+    }
+
+    // DB unavailable — let the auth page surface the error.
+    return passThrough;
   }
 
   return passThrough;

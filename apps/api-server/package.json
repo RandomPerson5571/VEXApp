@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "dev": "tsx watch src/index.ts",
+    "dev": "echo api-server not implemented",
     "build": "tsc",
-    "start": "node dist/index.ts"
+    "start": "node dist/index.js"
   },
   "dependencies": {
     "@hono/node-server": "^1.11.0",

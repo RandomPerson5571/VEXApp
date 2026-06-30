@@ -5,7 +5,7 @@ import { cache } from "react";
 import { verifySessionIdentity } from "@/lib/auth/identity";
 import { getAuthUser } from "@/lib/auth/session";
 import { createClient } from "@/lib/supabase/server";
-import type { Team, User } from "@/lib/supabase/wrappers/types";
+import type { Team, User } from "@stlvex/database/types";
 
 export type CurrentUser = {
   authUser: AuthUser;

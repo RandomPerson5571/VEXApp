@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   Calendar,
+  ClipboardList,
   FileCode,
   LayoutDashboard,
   Package,
@@ -11,23 +12,25 @@ import {
   ShieldCheck,
   Swords,
   Users2,
-  Wrench,
+  LinkIcon
 } from "lucide-react";
 import { useOptionalUser } from "@/components/providers/UserProvider";
-import { isGlobalAdmin } from "@/lib/auth/auth-guards";
+import {
+  canCreateInvites,
+  isGlobalAdmin,
+  verifyUserPermissions,
+} from "@/lib/auth/auth-guards";
 import { SidebarItem } from "@/lib/types/sidebar";
 import STLRoboticsLogoComponent from "../Logo";
 
 const menuItems: SidebarItem[] = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/matches", label: "Matches", icon: Swords },
-  // { href: "/scouting", label: "Scouting", icon: Search, badge: "New" },
-  { href: "/build-logs", label: "Build Logs", icon: Wrench },
   { href: "/inventory", label: "Inventory", icon: Package },
   { href: "/calendar", label: "Calendar", icon: Calendar },
+  { href: "/task-list", label: "Task List", icon: ClipboardList },
   { href: "/documents", label: "Documents", icon: FileCode },
-//  { href: "/media", label: "Media", icon: Image },
   { href: "/team-management", label: "Members", icon: Users2 },
+  { href: "/invite", label: "Invites", icon: LinkIcon, requiresInviteAccess: true },
   { href: "/settings", label: "Settings", icon: Settings },
 ];
 
@@ -35,6 +38,14 @@ export function AppSidebar() {
   const pathname = usePathname();
   const user = useOptionalUser();
   const showAdminLink = user !== null && isGlobalAdmin(user);
+  const canAccessInvites =
+    user !== null &&
+    canCreateInvites(
+      verifyUserPermissions(user, user.team?.id ?? undefined),
+    );
+  const visibleMenuItems = menuItems.filter(
+    (item) => !item.requiresInviteAccess || canAccessInvites,
+  );
 
   return (
     <aside className="w-[240px] flex-shrink-0 bg-white dark:bg-[#070b13] border-r border-slate-200 dark:border-slate-900/60 flex flex-col h-screen select-none font-sans">
@@ -55,7 +66,7 @@ export function AppSidebar() {
           Navigation
         </span>
 
-        {menuItems.map((item) => {
+        {visibleMenuItems.map((item) => {
           const Icon = item.icon;
           const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
 

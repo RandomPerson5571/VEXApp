@@ -4,7 +4,8 @@ import Link from "next/link";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useMemo, useState } from "react";
 import type { CalendarEvent } from "@/lib/types/team";
-import { formatMonthYear, getDaysInMonth } from "@/lib/utils/calendar";
+import { useTeamEvents } from "@/lib/hooks/use-team-events";
+import { formatMonthYear, getDaysInMonth, getTodayDateStr } from "@/lib/utils/calendar";
 
 const WEEKDAY_LABELS = ["S", "M", "T", "W", "T", "F", "S"];
 
@@ -16,16 +17,13 @@ const eventDotClass: Record<CalendarEvent["type"], string> = {
   meeting: "bg-purple-400",
 };
 
-export function TeamCalendarWidget({
-  events,
-  initialMonth = new Date(2025, 4, 1),
-  highlightedDate = "2025-05-14",
-}: {
-  events: CalendarEvent[];
-  initialMonth?: Date;
-  highlightedDate?: string;
-}) {
-  const [currentMonth, setCurrentMonth] = useState(initialMonth);
+export function TeamCalendarWidget() {
+  const { data: events = [], isLoading } = useTeamEvents();
+  const today = getTodayDateStr();
+  const [currentMonth, setCurrentMonth] = useState(() => {
+    const now = new Date();
+    return new Date(now.getFullYear(), now.getMonth(), 1);
+  });
 
   const daysGrid = useMemo(
     () => getDaysInMonth(currentMonth.getFullYear(), currentMonth.getMonth()),
@@ -88,10 +86,12 @@ export function TeamCalendarWidget({
         ))}
       </div>
 
-      <div className="grid grid-cols-7 gap-1 text-center pt-2">
+      <div
+        className={`grid grid-cols-7 gap-1 text-center pt-2 ${isLoading ? "opacity-50" : ""}`}
+      >
         {daysGrid.map((cell) => {
           const dayEvents = eventsByDate.get(cell.dateStr) ?? [];
-          const isSelectedDay = cell.dateStr === highlightedDate;
+          const isSelectedDay = cell.dateStr === today;
 
           return (
             <Link

@@ -45,11 +45,16 @@ export async function consumeRateLimit(
   return { allowed: true };
 }
 
-export const REGISTER_INVITE_RATE_LIMITS = {
-  ip: { limit: 10, windowMs: 15 * 60 * 1000 },
-  inviteCode: { limit: 20, windowMs: 60 * 60 * 1000 },
-} as const satisfies Record<string, RateLimitConfig>;
-
 export const JOIN_INVITE_RATE_LIMITS = {
   ip: { limit: 60, windowMs: 15 * 60 * 1000 },
+} as const satisfies Record<string, RateLimitConfig>;
+
+export const PROFILE_UPDATE_RATE_LIMITS = {
+  user: { limit: 10, windowMs: 60 * 60 * 1000 },
+  ip: { limit: 30, windowMs: 60 * 60 * 1000 },
+} as const satisfies Record<string, RateLimitConfig>;
+
+export const ACCOUNT_DELETE_RATE_LIMITS = {
+  user: { limit: 3, windowMs: 60 * 60 * 1000 },
+  ip: { limit: 10, windowMs: 60 * 60 * 1000 },
 } as const satisfies Record<string, RateLimitConfig>;

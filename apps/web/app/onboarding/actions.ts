@@ -1,18 +1,17 @@
 "use server";
 
 import { Prisma, prisma } from "@stlvex/database";
-import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
 import {
   clearInviteCookie,
-  INVITE_COOKIE,
+  consumeInvite,
   InviteExhaustedError,
   InviteExpiredError,
   InviteNotFoundError,
+  InviteReservedError,
   INVITE_REQUIRED_MESSAGE,
-  incrementInviteUse,
-  lockInviteForUse,
+  resolveInviteForAuthUser,
 } from "@/lib/auth/invite";
 import {
   confirmProfileVerification,
@@ -60,10 +59,19 @@ export async function completeOnboarding(
     return { error: "Your account is missing an email address." };
   }
 
-  const cookieStore = await cookies();
-  const inviteCode = cookieStore.get(INVITE_COOKIE)?.value?.trim();
+  const discordAuth = isDiscordAuthUser(user);
+  const emailVerified = Boolean(user.email_confirmed_at);
 
-  if (!inviteCode) {
+  if (!discordAuth && !emailVerified) {
+    return {
+      error:
+        "Your email address has not been verified yet. Check your inbox or continue with Discord.",
+    };
+  }
+
+  const { invite } = await resolveInviteForAuthUser(user);
+
+  if (!invite) {
     return { error: INVITE_REQUIRED_MESSAGE };
   }
 
@@ -96,12 +104,9 @@ export async function completeOnboarding(
         return existing;
       }
 
-      const invite = await lockInviteForUse(tx, inviteCode);
-      const discordId = isDiscordAuthUser(user)
-        ? getDiscordIdFromAuthUser(user)
-        : null;
-      const useDiscordVerify = discordId !== null;
-      const emailVerified = Boolean(user.email_confirmed_at);
+      await consumeInvite(tx, invite.id, user.id);
+
+      const discordId = discordAuth ? getDiscordIdFromAuthUser(user) : null;
 
       const created = await tx.user.create({
         data: {
@@ -121,16 +126,10 @@ export async function completeOnboarding(
                 },
               }
             : {}),
-          verificationMethod: useDiscordVerify
-            ? "DISCORD"
-            : emailVerified
-              ? "EMAIL"
-              : "UNVERIFIED",
-          isVerified: useDiscordVerify || emailVerified,
+          verificationMethod: discordAuth ? "DISCORD" : "EMAIL",
+          isVerified: true,
         },
       });
-
-      await incrementInviteUse(tx, invite.id);
 
       return created;
     });
@@ -148,7 +147,8 @@ export async function completeOnboarding(
     if (
       error instanceof InviteNotFoundError ||
       error instanceof InviteExhaustedError ||
-      error instanceof InviteExpiredError
+      error instanceof InviteExpiredError ||
+      error instanceof InviteReservedError
     ) {
       return { error: error.message };
     }

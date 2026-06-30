@@ -2,12 +2,16 @@
   "name": "web",
   "version": "0.1.0",
   "private": true,
+  "packageManager": "pnpm@11.8.0",
+  "type": "module",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "check-types": "tsc --noEmit"
+    "check-types": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
     "@stlvex/database": "workspace:*",
@@ -23,6 +27,7 @@
     "react": "19.2.4",
     "react-dom": "19.2.4",
     "recharts": "^3.8.1",
+    "server-only": "^0.0.1",
     "shadcn": "^4.11.0",
     "tailwind-merge": "^3.6.0",
     "three": "^0.184.0",
@@ -37,10 +42,12 @@
     "@types/three": "^0.184.1",
     "@typescript-eslint/eslint-plugin": "^8.61.1",
     "@typescript-eslint/parser": "^8.61.1",
+    "dotenv": "^17.4.2",
     "eslint": "^9",
     "eslint-config-next": "16.2.9",
     "tailwindcss": "^4",
     "typescript": "^5",
-    "vite-plugin-svgr": "^5.2.0"
+    "vite-plugin-svgr": "^5.2.0",
+    "vitest": "^3.2.4"
   }
 }

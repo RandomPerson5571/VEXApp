@@ -2,7 +2,6 @@ import type {
   Activity,
   BuildStatusComponent,
   CalendarEvent,
-  DashboardSummaryStats,
   DesignNotebookEntry,
   MatchRecord,
   UpcomingMatch,
@@ -170,18 +169,6 @@ export const mockUpcomingMatches: UpcomingMatch[] = [
     accentClass: "bg-amber-500/10 text-amber-400 border-amber-500/20",
   },
 ];
-
-export const mockSummaryStats: DashboardSummaryStats = {
-  buildProgress: 76,
-  buildProgressDelta: "+8%",
-  matchesScouted: mockMatches.length,
-  matchesScoutedDelta: "+6",
-  inventoryItems: 142,
-  inventoryWarning: true,
-  teamRank: "3rd",
-  teamRankDelta: "+1",
-  teamRankContext: "In District 6 Regional",
-};
 
 export const mockRobotLabel = "604A";
 

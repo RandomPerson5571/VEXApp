@@ -22,11 +22,11 @@ export const metadata: Metadata = {
     process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000",
   ),
   title: {
-    default: "STL Robotics Dashboard",
-    template: "%s | STL Robotics Dashboard",
+    default: "STL VEX Robotics",
+    template: "%s | STL VEX Robotics",
   },
   description:
-    "Team hub for STL VEX Robotics. Manage matches, build logs, inventory, calendar, documents, and members for the 2026–2027 season.",
+    "Team hub for STL VEX Robotics. Manage matches, build logs, inventory, calendar, documents, and members for the 2026-2027 season.",
   keywords: [
     "VEX Robotics",
     "STL Robotics",
@@ -39,19 +39,19 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "en_US",
-    siteName: "STL Robotics Dashboard",
-    title: "STL Robotics Dashboard",
+    siteName: "STL VEX Robotics",
+    title: "STL VEX Robotics",
     description:
       "Team hub for STL VEX Robotics. Manage matches, build logs, inventory, calendar, documents, and members.",
   },
   twitter: {
     card: "summary",
-    title: "STL Robotics Dashboard",
+    title: "STL VEX Robotics",
     description:
       "Team hub for STL VEX Robotics. Manage matches, build logs, inventory, calendar, documents, and members.",
   },
   icons: {
-    icon: "/icon.png",
+    icon: "/logos/Robotics_lion.svg",
   },
 };
 

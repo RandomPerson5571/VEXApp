@@ -1,5 +1,6 @@
 import { Prisma, prisma } from "@stlvex/database";
-import type { User as SupabaseUser } from "@supabase/supabase-js";
+import type { SupabaseClient, User as SupabaseUser } from "@supabase/supabase-js";
+import { cache } from "react";
 
 export type IdentityVerificationResult =
   | { ok: true }
@@ -13,23 +14,80 @@ export type DiscordSyncResult =
       code: "not_linked" | "no_profile" | "mismatch" | "conflict";
     };
 
+/**
+ * Ensures linked OAuth providers are present on the user object. The JWT-backed
+ * `getUser()` payload can omit `identities` after `linkIdentity`, while the
+ * session returned from `exchangeCodeForSession` usually includes them.
+ */
+export async function resolveAuthUserWithIdentities(
+  supabase: SupabaseClient,
+  user: SupabaseUser,
+): Promise<SupabaseUser> {
+  const sessionIdentities = user.identities ?? [];
+
+  const { data: identityData } = await supabase.auth.getUserIdentities();
+  const fetchedIdentities = identityData?.identities ?? [];
+
+  const identities =
+    fetchedIdentities.length > sessionIdentities.length
+      ? fetchedIdentities
+      : sessionIdentities.length > 0
+        ? sessionIdentities
+        : fetchedIdentities;
+
+  if (identities.length === 0) {
+    return user;
+  }
+
+  return { ...user, identities };
+}
+
+export function isDiscordAuthUser(user: SupabaseUser): boolean {
+  return (
+    user.app_metadata?.provider === "discord" ||
+    user.identities?.some((identity) => identity.provider === "discord") ===
+      true
+  );
+}
+
+function readDiscordIdFromMetadata(user: SupabaseUser): string | null {
+  const providerId = user.user_metadata?.provider_id;
+  if (
+    typeof providerId === "string" &&
+    providerId.length > 0 &&
+    providerId !== user.id
+  ) {
+    return providerId;
+  }
+
+  const sub = user.user_metadata?.sub;
+  if (typeof sub === "string" && sub.length > 0 && sub !== user.id) {
+    return sub;
+  }
+
+  return null;
+}
+
 export function getDiscordIdFromAuthUser(user: SupabaseUser): string | null {
   const discordIdentity = user.identities?.find(
     (identity) => identity.provider === "discord",
   );
 
-  if (discordIdentity?.id) {
-    return discordIdentity.id;
+  if (discordIdentity) {
+    const identitySub = discordIdentity.identity_data?.sub;
+    if (typeof identitySub === "string" && identitySub.length > 0) {
+      return identitySub;
+    }
+
+    if (discordIdentity.id && discordIdentity.id !== user.id) {
+      return discordIdentity.id;
+    }
   }
 
-  const providerId = user.user_metadata?.provider_id;
-  if (typeof providerId === "string" && providerId.length > 0) {
-    return providerId;
-  }
-
-  const sub = user.user_metadata?.sub;
-  if (typeof sub === "string" && sub.length > 0) {
-    return sub;
+  // Email/password accounts also carry `user_metadata.sub` (the Supabase UUID).
+  // Only read provider metadata for Discord-primary sign-in sessions.
+  if (isDiscordAuthUser(user)) {
+    return readDiscordIdFromMetadata(user);
   }
 
   return null;
@@ -87,14 +145,6 @@ async function writeDiscordLink(
   });
 }
 
-export function isDiscordAuthUser(user: SupabaseUser): boolean {
-  return (
-    user.app_metadata?.provider === "discord" ||
-    user.identities?.some((identity) => identity.provider === "discord") ===
-      true
-  );
-}
-
 /**
  * Persists the Discord ID from a verified Supabase OAuth identity onto the
  * user's profile. Never accepts a caller-supplied ID — only provider metadata.
@@ -104,7 +154,7 @@ export async function syncDiscordIdToProfile(
 ): Promise<DiscordSyncResult> {
   const discordId = getDiscordIdFromAuthUser(authUser);
 
-  if (!discordId) {
+  if (!discordId || discordId === authUser.id) {
     return {
       ok: false,
       error: "No Discord identity is linked to this session.",
@@ -254,6 +304,8 @@ type SessionProfile = {
 };
 
 const SESSION_VERIFICATION_TTL_MS = 30_000;
+/** Verified sessions change rarely — longer TTL avoids repeat Prisma work across navigations. */
+const VERIFIED_SESSION_VERIFICATION_TTL_MS = 5 * 60_000;
 const sessionVerificationCache = new Map<
   string,
   { result: IdentityVerificationResult; expiresAt: number }
@@ -285,10 +337,10 @@ function discordOnlyAccountError(): IdentityVerificationResult {
   };
 }
 
-function verifyDiscordAuthIdentityWithProfile(
+async function verifyDiscordAuthIdentityWithProfile(
   authUser: SupabaseUser,
   profile: Pick<SessionProfile, "id" | "discordId">,
-): IdentityVerificationResult {
+): Promise<IdentityVerificationResult> {
   const discordId = getDiscordIdFromAuthUser(authUser);
 
   if (!discordId) {
@@ -318,7 +370,7 @@ function verifyDiscordAuthIdentityWithProfile(
     return { ok: true };
   }
 
-  return verifyDiscordAuthIdentity(authUser);
+  return await verifyDiscordAuthIdentity(authUser);
 }
 
 async function maybeConfirmProfileVerification(
@@ -350,7 +402,10 @@ async function maybeConfirmProfileVerification(
   }
 
   if (profile.verificationMethod === "DISCORD" && isDiscordAuthUser(authUser)) {
-    const discordCheck = verifyDiscordAuthIdentityWithProfile(authUser, profile);
+    const discordCheck = await verifyDiscordAuthIdentityWithProfile(
+      authUser,
+      profile,
+    );
 
     if (discordCheck.ok) {
       await prisma.user.update({
@@ -365,6 +420,39 @@ async function maybeConfirmProfileVerification(
   return profile;
 }
 
+/**
+ * Skips Discord re-verification and profile confirmation writes when the stored
+ * profile is already verified and matches the current session identity.
+ */
+function tryVerifiedProfileFastPath(
+  authUser: SupabaseUser,
+  profile: SessionProfile,
+): IdentityVerificationResult | null {
+  if (!profile.isVerified) {
+    return null;
+  }
+
+  if (isDiscordAuthUser(authUser)) {
+    const discordId = getDiscordIdFromAuthUser(authUser);
+
+    if (
+      discordId &&
+      profile.discordId === discordId &&
+      profile.id === authUser.id
+    ) {
+      return { ok: true };
+    }
+
+    return null;
+  }
+
+  if (profile.verificationMethod === "DISCORD") {
+    return null;
+  }
+
+  return { ok: true };
+}
+
 async function resolveSessionIdentity(
   authUser: SupabaseUser,
 ): Promise<IdentityVerificationResult> {
@@ -377,13 +465,18 @@ async function resolveSessionIdentity(
     return { ok: true };
   }
 
+  const fastPath = tryVerifiedProfileFastPath(authUser, existingProfile);
+  if (fastPath) {
+    return fastPath;
+  }
+
   const profile = await maybeConfirmProfileVerification(
     authUser,
     existingProfile,
   );
 
   if (isDiscordAuthUser(authUser)) {
-    return verifyDiscordAuthIdentityWithProfile(authUser, profile);
+    return await verifyDiscordAuthIdentityWithProfile(authUser, profile);
   }
 
   if (profile.verificationMethod === "DISCORD") {
@@ -397,29 +490,39 @@ async function resolveSessionIdentity(
   return { ok: true };
 }
 
+function getSessionVerificationCacheTtl(
+  result: IdentityVerificationResult,
+): number {
+  return result.ok
+    ? VERIFIED_SESSION_VERIFICATION_TTL_MS
+    : SESSION_VERIFICATION_TTL_MS;
+}
+
 /**
  * Authorizes an existing Supabase session for app access. Used by the OAuth
  * callback and server-side user resolution — not the request proxy.
+ *
+ * Wrapped in React `cache()` so layout + page share one pass per request.
  */
-export async function verifySessionIdentity(
-  authUser: SupabaseUser,
-): Promise<IdentityVerificationResult> {
-  const cacheKey = getSessionVerificationCacheKey(authUser);
-  const cached = sessionVerificationCache.get(cacheKey);
+export const verifySessionIdentity = cache(
+  async (authUser: SupabaseUser): Promise<IdentityVerificationResult> => {
+    const cacheKey = getSessionVerificationCacheKey(authUser);
+    const cached = sessionVerificationCache.get(cacheKey);
 
-  if (cached && cached.expiresAt > Date.now()) {
-    return cached.result;
-  }
+    if (cached && cached.expiresAt > Date.now()) {
+      return cached.result;
+    }
 
-  const result = await resolveSessionIdentity(authUser);
+    const result = await resolveSessionIdentity(authUser);
 
-  sessionVerificationCache.set(cacheKey, {
-    result,
-    expiresAt: Date.now() + SESSION_VERIFICATION_TTL_MS,
-  });
+    sessionVerificationCache.set(cacheKey, {
+      result,
+      expiresAt: Date.now() + getSessionVerificationCacheTtl(result),
+    });
 
-  return result;
-}
+    return result;
+  },
+);
 
 /**
  * Marks invite/onboarding profiles verified once the user completes the

@@ -79,10 +79,23 @@ export default async function TeamManagementPage() {
     );
   }
 
-  const team = await prisma.team.findUnique({
-    where: { id: teamId },
-    select: { id: true, name: true, number: true },
-  });
+  const [team, rosterUsers] = await Promise.all([
+    prisma.team.findUnique({
+      where: { id: teamId },
+      select: { id: true, name: true, number: true },
+    }),
+    prisma.user.findMany({
+      where: { teamId },
+      select: {
+        id: true,
+        firstName: true,
+        lastName: true,
+        email: true,
+        role: true,
+      },
+      orderBy: [{ lastName: "asc" }, { firstName: "asc" }],
+    }),
+  ]);
 
   if (!team) {
     return (
@@ -92,18 +105,6 @@ export default async function TeamManagementPage() {
       />
     );
   }
-
-  const rosterUsers = await prisma.user.findMany({
-    where: { teamId },
-    select: {
-      id: true,
-      firstName: true,
-      lastName: true,
-      email: true,
-      role: true,
-    },
-    orderBy: [{ lastName: "asc" }, { firstName: "asc" }],
-  });
 
   const canManage = canManageTeamRoster(permissions);
 

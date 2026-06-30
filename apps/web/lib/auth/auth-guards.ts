@@ -1,5 +1,5 @@
 import type { UserContextValue } from "@/components/providers/UserProvider";
-import type { User, UserRole } from "@/lib/supabase/wrappers/types";
+import type { User, UserRole } from "@stlvex/database/types";
 
 export type TeamRole = "TEAM_LEADER" | "MEMBER";
 export type GlobalPermission = {
@@ -119,4 +119,12 @@ export function canDelegateTeamLeaders(permissions: PermissionState): boolean {
   }
 
   return permissions.role === "TEAM_LEADER";
+}
+
+/**
+ * Whether the user may create invite links.
+ * Global admins may invite to any team; team leaders only to their own.
+ */
+export function canCreateInvites(permissions: PermissionState): boolean {
+  return canDelegateTeamLeaders(permissions);
 }

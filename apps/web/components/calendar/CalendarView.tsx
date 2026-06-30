@@ -1,30 +1,43 @@
 "use client";
 
+import { useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import type { CalendarEvent, EventType } from "@/lib/types/team";
-import { getDaysInMonth, getTodayDateStr } from "@/lib/utils/calendar";
-import { CalendarEmptyView } from "./CalendarEmptyView";
+import { useTeam } from "@/components/providers/UserProvider";
+import { useTeamEvents } from "@/lib/hooks/use-team-events";
+import { queryKeys } from "@/lib/query-client";
+import {
+  addDaysToDateStr,
+  formatMonthYear,
+  formatSelectedDayLabel,
+  formatWeekRange,
+  getDaysInMonth,
+  getDaysInWeek,
+  getTodayDateStr,
+  parseDateStr,
+} from "@/lib/utils/calendar";
 import { CalendarEventModal } from "./CalendarEventModal";
 import { CalendarHeader } from "./CalendarHeader";
 import { CalendarMonthGrid } from "./CalendarMonthGrid";
 import { CalendarMonthToolbar } from "./CalendarMonthToolbar";
+import { CalendarScheduleGrid } from "./CalendarScheduleGrid";
 import { CalendarSidePanel } from "./CalendarSidePanel";
 import type { CalendarViewMode } from "./calendarTypes";
 
 const DEFAULT_LOCATION = "Iron Reign Workshop";
 
 export interface CalendarViewProps {
-  initialEvents: CalendarEvent[];
   initialSelectedDate?: string;
   onActivityLog?: (text: string, subtext: string, type: "schedule") => void;
 }
 
 export function CalendarView({
-  initialEvents,
-  initialSelectedDate = "2025-05-14",
+  initialSelectedDate = getTodayDateStr(),
   onActivityLog,
 }: CalendarViewProps) {
-  const [events, setEvents] = useState(initialEvents);
+  const team = useTeam();
+  const queryClient = useQueryClient();
+  const { data: events = [], isLoading } = useTeamEvents();
   const [viewType, setViewType] = useState<CalendarViewMode>("month");
   const [currentMonth, setCurrentMonth] = useState(() => {
     const [year, month] = initialSelectedDate.split("-").map(Number);
@@ -48,6 +61,25 @@ export function CalendarView({
     [currentMonth],
   );
 
+  const weekDays = useMemo(() => getDaysInWeek(selectedDate), [selectedDate]);
+
+  const dayCell = useMemo(() => {
+    const date = parseDateStr(selectedDate);
+    return [
+      {
+        day: date.getDate(),
+        isCurrentMonth: true,
+        dateStr: selectedDate,
+      },
+    ];
+  }, [selectedDate]);
+
+  const toolbarLabel = useMemo(() => {
+    if (viewType === "month") return formatMonthYear(currentMonth);
+    if (viewType === "week") return formatWeekRange(selectedDate);
+    return formatSelectedDayLabel(selectedDate);
+  }, [viewType, currentMonth, selectedDate]);
+
   const eventsByDate = useMemo(() => {
     const map = new Map<string, CalendarEvent[]>();
     for (const event of events) {
@@ -65,6 +97,45 @@ export function CalendarView({
     );
   };
 
+  const shiftSelectedDate = (delta: number) => {
+    setSelectedDate((prev) => {
+      const next = addDaysToDateStr(prev, delta);
+      const [year, month] = next.split("-").map(Number);
+      setCurrentMonth(new Date(year, month - 1, 1));
+      return next;
+    });
+  };
+
+  const handlePrevious = () => {
+    if (viewType === "month") {
+      shiftMonth(-1);
+      return;
+    }
+    if (viewType === "week") {
+      shiftSelectedDate(-7);
+      return;
+    }
+    shiftSelectedDate(-1);
+  };
+
+  const handleNext = () => {
+    if (viewType === "month") {
+      shiftMonth(1);
+      return;
+    }
+    if (viewType === "week") {
+      shiftSelectedDate(7);
+      return;
+    }
+    shiftSelectedDate(1);
+  };
+
+  const handleSelectDate = (date: string) => {
+    setSelectedDate(date);
+    const [year, month] = date.split("-").map(Number);
+    setCurrentMonth(new Date(year, month - 1, 1));
+  };
+
   const openAddEventModal = () => {
     setEventDate(selectedDate);
     setIsModalOpen(true);
@@ -72,7 +143,7 @@ export function CalendarView({
 
   const handleAddEvent = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!title.trim()) return;
+    if (!title.trim() || !team?.id) return;
 
     const newEvent: CalendarEvent = {
       id: `ev-${Date.now()}`,
@@ -85,7 +156,11 @@ export function CalendarView({
       description: description.trim() || undefined,
     };
 
-    setEvents((prev) => [...prev, newEvent]);
+    queryClient.setQueryData<CalendarEvent[]>(
+      queryKeys.events.forTeam(team.id),
+      (prev) => [...(prev ?? []), newEvent],
+    );
+
     onActivityLog?.(
       `Event scheduled`,
       `${title.trim()} set on ${eventDate}`,
@@ -101,26 +176,42 @@ export function CalendarView({
       <div className="flex-1 overflow-y-auto px-8 py-6 flex flex-col h-full dashboard-scroll border-r border-slate-200 dark:border-slate-900/60">
         <CalendarHeader viewType={viewType} onViewTypeChange={setViewType} />
         <CalendarMonthToolbar
-          currentMonth={currentMonth}
-          onPreviousMonth={() => shiftMonth(-1)}
-          onNextMonth={() => shiftMonth(1)}
+          label={toolbarLabel}
+          viewType={viewType}
+          onPrevious={handlePrevious}
+          onNext={handleNext}
           onAddEvent={openAddEventModal}
         />
 
-        {viewType === "month" ? (
-          <CalendarMonthGrid
-            calendarDays={calendarDays}
-            eventsByDate={eventsByDate}
-            selectedDate={selectedDate}
-            todayStr={todayStr}
-            onSelectDate={setSelectedDate}
-          />
-        ) : (
-          <CalendarEmptyView
-            viewType={viewType}
-            onReturnToMonth={() => setViewType("month")}
-          />
-        )}
+        <div className={isLoading ? "animate-pulse opacity-70" : undefined}>
+          {viewType === "month" ? (
+            <CalendarMonthGrid
+              calendarDays={calendarDays}
+              eventsByDate={eventsByDate}
+              selectedDate={selectedDate}
+              todayStr={todayStr}
+              onSelectDate={handleSelectDate}
+            />
+          ) : viewType === "week" ? (
+            <CalendarScheduleGrid
+              mode="week"
+              days={weekDays}
+              eventsByDate={eventsByDate}
+              selectedDate={selectedDate}
+              todayStr={todayStr}
+              onSelectDate={handleSelectDate}
+            />
+          ) : (
+            <CalendarScheduleGrid
+              mode="day"
+              days={dayCell}
+              eventsByDate={eventsByDate}
+              selectedDate={selectedDate}
+              todayStr={todayStr}
+              onSelectDate={handleSelectDate}
+            />
+          )}
+        </div>
       </div>
 
       <CalendarSidePanel

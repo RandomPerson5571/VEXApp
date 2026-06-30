@@ -16,13 +16,23 @@ export const queryKeys = {
   teams: {
     all: ["teams"] as const,
     detail: (id: string) => ["teams", "detail", id] as const,
+    members: (teamId: string) => ["teams", "members", teamId] as const,
   },
   events: {
-    all: ["events"] as const,
-    detail: (id: string) => ["events", "detail", id] as const,
+    forTeam: (teamId: string) => ["events", "team", teamId] as const,
+  },
+  tasks: {
+    forTeam: (teamId: string) => ["tasks", "team", teamId] as const,
+  },
+  inventory: {
+    forTeam: (teamId: string) => ["inventory", "team", teamId] as const,
+  },
+  dashboard: {
+    summary: (teamId: string) => ["dashboard", "summary", teamId] as const,
+    tasks: (teamId: string) => ["dashboard", "tasks", teamId] as const,
   },
   docs: {
-    all: ["docs"] as const,
+    tree: (teamId: string) => ["docs", "tree", teamId] as const,
     detail: (id: string) => ["docs", "detail", id] as const,
   },
   notebookLogs: {

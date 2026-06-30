@@ -1,9 +1,10 @@
 "use client";
 
 import { LogOut } from "lucide-react";
-import { useTransition } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useTransition } from "react";
 
+import { signOut } from "@/app/(auth)/actions/auth";
+import { ConfirmationDialog } from "@/components/ui/ConfirmationDialog";
 import { createClient } from "@/lib/supabase/client";
 
 type LogoutButtonProps = {
@@ -13,6 +14,9 @@ type LogoutButtonProps = {
   pendingLabel?: string;
   showIcon?: boolean;
   onSignOut?: () => void;
+  requireConfirmation?: boolean;
+  confirmationTitle?: string;
+  confirmationDescription?: string;
 };
 
 export function LogoutButton({
@@ -22,28 +26,63 @@ export function LogoutButton({
   pendingLabel = "Signing out...",
   showIcon = true,
   onSignOut,
+  requireConfirmation = true,
+  confirmationTitle = "Log out?",
+  confirmationDescription = "You will be signed out of your account on this device.",
 }: LogoutButtonProps) {
   const [pending, startTransition] = useTransition();
-  const router = useRouter();
+  const [showConfirmation, setShowConfirmation] = useState(false);
 
-  const handleSignOut = () => {
+  const performSignOut = () => {
     onSignOut?.();
     startTransition(async () => {
       const supabase = createClient();
       await supabase.auth.signOut();
-      router.push("/");
+      await signOut();
     });
   };
 
+  const handleClick = () => {
+    if (requireConfirmation) {
+      setShowConfirmation(true);
+      return;
+    }
+
+    performSignOut();
+  };
+
   return (
-    <button
-      type="button"
-      onClick={handleSignOut}
-      disabled={pending}
-      className={className}
-    >
-      {showIcon && <LogOut className={iconClassName} />}
-      {pending ? pendingLabel : label}
-    </button>
+    <>
+      <button
+        type="button"
+        onClick={handleClick}
+        disabled={pending}
+        className={className}
+      >
+        {showIcon && <LogOut className={iconClassName} />}
+        {pending ? pendingLabel : label}
+      </button>
+
+      <ConfirmationDialog
+        isOpen={showConfirmation}
+        title={confirmationTitle}
+        description={confirmationDescription}
+        confirmLabel="Log out"
+        cancelLabel="Stay signed in"
+        variant="danger"
+        pending={pending}
+        pendingLabel={pendingLabel}
+        icon={<LogOut className="h-5 w-5 text-red-400" />}
+        onClose={() => {
+          if (!pending) {
+            setShowConfirmation(false);
+          }
+        }}
+        onConfirm={() => {
+          setShowConfirmation(false);
+          performSignOut();
+        }}
+      />
+    </>
   );
 }

@@ -19,9 +19,11 @@
     "@prisma/adapter-pg": "^7.8.0",
     "@prisma/client": "^7.8.0",
     "@prisma/client-runtime-utils": "^7.8.0",
+    "dotenv": "^17.4.2",
     "pg": "^8.22.0"
   },
   "scripts": {
+    "build": "pnpm db:generate",
     "generate": "prisma generate",
     "db:generate": "prisma generate",
     "postinstall": "prisma generate",
@@ -37,7 +39,6 @@
   "devDependencies": {
     "@types/node": "^26.0.0",
     "@types/pg": "^8.20.0",
-    "dotenv": "^17.4.2",
     "prisma": "^7.8.0",
     "typescript": "^6.0.3"
   }

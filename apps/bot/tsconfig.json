@@ -1,14 +1,8 @@
 {
   "compilerOptions": {
     "target": "ES2022",
-    "module": "NodeNext",
-    "moduleResolution": "NodeNext",
-    "baseUrl": ".",
-    "ignoreDeprecations": "6.0",
-    "paths": {
-      "@stlvex/database": ["../../packages/database/src/index.ts"],
-      "@stlvex/database/types": ["../../packages/database/src/types.ts"]
-    },
+    "module": "ESNext",
+    "moduleResolution": "bundler",
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
