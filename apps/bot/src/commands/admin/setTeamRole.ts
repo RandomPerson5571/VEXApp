@@ -5,7 +5,7 @@ import type { SlashCommand } from "../../types.js";
 import { autocompleteTeamOption } from "../../utils/team-options.js";
 
 export const data = new SlashCommandBuilder()
-  .setName("setTeamRole")
+  .setName("set-team-role")
   .setDescription("Set the role for a team")
   .addStringOption((option) =>
     option
