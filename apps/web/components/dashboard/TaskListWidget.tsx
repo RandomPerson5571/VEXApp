@@ -27,7 +27,7 @@ import {
 
 function AssigneeStack({ assignees }: { assignees: TaskListAssignee[] }) {
   if (assignees.length === 0) {
-    return <span className="text-[10px] font-semibold text-slate-600">Unassigned</span>;
+    return <span className="text-[10px] font-semibold text-slate-500 dark:text-slate-600">Unassigned</span>;
   }
 
   const visible = assignees.slice(0, 3);
@@ -40,7 +40,7 @@ function AssigneeStack({ assignees }: { assignees: TaskListAssignee[] }) {
           <div
             key={person.id}
             title={`${person.firstName} ${person.lastName}`}
-            className="flex h-6 w-6 items-center justify-center rounded-full border-2 border-[#090e18] bg-gradient-to-br from-blue-700 to-indigo-800 text-[8px] font-bold text-white"
+            className="flex h-6 w-6 items-center justify-center rounded-full border-2 border-white bg-gradient-to-br from-blue-700 to-indigo-800 text-[8px] font-bold text-white dark:border-[#090e18]"
           >
             {getInitials(person.firstName, person.lastName)}
           </div>
@@ -61,7 +61,7 @@ function TaskRow({ task, index }: { task: DashboardTask; index: number }) {
   return (
     <Link
       href="/task-list"
-      className="group block rounded-xl border border-slate-900/80 bg-slate-950/40 p-3.5 transition duration-200 hover:border-slate-700/80 hover:bg-slate-950/70 motion-safe:hover:-translate-y-px"
+      className="group block rounded-xl border border-slate-200 bg-slate-50 p-3.5 transition duration-200 hover:border-slate-300 hover:bg-white dark:border-slate-900/80 dark:bg-slate-950/40 dark:hover:border-slate-700/80 dark:hover:bg-slate-950/70 motion-safe:hover:-translate-y-px"
       style={
         {
           animationDelay: `${index * 60}ms`,
@@ -75,7 +75,7 @@ function TaskRow({ task, index }: { task: DashboardTask; index: number }) {
 
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">
-            <p className="truncate text-sm font-extrabold text-slate-100 group-hover:text-white">
+            <p className="truncate text-sm font-extrabold text-slate-900 group-hover:text-slate-700 dark:text-slate-100 dark:group-hover:text-white">
               {task.title}
             </p>
             <TaskTypeBadge type={task.type} />
@@ -103,7 +103,7 @@ function TaskRow({ task, index }: { task: DashboardTask; index: number }) {
           </div>
         </div>
 
-        <ChevronRight className="mt-1 h-4 w-4 shrink-0 text-slate-700 transition group-hover:text-slate-400" />
+        <ChevronRight className="mt-1 h-4 w-4 shrink-0 text-slate-400 transition group-hover:text-slate-600 dark:text-slate-700 dark:group-hover:text-slate-400" />
       </div>
     </Link>
   );
@@ -124,21 +124,21 @@ export function TaskListWidget({ maxItems = 4 }: TaskListWidgetProps) {
 
   return (
     <div
-      className={`relative lg:col-span-7 overflow-hidden rounded-2xl border border-slate-900/80 bg-[#090e18]/80 p-6 shadow-md ${isLoading ? "opacity-50" : ""}`}
+      className={`relative lg:col-span-7 overflow-hidden rounded-2xl border border-slate-200 bg-white p-6 shadow-md dark:border-slate-900/80 dark:bg-[#090e18]/80 ${isLoading ? "opacity-50" : ""}`}
     >
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,rgba(59,130,246,0.07),transparent_50%)]"
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,rgba(249,115,22,0.06),transparent_50%)] dark:bg-[radial-gradient(ellipse_at_top_left,rgba(59,130,246,0.07),transparent_50%)]"
       />
 
       <div className="relative flex flex-col">
-        <div className="flex items-start justify-between border-b border-slate-900 pb-3 mb-4">
+        <div className="flex items-start justify-between border-b border-slate-200 pb-3 mb-4 dark:border-slate-900">
           <div>
             <div className="flex items-center gap-2">
               <div className="flex h-7 w-7 items-center justify-center rounded-lg border border-blue-500/20 bg-blue-600/10">
                 <ListTodo className="h-3.5 w-3.5 text-blue-400" />
               </div>
-              <h3 className="text-sm font-black uppercase tracking-wide text-slate-200">
+              <h3 className="text-sm font-black uppercase tracking-wide text-slate-900 dark:text-slate-200">
                 Team Tasks
               </h3>
             </div>
@@ -148,7 +148,7 @@ export function TaskListWidget({ maxItems = 4 }: TaskListWidgetProps) {
           </div>
           <Link
             href="/task-list"
-            className="text-[10px] font-bold text-blue-500 hover:underline flex items-center gap-0.5"
+            className="text-[10px] font-bold text-orange-500 hover:underline flex items-center gap-0.5"
           >
             View All
             <ChevronRight className="h-3 w-3" />
@@ -173,8 +173,8 @@ export function TaskListWidget({ maxItems = 4 }: TaskListWidgetProps) {
 
         <div className="space-y-2.5 motion-safe:[&>*]:animate-in motion-safe:[&>*]:fade-in motion-safe:[&>*]:slide-in-from-bottom-1 motion-safe:[&>*]:duration-300">
           {displayTasks.length === 0 ? (
-            <div className="rounded-xl border border-slate-900/80 bg-slate-950/40 px-4 py-8 text-center">
-              <p className="text-sm font-bold text-slate-300">All caught up</p>
+            <div className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-8 text-center dark:border-slate-900/80 dark:bg-slate-950/40">
+              <p className="text-sm font-bold text-slate-700 dark:text-slate-300">All caught up</p>
               <p className="mt-1 text-[11px] text-slate-500">No open tasks right now.</p>
             </div>
           ) : (
