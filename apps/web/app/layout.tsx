@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono, Inter } from "next/font/google";
 import "./globals.css";
 import { QueryProvider } from "@/components/providers/QueryProvider";
+import { ServiceWorkerRegistration } from "@/components/providers/ServiceWorkerRegistration";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { cn } from "@/lib/utils";
 
@@ -52,7 +53,19 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: "/logos/Robotics_lion.svg",
+    apple: "/icon.png",
   },
+  manifest: "/manifest.webmanifest",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "STL VEX",
+  },
+  applicationName: "STL VEX Robotics",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#f8fafc" },
+    { media: "(prefers-color-scheme: dark)", color: "#03070e" },
+  ],
 };
 
 export default function RootLayout({
@@ -83,6 +96,7 @@ export default function RootLayout({
         />
       </head>
       <body className="min-h-full flex flex-col">
+        <ServiceWorkerRegistration />
         <ThemeProvider>
           <QueryProvider>{children}</QueryProvider>
         </ThemeProvider>
