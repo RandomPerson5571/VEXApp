@@ -14,20 +14,22 @@ export interface DashboardViewProps {
 
 export function DashboardView({ matches }: DashboardViewProps) {
   return (
-    <div className="flex-1 overflow-y-auto px-8 py-6 bg-slate-50 dark:bg-[#03070e] font-sans dashboard-scroll">
-      <DashboardHeader />
-      <SummaryStatsGrid />
+    <div className="flex-1 overflow-y-auto px-6 py-6 bg-[#020617] text-slate-100 font-sans dashboard-scroll">
+      <div className="mx-auto w-full max-w-[1600px] space-y-6">
+        <DashboardHeader />
+        <SummaryStatsGrid />
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-7">
-        <TaskListWidget />
-        <InventoryTrackerWidget />
-      </div>
+        <div className="grid gap-6 xl:grid-cols-[1.35fr_0.85fr] mb-6">
+          <TaskListWidget />
+          <InventoryTrackerWidget />
+        </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        <MatchPerformanceChartDynamic matches={matches} />
-        <div className="lg:col-span-4 space-y-6">
-          <TeamCalendarWidget />
-          <UpcomingMatchesList />
+        <div className="grid gap-6 lg:grid-cols-[1.95fr_1fr]">
+          <MatchPerformanceChartDynamic matches={matches} />
+          <div className="space-y-6">
+            <TeamCalendarWidget />
+            <UpcomingMatchesList />
+          </div>
         </div>
       </div>
     </div>

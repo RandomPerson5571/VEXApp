@@ -42,13 +42,11 @@ export function MatchPerformanceChart({ matches }: { matches: MatchRecord[] }) {
   const { avgScore, maxScore, autoWinRate, driverWinRate } = computeMatchStats(matches);
 
   return (
-    <div className="lg:col-span-8 rounded-2xl bg-white border border-slate-200 shadow-md p-6 dark:bg-[#090e18]/80 dark:border-slate-900/80">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 pb-4 mb-5 dark:border-slate-900">
+    <div className="lg:col-span-8 rounded-[32px] border border-white/10 bg-[#08112a]/90 p-6 shadow-[0_24px_80px_rgba(0,0,0,0.35)]">
+      <div className="flex flex-col gap-4 border-b border-white/10 pb-4 mb-5 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h3 className="text-sm font-black text-slate-900 dark:text-slate-200 uppercase tracking-wide">
-            Recent Match Performance
-          </h3>
-          <p className="text-[11px] text-slate-500 font-semibold mt-0.5">High stakes scouting tracking</p>
+          <h3 className="text-base font-black text-white uppercase tracking-[0.24em]">Recent Match Performance</h3>
+          <p className="text-xs text-slate-400 font-semibold mt-1">High stakes scouting tracking</p>
         </div>
 
         <div className="flex flex-wrap items-center gap-3">
@@ -58,20 +56,20 @@ export function MatchPerformanceChart({ matches }: { matches: MatchRecord[] }) {
         </div>
       </div>
 
-      <div className="h-64 relative">
+      <div className="h-[420px] relative">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={chartData} margin={{ top: 20, right: 30, left: -20, bottom: 5 }}>
-            <CartesianGrid stroke="#0e1726" strokeDasharray="3 3" vertical={false} />
+            <CartesianGrid stroke="rgba(148,163,184,0.12)" strokeDasharray="3 3" vertical={false} />
             <XAxis
               dataKey="name"
-              stroke="#475569"
+              stroke="#94a3b8"
               fontSize={10}
               fontWeight="bold"
               tickLine={false}
               axisLine={false}
             />
             <YAxis
-              stroke="#475569"
+              stroke="#94a3b8"
               fontSize={10}
               fontWeight="bold"
               tickLine={false}
@@ -85,22 +83,20 @@ export function MatchPerformanceChart({ matches }: { matches: MatchRecord[] }) {
                 const data = payload[0]?.payload as (typeof chartData)[number];
                 if (!data) return null;
                 return (
-                  <div className="p-3 bg-white border border-slate-200 rounded-lg shadow-xl text-xs font-sans text-slate-700 dark:bg-[#0c1424] dark:border-slate-800 dark:text-slate-200">
-                    <p className="font-extrabold text-orange-400 mb-1">{data.name} Match Results</p>
-                    <div className="h-px bg-slate-200 my-1.5 dark:bg-slate-800" />
-                    <p className="flex justify-between gap-4 font-semibold">
-                      Total Score:{" "}
-                      <span className="font-mono text-slate-900 dark:text-slate-100 font-black">{data.score}</span>
+                  <div className="p-3 bg-[#061423] border border-white/10 rounded-2xl shadow-2xl text-xs text-slate-200">
+                    <p className="font-extrabold text-orange-300 mb-2">{data.name} Match Results</p>
+                    <div className="h-px bg-white/10 my-1.5" />
+                    <p className="flex justify-between gap-4 font-semibold text-slate-200">
+                      Total Score:
+                      <span className="font-mono text-white font-black">{data.score}</span>
                     </p>
-                    <p className="flex justify-between gap-4 text-slate-600 dark:text-slate-400">
+                    <p className="flex justify-between gap-4 text-slate-400">
                       Autonomous: <span className="font-semibold">{data.autonomous}</span>
                     </p>
-                    <p className="flex justify-between gap-4 text-slate-600 dark:text-slate-400">
+                    <p className="flex justify-between gap-4 text-slate-400">
                       Driver Skill: <span className="font-semibold">{data.driver}</span>
                     </p>
-                    <p className="text-[9.5px] text-slate-500 mt-1 font-semibold">
-                      Scouted by {data.scoutedBy}
-                    </p>
+                    <p className="mt-2 text-[10px] text-slate-500 font-semibold">Scouted by {data.scoutedBy}</p>
                   </div>
                 );
               }}
@@ -109,24 +105,26 @@ export function MatchPerformanceChart({ matches }: { matches: MatchRecord[] }) {
               type="monotone"
               dataKey="score"
               stroke="#3b82f6"
-              strokeWidth={3}
-              activeDot={{ r: 7, stroke: "#93c5fd", strokeWidth: 1 }}
+              strokeWidth={4}
+              activeDot={{ r: 7, stroke: "#93c5fd", strokeWidth: 2 }}
               dot={{ r: 4, strokeWidth: 2 }}
             />
           </LineChart>
         </ResponsiveContainer>
 
-        <div className="absolute top-2 left-1/2 -translate-x-1/2 px-2 py-1 rounded bg-white border border-slate-200 shadow text-center select-none pointer-events-none dark:bg-slate-950 dark:border-slate-900">
-          <span className="text-[8.5px] font-bold text-slate-500 uppercase block leading-none">Avg score</span>
-          <span className="text-xs font-black text-slate-900 dark:text-slate-200 font-mono mt-0.5 block">{avgScore}</span>
+        <div className="absolute top-3 left-1/2 z-10 flex -translate-x-1/2 items-center gap-2 rounded-full border border-white/10 bg-slate-950/80 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.24em] text-slate-300 shadow-lg">
+          <span>Avg score</span>
+          <span className="rounded-full bg-slate-900 px-2 py-0.5 text-white font-black">{avgScore}</span>
         </div>
       </div>
 
-      <div className="flex items-center justify-between mt-4 bg-slate-50 p-3 rounded-lg border border-slate-200 text-xs dark:bg-slate-950/40 dark:border-slate-900">
-        <span className="font-bold text-slate-600 dark:text-slate-400">Showing last 7 scouting records.</span>
-        <Link href="/scouting" className="text-orange-500 font-bold hover:underline">
-          Manage Match Records →
-        </Link>
+      <div className="mt-5 rounded-[24px] border border-white/10 bg-slate-950/60 p-3 text-xs text-slate-400">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+          <span className="font-bold text-slate-300">Showing last 7 scouting records.</span>
+          <Link href="/scouting" className="text-orange-300 font-bold hover:text-orange-200">
+            Manage Match Records →
+          </Link>
+        </div>
       </div>
     </div>
   );
@@ -134,9 +132,9 @@ export function MatchPerformanceChart({ matches }: { matches: MatchRecord[] }) {
 
 function StatBadge({ label, value }: { label: string; value: string | number }) {
   return (
-    <div className="px-2.5 py-1.5 rounded-lg bg-slate-50 border border-slate-200 text-center dark:bg-slate-950 dark:border-slate-900">
-      <span className="text-[9px] font-bold text-slate-500 uppercase block leading-none">{label}</span>
-      <span className="text-sm font-black text-slate-900 dark:text-slate-100 font-mono mt-1 block">{value}</span>
+    <div className="rounded-2xl border border-white/10 bg-slate-950/60 px-3 py-2 text-center">
+      <span className="text-[10px] font-semibold uppercase tracking-[0.22em] text-slate-400 block leading-none">{label}</span>
+      <span className="text-sm font-black text-white font-mono mt-1 block">{value}</span>
     </div>
   );
 }

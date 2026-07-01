@@ -11,13 +11,13 @@ export function SummaryStatsGrid() {
   if (!stats) {
     return (
       <div
-        className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4.5 mb-7 transition-opacity ${isLoading ? "opacity-50" : "opacity-100"}`}
+        className={`grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5 mb-7 transition-opacity ${isLoading ? "opacity-40" : "opacity-100"}`}
       />
     );
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4.5 mb-7">
+    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5 mb-7">
       <SummaryStatCard
         label="Incomplete Tasks"
         value={stats.incompleteTasks}
@@ -37,7 +37,7 @@ export function SummaryStatsGrid() {
         value={stats.inventoryItems}
         subtitle={
           stats.inventoryWarning ? (
-            <span className="flex items-center gap-1">
+            <span className="flex items-center gap-1 text-yellow-300">
               <AlertTriangle className="h-3 w-3 animate-pulse inline" />
               Low stock warning activated
             </span>

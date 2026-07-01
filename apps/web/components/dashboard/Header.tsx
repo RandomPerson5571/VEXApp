@@ -4,19 +4,28 @@ import { TrendingUp } from "lucide-react";
 
 export function DashboardHeader() {
   return (
-    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-      <div>
-        <h1 className="text-2xl font-black text-slate-900 dark:text-slate-100 tracking-tight">Team Dashboard</h1>
-        <p className="text-xs text-slate-600 dark:text-slate-400 font-semibold mt-1">
-          Overview of robot build statuses, pending scrimmage matches, and scouter analytics feeds.
-        </p>
+    <div className="flex flex-col gap-6 rounded-[32px] border border-white/10 bg-white/5 p-6 shadow-[0_24px_80px_rgba(0,0,0,0.35)] backdrop-blur-xl">
+      <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+        <div className="space-y-3">
+          <div className="flex flex-wrap items-center gap-3">
+            <h1 className="text-3xl font-black tracking-tight text-white">Team Dashboard</h1>
+          </div>
+          <p className="max-w-3xl text-sm leading-6 text-slate-400">
+            Overview of robot build status, event readiness, inventory alerts, and match analytics in one place.
+          </p>
+        </div>
+        <div className="flex flex-wrap items-center gap-3">
+          <Link
+            href="/settings"
+            className="inline-flex items-center justify-center rounded-full border border-white/10 bg-slate-950/70 px-4 py-2 text-sm font-semibold text-slate-100 transition hover:border-white/20 hover:bg-slate-900/80"
+          >
+            Customize Layout
+          </Link>
+          <span className="rounded-full border border-slate-800/80 bg-slate-950/70 px-3 py-2 text-xs font-semibold uppercase tracking-[0.16em] text-slate-300">
+            Live team view
+          </span>
+        </div>
       </div>
-      <Link
-        href="/settings"
-        className="flex items-center gap-2 px-3.5 py-2 rounded-lg bg-white dark:bg-[#0a101d] border border-slate-200 dark:border-slate-900 text-xs font-bold text-slate-900 dark:text-slate-300 hover:border-slate-300 dark:hover:border-slate-800 hover:text-slate-700 dark:hover:text-white transition self-start sm:self-center"
-      >
-        Customize Layout
-      </Link>
     </div>
   );
 }
@@ -41,42 +50,41 @@ export function SummaryStatCard({
   warning?: boolean;
 }) {
   const iconToneClasses = {
-    orange: "bg-orange-600/10 border-orange-500/20 text-orange-400",
-    indigo: "bg-indigo-600/10 border-indigo-500/20 text-indigo-400",
-    yellow: "bg-yellow-600/10 border-yellow-500/20 text-yellow-400",
-    green: "bg-green-600/10 border-green-500/20 text-green-400",
+    orange: "bg-orange-500/10 border-orange-400/20 text-orange-300",
+    indigo: "bg-indigo-500/10 border-indigo-400/20 text-indigo-300",
+    yellow: "bg-yellow-500/10 border-yellow-400/20 text-yellow-300",
+    green: "bg-emerald-500/10 border-emerald-400/20 text-emerald-300",
   };
 
   const deltaToneClasses = {
-    orange: "text-orange-400",
-    green: "text-green-400",
+    orange: "text-orange-300",
+    green: "text-emerald-300",
   };
 
   return (
-    <div className="p-4.5 rounded-xl bg-white dark:bg-[#090e18]/80 border border-slate-200 dark:border-slate-900 shadow-md flex items-center justify-between relative overflow-hidden">
-      <div className="space-y-2">
-        <span className="text-[10.5px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest block">
-          {label}
-        </span>
-        <div className="flex items-baseline gap-2">
-          <span className="text-2xl font-black text-slate-900 dark:text-slate-100">{value}</span>
-          {delta && (
-            <span className={`text-[11px] font-bold flex items-center gap-0.5 ${deltaToneClasses[deltaTone]}`}>
-              <TrendingUp className="h-3 w-3" />
-              <span>{delta}</span>
-            </span>
-          )}
+    <div className="relative overflow-hidden rounded-[28px] border border-white/10 bg-slate-950/70 px-5 py-5 shadow-[0_24px_80px_rgba(0,0,0,0.35)]">
+      <div className="flex items-start justify-between gap-4">
+        <div className="space-y-3">
+          <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.3em] text-slate-400">
+            <span className="inline-flex h-2.5 w-2.5 rounded-full bg-orange-400" />
+            {label}
+          </div>
+          <div className="flex items-center gap-3">
+            <span className="text-3xl font-black text-white">{value}</span>
+            {delta ? (
+              <span className={`inline-flex items-center gap-1 rounded-full px-2 py-1 text-xs font-bold ${deltaToneClasses[deltaTone]}`}>
+                <TrendingUp className="h-3 w-3" />
+                {delta}
+              </span>
+            ) : null}
+          </div>
+          <p className={`text-xs font-semibold ${warning ? "text-yellow-300" : "text-slate-400"}`}>
+            {subtitle}
+          </p>
         </div>
-        <span
-          className={`text-[10px] font-semibold block ${warning ? "text-yellow-500 font-bold" : "text-slate-500"}`}
-        >
-          {subtitle}
-        </span>
-      </div>
-      <div
-        className={`h-11 w-11 rounded-lg border flex items-center justify-center ${iconToneClasses[iconTone]}`}
-      >
-        <Icon className="h-5 w-5" />
+        <div className={`flex h-12 w-12 items-center justify-center rounded-2xl border ${iconToneClasses[iconTone]}`}>
+          <Icon className="h-5 w-5" />
+        </div>
       </div>
     </div>
   );
