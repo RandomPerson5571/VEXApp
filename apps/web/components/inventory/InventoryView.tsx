@@ -52,7 +52,7 @@ export function InventoryView() {
   );
 
   return (
-    <div className="relative flex-1 overflow-y-auto bg-[#03070e] px-8 py-6 font-sans dashboard-scroll">
+    <div className="relative flex-1 overflow-y-auto bg-white dark:bg-[#03070e] px-8 py-6 font-sans dashboard-scroll">
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(234,179,8,0.07),transparent_55%)]"
@@ -70,18 +70,18 @@ export function InventoryView() {
         <header className="mb-8">
           <div className="flex items-center gap-3">
             <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-yellow-500/20 bg-yellow-500/10 shadow-[0_0_24px_rgba(234,179,8,0.12)]">
-              <Package className="h-5 w-5 text-yellow-400" />
+              <Package className="h-5 w-5 text-yellow-500 dark:text-yellow-400" />
             </div>
             <div>
-              <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-yellow-400/80">
+              <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-yellow-600 dark:text-yellow-400/80">
                 Workshop ops
               </p>
-              <h1 className="text-[clamp(1.75rem,4vw,2.5rem)] font-black leading-none tracking-tight text-slate-100">
+              <h1 className="text-[clamp(1.75rem,4vw,2.5rem)] font-black leading-none tracking-tight text-slate-900 dark:text-slate-100">
                 Inventory
               </h1>
             </div>
           </div>
-          <p className="mt-3 max-w-2xl text-sm font-medium leading-relaxed text-slate-400">
+          <p className="mt-3 max-w-2xl text-sm font-medium leading-relaxed text-slate-600 dark:text-slate-400">
             Track organization stock, sign-outs, and availability for {teamLabel}.
             Parts checked out by your team appear with borrower details.
           </p>
@@ -93,11 +93,11 @@ export function InventoryView() {
               {Array.from({ length: 5 }).map((_, index) => (
                 <div
                   key={index}
-                  className="h-20 animate-pulse rounded-xl border border-slate-900 bg-slate-950/60"
+                  className="h-20 animate-pulse rounded-xl border border-slate-300 dark:border-slate-900 bg-slate-200 dark:bg-slate-950/60"
                 />
               ))}
             </div>
-            <div className="h-28 animate-pulse rounded-2xl border border-slate-900 bg-slate-950/60" />
+            <div className="h-28 animate-pulse rounded-2xl border border-slate-300 dark:border-slate-900 bg-slate-200 dark:bg-slate-950/60" />
             <div className="grid gap-4 lg:grid-cols-2">
               {Array.from({ length: 4 }).map((_, index) => (
                 <div
@@ -109,11 +109,11 @@ export function InventoryView() {
           </div>
         ) : isError ? (
           <div className="rounded-2xl border border-red-500/20 bg-red-500/5 p-12 text-center">
-            <AlertTriangle className="mx-auto mb-4 h-8 w-8 text-red-400" />
-            <h2 className="text-lg font-black text-slate-200">
+            <AlertTriangle className="mx-auto mb-4 h-8 w-8 text-red-500 dark:text-red-400" />
+            <h2 className="text-lg font-black text-slate-900 dark:text-slate-200">
               Unable to load inventory
             </h2>
-            <p className="mt-2 text-sm text-slate-500">
+            <p className="mt-2 text-sm text-slate-600 dark:text-slate-500">
               Something went wrong while fetching parts. Please refresh and try again.
             </p>
           </div>
@@ -131,12 +131,12 @@ export function InventoryView() {
             </div>
 
             {filteredItems.length === 0 ? (
-              <div className="rounded-2xl border border-slate-900/80 bg-[#090e18]/80 p-12 text-center shadow-md">
-                <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full border border-slate-800 bg-slate-900/60">
-                  <Package className="h-7 w-7 text-slate-500" />
+              <div className="rounded-2xl border border-slate-300 dark:border-slate-900/80 bg-slate-100 dark:bg-[#090e18]/80 p-12 text-center shadow-md dark:shadow-md">
+                <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full border border-slate-400 dark:border-slate-800 bg-slate-200 dark:bg-slate-900/60">
+                  <Package className="h-7 w-7 text-slate-600 dark:text-slate-500" />
                 </div>
-                <h2 className="text-lg font-black text-slate-200">No parts found</h2>
-                <p className="mt-2 text-sm text-slate-500">
+                <h2 className="text-lg font-black text-slate-900 dark:text-slate-200">No parts found</h2>
+                <p className="mt-2 text-sm text-slate-600 dark:text-slate-500">
                   {items.length === 0
                     ? "No inventory items have been added yet."
                     : "Try adjusting your search or availability filter."}

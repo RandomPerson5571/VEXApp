@@ -51,18 +51,18 @@ export function DiscordLinkForm({
 
           <div className="flex-1 min-w-0 space-y-1">
             <div className="flex flex-wrap items-center gap-2">
-              <h3 className="text-sm font-black text-slate-100">Discord</h3>
+              <h3 className="text-sm font-black text-slate-900 dark:text-slate-100">Discord</h3>
               <span
                 className={`inline-flex items-center rounded-full border px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider ${
                   isConnected
-                    ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-400"
-                    : "border-slate-800 bg-slate-900/80 text-slate-500"
+                    ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
+                    : "border-slate-200 bg-white text-slate-500 dark:border-slate-800 dark:bg-slate-900/80"
                 }`}
               >
                 {isConnected ? "Connected" : "Not connected"}
               </span>
             </div>
-            <p className="text-xs text-slate-500 leading-relaxed">{description}</p>
+            <p className="text-xs text-slate-600 leading-relaxed dark:text-slate-500">{description}</p>
           </div>
         </div>
 
@@ -76,25 +76,25 @@ export function DiscordLinkForm({
             <p className="text-xs font-bold uppercase tracking-wide text-slate-500">
               Linked Discord ID
             </p>
-            <p className="mt-1 font-mono text-sm text-emerald-300 break-all">
+            <p className="mt-1 font-mono text-sm text-emerald-600 break-all dark:text-emerald-300">
               {linkedDiscordId}
             </p>
           </div>
         </div>
       ) : embedded ? (
-        <p className="text-xs text-slate-500 leading-relaxed">
+        <p className="text-xs text-slate-600 leading-relaxed dark:text-slate-500">
           Connect through OAuth so we can verify you own the account. Manual Discord
           IDs are not accepted.
         </p>
       ) : null}
 
       {error ? (
-        <div className="rounded-lg border border-red-500/20 bg-red-500/5 px-3.5 py-2.5 text-sm text-red-300">
+        <div className="rounded-lg border border-red-500/20 bg-red-500/5 px-3.5 py-2.5 text-sm text-red-600 dark:text-red-300">
           {error}
         </div>
       ) : null}
       {message ? (
-        <div className="rounded-lg border border-emerald-500/20 bg-emerald-500/5 px-3.5 py-2.5 text-sm text-emerald-300">
+        <div className="rounded-lg border border-emerald-500/20 bg-emerald-500/5 px-3.5 py-2.5 text-sm text-emerald-600 dark:text-emerald-300">
           {message}
         </div>
       ) : null}
@@ -108,7 +108,7 @@ export function DiscordLinkForm({
   }
 
   return (
-    <article className="group rounded-xl border border-slate-900 bg-slate-950/40 p-5 transition duration-200 hover:border-indigo-500/20">
+    <article className="group rounded-xl border border-slate-200 bg-slate-50 p-5 transition duration-200 hover:border-indigo-500/20 dark:border-slate-900 dark:bg-slate-950/40">
       {body}
     </article>
   );

@@ -235,3 +235,22 @@
     opacity: 1;
   }
 }
+
+/* Custom Cursor Styles */
+html,
+body,
+a,
+button,
+[role="button"],
+.cursor-pointer,
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="search"],
+input[type="url"],
+input[type="number"],
+textarea,
+[contenteditable="true"],
+.cursor-text {
+  cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="30" height="30"><circle cx="16" cy="16" r="10" fill="white" mix-blend-mode="overlay"/></svg>') 15 15, auto;
+}

@@ -61,7 +61,7 @@ function TaskRow({ task, index }: { task: DashboardTask; index: number }) {
   return (
     <Link
       href="/task-list"
-      className="group block rounded-3xl border border-white/10 bg-slate-950/60 p-4 transition duration-200 hover:-translate-y-1 hover:border-white/20 hover:bg-slate-900/80 motion-safe:will-change-transform"
+      className="group block rounded-3xl border border-slate-300 dark:border-white/10 bg-slate-100 dark:bg-slate-950/60 p-4 transition duration-200 hover:-translate-y-1 hover:border-slate-400 dark:hover:border-white/20 hover:bg-slate-200 dark:hover:bg-slate-900/80 motion-safe:will-change-transform"
       style={
         {
           animationDelay: `${index * 60}ms`,
@@ -75,7 +75,7 @@ function TaskRow({ task, index }: { task: DashboardTask; index: number }) {
 
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">
-            <p className="truncate text-sm font-extrabold text-white group-hover:text-slate-200">
+              <p className="truncate text-sm font-extrabold text-slate-900 dark:text-white group-hover:text-slate-700 dark:group-hover:text-slate-200">
               {task.title}
             </p>
             <TaskTypeBadge type={task.type} />
@@ -88,7 +88,7 @@ function TaskRow({ task, index }: { task: DashboardTask; index: number }) {
             {dueLabel ? (
               <span
                 className={`inline-flex items-center gap-1 text-[10px] font-bold ${
-                  overdue ? "text-red-400" : "text-slate-500"
+                  overdue ? "text-red-600 dark:text-red-400" : "text-slate-500 dark:text-slate-500"
                 }`}
               >
                 {overdue ? (
@@ -124,7 +124,7 @@ export function TaskListWidget({ maxItems = 4 }: TaskListWidgetProps) {
 
   return (
     <div
-      className={`relative lg:col-span-7 overflow-hidden rounded-[32px] border border-white/10 bg-[#091126]/80 p-6 shadow-[0_24px_80px_rgba(0,0,0,0.35)] ${isLoading ? "opacity-60" : ""}`}
+      className={`relative overflow-hidden rounded-[32px] border border-slate-200 dark:border-white/10 bg-white dark:bg-[#091126]/80 p-6 shadow-[0_24px_80px_rgba(0,0,0,0.08)] dark:shadow-[0_24px_80px_rgba(0,0,0,0.35)] ${isLoading ? "opacity-60" : ""}`}
     >
       <div
         aria-hidden
@@ -132,23 +132,23 @@ export function TaskListWidget({ maxItems = 4 }: TaskListWidgetProps) {
       />
 
       <div className="relative flex flex-col">
-        <div className="flex items-start justify-between border-b border-white/10 pb-3 mb-4">
+        <div className="flex items-start justify-between border-b border-slate-300 dark:border-white/10 pb-3 mb-4">
           <div>
             <div className="flex items-center gap-3">
               <div className="flex h-9 w-9 items-center justify-center rounded-2xl border border-blue-400/20 bg-blue-500/10">
-                <ListTodo className="h-4 w-4 text-blue-300" />
+                <ListTodo className="h-4 w-4 text-blue-600 dark:text-blue-300" />
               </div>
-              <h3 className="text-sm font-black uppercase tracking-[0.24em] text-slate-100">
+              <h3 className="text-sm font-black uppercase tracking-[0.24em] text-slate-900 dark:text-slate-100">
                 Team Tasks
               </h3>
             </div>
-            <p className="mt-1 text-[11px] font-semibold text-slate-400">
+            <p className="mt-1 text-[11px] font-semibold text-slate-600 dark:text-slate-400">
               Active work across build, software, and CAD
             </p>
           </div>
           <Link
             href="/task-list"
-            className="text-[10px] font-bold text-orange-500 hover:underline flex items-center gap-0.5"
+            className="text-[10px] font-bold text-orange-600 dark:text-orange-500 hover:underline flex items-center gap-0.5"
           >
             View All
             <ChevronRight className="h-3 w-3" />
@@ -156,26 +156,26 @@ export function TaskListWidget({ maxItems = 4 }: TaskListWidgetProps) {
         </div>
 
         <div className="mb-4 flex flex-wrap gap-2">
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-blue-400/20 bg-blue-500/10 px-3 py-1.5 text-[10px] font-bold text-blue-300">
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-blue-400/20 bg-blue-500/10 px-3 py-1.5 text-[10px] font-bold text-blue-600 dark:text-blue-300">
             <Clock className="h-3 w-3" />
             {activeCount} active
           </span>
           {overdueCount > 0 ? (
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-red-400/20 bg-red-500/10 px-3 py-1.5 text-[10px] font-bold text-red-300">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-red-400/20 bg-red-500/10 px-3 py-1.5 text-[10px] font-bold text-red-600 dark:text-red-300">
               <AlertCircle className="h-3 w-3" />
               {overdueCount} overdue
             </span>
           ) : null}
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-400/20 bg-emerald-500/10 px-3 py-1.5 text-[10px] font-bold text-emerald-300">
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-400/20 bg-emerald-500/10 px-3 py-1.5 text-[10px] font-bold text-emerald-600 dark:text-emerald-300">
             {completedCount} completed
           </span>
         </div>
 
         <div className="space-y-2.5 motion-safe:[&>*]:animate-in motion-safe:[&>*]:fade-in motion-safe:[&>*]:slide-in-from-bottom-1 motion-safe:[&>*]:duration-300">
           {displayTasks.length === 0 ? (
-            <div className="rounded-3xl border border-white/10 bg-slate-950/60 px-4 py-8 text-center">
-              <p className="text-sm font-bold text-white">All caught up</p>
-              <p className="mt-1 text-[11px] text-slate-400">No open tasks right now.</p>
+            <div className="rounded-3xl border border-slate-300 dark:border-white/10 bg-slate-100 dark:bg-slate-950/60 px-4 py-8 text-center">
+              <p className="text-sm font-bold text-slate-900 dark:text-white">All caught up</p>
+              <p className="mt-1 text-[11px] text-slate-600 dark:text-slate-400">No open tasks right now.</p>
             </div>
           ) : (
             displayTasks.map((task, index) => (

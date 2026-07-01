@@ -14,8 +14,8 @@ function DocumentsFallback({
   description: string;
 }) {
   return (
-    <div className="flex flex-1 items-center justify-center bg-[#03070e] p-8">
-      <div className="w-full max-w-md rounded-2xl border border-slate-900 bg-[#090e18]/80 p-8 text-center shadow-md">
+    <div className="flex flex-1 items-center justify-center bg-slate-100 dark:bg-[#03070e] p-8">
+      <div className="w-full max-w-md rounded-2xl border border-slate-300 dark:border-slate-900 bg-white dark:bg-[#090e18]/80 p-8 text-center shadow-md dark:shadow-lg">
         <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full border border-slate-800 bg-slate-900/60">
           <FileText className="h-7 w-7 text-slate-400" />
         </div>

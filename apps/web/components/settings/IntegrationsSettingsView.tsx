@@ -70,10 +70,10 @@ export function IntegrationsSettingsView({
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-xl font-black text-slate-100 tracking-tight">
+        <h1 className="text-xl font-black text-slate-950 tracking-tight dark:text-slate-100">
           Integrations
         </h1>
-        <p className="text-xs text-slate-400 font-semibold mt-1">
+        <p className="text-xs text-slate-600 font-semibold mt-1 dark:text-slate-400">
           Connect external tools to keep design and development workflows in sync.
         </p>
       </div>
@@ -87,7 +87,7 @@ export function IntegrationsSettingsView({
           {integrations.map((integration) => (
             <article
               key={integration.id}
-              className={`group rounded-xl border border-slate-900 bg-slate-950/40 p-5 transition duration-200 ${integration.borderClassName}`}
+              className={`group rounded-xl border border-slate-200 bg-slate-50 p-5 transition duration-200 dark:border-slate-900 dark:bg-slate-950/40 ${integration.borderClassName}`}
             >
               <div className="flex flex-col sm:flex-row sm:items-center gap-4">
                 <div
@@ -103,14 +103,14 @@ export function IntegrationsSettingsView({
 
                 <div className="flex-1 min-w-0 space-y-1">
                   <div className="flex flex-wrap items-center gap-2">
-                    <h3 className="text-sm font-black text-slate-100">
+                    <h3 className="text-sm font-black text-slate-900 dark:text-slate-100">
                       {integration.name}
                     </h3>
-                    <span className="inline-flex items-center rounded-full border border-slate-800 bg-slate-900/80 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-slate-500">
+                    <span className="inline-flex items-center rounded-full border border-slate-200 bg-white px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-slate-500 dark:border-slate-800 dark:bg-slate-900/80">
                       Not connected
                     </span>
                   </div>
-                  <p className="text-xs text-slate-500 leading-relaxed">
+                  <p className="text-xs text-slate-600 leading-relaxed dark:text-slate-500">
                     {integration.description}
                   </p>
                 </div>
@@ -118,7 +118,7 @@ export function IntegrationsSettingsView({
                 <button
                   type="button"
                   disabled
-                  className="inline-flex items-center justify-center gap-2 rounded-lg border border-slate-900 bg-[#0a101d] px-4 py-2 text-xs font-bold text-slate-600 cursor-not-allowed shrink-0 sm:self-center"
+                  className="inline-flex items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2 text-xs font-bold text-slate-500 cursor-not-allowed shrink-0 sm:self-center dark:border-slate-900 dark:bg-[#0a101d] dark:text-slate-600"
                 >
                   <Link2 className="h-3.5 w-3.5" />
                   Connect

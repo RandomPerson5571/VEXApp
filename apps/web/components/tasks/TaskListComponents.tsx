@@ -52,7 +52,7 @@ function AssigneeStack({ assignees }: { assignees: TaskListAssignee[] }) {
           <div
             key={person.id}
             title={formatPersonName(person)}
-            className="flex h-7 w-7 items-center justify-center rounded-full border-2 border-[#090e18] bg-gradient-to-br from-blue-700 to-indigo-800 text-[9px] font-bold text-white shadow-sm"
+            className="flex h-7 w-7 items-center justify-center rounded-full border-2 border-white bg-gradient-to-br from-blue-700 to-indigo-800 text-[9px] font-bold text-white shadow-sm dark:border-[#090e18]"
           >
             {getInitials(person.firstName, person.lastName)}
           </div>
@@ -71,12 +71,12 @@ function SubtaskRow({ task }: { task: TaskListSubTask }) {
   const assignees = getTaskAssignees(task);
 
   return (
-    <div className="group/sub flex items-start gap-3 rounded-lg border border-transparent px-3 py-2.5 transition hover:border-slate-800/80 hover:bg-slate-950/40">
+    <div className="group/sub flex items-start gap-3 rounded-lg border border-transparent px-3 py-2.5 transition hover:border-slate-200 hover:bg-slate-100 dark:hover:border-slate-800/80 dark:hover:bg-slate-950/40">
       <div className="mt-1.5 flex h-4 w-4 shrink-0 items-center justify-center">
         {task.status === "Done" ? (
           <CheckCircle2 className="h-4 w-4 text-emerald-500" />
         ) : task.status === "InProgress" ? (
-          <Clock className="h-4 w-4 text-blue-400" />
+          <Clock className="h-4 w-4 text-blue-600 dark:text-blue-400" />
         ) : (
           <Circle className="h-4 w-4 text-slate-600" />
         )}
@@ -86,7 +86,7 @@ function SubtaskRow({ task }: { task: TaskListSubTask }) {
         <div className="flex flex-wrap items-center gap-2">
           <p
             className={`text-sm font-semibold ${
-              task.status === "Done" ? "text-slate-500 line-through" : "text-slate-200"
+              task.status === "Done" ? "text-slate-500 line-through" : "text-slate-900 dark:text-slate-200"
             }`}
           >
             {task.title}
@@ -103,7 +103,7 @@ function SubtaskRow({ task }: { task: TaskListSubTask }) {
           {dueLabel ? (
             <span
               className={`inline-flex items-center gap-1 ${
-                overdue ? "text-red-400" : "text-slate-500"
+                overdue ? "text-red-600 dark:text-red-400" : "text-slate-500"
               }`}
             >
               {overdue ? (
@@ -147,7 +147,7 @@ export function TaskCard({
   const hasSubtasks = task.subTasks.length > 0;
 
   return (
-    <article className="overflow-hidden rounded-2xl border border-slate-900/80 bg-[#090e18]/80 shadow-md transition hover:border-slate-800">
+    <article className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:border-slate-300 dark:border-slate-900/80 dark:bg-[#090e18]/80 dark:shadow-md dark:hover:border-slate-800">
       <div className="p-5">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
           <div className="min-w-0 flex-1">
@@ -161,7 +161,7 @@ export function TaskCard({
               />
             </div>
 
-            <h3 className="mt-3 text-lg font-black tracking-tight text-slate-100">
+            <h3 className="mt-3 text-lg font-black tracking-tight text-slate-950 dark:text-slate-100">
               <InlineEdit
                 value={task.title}
                 placeholder="Task title"
@@ -176,7 +176,7 @@ export function TaskCard({
                 placeholder="Add a description..."
                 allowEmpty
                 onSave={onUpdateDescription}
-                className="text-sm leading-relaxed text-slate-400"
+                className="text-sm leading-relaxed text-slate-600 dark:text-slate-400"
               />
             </div>
 
@@ -184,7 +184,7 @@ export function TaskCard({
               <div className="flex items-center gap-2">
                 <User className="h-3.5 w-3.5 text-slate-500" />
                 <span className="font-semibold text-slate-500">Created by</span>
-                <span className="font-bold text-slate-300">
+                <span className="font-bold text-slate-800 dark:text-slate-300">
                   {formatPersonName(task.creator)}
                 </span>
               </div>
@@ -197,7 +197,7 @@ export function TaskCard({
               {dueLabel ? (
                 <div
                   className={`flex items-center gap-1.5 font-bold ${
-                    overdue ? "text-red-400" : "text-slate-400"
+                    overdue ? "text-red-600 dark:text-red-400" : "text-slate-600 dark:text-slate-400"
                   }`}
                 >
                   {overdue ? (
@@ -213,20 +213,20 @@ export function TaskCard({
 
           {hasSubtasks ? (
             <div className="w-full shrink-0 lg:w-44">
-              <div className="rounded-xl border border-slate-900/80 bg-slate-950/50 p-3">
+              <div className="rounded-xl border border-slate-200 bg-slate-50 p-3 dark:border-slate-900/80 dark:bg-slate-950/50">
                 <div className="flex items-center justify-between text-[10px] font-bold uppercase tracking-wide text-slate-500">
                   <span>Subtasks</span>
-                  <span className="font-mono text-slate-400">
+                  <span className="font-mono text-slate-600 dark:text-slate-400">
                     {progress.completed}/{progress.total}
                   </span>
                 </div>
-                <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-slate-900">
+                <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-slate-200 dark:bg-slate-900">
                   <div
                     className="h-full rounded-full bg-gradient-to-r from-blue-600 to-indigo-500 transition-all duration-500"
                     style={{ width: `${progress.percent}%` }}
                   />
                 </div>
-                <p className="mt-1.5 text-right text-[10px] font-bold text-blue-400">
+                <p className="mt-1.5 text-right text-[10px] font-bold text-blue-600 dark:text-blue-400">
                   {progress.percent}% complete
                 </p>
               </div>
@@ -238,7 +238,7 @@ export function TaskCard({
           <button
             type="button"
             onClick={() => setExpanded((open) => !open)}
-            className="mt-4 inline-flex items-center gap-2 rounded-lg border border-slate-900 bg-slate-950/50 px-3 py-1.5 text-[11px] font-bold text-slate-400 transition hover:border-slate-800 hover:text-slate-200"
+            className="mt-4 inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 px-3 py-1.5 text-[11px] font-bold text-slate-600 transition hover:border-slate-300 hover:text-slate-900 dark:border-slate-900 dark:bg-slate-950/50 dark:text-slate-400 dark:hover:border-slate-800 dark:hover:text-slate-200"
             aria-expanded={expanded}
           >
             <ChevronDown
@@ -253,7 +253,7 @@ export function TaskCard({
       </div>
 
       {hasSubtasks && expanded ? (
-        <div className="border-t border-slate-900/80 bg-slate-950/30 px-2 py-2">
+        <div className="border-t border-slate-200 bg-slate-50/70 px-2 py-2 dark:border-slate-900/80 dark:bg-slate-950/30">
           <div className="space-y-0.5">
             {task.subTasks.map((subtask) => (
               <SubtaskRow key={subtask.id} task={subtask} />
@@ -280,28 +280,28 @@ export function TaskListStats({ tasks }: TaskListStatsProps) {
       label: "Total tasks",
       value: total,
       icon: ListTodo,
-      accent: "text-blue-400",
+      accent: "text-blue-600 dark:text-blue-400",
       bg: "bg-blue-500/10 border-blue-500/20",
     },
     {
       label: "In progress",
       value: inProgress,
       icon: Clock,
-      accent: "text-indigo-400",
+      accent: "text-indigo-600 dark:text-indigo-400",
       bg: "bg-indigo-500/10 border-indigo-500/20",
     },
     {
       label: "Completed",
       value: done,
       icon: CheckCircle2,
-      accent: "text-emerald-400",
+      accent: "text-emerald-600 dark:text-emerald-400",
       bg: "bg-emerald-500/10 border-emerald-500/20",
     },
     {
       label: "Overdue",
       value: overdue,
       icon: AlertCircle,
-      accent: "text-red-400",
+      accent: "text-red-600 dark:text-red-400",
       bg: "bg-red-500/10 border-red-500/20",
     },
   ];
@@ -314,7 +314,7 @@ export function TaskListStats({ tasks }: TaskListStatsProps) {
         return (
           <div
             key={stat.label}
-            className="rounded-2xl border border-slate-900/80 bg-[#090e18]/80 p-4 shadow-md"
+            className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-900/80 dark:bg-[#090e18]/80 dark:shadow-md"
           >
             <div className="flex items-center justify-between">
               <span className="text-[10px] font-bold uppercase tracking-widest text-slate-500">
@@ -326,7 +326,7 @@ export function TaskListStats({ tasks }: TaskListStatsProps) {
                 <Icon className={`h-4 w-4 ${stat.accent}`} />
               </div>
             </div>
-            <p className="mt-3 text-3xl font-black tracking-tight text-slate-100">
+            <p className="mt-3 text-3xl font-black tracking-tight text-slate-950 dark:text-slate-100">
               {stat.value}
             </p>
           </div>
@@ -349,7 +349,7 @@ type TaskFiltersProps = {
 };
 
 const selectClassName =
-  "rounded-lg border border-slate-900 bg-slate-950/60 px-3 py-2 text-xs font-semibold text-slate-300 outline-none transition focus:border-blue-500/40 focus:ring-1 focus:ring-blue-500/20";
+  "rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 outline-none transition focus:border-blue-500/40 focus:ring-1 focus:ring-blue-500/20 dark:border-slate-900 dark:bg-slate-950/60 dark:text-slate-300";
 
 export function TaskFilters({
   search,
@@ -363,7 +363,7 @@ export function TaskFilters({
   resultCount,
 }: TaskFiltersProps) {
   return (
-    <div className="rounded-2xl border border-slate-900/80 bg-[#090e18]/80 p-4 shadow-md">
+    <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-900/80 dark:bg-[#090e18]/80 dark:shadow-md">
       <div className="flex flex-col gap-3 lg:flex-row lg:items-center">
         <div className="relative min-w-0 flex-1">
           <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
@@ -372,7 +372,7 @@ export function TaskFilters({
             value={search}
             onChange={(event) => onSearchChange(event.target.value)}
             placeholder="Search tasks..."
-            className="w-full rounded-lg border border-slate-900 bg-slate-950/60 py-2 pl-9 pr-3 text-xs font-semibold text-slate-200 outline-none transition placeholder:text-slate-600 focus:border-blue-500/40 focus:ring-1 focus:ring-blue-500/20"
+            className="w-full rounded-lg border border-slate-200 bg-white py-2 pl-9 pr-3 text-xs font-semibold text-slate-900 outline-none transition placeholder:text-slate-500 focus:border-blue-500/40 focus:ring-1 focus:ring-blue-500/20 dark:border-slate-900 dark:bg-slate-950/60 dark:text-slate-200 dark:placeholder:text-slate-600"
           />
         </div>
 

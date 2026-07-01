@@ -33,10 +33,10 @@ type ProfileUpdateResponse = {
 };
 
 const inputClassName =
-  "w-full px-3 py-2.5 bg-slate-950/80 border border-slate-900 rounded-lg text-sm text-slate-200 font-semibold placeholder:text-slate-600 transition focus:outline-none focus:border-blue-500/40 focus:ring-1 focus:ring-blue-500/20";
+  "w-full px-3 py-2.5 bg-white border border-slate-200 rounded-lg text-sm text-slate-900 font-semibold placeholder:text-slate-500 transition focus:outline-none focus:border-blue-500/40 focus:ring-1 focus:ring-blue-500/20 dark:bg-slate-950/80 dark:border-slate-900 dark:text-slate-200 dark:placeholder:text-slate-600";
 
 const labelClassName =
-  "text-[10px] text-slate-400 uppercase tracking-wider font-bold block";
+  "text-[10px] text-slate-600 uppercase tracking-wider font-bold block dark:text-slate-400";
 
 function normalizeEmail(value: string) {
   return value.trim().toLowerCase();
@@ -152,10 +152,10 @@ export function ProfileSettingsView({
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-xl font-black text-slate-100 tracking-tight">
+        <h1 className="text-xl font-black text-slate-950 tracking-tight dark:text-slate-100">
           Profile
         </h1>
-        <p className="text-xs text-slate-400 font-semibold mt-1">
+        <p className="text-xs text-slate-600 font-semibold mt-1 dark:text-slate-400">
           Update your identity, security preferences, and account controls.
         </p>
       </div>
@@ -214,17 +214,17 @@ export function ProfileSettingsView({
           </div>
 
           {profileError ? (
-            <div className="rounded-lg border border-red-500/20 bg-red-500/5 px-3.5 py-2.5 text-sm text-red-300">
+            <div className="rounded-lg border border-red-500/20 bg-red-500/5 px-3.5 py-2.5 text-sm text-red-600 dark:text-red-300">
               {profileError}
             </div>
           ) : null}
           {profileMessage ? (
-            <div className="rounded-lg border border-emerald-500/20 bg-emerald-500/5 px-3.5 py-2.5 text-sm text-emerald-300">
+            <div className="rounded-lg border border-emerald-500/20 bg-emerald-500/5 px-3.5 py-2.5 text-sm text-emerald-600 dark:text-emerald-300">
               {profileMessage}
             </div>
           ) : null}
 
-          <div className="flex flex-wrap items-center gap-3 border-t border-slate-900/60 pt-4">
+          <div className="flex flex-wrap items-center gap-3 border-t border-slate-200 pt-4 dark:border-slate-900/60">
             <button
               type="submit"
               disabled={!isDirty || isSaving}
@@ -236,7 +236,7 @@ export function ProfileSettingsView({
               type="button"
               onClick={resetDraft}
               disabled={!isDirty || isSaving}
-              className="cursor-pointer px-4 py-2 rounded-lg border border-slate-900 text-xs font-semibold text-slate-400 hover:text-slate-200 hover:border-slate-800 transition disabled:cursor-not-allowed disabled:opacity-50"
+              className="cursor-pointer px-4 py-2 rounded-lg border border-slate-200 text-xs font-semibold text-slate-600 hover:text-slate-900 hover:border-slate-300 transition disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-900 dark:text-slate-400 dark:hover:text-slate-200 dark:hover:border-slate-800"
             >
               Reset
             </button>
@@ -270,24 +270,24 @@ export function ProfileSettingsView({
       >
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-start gap-3">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-slate-950 border border-slate-900 text-slate-500">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-slate-100 border border-slate-200 text-slate-500 dark:bg-slate-950 dark:border-slate-900">
               <Users className="h-4.5 w-4.5" />
             </div>
             <div className="space-y-1">
-              <p className="text-sm font-bold text-slate-200">Current team</p>
-              <p className="text-xs text-slate-400">{teamLabel}</p>
+              <p className="text-sm font-bold text-slate-900 dark:text-slate-200">Current team</p>
+              <p className="text-xs text-slate-600 dark:text-slate-400">{teamLabel}</p>
             </div>
           </div>
 
           <div className="flex items-center gap-3 shrink-0">
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-amber-500/20 bg-amber-500/10 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-amber-400">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-amber-500/20 bg-amber-500/10 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-amber-600 dark:text-amber-400">
               <Clock3 className="h-3 w-3" />
               Coming soon
             </span>
             <button
               type="button"
               disabled
-              className="rounded-lg border border-slate-900 px-4 py-2 text-xs font-bold text-slate-600 cursor-not-allowed"
+              className="rounded-lg border border-slate-200 px-4 py-2 text-xs font-bold text-slate-500 cursor-not-allowed dark:border-slate-900 dark:text-slate-600"
             >
               Request Transfer
             </button>
@@ -301,29 +301,29 @@ export function ProfileSettingsView({
         description="Irreversible actions that affect your account access."
       >
         <div className="space-y-4">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 rounded-xl border border-red-500/15 bg-red-950/20 px-4 py-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 rounded-xl border border-red-500/15 bg-red-500/5 px-4 py-4 dark:bg-red-950/20">
             <div>
-              <p className="text-sm font-bold text-red-300">Delete account</p>
-              <p className="mt-1 text-xs text-red-400/70 leading-relaxed">
+              <p className="text-sm font-bold text-red-600 dark:text-red-300">Delete account</p>
+              <p className="mt-1 text-xs text-red-600/80 leading-relaxed dark:text-red-400/70">
                 Permanently remove your profile, team memberships, and linked
                 integrations. This cannot be undone.
               </p>
             </div>
             <DeleteAccountButton
-              className="cursor-pointer inline-flex items-center gap-2 rounded-lg border border-red-500/25 bg-red-500/10 px-4 py-2 text-xs font-bold text-red-400 hover:bg-red-500/20 hover:text-red-300 transition shrink-0 disabled:cursor-not-allowed disabled:opacity-60"
+              className="cursor-pointer inline-flex items-center gap-2 rounded-lg border border-red-500/25 bg-red-500/10 px-4 py-2 text-xs font-bold text-red-600 hover:bg-red-500/20 hover:text-red-700 transition shrink-0 disabled:cursor-not-allowed disabled:opacity-60 dark:text-red-400 dark:hover:text-red-300"
             />
           </div>
 
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 rounded-xl border border-red-500/15 bg-red-950/20 px-4 py-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 rounded-xl border border-red-500/15 bg-red-500/5 px-4 py-4 dark:bg-red-950/20">
             <div>
-              <p className="text-sm font-bold text-red-300">Log out</p>
-              <p className="mt-1 text-xs text-red-400/70">
+              <p className="text-sm font-bold text-red-600 dark:text-red-300">Log out</p>
+              <p className="mt-1 text-xs text-red-600/80 dark:text-red-400/70">
                 End your current session on this device.
               </p>
             </div>
             <LogoutButton
               label="Log Out"
-              className="cursor-pointer inline-flex items-center gap-2 rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-2 text-xs font-bold text-red-400 hover:bg-red-500/20 hover:text-red-300 transition shrink-0"
+              className="cursor-pointer inline-flex items-center gap-2 rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-2 text-xs font-bold text-red-600 hover:bg-red-500/20 hover:text-red-700 transition shrink-0 dark:text-red-400 dark:hover:text-red-300"
               iconClassName="h-4 w-4"
             />
           </div>

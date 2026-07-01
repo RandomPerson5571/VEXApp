@@ -26,10 +26,10 @@ export function DocsSidebarSkeleton() {
     <div className="space-y-3.5">
       {Array.from({ length: 4 }).map((_, index) => (
         <div key={index} className="space-y-2">
-          <div className="h-6 animate-pulse rounded-md bg-slate-900/80" />
-          <div className="ml-4 space-y-1.5 border-l border-slate-900 pl-3">
-            <div className="h-5 animate-pulse rounded-md bg-slate-950/80" />
-            <div className="h-5 animate-pulse rounded-md bg-slate-950/60" />
+          <div className="h-6 animate-pulse rounded-md bg-slate-200 dark:bg-slate-900/80" />
+          <div className="ml-4 space-y-1.5 border-l border-slate-200 pl-3 dark:border-slate-900">
+            <div className="h-5 animate-pulse rounded-md bg-slate-100 dark:bg-slate-950/80" />
+            <div className="h-5 animate-pulse rounded-md bg-slate-100 dark:bg-slate-950/60" />
           </div>
         </div>
       ))}
@@ -40,12 +40,12 @@ export function DocsSidebarSkeleton() {
 export function DocsContentSkeleton({ sectionCount = 4 }: { sectionCount?: number }) {
   return (
     <div className="max-w-3xl space-y-6">
-      <div className="h-8 w-2/3 animate-pulse rounded-lg bg-slate-900/80" />
+      <div className="h-8 w-2/3 animate-pulse rounded-lg bg-slate-200 dark:bg-slate-900/80" />
       <div className="h-1 w-16 animate-pulse rounded-full bg-blue-600/40" />
       {Array.from({ length: sectionCount }).map((_, index) => (
         <div key={index} className="space-y-2">
-          <div className="h-5 w-40 animate-pulse rounded bg-slate-900/70" />
-          <div className="h-16 animate-pulse rounded-lg bg-slate-950/60" />
+          <div className="h-5 w-40 animate-pulse rounded bg-slate-200 dark:bg-slate-900/70" />
+          <div className="h-16 animate-pulse rounded-lg bg-white dark:bg-slate-950/60" />
         </div>
       ))}
     </div>
@@ -78,8 +78,8 @@ export function DocsDirectorySidebar({
   onCreateDocument,
 }: DocsDirectorySidebarProps) {
   return (
-    <aside className="w-[250px] bg-[#070b13] border-r border-slate-900 flex flex-col h-full select-none p-5">
-      <div className="mb-4 flex items-center justify-between gap-2 border-b border-slate-900 pb-2">
+    <aside className="w-[250px] bg-white border-r border-slate-200 flex flex-col h-full select-none p-5 dark:bg-[#070b13] dark:border-slate-900">
+      <div className="mb-4 flex items-center justify-between gap-2 border-b border-slate-200 pb-2 dark:border-slate-900">
         <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">
           Directory
         </span>
@@ -87,7 +87,7 @@ export function DocsDirectorySidebar({
           <button
             type="button"
             onClick={onCreateFolder}
-            className="inline-flex items-center gap-1 rounded-md border border-slate-900 bg-slate-950/60 px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-400 transition hover:border-blue-500/30 hover:bg-blue-600/10 hover:text-blue-300"
+            className="inline-flex items-center gap-1 rounded-md border border-slate-200 bg-slate-50 px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-600 transition hover:border-blue-500/30 hover:bg-blue-600/10 hover:text-blue-600 dark:border-slate-900 dark:bg-slate-950/60 dark:text-slate-400 dark:hover:text-blue-300"
             title="New folder"
           >
             <Plus className="h-3 w-3" />
@@ -107,11 +107,11 @@ export function DocsDirectorySidebar({
             </p>
           </div>
         ) : folders.length === 0 ? (
-          <div className="rounded-lg border border-slate-900 bg-[#090e18]/45 p-4 text-center">
+          <div className="rounded-lg border border-slate-200 bg-slate-50 p-4 text-center dark:border-slate-900 dark:bg-[#090e18]/45">
             <FolderOpen className="mx-auto mb-2 h-5 w-5 text-slate-600" />
-            <p className="text-[11px] font-bold text-slate-400">No folders yet</p>
+            <p className="text-[11px] font-bold text-slate-700 dark:text-slate-400">No folders yet</p>
             {isLeader ? (
-              <p className="mt-1 text-[10px] text-slate-600">
+              <p className="mt-1 text-[10px] text-slate-500 dark:text-slate-600">
                 Create a folder to start organizing documentation.
               </p>
             ) : null}
@@ -126,7 +126,7 @@ export function DocsDirectorySidebar({
                   <button
                     type="button"
                     onClick={() => onToggleFolder(folder.id)}
-                    className="flex min-w-0 flex-1 items-center justify-between text-left text-xs font-black text-slate-300 hover:text-slate-100 py-1 cursor-pointer"
+                    className="flex min-w-0 flex-1 items-center justify-between text-left text-xs font-black text-slate-800 hover:text-slate-950 py-1 cursor-pointer dark:text-slate-300 dark:hover:text-slate-100"
                   >
                     <div className="flex min-w-0 items-center gap-2">
                       <FolderOpen className="h-4 w-4 text-amber-500 flex-shrink-0" />
@@ -141,7 +141,7 @@ export function DocsDirectorySidebar({
                   <button
                     type="button"
                     onClick={() => onCreateDocument(folder.id)}
-                    className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md border border-transparent text-slate-600 transition hover:border-slate-800 hover:bg-slate-900/60 hover:text-blue-400"
+                    className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md border border-transparent text-slate-500 transition hover:border-slate-200 hover:bg-slate-100 hover:text-blue-600 dark:text-slate-600 dark:hover:border-slate-800 dark:hover:bg-slate-900/60 dark:hover:text-blue-400"
                     title="New document"
                   >
                     <Plus className="h-3.5 w-3.5" />
@@ -149,7 +149,7 @@ export function DocsDirectorySidebar({
                 </div>
 
                 {isExpanded ? (
-                  <div className="pl-4.5 border-l border-slate-900 space-y-1 py-1">
+                  <div className="pl-4.5 border-l border-slate-200 space-y-1 py-1 dark:border-slate-900">
                     {folder.docs.length === 0 ? (
                       <p className="px-2 py-1.5 text-[10px] font-semibold text-slate-600">
                         No documents
@@ -162,8 +162,8 @@ export function DocsDirectorySidebar({
                           onClick={() => onSelectDoc(doc.id)}
                           className={`w-full flex items-center gap-2 px-2 py-1.5 rounded-md text-[11px] font-semibold text-left cursor-pointer ${
                             selectedDocId === doc.id
-                              ? "bg-blue-600/10 text-blue-400 font-bold border-l-2 border-blue-500"
-                              : "text-slate-500 hover:text-slate-300"
+                              ? "bg-blue-600/10 text-blue-600 font-bold border-l-2 border-blue-500 dark:text-blue-400"
+                              : "text-slate-500 hover:text-slate-800 dark:hover:text-slate-300"
                           }`}
                         >
                           <FileText className="h-3.5 w-3.5 text-slate-600 shrink-0" />
@@ -228,7 +228,7 @@ export function DocsNotebookArticle({
     <article className="max-w-3xl space-y-8">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-black text-slate-100 tracking-tight leading-none">
+          <h1 className="text-2xl font-black text-slate-950 tracking-tight leading-none dark:text-slate-100">
             {entry.title}
           </h1>
           <div className="h-1 w-16 bg-blue-600 rounded-full mt-4" />
@@ -240,7 +240,7 @@ export function DocsNotebookArticle({
               <button
                 type="button"
                 onClick={onEdit}
-                className="inline-flex items-center gap-1.5 rounded-lg border border-slate-900 bg-slate-950/60 px-3 py-1.5 text-[11px] font-bold text-slate-400 transition hover:border-blue-500/30 hover:bg-blue-600/10 hover:text-blue-300"
+                className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-[11px] font-bold text-slate-600 transition hover:border-blue-500/30 hover:bg-blue-600/10 hover:text-blue-600 dark:border-slate-900 dark:bg-slate-950/60 dark:text-slate-400 dark:hover:text-blue-300"
               >
                 <Pencil className="h-3.5 w-3.5" />
                 Edit
@@ -251,7 +251,7 @@ export function DocsNotebookArticle({
                 type="button"
                 onClick={onDelete}
                 disabled={isDeletePending}
-                className="inline-flex items-center gap-1.5 rounded-lg border border-slate-900 bg-slate-950/60 px-3 py-1.5 text-[11px] font-bold text-slate-400 transition hover:border-red-500/30 hover:bg-red-500/10 hover:text-red-300 disabled:cursor-not-allowed disabled:opacity-50"
+                className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-[11px] font-bold text-slate-600 transition hover:border-red-500/30 hover:bg-red-500/10 hover:text-red-600 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-900 dark:bg-slate-950/60 dark:text-slate-400 dark:hover:text-red-300"
               >
                 <Trash2 className="h-3.5 w-3.5" />
                 Delete
@@ -262,14 +262,14 @@ export function DocsNotebookArticle({
       </div>
 
       <section id="introduction" className="space-y-3.5 scroll-mt-20">
-        <h2 className="text-base font-black text-slate-100 tracking-tight">Introduction</h2>
-        <p className="text-xs text-slate-400 leading-relaxed font-semibold">
+        <h2 className="text-base font-black text-slate-950 tracking-tight dark:text-slate-100">Introduction</h2>
+        <p className="text-xs text-slate-700 leading-relaxed font-semibold dark:text-slate-400">
           {entry.introduction}
         </p>
       </section>
 
       <section id="constraints" className="space-y-3.5 scroll-mt-20">
-        <h2 className="text-base font-black text-slate-100 tracking-tight">
+        <h2 className="text-base font-black text-slate-950 tracking-tight dark:text-slate-100">
           Design Constraints
         </h2>
         {entry.designConstraints.length > 0 ? (
@@ -277,7 +277,7 @@ export function DocsNotebookArticle({
             {entry.designConstraints.map((constraint) => (
               <li
                 key={constraint}
-                className="text-xs text-slate-400 leading-normal font-semibold"
+                className="text-xs text-slate-700 leading-normal font-semibold dark:text-slate-400"
               >
                 {constraint}
               </li>
@@ -289,40 +289,40 @@ export function DocsNotebookArticle({
       </section>
 
       <section id="sketches" className="space-y-4 scroll-mt-20">
-        <h2 className="text-base font-black text-slate-100 tracking-tight">
+        <h2 className="text-base font-black text-slate-950 tracking-tight dark:text-slate-100">
           Concept Sketches
         </h2>
-        <p className="text-xs text-slate-400 leading-relaxed font-semibold">
+        <p className="text-xs text-slate-700 leading-relaxed font-semibold dark:text-slate-400">
           {entry.conceptSketchesDescription}
         </p>
       </section>
 
       <section id="prototypes" className="space-y-3.5 scroll-mt-20">
-        <h2 className="text-base font-black text-slate-100 tracking-tight">Prototypes</h2>
-        <p className="text-xs text-slate-400 leading-relaxed font-semibold">
+        <h2 className="text-base font-black text-slate-950 tracking-tight dark:text-slate-100">Prototypes</h2>
+        <p className="text-xs text-slate-700 leading-relaxed font-semibold dark:text-slate-400">
           {entry.prototypesText}
         </p>
       </section>
 
       <section id="results" className="space-y-3.5 scroll-mt-20">
-        <h2 className="text-base font-black text-slate-100 tracking-tight">
+        <h2 className="text-base font-black text-slate-950 tracking-tight dark:text-slate-100">
           Testing Results
         </h2>
-        <p className="text-xs text-slate-400 leading-relaxed font-semibold">
+        <p className="text-xs text-slate-700 leading-relaxed font-semibold dark:text-slate-400">
           {entry.testingResults}
         </p>
       </section>
 
       <section id="conclusion" className="space-y-3.5 scroll-mt-20">
-        <h2 className="text-base font-black text-slate-100 tracking-tight">Conclusion</h2>
-        <p className="text-xs text-slate-400 leading-relaxed font-semibold">
+        <h2 className="text-base font-black text-slate-950 tracking-tight dark:text-slate-100">Conclusion</h2>
+        <p className="text-xs text-slate-700 leading-relaxed font-semibold dark:text-slate-400">
           {entry.conclusion}
         </p>
       </section>
 
       <section id="steps" className="space-y-3.5 scroll-mt-20">
-        <h2 className="text-base font-black text-slate-100 tracking-tight">Next Steps</h2>
-        <p className="text-xs text-slate-400 leading-relaxed font-semibold">
+        <h2 className="text-base font-black text-slate-950 tracking-tight dark:text-slate-100">Next Steps</h2>
+        <p className="text-xs text-slate-700 leading-relaxed font-semibold dark:text-slate-400">
           {entry.nextSteps}
         </p>
       </section>
@@ -366,7 +366,7 @@ export function DocsMainPanel({
   handleDeleteDocument,
 }: DocsMainPanelProps) {
   return (
-    <div className="flex-1 overflow-y-auto px-10 py-8 bg-[#03070e] text-slate-300 dashboard-scroll">
+    <div className="flex-1 overflow-y-auto px-10 py-8 bg-slate-50 text-slate-700 dashboard-scroll dark:bg-[#03070e] dark:text-slate-300">
       <DocsBreadcrumb folderName={breadcrumbFolderName} docTitle={breadcrumbDocTitle} />
 
       {isTreeLoading ? (
@@ -374,25 +374,25 @@ export function DocsMainPanel({
       ) : isTreeError ? (
         <div className="border border-red-500/20 bg-red-500/5 p-12 rounded-2xl text-center max-w-2xl mx-auto my-12 shadow-xl">
           <AlertTriangle className="h-10 w-10 text-red-400 mx-auto mb-3" />
-          <p className="text-sm font-bold text-slate-300">Unable to load documentation</p>
-          <p className="text-xs text-slate-500 mt-1">
+          <p className="text-sm font-bold text-slate-900 dark:text-slate-300">Unable to load documentation</p>
+          <p className="text-xs text-slate-600 mt-1 dark:text-slate-500">
             Something went wrong while fetching the directory. Please refresh and try again.
           </p>
         </div>
       ) : !hasAnyDocs ? (
-        <div className="border border-slate-900 bg-[#090e18]/45 p-12 rounded-2xl text-center max-w-2xl mx-auto my-12 shadow-xl select-none">
+        <div className="border border-slate-200 bg-white p-12 rounded-2xl text-center max-w-2xl mx-auto my-12 shadow-sm select-none dark:border-slate-900 dark:bg-[#090e18]/45 dark:shadow-xl">
           <FileText className="h-10 w-10 text-slate-500 mx-auto mb-3" />
-          <p className="text-sm font-bold text-slate-300">No documents yet</p>
-          <p className="text-xs text-slate-600 mt-1">
+          <p className="text-sm font-bold text-slate-900 dark:text-slate-300">No documents yet</p>
+          <p className="text-xs text-slate-600 mt-1 dark:text-slate-600">
             Your team has not published any design notebook entries. The directory and outline
             will populate here once documentation is available.
           </p>
         </div>
       ) : !selectedDocId ? (
-        <div className="border border-slate-900 bg-[#090e18]/45 p-12 rounded-2xl text-center max-w-2xl mx-auto my-12 shadow-xl select-none">
+        <div className="border border-slate-200 bg-white p-12 rounded-2xl text-center max-w-2xl mx-auto my-12 shadow-sm select-none dark:border-slate-900 dark:bg-[#090e18]/45 dark:shadow-xl">
           <FileText className="h-10 w-10 text-slate-500 mx-auto mb-3" />
-          <p className="text-sm font-bold text-slate-300">Select a document</p>
-          <p className="text-xs text-slate-600 mt-1">
+          <p className="text-sm font-bold text-slate-900 dark:text-slate-300">Select a document</p>
+          <p className="text-xs text-slate-600 mt-1 dark:text-slate-600">
             Choose an entry from the directory tree to view its contents.
           </p>
         </div>
@@ -401,8 +401,8 @@ export function DocsMainPanel({
       ) : isDetailError || !notebookEntry ? (
         <div className="border border-red-500/20 bg-red-500/5 p-12 rounded-2xl text-center max-w-2xl mx-auto my-12 shadow-xl">
           <AlertTriangle className="h-10 w-10 text-red-400 mx-auto mb-3" />
-          <p className="text-sm font-bold text-slate-300">Unable to load document</p>
-          <p className="text-xs text-slate-500 mt-1">
+          <p className="text-sm font-bold text-slate-900 dark:text-slate-300">Unable to load document</p>
+          <p className="text-xs text-slate-600 mt-1 dark:text-slate-500">
             The selected entry could not be fetched. It may have been removed.
           </p>
         </div>
@@ -432,8 +432,8 @@ export function DocsTableOfContents({
   onSelect,
 }: DocsTableOfContentsProps) {
   return (
-    <aside className="w-[200px] bg-[#070b13] border-l border-slate-900 flex flex-col h-full select-none p-5">
-      <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest block mb-4 border-b border-slate-900 pb-2">
+    <aside className="w-[200px] bg-white border-l border-slate-200 flex flex-col h-full select-none p-5 dark:bg-[#070b13] dark:border-slate-900">
+      <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest block mb-4 border-b border-slate-200 pb-2 dark:border-slate-900">
         Table of Contents
       </span>
 
@@ -449,10 +449,10 @@ export function DocsTableOfContents({
               onClick={() => onSelect(toc.id)}
               className={`w-full text-left px-2 py-1.5 rounded-md text-[11px] font-semibold leading-normal transition flex items-center gap-1.5 ${
                 !showToc
-                  ? "text-slate-700 cursor-not-allowed"
+                  ? "text-slate-400 cursor-not-allowed dark:text-slate-700"
                   : isSelected
-                    ? "bg-blue-600/10 text-blue-400 font-bold border-l border-blue-500 cursor-pointer"
-                    : "text-slate-500 hover:text-slate-300 hover:bg-slate-900/10 cursor-pointer"
+                    ? "bg-blue-600/10 text-blue-600 font-bold border-l border-blue-500 cursor-pointer dark:text-blue-400"
+                    : "text-slate-500 hover:text-slate-800 hover:bg-slate-100 cursor-pointer dark:hover:text-slate-300 dark:hover:bg-slate-900/10"
               }`}
             >
               <div
