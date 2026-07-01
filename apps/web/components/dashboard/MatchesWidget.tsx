@@ -12,9 +12,9 @@ export function UpcomingMatchesList() {
   const matches = useMemo(() => toUpcomingMatches(events), [events]);
 
   return (
-    <div className="rounded-2xl bg-[#090e18]/80 border border-slate-900/80 p-5 shadow-md space-y-4">
-      <div className="flex items-center justify-between border-b border-slate-900 pb-2.5">
-        <span className="text-xs font-black text-slate-200 uppercase tracking-wider">
+    <div className="rounded-2xl bg-white border border-slate-200 p-5 shadow-md space-y-4 dark:bg-[#090e18]/80 dark:border-slate-900/80">
+      <div className="flex items-center justify-between border-b border-slate-200 pb-2.5 dark:border-slate-900">
+        <span className="text-xs font-black text-slate-900 dark:text-slate-200 uppercase tracking-wider">
           Upcoming Matches
         </span>
         <Link
@@ -34,7 +34,7 @@ export function UpcomingMatchesList() {
           matches.map((match) => (
             <div
               key={match.id}
-              className="p-3 bg-slate-950/60 border border-slate-900 rounded-xl flex items-center justify-between gap-3 text-xs"
+              className="p-3 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between gap-3 text-xs dark:bg-slate-950/60 dark:border-slate-900"
             >
               <div className="flex gap-3">
                 <div
@@ -46,7 +46,7 @@ export function UpcomingMatchesList() {
                   <span className="text-md leading-none mt-1">{match.day}</span>
                 </div>
                 <div className="flex flex-col">
-                  <span className="font-extrabold text-slate-200">{match.title}</span>
+                  <span className="font-extrabold text-slate-900 dark:text-slate-200">{match.title}</span>
                   <span className="text-[10.5px] text-slate-500 font-semibold mt-0.5">
                     {match.location}
                   </span>

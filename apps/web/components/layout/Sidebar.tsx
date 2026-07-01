@@ -95,13 +95,13 @@ export function AppSidebar() {
       </nav>
 
       {showAdminLink && (
-        <div className="border-t border-slate-900/40 px-3 py-4">
+        <div className="border-t border-slate-200 px-3 py-4 dark:border-slate-900/40">
           <Link
             href="/admin"
             className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-semibold tracking-normal transition-all duration-150 ${
               pathname === "/admin" || pathname.startsWith("/admin/")
                 ? "bg-orange-600/15 text-orange-400 border border-orange-500/20 shadow-sm shadow-orange-500/5"
-                : "text-slate-400 hover:bg-slate-900/50 hover:text-slate-200 border border-transparent"
+                : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-900/50 hover:text-slate-900 dark:hover:text-slate-200 border border-transparent"
             }`}
           >
             <ShieldCheck

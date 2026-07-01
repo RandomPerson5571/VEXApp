@@ -42,10 +42,10 @@ export function MatchPerformanceChart({ matches }: { matches: MatchRecord[] }) {
   const { avgScore, maxScore, autoWinRate, driverWinRate } = computeMatchStats(matches);
 
   return (
-    <div className="lg:col-span-8 rounded-2xl bg-[#090e18]/80 border border-slate-900/80 shadow-md p-6">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-900 pb-4 mb-5">
+    <div className="lg:col-span-8 rounded-2xl bg-white border border-slate-200 shadow-md p-6 dark:bg-[#090e18]/80 dark:border-slate-900/80">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 pb-4 mb-5 dark:border-slate-900">
         <div>
-          <h3 className="text-sm font-black text-slate-200 uppercase tracking-wide">
+          <h3 className="text-sm font-black text-slate-900 dark:text-slate-200 uppercase tracking-wide">
             Recent Match Performance
           </h3>
           <p className="text-[11px] text-slate-500 font-semibold mt-0.5">High stakes scouting tracking</p>
@@ -85,17 +85,17 @@ export function MatchPerformanceChart({ matches }: { matches: MatchRecord[] }) {
                 const data = payload[0]?.payload as (typeof chartData)[number];
                 if (!data) return null;
                 return (
-                  <div className="p-3 bg-[#0c1424] border border-slate-800 rounded-lg shadow-xl text-xs font-sans text-slate-200">
+                  <div className="p-3 bg-white border border-slate-200 rounded-lg shadow-xl text-xs font-sans text-slate-700 dark:bg-[#0c1424] dark:border-slate-800 dark:text-slate-200">
                     <p className="font-extrabold text-orange-400 mb-1">{data.name} Match Results</p>
-                    <div className="h-px bg-slate-800 my-1.5" />
+                    <div className="h-px bg-slate-200 my-1.5 dark:bg-slate-800" />
                     <p className="flex justify-between gap-4 font-semibold">
                       Total Score:{" "}
-                      <span className="font-mono text-slate-100 font-black">{data.score}</span>
+                      <span className="font-mono text-slate-900 dark:text-slate-100 font-black">{data.score}</span>
                     </p>
-                    <p className="flex justify-between gap-4 text-slate-400">
+                    <p className="flex justify-between gap-4 text-slate-600 dark:text-slate-400">
                       Autonomous: <span className="font-semibold">{data.autonomous}</span>
                     </p>
-                    <p className="flex justify-between gap-4 text-slate-400">
+                    <p className="flex justify-between gap-4 text-slate-600 dark:text-slate-400">
                       Driver Skill: <span className="font-semibold">{data.driver}</span>
                     </p>
                     <p className="text-[9.5px] text-slate-500 mt-1 font-semibold">
@@ -116,14 +116,14 @@ export function MatchPerformanceChart({ matches }: { matches: MatchRecord[] }) {
           </LineChart>
         </ResponsiveContainer>
 
-        <div className="absolute top-2 left-1/2 -translate-x-1/2 px-2 py-1 rounded bg-slate-950 border border-slate-900 shadow text-center select-none pointer-events-none">
+        <div className="absolute top-2 left-1/2 -translate-x-1/2 px-2 py-1 rounded bg-white border border-slate-200 shadow text-center select-none pointer-events-none dark:bg-slate-950 dark:border-slate-900">
           <span className="text-[8.5px] font-bold text-slate-500 uppercase block leading-none">Avg score</span>
-          <span className="text-xs font-black text-slate-200 font-mono mt-0.5 block">{avgScore}</span>
+          <span className="text-xs font-black text-slate-900 dark:text-slate-200 font-mono mt-0.5 block">{avgScore}</span>
         </div>
       </div>
 
-      <div className="flex items-center justify-between mt-4 bg-slate-950/40 p-3 rounded-lg border border-slate-900 text-xs">
-        <span className="font-bold text-slate-400">Showing last 7 scouting records.</span>
+      <div className="flex items-center justify-between mt-4 bg-slate-50 p-3 rounded-lg border border-slate-200 text-xs dark:bg-slate-950/40 dark:border-slate-900">
+        <span className="font-bold text-slate-600 dark:text-slate-400">Showing last 7 scouting records.</span>
         <Link href="/scouting" className="text-orange-500 font-bold hover:underline">
           Manage Match Records →
         </Link>
@@ -134,9 +134,9 @@ export function MatchPerformanceChart({ matches }: { matches: MatchRecord[] }) {
 
 function StatBadge({ label, value }: { label: string; value: string | number }) {
   return (
-    <div className="px-2.5 py-1.5 rounded-lg bg-slate-950 border border-slate-900 text-center">
+    <div className="px-2.5 py-1.5 rounded-lg bg-slate-50 border border-slate-200 text-center dark:bg-slate-950 dark:border-slate-900">
       <span className="text-[9px] font-bold text-slate-500 uppercase block leading-none">{label}</span>
-      <span className="text-sm font-black text-slate-100 font-mono mt-1 block">{value}</span>
+      <span className="text-sm font-black text-slate-900 dark:text-slate-100 font-mono mt-1 block">{value}</span>
     </div>
   );
 }

@@ -4,7 +4,7 @@ import { SidebarSkeleton } from "@/components/layout/skeletons/SidebarSkeleton";
 
 export function DashboardShellSkeleton() {
   return (
-    <div className="flex h-screen min-h-screen overflow-hidden bg-[#03070e] text-slate-100 selection:bg-blue-600/30 selection:text-blue-200">
+    <div className="flex h-screen min-h-screen overflow-hidden bg-slate-50 text-slate-900 dark:bg-[#03070e] dark:text-slate-100 selection:bg-orange-600/30 selection:text-orange-200">
       <SidebarSkeleton />
       <div className="flex h-full flex-1 flex-col overflow-hidden">
         <HeaderSkeleton />
