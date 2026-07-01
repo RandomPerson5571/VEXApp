@@ -46,12 +46,12 @@ export function TeamCalendarWidget() {
   };
 
   return (
-    <div className="rounded-2xl bg-white border border-slate-200 p-5 shadow-md dark:bg-[#090e18]/80 dark:border-slate-900/80">
+    <div className="rounded-[32px] border border-white/10 bg-[#091126]/80 p-5 shadow-[0_24px_80px_rgba(0,0,0,0.35)]">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-xs font-black text-slate-900 dark:text-slate-200 uppercase tracking-wider">Team Calendar</h3>
+        <h3 className="text-xs font-black text-slate-100 uppercase tracking-wider">Team Calendar</h3>
         <Link
           href="/calendar"
-          className="text-[10px] font-extrabold text-orange-500 hover:underline flex items-center gap-0.5"
+          className="text-[10px] font-extrabold text-orange-300 hover:text-orange-200 flex items-center gap-0.5"
         >
           View Calendar
           <ChevronRight className="h-3 w-3" />
@@ -59,12 +59,12 @@ export function TeamCalendarWidget() {
       </div>
 
       <div className="flex items-center justify-between mb-2">
-        <span className="text-xs font-black text-slate-700 dark:text-slate-300">{formatMonthYear(currentMonth)}</span>
+        <span className="text-xs font-black text-slate-100">{formatMonthYear(currentMonth)}</span>
         <div className="flex items-center gap-1">
           <button
             type="button"
             onClick={() => shiftMonth(-1)}
-            className="p-1 rounded bg-white hover:bg-slate-100 border border-slate-200 text-slate-600 dark:bg-slate-950 dark:hover:bg-slate-900 dark:border-slate-900 dark:text-slate-400"
+            className="p-1 rounded bg-slate-950/80 border border-white/10 text-slate-200 hover:bg-slate-900"
             aria-label="Previous month"
           >
             <ChevronLeft className="h-3 w-3" />
@@ -72,7 +72,7 @@ export function TeamCalendarWidget() {
           <button
             type="button"
             onClick={() => shiftMonth(1)}
-            className="p-1 rounded bg-white hover:bg-slate-100 border border-slate-200 text-slate-600 dark:bg-slate-950 dark:hover:bg-slate-900 dark:border-slate-900 dark:text-slate-400"
+            className="p-1 rounded bg-slate-950/80 border border-white/10 text-slate-200 hover:bg-slate-900"
             aria-label="Next month"
           >
             <ChevronRight className="h-3 w-3" />
@@ -80,14 +80,14 @@ export function TeamCalendarWidget() {
         </div>
       </div>
 
-      <div className="grid grid-cols-7 gap-1 text-center text-[10px] font-bold pb-2 border-b border-slate-200 text-slate-500 dark:border-slate-900">
+      <div className="grid grid-cols-7 gap-1 text-center text-[10px] font-bold pb-2 border-b border-white/10 text-slate-500">
         {WEEKDAY_LABELS.map((day, i) => (
           <span key={`${day}-${i}`}>{day}</span>
         ))}
       </div>
 
       <div
-        className={`grid grid-cols-7 gap-1 text-center pt-2 ${isLoading ? "opacity-50" : ""}`}
+        className={`grid grid-cols-7 gap-1 text-center pt-2 ${isLoading ? "opacity-60" : ""}`}
       >
         {daysGrid.map((cell) => {
           const dayEvents = eventsByDate.get(cell.dateStr) ?? [];
@@ -97,9 +97,9 @@ export function TeamCalendarWidget() {
             <Link
               key={cell.dateStr}
               href={`/calendar?date=${cell.dateStr}`}
-              className={`h-7 rounded flex flex-col items-center justify-center p-0.5 relative text-[10px] font-bold hover:bg-slate-100 dark:hover:bg-slate-900/60 transition ${
-                cell.isCurrentMonth ? "text-slate-700 dark:text-slate-300" : "text-slate-400 dark:text-slate-600"
-              } ${isSelectedDay ? "bg-orange-600/20 text-orange-400 border border-orange-500/30" : ""}`}
+              className={`h-8 rounded-3xl flex flex-col items-center justify-center p-0.5 relative text-[10px] font-bold transition ${
+                cell.isCurrentMonth ? "text-slate-100" : "text-slate-500"
+              } ${isSelectedDay ? "bg-orange-500/20 text-orange-300 border border-orange-500/30" : "hover:bg-white/5"}`}
             >
               <span>{cell.day}</span>
               {dayEvents.length > 0 && (

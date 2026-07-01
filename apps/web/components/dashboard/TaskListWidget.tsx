@@ -61,7 +61,7 @@ function TaskRow({ task, index }: { task: DashboardTask; index: number }) {
   return (
     <Link
       href="/task-list"
-      className="group block rounded-xl border border-slate-200 bg-slate-50 p-3.5 transition duration-200 hover:border-slate-300 hover:bg-white dark:border-slate-900/80 dark:bg-slate-950/40 dark:hover:border-slate-700/80 dark:hover:bg-slate-950/70 motion-safe:hover:-translate-y-px"
+      className="group block rounded-3xl border border-white/10 bg-slate-950/60 p-4 transition duration-200 hover:-translate-y-1 hover:border-white/20 hover:bg-slate-900/80 motion-safe:will-change-transform"
       style={
         {
           animationDelay: `${index * 60}ms`,
@@ -75,7 +75,7 @@ function TaskRow({ task, index }: { task: DashboardTask; index: number }) {
 
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">
-            <p className="truncate text-sm font-extrabold text-slate-900 group-hover:text-slate-700 dark:text-slate-100 dark:group-hover:text-white">
+            <p className="truncate text-sm font-extrabold text-white group-hover:text-slate-200">
               {task.title}
             </p>
             <TaskTypeBadge type={task.type} />
@@ -124,25 +124,25 @@ export function TaskListWidget({ maxItems = 4 }: TaskListWidgetProps) {
 
   return (
     <div
-      className={`relative lg:col-span-7 overflow-hidden rounded-2xl border border-slate-200 bg-white p-6 shadow-md dark:border-slate-900/80 dark:bg-[#090e18]/80 ${isLoading ? "opacity-50" : ""}`}
+      className={`relative lg:col-span-7 overflow-hidden rounded-[32px] border border-white/10 bg-[#091126]/80 p-6 shadow-[0_24px_80px_rgba(0,0,0,0.35)] ${isLoading ? "opacity-60" : ""}`}
     >
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,rgba(249,115,22,0.06),transparent_50%)] dark:bg-[radial-gradient(ellipse_at_top_left,rgba(59,130,246,0.07),transparent_50%)]"
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(56,189,248,0.16),transparent_35%)]"
       />
 
       <div className="relative flex flex-col">
-        <div className="flex items-start justify-between border-b border-slate-200 pb-3 mb-4 dark:border-slate-900">
+        <div className="flex items-start justify-between border-b border-white/10 pb-3 mb-4">
           <div>
-            <div className="flex items-center gap-2">
-              <div className="flex h-7 w-7 items-center justify-center rounded-lg border border-blue-500/20 bg-blue-600/10">
-                <ListTodo className="h-3.5 w-3.5 text-blue-400" />
+            <div className="flex items-center gap-3">
+              <div className="flex h-9 w-9 items-center justify-center rounded-2xl border border-blue-400/20 bg-blue-500/10">
+                <ListTodo className="h-4 w-4 text-blue-300" />
               </div>
-              <h3 className="text-sm font-black uppercase tracking-wide text-slate-900 dark:text-slate-200">
+              <h3 className="text-sm font-black uppercase tracking-[0.24em] text-slate-100">
                 Team Tasks
               </h3>
             </div>
-            <p className="mt-1 text-[11px] font-semibold text-slate-500">
+            <p className="mt-1 text-[11px] font-semibold text-slate-400">
               Active work across build, software, and CAD
             </p>
           </div>
@@ -156,26 +156,26 @@ export function TaskListWidget({ maxItems = 4 }: TaskListWidgetProps) {
         </div>
 
         <div className="mb-4 flex flex-wrap gap-2">
-          <span className="inline-flex items-center gap-1.5 rounded-lg border border-blue-500/20 bg-blue-500/10 px-2.5 py-1 text-[10px] font-bold text-blue-400">
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-blue-400/20 bg-blue-500/10 px-3 py-1.5 text-[10px] font-bold text-blue-300">
             <Clock className="h-3 w-3" />
             {activeCount} active
           </span>
           {overdueCount > 0 ? (
-            <span className="inline-flex items-center gap-1.5 rounded-lg border border-red-500/20 bg-red-500/10 px-2.5 py-1 text-[10px] font-bold text-red-400">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-red-400/20 bg-red-500/10 px-3 py-1.5 text-[10px] font-bold text-red-300">
               <AlertCircle className="h-3 w-3" />
               {overdueCount} overdue
             </span>
           ) : null}
-          <span className="inline-flex items-center gap-1.5 rounded-lg border border-emerald-500/20 bg-emerald-500/10 px-2.5 py-1 text-[10px] font-bold text-emerald-400">
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-400/20 bg-emerald-500/10 px-3 py-1.5 text-[10px] font-bold text-emerald-300">
             {completedCount} completed
           </span>
         </div>
 
         <div className="space-y-2.5 motion-safe:[&>*]:animate-in motion-safe:[&>*]:fade-in motion-safe:[&>*]:slide-in-from-bottom-1 motion-safe:[&>*]:duration-300">
           {displayTasks.length === 0 ? (
-            <div className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-8 text-center dark:border-slate-900/80 dark:bg-slate-950/40">
-              <p className="text-sm font-bold text-slate-700 dark:text-slate-300">All caught up</p>
-              <p className="mt-1 text-[11px] text-slate-500">No open tasks right now.</p>
+            <div className="rounded-3xl border border-white/10 bg-slate-950/60 px-4 py-8 text-center">
+              <p className="text-sm font-bold text-white">All caught up</p>
+              <p className="mt-1 text-[11px] text-slate-400">No open tasks right now.</p>
             </div>
           ) : (
             displayTasks.map((task, index) => (
