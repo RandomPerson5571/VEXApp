@@ -3,6 +3,29 @@ import type { QueryClient } from "@tanstack/react-query";
 import { queryKeys } from "@/lib/query-client";
 import type { DocumentationDetail, FolderWithDocs } from "@stlvex/database/types";
 
+/** Pure merge: update doc summary fields in the folder tree. */
+export function mergeDocInTree(
+  folders: FolderWithDocs[],
+  doc: Pick<DocumentationDetail, "id" | "title" | "type" | "folderId">,
+): FolderWithDocs[] {
+  return folders.map((folder) => {
+    if (folder.id !== doc.folderId) return folder;
+
+    return {
+      ...folder,
+      docs: folder.docs.map((summary) =>
+        summary.id === doc.id
+          ? {
+              ...summary,
+              title: doc.title,
+              type: doc.type,
+            }
+          : summary,
+      ),
+    };
+  });
+}
+
 /** Replace detail cache with authoritative PATCH response. */
 export function applyDocumentationDetailPatch(
   queryClient: QueryClient,
@@ -20,25 +43,6 @@ export function applyDocumentationTreeDocPatch(
 ): void {
   queryClient.setQueryData<FolderWithDocs[]>(
     queryKeys.docs.tree(teamId),
-    (old) => {
-      if (!old) return old;
-
-      return old.map((folder) => {
-        if (folder.id !== doc.folderId) return folder;
-
-        return {
-          ...folder,
-          docs: folder.docs.map((summary) =>
-            summary.id === doc.id
-              ? {
-                  ...summary,
-                  title: doc.title,
-                  type: doc.type,
-                }
-              : summary,
-          ),
-        };
-      });
-    },
+    (old) => (old ? mergeDocInTree(old, doc) : old),
   );
 }

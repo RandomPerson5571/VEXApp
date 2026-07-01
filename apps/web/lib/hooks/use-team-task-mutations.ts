@@ -1,12 +1,11 @@
 "use client";
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import type { TaskListTask } from "@stlvex/database/types";
 
 import { queryKeys } from "@/lib/query-client";
 import {
-  applyOptimisticTeamTaskUpdate,
   applyTeamTaskPatch,
+  optimisticallyPatchTeamTask,
   prependTeamTask,
 } from "@/lib/queries/cache-updates/tasks";
 import { invalidateTaskDashboard } from "@/lib/queries/cache-updates/invalidate";
@@ -14,26 +13,26 @@ import {
   createTeamTaskFromApi,
   updateTeamTaskFromApi,
 } from "@/lib/queries/tasks";
+import type { TaskListTask } from "@stlvex/database/types";
 
 type UseTeamTaskMutationsOptions = {
+  teamId: string | undefined;
   onCreateSuccess?: () => void;
 };
 
-export function useTeamTaskMutations(
-  teamId: string | undefined,
-  options?: UseTeamTaskMutationsOptions,
-) {
+export function useTeamTaskMutations({
+  teamId,
+  onCreateSuccess,
+}: UseTeamTaskMutationsOptions) {
   const queryClient = useQueryClient();
 
-  const createTaskMutation = useMutation({
+  const createMutation = useMutation({
     mutationFn: createTeamTaskFromApi,
-    onSuccess: (task) => {
-      if (!teamId) {
-        return;
+    onSuccess: (newTask) => {
+      if (teamId) {
+        prependTeamTask(queryClient, teamId, newTask);
       }
-
-      prependTeamTask(queryClient, teamId, task);
-      options?.onCreateSuccess?.();
+      onCreateSuccess?.();
     },
     onSettled: () => {
       if (teamId) {
@@ -42,12 +41,10 @@ export function useTeamTaskMutations(
     },
   });
 
-  const updateTaskMutation = useMutation({
+  const updateMutation = useMutation({
     mutationFn: updateTeamTaskFromApi,
     onMutate: async (variables) => {
-      if (!teamId) {
-        return;
-      }
+      if (!teamId) return {};
 
       await queryClient.cancelQueries({
         queryKey: queryKeys.tasks.forTeam(teamId),
@@ -57,20 +54,14 @@ export function useTeamTaskMutations(
         queryKeys.tasks.forTeam(teamId),
       );
 
-      const patch: Partial<Pick<TaskListTask, "title" | "description" | "status">> =
-        {};
-
-      if (variables.title !== undefined) {
-        patch.title = variables.title;
-      }
+      const patch: Parameters<typeof optimisticallyPatchTeamTask>[3] = {};
+      if (variables.title !== undefined) patch.title = variables.title;
       if (variables.description !== undefined) {
         patch.description = variables.description;
       }
-      if (variables.status !== undefined) {
-        patch.status = variables.status;
-      }
+      if (variables.status !== undefined) patch.status = variables.status;
 
-      applyOptimisticTeamTaskUpdate(
+      optimisticallyPatchTeamTask(
         queryClient,
         teamId,
         variables.taskId,
@@ -79,12 +70,10 @@ export function useTeamTaskMutations(
 
       return { previous };
     },
-    onSuccess: (updated) => {
-      if (!teamId) {
-        return;
+    onSuccess: (updatedTask) => {
+      if (teamId) {
+        applyTeamTaskPatch(queryClient, teamId, updatedTask);
       }
-
-      applyTeamTaskPatch(queryClient, teamId, updated);
     },
     onError: (_error, _variables, context) => {
       if (teamId && context?.previous) {
@@ -101,5 +90,5 @@ export function useTeamTaskMutations(
     },
   });
 
-  return { createTaskMutation, updateTaskMutation };
+  return { createMutation, updateMutation };
 }

@@ -7,6 +7,39 @@ type TaskListPatch = Partial<
   Pick<TaskListTask, "title" | "description" | "status">
 >;
 
+/** Pure merge: replace one task in a team list by id. */
+export function mergeTaskInList(
+  tasks: TaskListTask[],
+  updatedTask: TaskListTask,
+): TaskListTask[] {
+  return tasks.map((task) =>
+    task.id === updatedTask.id ? updatedTask : task,
+  );
+}
+
+/** Pure merge: patch or remove a task in dashboard widget caches. */
+export function patchDashboardTasksList(
+  dashboardTasks: DashboardTask[],
+  updatedTask: Pick<TaskListTask, "id" | "title" | "status">,
+): DashboardTask[] {
+  if (updatedTask.status === "Done") {
+    return dashboardTasks.filter((task) => task.id !== updatedTask.id);
+  }
+
+  const index = dashboardTasks.findIndex((task) => task.id === updatedTask.id);
+  if (index === -1) return dashboardTasks;
+
+  return dashboardTasks.map((task) =>
+    task.id === updatedTask.id
+      ? {
+          ...task,
+          title: updatedTask.title,
+          status: updatedTask.status,
+        }
+      : task,
+  );
+}
+
 function patchDashboardTaskCaches(
   queryClient: QueryClient,
   teamId: string,
@@ -46,18 +79,13 @@ export function applyTeamTaskPatch(
 ): void {
   queryClient.setQueryData<TaskListTask[]>(
     queryKeys.tasks.forTeam(teamId),
-    (old) => {
-      if (!old) return old;
-      return old.map((task) =>
-        task.id === updatedTask.id ? updatedTask : task,
-      );
-    },
+    (old) => (old ? mergeTaskInList(old, updatedTask) : old),
   );
 
-  patchDashboardTaskCaches(queryClient, teamId, updatedTask.id, {
-    title: updatedTask.title,
-    status: updatedTask.status,
-  });
+  queryClient.setQueriesData<DashboardTask[]>(
+    { queryKey: ["dashboard", "tasks", teamId] },
+    (old) => (old ? patchDashboardTasksList(old, updatedTask) : old),
+  );
 }
 
 /** Prepend a newly created task to the team list cache. */
