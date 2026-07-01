@@ -64,6 +64,7 @@ export default function RootLayout({
     <html
       lang="en"
       className={cn("h-full dark", "antialiased", geistSans.variable, geistMono.variable, "font-sans", inter.variable)}
+      suppressHydrationWarning
     >
       <head>
         <script
@@ -76,7 +77,6 @@ export default function RootLayout({
                 } else {
                   document.documentElement.classList.add('dark');
                 }
-                document.documentElement.style.colorScheme = theme;
               })();
             `,
           }}

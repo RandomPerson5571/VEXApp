@@ -1,7 +1,7 @@
 import "server-only";
 
 import { listTeamMembersForTeam } from "@/lib/data/team-members";
-import { queryKeys } from "@/lib/query-client";
+import { createTeamMembersQueryOptions } from "@/lib/queries/shared/team-members";
 import type { TaskListAssignee } from "@stlvex/database/types";
 
 export async function getTeamMembers(
@@ -11,8 +11,5 @@ export async function getTeamMembers(
 }
 
 export function teamMembersQueryOptions(teamId: string) {
-  return {
-    queryKey: queryKeys.teams.members(teamId),
-    queryFn: () => getTeamMembers(teamId),
-  };
+  return createTeamMembersQueryOptions(teamId, () => getTeamMembers(teamId));
 }

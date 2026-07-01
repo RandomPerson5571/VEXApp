@@ -1,4 +1,4 @@
-import { queryKeys } from "@/lib/query-client";
+import { createTeamEventsQueryOptions } from "@/lib/queries/shared/events";
 import type { CalendarEvent } from "@/lib/types/team";
 
 export async function fetchTeamEventsFromApi(): Promise<CalendarEvent[]> {
@@ -12,8 +12,5 @@ export async function fetchTeamEventsFromApi(): Promise<CalendarEvent[]> {
 }
 
 export function teamEventsQueryOptions(teamId: string) {
-  return {
-    queryKey: queryKeys.events.forTeam(teamId),
-    queryFn: fetchTeamEventsFromApi,
-  };
+  return createTeamEventsQueryOptions(teamId, fetchTeamEventsFromApi);
 }

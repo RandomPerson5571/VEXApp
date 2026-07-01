@@ -1,5 +1,6 @@
-import { queryKeys } from "@/lib/query-client";
 import type { FolderWithDocs } from "@stlvex/database/types";
+
+import { createTeamDocumentationTreeQueryOptions } from "@/lib/queries/shared/folders";
 
 export type CreateFolderPayload = {
   name: string;
@@ -73,8 +74,8 @@ export async function deleteFolderFromApi(folderId: string): Promise<void> {
 }
 
 export function teamDocumentationTreeQueryOptions(teamId: string) {
-  return {
-    queryKey: queryKeys.docs.tree(teamId),
-    queryFn: fetchDocumentationTreeFromApi,
-  };
+  return createTeamDocumentationTreeQueryOptions(
+    teamId,
+    fetchDocumentationTreeFromApi,
+  );
 }

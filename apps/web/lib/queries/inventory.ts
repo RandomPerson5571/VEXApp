@@ -1,5 +1,6 @@
-import { queryKeys } from "@/lib/query-client";
 import type { TeamInventoryItem } from "@stlvex/database/types";
+
+import { createTeamInventoryQueryOptions } from "@/lib/queries/shared/inventory";
 
 export async function fetchTeamInventoryFromApi(): Promise<TeamInventoryItem[]> {
   const response = await fetch("/api/inventory");
@@ -12,8 +13,5 @@ export async function fetchTeamInventoryFromApi(): Promise<TeamInventoryItem[]> 
 }
 
 export function teamInventoryQueryOptions(teamId: string) {
-  return {
-    queryKey: queryKeys.inventory.forTeam(teamId),
-    queryFn: fetchTeamInventoryFromApi,
-  };
+  return createTeamInventoryQueryOptions(teamId, fetchTeamInventoryFromApi);
 }

@@ -1,5 +1,9 @@
-import { queryKeys } from "@/lib/query-client";
 import type { DashboardTask, TaskPriority, TaskListTask, TaskStatus, TaskType } from "@stlvex/database/types";
+
+import {
+  createDashboardTasksQueryOptions,
+  createTeamTasksQueryOptions,
+} from "@/lib/queries/shared/tasks";
 
 export type CreateTaskPayload = {
   title: string;
@@ -81,15 +85,9 @@ export async function updateTeamTaskFromApi(
 }
 
 export function teamTasksQueryOptions(teamId: string) {
-  return {
-    queryKey: queryKeys.tasks.forTeam(teamId),
-    queryFn: fetchTeamTasksFromApi,
-  };
+  return createTeamTasksQueryOptions(teamId, fetchTeamTasksFromApi);
 }
 
-export function dashboardTasksQueryOptions(teamId: string) {
-  return {
-    queryKey: queryKeys.dashboard.tasks(teamId),
-    queryFn: fetchDashboardTasksFromApi,
-  };
+export function dashboardTasksQueryOptions(teamId: string, limit = 4) {
+  return createDashboardTasksQueryOptions(teamId, limit, fetchDashboardTasksFromApi);
 }

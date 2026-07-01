@@ -101,6 +101,9 @@ export function TaskListView() {
           queryClient.invalidateQueries({
             queryKey: queryKeys.dashboard.summary(teamId),
           }),
+          queryClient.invalidateQueries({
+            queryKey: ["dashboard", "tasks", teamId],
+          }),
         ]);
       }
 
@@ -119,6 +122,9 @@ export function TaskListView() {
           }),
           queryClient.invalidateQueries({
             queryKey: queryKeys.dashboard.summary(teamId),
+          }),
+          queryClient.invalidateQueries({
+            queryKey: ["dashboard", "tasks", teamId],
           }),
         ]);
       }
