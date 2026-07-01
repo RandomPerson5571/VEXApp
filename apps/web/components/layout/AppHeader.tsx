@@ -7,6 +7,8 @@ import {
   ChevronDown,
   Link as LinkIcon,
   Moon,
+  PanelLeft,
+  PanelLeftOpen,
   Settings as SettingsIcon,
   Sun,
   User,
@@ -29,7 +31,15 @@ function getInitials(firstName: string, lastName: string): string {
   return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
 }
 
-export function AppHeader() {
+type AppHeaderProps = {
+  isNavigationOpen?: boolean;
+  onToggleNavigation?: () => void;
+};
+
+export function AppHeader({
+  isNavigationOpen = true,
+  onToggleNavigation,
+}: AppHeaderProps) {
   const { profile, team } = useUser();
   const { theme, toggleTheme } = useTheme();
   const [showUserDropdown, setShowUserDropdown] = useState(false);
@@ -40,17 +50,32 @@ export function AppHeader() {
 
   return (
     <header className="h-16 border-b border-slate-200 dark:border-slate-900/60 bg-white dark:bg-[#070b13] flex items-center justify-between px-6 select-none font-sans z-30">
-      <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-900 shadow-sm">
-        <Image src={VEXV5Logo} alt="VEX V5 Logo" width={30} height={30} />
-        <div className="flex flex-col pr-1">
-          <span className="text-xs font-black text-slate-900 dark:text-slate-100 leading-none">
-            {team?.name ?? "No team assigned"}
-          </span>
-          {team ? (
-            <span className="text-[10px] text-slate-600 dark:text-slate-400 font-semibold tracking-wide">
-              Team {team.number}
+      <div className="flex items-center gap-3">
+        <button
+          type="button"
+          onClick={onToggleNavigation}
+          className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-600 shadow-sm transition hover:border-slate-300 hover:bg-slate-100 hover:text-slate-900 dark:border-slate-900 dark:bg-slate-950 dark:text-slate-500 dark:hover:border-slate-800 dark:hover:bg-slate-900/60 dark:hover:text-slate-200"
+          aria-label={isNavigationOpen ? "Close navigation panel" : "Open navigation panel"}
+          title={isNavigationOpen ? "Close navigation" : "Open navigation"}
+        >
+          {isNavigationOpen ? (
+            <PanelLeft className="h-4.5 w-4.5" />
+          ) : (
+            <PanelLeftOpen className="h-4.5 w-4.5" />
+          )}
+        </button>
+        <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-900 shadow-sm">
+          <Image src={VEXV5Logo} alt="VEX V5 Logo" width={30} height={30} />
+          <div className="flex flex-col pr-1">
+            <span className="text-xs font-black text-slate-900 dark:text-slate-100 leading-none">
+              {team?.name ?? "No team assigned"}
             </span>
-          ) : null}
+            {team ? (
+              <span className="text-[10px] text-slate-600 dark:text-slate-400 font-semibold tracking-wide">
+                Team {team.number}
+              </span>
+            ) : null}
+          </div>
         </div>
       </div>
 

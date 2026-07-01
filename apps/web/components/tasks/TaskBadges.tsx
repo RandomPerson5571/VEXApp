@@ -28,17 +28,17 @@ const statusConfig: Record<
 > = {
   NotStarted: {
     label: "Not started",
-    className: "bg-slate-500/10 text-slate-400 border-slate-600/30",
+    className: "bg-slate-500/10 text-slate-600 border-slate-600/30 dark:text-slate-400",
     dotClassName: "bg-slate-500",
   },
   InProgress: {
     label: "In progress",
-    className: "bg-blue-500/10 text-blue-400 border-blue-500/25",
+    className: "bg-blue-500/10 text-blue-600 border-blue-500/25 dark:text-blue-400",
     dotClassName: "bg-blue-500",
   },
   Done: {
     label: "Done",
-    className: "bg-emerald-500/10 text-emerald-400 border-emerald-500/25",
+    className: "bg-emerald-500/10 text-emerald-600 border-emerald-500/25 dark:text-emerald-400",
     dotClassName: "bg-emerald-500",
   },
 };
@@ -50,22 +50,22 @@ const typeConfig: Record<
   Hardware: {
     label: "Hardware",
     icon: Box,
-    className: "bg-orange-500/10 text-orange-400 border-orange-500/20",
+    className: "bg-orange-500/10 text-orange-600 border-orange-500/20 dark:text-orange-400",
   },
   Software: {
     label: "Software",
     icon: Cpu,
-    className: "bg-violet-500/10 text-violet-400 border-violet-500/20",
+    className: "bg-violet-500/10 text-violet-600 border-violet-500/20 dark:text-violet-400",
   },
   CAD: {
     label: "CAD",
     icon: Layers,
-    className: "bg-cyan-500/10 text-cyan-400 border-cyan-500/20",
+    className: "bg-cyan-500/10 text-cyan-600 border-cyan-500/20 dark:text-cyan-400",
   },
   Other: {
     label: "Other",
     icon: MoreHorizontal,
-    className: "bg-slate-500/10 text-slate-400 border-slate-600/30",
+    className: "bg-slate-500/10 text-slate-600 border-slate-600/30 dark:text-slate-400",
   },
 };
 
@@ -75,15 +75,15 @@ const priorityConfig: Record<
 > = {
   Low: {
     label: "Low",
-    className: "bg-slate-500/10 text-slate-400 border-slate-600/30",
+    className: "bg-slate-500/10 text-slate-600 border-slate-600/30 dark:text-slate-400",
   },
   Medium: {
     label: "Medium",
-    className: "bg-amber-500/10 text-amber-400 border-amber-500/25",
+    className: "bg-amber-500/10 text-amber-600 border-amber-500/25 dark:text-amber-400",
   },
   High: {
     label: "High",
-    className: "bg-red-500/10 text-red-400 border-red-500/25",
+    className: "bg-red-500/10 text-red-600 border-red-500/25 dark:text-red-400",
   },
 };
 
@@ -128,7 +128,7 @@ export function TaskStatusPicker({
         <CircleDot className="h-3 w-3 shrink-0" />
         <SelectValue />
       </SelectTrigger>
-      <SelectContent className="min-w-[9rem] border-slate-800 bg-slate-950 text-slate-200">
+      <SelectContent className="min-w-[9rem] border-slate-200 bg-white text-slate-800 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-200">
         {TASK_STATUS_OPTIONS.map((option) => {
           const optionConfig = statusConfig[option];
 
@@ -136,7 +136,7 @@ export function TaskStatusPicker({
             <SelectItem
               key={option}
               value={option}
-              className="pr-2 text-xs font-semibold focus:bg-slate-800 focus:text-slate-100 [&>span:first-child]:hidden"
+              className="pr-2 text-xs font-semibold focus:bg-slate-100 focus:text-slate-950 dark:focus:bg-slate-800 dark:focus:text-slate-100 [&>span:first-child]:hidden"
             >
               <span className="inline-flex items-center gap-2">
                 <span

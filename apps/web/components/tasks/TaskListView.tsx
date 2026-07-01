@@ -160,7 +160,7 @@ export function TaskListView() {
   }
 
   return (
-    <div className="relative flex-1 overflow-y-auto bg-[#03070e] px-8 py-6 font-sans dashboard-scroll">
+    <div className="relative flex-1 overflow-y-auto bg-slate-50 px-8 py-6 font-sans dashboard-scroll dark:bg-[#03070e]">
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(59,130,246,0.06),transparent_55%)]"
@@ -172,18 +172,18 @@ export function TaskListView() {
             <div>
               <div className="flex items-center gap-3">
                 <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-blue-500/20 bg-blue-600/10 shadow-[0_0_20px_rgba(59,130,246,0.1)]">
-                  <ClipboardList className="h-5 w-5 text-blue-400" />
+                  <ClipboardList className="h-5 w-5 text-blue-600 dark:text-blue-400" />
                 </div>
                 <div>
-                  <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-blue-400/80">
+                  <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-blue-600/80 dark:text-blue-400/80">
                     Team workspace
                   </p>
-                  <h1 className="text-[clamp(1.5rem,3.5vw,2rem)] font-black leading-none tracking-tight text-slate-100">
+                  <h1 className="text-[clamp(1.5rem,3.5vw,2rem)] font-black leading-none tracking-tight text-slate-950 dark:text-slate-100">
                     Task List
                   </h1>
                 </div>
               </div>
-              <p className="mt-3 max-w-2xl text-sm font-medium leading-relaxed text-slate-400">
+              <p className="mt-3 max-w-2xl text-sm font-medium leading-relaxed text-slate-600 dark:text-slate-400">
                 Track build, software, and CAD work for {label}. Any team member
                 can create tasks — expand a card to view subtasks and progress.
               </p>
@@ -207,16 +207,16 @@ export function TaskListView() {
               {Array.from({ length: 4 }).map((_, index) => (
                 <div
                   key={index}
-                  className="h-20 animate-pulse rounded-xl border border-slate-900 bg-slate-950/60"
+                  className="h-20 animate-pulse rounded-xl border border-slate-200 bg-white dark:border-slate-900 dark:bg-slate-950/60"
                 />
               ))}
             </div>
-            <div className="h-28 animate-pulse rounded-2xl border border-slate-900 bg-slate-950/60" />
+            <div className="h-28 animate-pulse rounded-2xl border border-slate-200 bg-white dark:border-slate-900 dark:bg-slate-950/60" />
             <div className="space-y-4">
               {Array.from({ length: 3 }).map((_, index) => (
                 <div
                   key={index}
-                  className="h-40 animate-pulse rounded-2xl border border-slate-900 bg-slate-950/60"
+                  className="h-40 animate-pulse rounded-2xl border border-slate-200 bg-white dark:border-slate-900 dark:bg-slate-950/60"
                 />
               ))}
             </div>
@@ -224,10 +224,10 @@ export function TaskListView() {
         ) : isError ? (
           <div className="rounded-2xl border border-red-500/20 bg-red-500/5 p-12 text-center">
             <AlertTriangle className="mx-auto mb-4 h-8 w-8 text-red-400" />
-            <h2 className="text-lg font-black text-slate-200">
+            <h2 className="text-lg font-black text-slate-900 dark:text-slate-200">
               Unable to load tasks
             </h2>
-            <p className="mt-2 text-sm text-slate-500">
+            <p className="mt-2 text-sm text-slate-600 dark:text-slate-500">
               Something went wrong while fetching your team&apos;s tasks. Please
               refresh and try again.
             </p>
@@ -254,12 +254,12 @@ export function TaskListView() {
             </div>
 
             {filteredTasks.length === 0 ? (
-              <div className="rounded-2xl border border-slate-900/80 bg-[#090e18]/80 p-12 text-center shadow-md">
-                <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full border border-slate-800 bg-slate-900/60">
+              <div className="rounded-2xl border border-slate-200 bg-white p-12 text-center shadow-sm dark:border-slate-900/80 dark:bg-[#090e18]/80 dark:shadow-md">
+                <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full border border-slate-200 bg-slate-100 dark:border-slate-800 dark:bg-slate-900/60">
                   <ClipboardList className="h-7 w-7 text-slate-500" />
                 </div>
-                <h2 className="text-lg font-black text-slate-200">No tasks found</h2>
-                <p className="mt-2 text-sm text-slate-500">
+                <h2 className="text-lg font-black text-slate-900 dark:text-slate-200">No tasks found</h2>
+                <p className="mt-2 text-sm text-slate-600 dark:text-slate-500">
                   {tasks.length === 0
                     ? "Create your first task to start tracking team work."
                     : "Try adjusting your filters or search query."}

@@ -12,7 +12,7 @@ export function DocsView() {
   const view = useDocsView();
 
   return (
-    <div className="flex-1 flex overflow-hidden bg-[#03070e] font-sans">
+    <div className="flex-1 flex overflow-hidden bg-slate-50 font-sans dark:bg-[#03070e]">
       <DocsDirectorySidebar
         folders={view.folders}
         expandedFolderIds={view.expandedFolderIds}

@@ -10,7 +10,7 @@ import {
   Package,
   Settings,
   ShieldCheck,
-  Swords,
+  PanelLeftClose,
   Users2,
   LinkIcon
 } from "lucide-react";
@@ -34,7 +34,11 @@ const menuItems: SidebarItem[] = [
   { href: "/settings", label: "Settings", icon: Settings },
 ];
 
-export function AppSidebar() {
+type AppSidebarProps = {
+  onClose?: () => void;
+};
+
+export function AppSidebar({ onClose }: AppSidebarProps) {
   const pathname = usePathname();
   const user = useOptionalUser();
   const showAdminLink = user !== null && isGlobalAdmin(user);
@@ -49,16 +53,27 @@ export function AppSidebar() {
 
   return (
     <aside className="w-[240px] flex-shrink-0 bg-white dark:bg-[#070b13] border-r border-slate-200 dark:border-slate-900/60 flex flex-col h-screen select-none font-sans">
-      <div className="p-6 border-b border-slate-200 dark:border-slate-900/40 flex items-center gap-3">
-        <STLRoboticsLogoComponent />
-        <div className="flex flex-col">
-          <span className="text-slate-900 dark:text-slate-100 font-black tracking-normal leading-tight text-sm uppercase">
-            STL Robotics
-          </span>
-          <span className="text-slate-600 dark:text-slate-400 font-semibold tracking-wider text-[10px] uppercase leading-none">
-            2026-2027 Season
-          </span>
+      <div className="relative flex items-center border-b border-slate-200 p-5 pr-14 dark:border-slate-900/40">
+        <div className="flex min-w-0 flex-1 items-center gap-3">
+          <STLRoboticsLogoComponent width={44} height={44} />
+          <div className="flex min-w-0 flex-col">
+            <span className="whitespace-nowrap text-sm font-black uppercase leading-tight tracking-normal text-slate-900 dark:text-slate-100">
+              STL Robotics
+            </span>
+            <span className="whitespace-nowrap text-[10px] font-semibold uppercase leading-none tracking-wider text-slate-600 dark:text-slate-400">
+              2026-2027 Season
+            </span>
+          </div>
         </div>
+        <button
+          type="button"
+          onClick={onClose}
+          className="absolute right-4 top-1/2 inline-flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-lg border border-slate-200 text-slate-600 transition hover:border-slate-300 hover:bg-slate-100 hover:text-slate-900 dark:border-slate-900 dark:text-slate-500 dark:hover:border-slate-800 dark:hover:bg-slate-900/60 dark:hover:text-slate-200"
+          aria-label="Close navigation panel"
+          title="Close navigation"
+        >
+          <PanelLeftClose className="h-4 w-4" />
+        </button>
       </div>
 
       <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-1 dashboard-scroll">

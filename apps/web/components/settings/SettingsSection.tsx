@@ -17,10 +17,10 @@ export function SettingsSection({
 
   return (
     <section
-      className={`rounded-2xl bg-[#090e18]/80 border p-6 shadow-md backdrop-blur-sm relative overflow-hidden ${
+      className={`rounded-2xl bg-white border p-6 shadow-sm backdrop-blur-sm relative overflow-hidden dark:bg-[#090e18]/80 dark:shadow-md ${
         isDanger
           ? "border-red-500/20 shadow-red-500/5"
-          : "border-slate-900 shadow-black/20"
+          : "border-slate-200 dark:border-slate-900 dark:shadow-black/20"
       }`}
     >
       {isDanger ? (
@@ -30,10 +30,10 @@ export function SettingsSection({
         />
       ) : null}
 
-      <div className="border-b border-slate-900/80 pb-4 mb-5">
+      <div className="border-b border-slate-200 pb-4 mb-5 dark:border-slate-900/80">
         <h2
           className={`text-[10.5px] font-black uppercase tracking-widest ${
-            isDanger ? "text-red-400" : "text-slate-400"
+            isDanger ? "text-red-600 dark:text-red-400" : "text-slate-600 dark:text-slate-400"
           }`}
         >
           {title}

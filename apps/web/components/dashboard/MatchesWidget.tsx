@@ -12,14 +12,14 @@ export function UpcomingMatchesList() {
   const matches = useMemo(() => toUpcomingMatches(events), [events]);
 
   return (
-    <div className="rounded-[32px] border border-white/10 bg-[#091126]/80 p-5 shadow-[0_24px_80px_rgba(0,0,0,0.35)] space-y-4">
-      <div className="flex items-center justify-between border-b border-white/10 pb-2.5">
-        <span className="text-xs font-black text-slate-100 uppercase tracking-wider">
+    <div className="rounded-[32px] border border-slate-200 dark:border-white/10 bg-white dark:bg-[#091126]/80 p-5 shadow-[0_24px_80px_rgba(0,0,0,0.08)] dark:shadow-[0_24px_80px_rgba(0,0,0,0.35)] space-y-4">
+      <div className="flex items-center justify-between border-b border-slate-300 dark:border-white/10 pb-2.5">
+        <span className="text-xs font-black text-slate-900 dark:text-slate-100 uppercase tracking-wider">
           Upcoming Matches
         </span>
         <Link
           href="/matches"
-          className="text-[10px] font-bold text-slate-400 hover:text-slate-200"
+          className="text-[10px] font-bold text-slate-600 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
         >
           View All
         </Link>
@@ -27,14 +27,14 @@ export function UpcomingMatchesList() {
 
       <div className={`space-y-3 ${isLoading ? "opacity-60" : ""}`}>
         {matches.length === 0 && !isLoading ? (
-          <p className="text-[11px] text-slate-400 font-medium py-2">
+          <p className="text-[11px] text-slate-600 dark:text-slate-400 font-medium py-2">
             No upcoming matches scheduled.
           </p>
         ) : (
           matches.map((match) => (
             <div
               key={match.id}
-              className="p-3 rounded-3xl border border-white/10 bg-slate-950/60 flex items-center justify-between gap-3 text-xs"
+              className="p-3 rounded-3xl border border-slate-300 dark:border-white/10 bg-slate-100 dark:bg-slate-950/60 flex items-center justify-between gap-3 text-xs"
             >
               <div className="flex gap-3">
                 <div

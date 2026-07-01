@@ -11,7 +11,7 @@ const MatchPerformanceChart = dynamic(
       <div
         aria-busy
         aria-label="Loading match performance chart"
-        className="lg:col-span-8 h-[420px] animate-pulse rounded-2xl border border-slate-200 bg-white dark:border-slate-900 dark:bg-slate-950/60"
+        className="h-[420px] animate-pulse rounded-2xl border border-slate-200 bg-white dark:border-slate-900 dark:bg-slate-950/60"
       />
     ),
   },
