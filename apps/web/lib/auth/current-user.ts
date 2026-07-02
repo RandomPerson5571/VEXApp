@@ -3,7 +3,10 @@ import type { User as AuthUser } from "@supabase/supabase-js";
 import { connection } from "next/server";
 import { cache } from "react";
 
-import { verifySessionIdentity } from "@/lib/auth/identity";
+import {
+  getDiscordAvatarUrlFromAuthUser,
+  verifySessionIdentity,
+} from "@/lib/auth/identity";
 import { getAuthUser } from "@/lib/auth/session";
 import { createClient } from "@/lib/supabase/server";
 import type { Team, User } from "@stlvex/database/types";
@@ -12,6 +15,7 @@ export type CurrentUser = {
   authUser: AuthUser;
   profile: User;
   team: Team | null;
+  discordAvatarUrl: string | null;
 };
 
 export type CurrentUserState =
@@ -55,7 +59,12 @@ export const getCurrentUserState = cache(async (): Promise<CurrentUserState> => 
 
     return {
       status: "ready",
-      user: { authUser, profile: userProfile, team },
+      user: {
+        authUser,
+        profile: userProfile,
+        team,
+        discordAvatarUrl: getDiscordAvatarUrlFromAuthUser(authUser),
+      },
     };
   } catch {
     return { status: "unauthenticated" };
