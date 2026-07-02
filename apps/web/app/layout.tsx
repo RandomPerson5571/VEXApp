@@ -23,11 +23,11 @@ export const metadata: Metadata = {
     process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000",
   ),
   title: {
-    default: "STL VEX Robotics",
-    template: "%s | STL VEX Robotics",
+    default: "STL Robotics",
+    template: "%s | STL Robotics",
   },
   description:
-    "Team hub for STL VEX Robotics. Manage matches, build logs, inventory, calendar, documents, and members for the 2026-2027 season.",
+    "Team hub for STL Robotics. Manage matches, build logs, inventory, calendar, documents, and members for the 2026-2027 season.",
   keywords: [
     "VEX Robotics",
     "STL Robotics",
@@ -35,25 +35,25 @@ export const metadata: Metadata = {
     "team management",
     "competition",
   ],
-  authors: [{ name: "STL VEX Robotics" }],
-  creator: "STL VEX Robotics",
+  authors: [{ name: "STL Robotics" }],
+  creator: "STL Robotics",
   openGraph: {
     type: "website",
     locale: "en_US",
-    siteName: "STL VEX Robotics",
-    title: "STL VEX Robotics",
+    siteName: "STL Robotics",
+    title: "STL Robotics",
     description:
-      "Team hub for STL VEX Robotics. Manage matches, build logs, inventory, calendar, documents, and members.",
+      "Team hub for STL Robotics. Manage matches, build logs, inventory, calendar, documents, and members.",
   },
   twitter: {
     card: "summary",
-    title: "STL VEX Robotics",
+    title: "STL Robotics",
     description:
-      "Team hub for STL VEX Robotics. Manage matches, build logs, inventory, calendar, documents, and members.",
+      "Team hub for STL Robotics. Manage matches, build logs, inventory, calendar, documents, and members.",
   },
   icons: {
-    icon: "/logos/Robotics_lion.svg",
-    apple: "/icon.png",
+    icon: "/favicon.ico",
+    apple: "/favicon.ico",
   },
   manifest: "/manifest.webmanifest",
   appleWebApp: {
