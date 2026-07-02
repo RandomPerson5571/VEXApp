@@ -1,5 +1,6 @@
-import { queryKeys } from "@/lib/query-client";
 import type { DocType, DocumentationDetail } from "@stlvex/database/types";
+
+import { createDocumentationDetailQueryOptions } from "@/lib/queries/shared/documentation";
 
 export const DEFAULT_DOCUMENTATION_TEMPLATE = `## Introduction
 
@@ -100,8 +101,7 @@ export async function deleteDocumentationFromApi(docId: string): Promise<void> {
 }
 
 export function documentationDetailQueryOptions(docId: string) {
-  return {
-    queryKey: queryKeys.docs.detail(docId),
-    queryFn: () => fetchDocumentationDetailFromApi(docId),
-  };
+  return createDocumentationDetailQueryOptions(docId, () =>
+    fetchDocumentationDetailFromApi(docId),
+  );
 }

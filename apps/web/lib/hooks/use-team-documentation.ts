@@ -3,7 +3,12 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { useTeam } from "@/components/providers/UserProvider";
-import { queryKeys } from "@/lib/query-client";
+import {
+  applyDocumentationDetailPatch,
+  applyDocumentationTreeDocPatch,
+} from "@/lib/queries/cache-updates/documentation";
+import { applyFolderTreePatch } from "@/lib/queries/cache-updates/folders";
+import { invalidateDocsTree } from "@/lib/queries/cache-updates/invalidate";
 import {
   createDocumentationFromApi,
   deleteDocumentationFromApi,
@@ -17,31 +22,17 @@ import {
   updateFolderFromApi,
 } from "@/lib/queries/folders";
 
-function useInvalidateDocumentationQueries() {
+function useBackgroundInvalidateDocumentation() {
   const team = useTeam();
   const queryClient = useQueryClient();
   const teamId = team?.id;
 
-  return async (docId?: string) => {
-    const invalidations: Promise<void>[] = [];
-
-    if (teamId) {
-      invalidations.push(
-        queryClient.invalidateQueries({
-          queryKey: queryKeys.docs.tree(teamId),
-        }),
-      );
+  return (docId?: string) => {
+    if (!teamId) {
+      return;
     }
 
-    if (docId) {
-      invalidations.push(
-        queryClient.invalidateQueries({
-          queryKey: queryKeys.docs.detail(docId),
-        }),
-      );
-    }
-
-    await Promise.all(invalidations);
+    invalidateDocsTree(queryClient, teamId, docId);
   };
 }
 
@@ -63,55 +54,102 @@ export function useDocumentationDetail(docId: string | null | undefined) {
 }
 
 export function useCreateFolder() {
-  const invalidate = useInvalidateDocumentationQueries();
+  const team = useTeam();
+  const invalidate = useBackgroundInvalidateDocumentation();
 
   return useMutation({
     mutationFn: createFolderFromApi,
-    onSuccess: () => invalidate(),
+    onSettled: () => {
+      if (team?.id) {
+        invalidate();
+      }
+    },
   });
 }
 
 export function useUpdateFolder() {
-  const invalidate = useInvalidateDocumentationQueries();
+  const team = useTeam();
+  const queryClient = useQueryClient();
+  const teamId = team?.id;
+  const invalidate = useBackgroundInvalidateDocumentation();
 
   return useMutation({
     mutationFn: updateFolderFromApi,
-    onSuccess: () => invalidate(),
+    onSuccess: (folder) => {
+      if (!teamId) {
+        return;
+      }
+
+      applyFolderTreePatch(queryClient, teamId, folder);
+    },
+    onSettled: () => {
+      if (teamId) {
+        invalidate();
+      }
+    },
   });
 }
 
 export function useDeleteFolder() {
-  const invalidate = useInvalidateDocumentationQueries();
+  const team = useTeam();
+  const invalidate = useBackgroundInvalidateDocumentation();
 
   return useMutation({
     mutationFn: deleteFolderFromApi,
-    onSuccess: () => invalidate(),
+    onSettled: () => {
+      if (team?.id) {
+        invalidate();
+      }
+    },
   });
 }
 
 export function useCreateDocumentation() {
-  const invalidate = useInvalidateDocumentationQueries();
+  const team = useTeam();
+  const invalidate = useBackgroundInvalidateDocumentation();
 
   return useMutation({
     mutationFn: createDocumentationFromApi,
-    onSuccess: (doc) => invalidate(doc.id),
+    onSettled: () => {
+      if (team?.id) {
+        invalidate();
+      }
+    },
   });
 }
 
 export function useUpdateDocumentation() {
-  const invalidate = useInvalidateDocumentationQueries();
+  const team = useTeam();
+  const queryClient = useQueryClient();
+  const teamId = team?.id;
+  const invalidate = useBackgroundInvalidateDocumentation();
 
   return useMutation({
     mutationFn: updateDocumentationFromApi,
-    onSuccess: (doc) => invalidate(doc.id),
+    onSuccess: (doc) => {
+      applyDocumentationDetailPatch(queryClient, doc.id, doc);
+      if (teamId) {
+        applyDocumentationTreeDocPatch(queryClient, teamId, doc);
+      }
+    },
+    onSettled: (_doc, _error, variables) => {
+      if (teamId) {
+        invalidate(variables.docId);
+      }
+    },
   });
 }
 
 export function useDeleteDocumentation() {
-  const invalidate = useInvalidateDocumentationQueries();
+  const team = useTeam();
+  const invalidate = useBackgroundInvalidateDocumentation();
 
   return useMutation({
     mutationFn: deleteDocumentationFromApi,
-    onSuccess: (_void, docId) => invalidate(docId),
+    onSettled: (_void, _error, docId) => {
+      if (team?.id) {
+        invalidate(docId);
+      }
+    },
   });
 }

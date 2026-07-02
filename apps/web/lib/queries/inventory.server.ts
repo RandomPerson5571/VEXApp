@@ -1,7 +1,7 @@
 import "server-only";
 
 import { listInventoryForTeam } from "@/lib/data/inventory";
-import { queryKeys } from "@/lib/query-client";
+import { createTeamInventoryQueryOptions } from "@/lib/queries/shared/inventory";
 import type { TeamInventoryItem } from "@stlvex/database/types";
 
 export async function getTeamInventory(
@@ -11,8 +11,5 @@ export async function getTeamInventory(
 }
 
 export function teamInventoryQueryOptions(teamId: string) {
-  return {
-    queryKey: queryKeys.inventory.forTeam(teamId),
-    queryFn: () => getTeamInventory(teamId),
-  };
+  return createTeamInventoryQueryOptions(teamId, () => getTeamInventory(teamId));
 }

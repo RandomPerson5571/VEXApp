@@ -8,7 +8,7 @@ import {
   type CreateDocumentationInput,
   type UpdateDocumentationInput,
 } from "@/lib/data/documentation";
-import { queryKeys } from "@/lib/query-client";
+import { createDocumentationDetailQueryOptions } from "@/lib/queries/shared/documentation";
 import type { DocumentationDetail } from "@stlvex/database/types";
 
 export async function getDocumentationDetail(
@@ -34,8 +34,13 @@ export async function deleteTeamDocumentation(docId: string): Promise<void> {
 }
 
 export function documentationDetailQueryOptions(docId: string) {
-  return {
-    queryKey: queryKeys.docs.detail(docId),
-    queryFn: () => getDocumentationDetail(docId),
-  };
+  return createDocumentationDetailQueryOptions(docId, async () => {
+    const detail = await getDocumentationDetail(docId);
+
+    if (!detail) {
+      throw new Error("Document not found.");
+    }
+
+    return detail;
+  });
 }

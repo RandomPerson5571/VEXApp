@@ -1,5 +1,6 @@
-import { queryKeys } from "@/lib/query-client";
 import type { TaskListAssignee } from "@stlvex/database/types";
+
+import { createTeamMembersQueryOptions } from "@/lib/queries/shared/team-members";
 
 export async function fetchTeamMembersFromApi(): Promise<TaskListAssignee[]> {
   const response = await fetch("/api/team-members");
@@ -12,8 +13,5 @@ export async function fetchTeamMembersFromApi(): Promise<TaskListAssignee[]> {
 }
 
 export function teamMembersQueryOptions(teamId: string) {
-  return {
-    queryKey: queryKeys.teams.members(teamId),
-    queryFn: fetchTeamMembersFromApi,
-  };
+  return createTeamMembersQueryOptions(teamId, fetchTeamMembersFromApi);
 }
