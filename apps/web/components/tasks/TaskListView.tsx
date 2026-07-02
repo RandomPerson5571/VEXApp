@@ -1,14 +1,12 @@
 "use client";
 
 import { useMemo, useState, type FormEvent } from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AlertTriangle, ClipboardList, Plus } from "lucide-react";
 
 import { useProfile, useTeam } from "@/components/providers/UserProvider";
 import { useTeamMembers } from "@/lib/hooks/use-team-members";
+import { useTeamTaskMutations } from "@/lib/hooks/use-team-task-mutations";
 import { useTeamTasks } from "@/lib/hooks/use-team-tasks";
-import { queryKeys } from "@/lib/query-client";
-import { createTeamTaskFromApi, updateTeamTaskFromApi } from "@/lib/queries/tasks";
 import type {
   TaskListTask,
   TaskPriority,
@@ -41,8 +39,8 @@ function matchesSearch(task: TaskListTask, query: string): boolean {
   const haystack = [
     task.title,
     task.description ?? "",
-    task.creator.firstName,
-    task.creator.lastName,
+    task.creator?.firstName ?? "",
+    task.creator?.lastName ?? "",
     ...assignees.flatMap((a) => [a.firstName, a.lastName]),
     ...task.subTasks.map((s) => s.title),
   ]
@@ -70,7 +68,6 @@ function filterTasks(
 export function TaskListView() {
   const team = useTeam();
   const profile = useProfile();
-  const queryClient = useQueryClient();
   const { data: fetchedTasks = [], isLoading, isError } = useTeamTasks();
   const { data: teamMembers = [] } = useTeamMembers();
   const [search, setSearch] = useState("");
@@ -90,40 +87,14 @@ export function TaskListView() {
     lastName: profile.lastName,
   };
 
-  const createTaskMutation = useMutation({
-    mutationFn: createTeamTaskFromApi,
-    onSuccess: async () => {
-      if (teamId) {
-        await Promise.all([
-          queryClient.invalidateQueries({
-            queryKey: queryKeys.tasks.forTeam(teamId),
-          }),
-          queryClient.invalidateQueries({
-            queryKey: queryKeys.dashboard.summary(teamId),
-          }),
-        ]);
-      }
-
-      setIsCreateModalOpen(false);
-      setCreateForm(emptyCreateTaskFormValues);
-    },
-  });
-
-  const updateTaskMutation = useMutation({
-    mutationFn: updateTeamTaskFromApi,
-    onSuccess: async () => {
-      if (teamId) {
-        await Promise.all([
-          queryClient.invalidateQueries({
-            queryKey: queryKeys.tasks.forTeam(teamId),
-          }),
-          queryClient.invalidateQueries({
-            queryKey: queryKeys.dashboard.summary(teamId),
-          }),
-        ]);
-      }
-    },
-  });
+  const { createMutation: createTaskMutation, updateMutation: updateTaskMutation } =
+    useTeamTaskMutations({
+      teamId,
+      onCreateSuccess: () => {
+        setIsCreateModalOpen(false);
+        setCreateForm(emptyCreateTaskFormValues);
+      },
+    });
 
   const tasks = fetchedTasks;
 

@@ -21,11 +21,7 @@ export function TeamMembersPanel({
   onDelete,
 }: TeamMembersPanelProps) {
   return (
-    <div
-      className={`rounded-2xl border border-slate-900 bg-[#090e18]/80 p-6 shadow-md ${
-        canManage ? "lg:col-span-8" : "lg:col-span-12"
-      }`}
-    >
+    <div className="rounded-2xl border border-slate-900 bg-[#090e18]/80 p-6 shadow-md">
       <div className="mb-5 flex items-center justify-between border-b border-slate-900 pb-3.5">
         <div>
           <h2 className="text-sm font-black uppercase tracking-wide text-slate-200">
@@ -33,7 +29,7 @@ export function TeamMembersPanel({
           </h2>
           <p className="mt-0.5 text-[11px] font-semibold text-slate-500">
             {canManage
-              ? "Manage roles, invites, and platform permissions"
+              ? "Manage roles and invites for your team"
               : "View members assigned to your team"}
           </p>
         </div>

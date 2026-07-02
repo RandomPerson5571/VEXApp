@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 
 import { getUser } from "@/app/(auth)/lib/session";
+import { verifySessionIdentity } from "@/lib/auth/identity";
 import { lookupUserProfile } from "@/lib/auth/profile";
 import { LoginClient } from "./login-client";
 
@@ -16,7 +17,11 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
     const profile = await lookupUserProfile(user.id);
 
     if (profile.status === "found") {
-      redirect("/dashboard");
+      const identity = await verifySessionIdentity(user);
+
+      if (identity.ok) {
+        redirect("/dashboard");
+      }
     }
 
     if (profile.status === "missing") {

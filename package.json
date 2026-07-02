@@ -14,7 +14,7 @@
     "lint": "turbo run lint",
     "check-types": "turbo run check-types",
     "format": "prettier --write \"**/*.{ts,tsx,md,json}\"",
-    "test": "turbo run test --filter=web",
+    "test": "turbo run test --filter=web --filter=bot",
 
     "db:generate": "turbo run db:generate",
     "db:migrate": "turbo run db:migrate --filter=@stlvex/database",

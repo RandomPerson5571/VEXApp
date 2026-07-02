@@ -6,26 +6,15 @@ import { getSiteUrl } from "@/app/(auth)/lib/site-url";
 import { getSafeRedirectPath } from "@/lib/auth/redirect";
 import { createClient } from "@/lib/supabase/server";
 
-const DISCORD_LINK_RETURN_PATHS = [
-  "/settings/profile",
-  "/settings/integrations",
-] as const;
+const DISCORD_LINK_RETURN_PATH = "/settings/profile" as const;
 
 function getDiscordLinkReturnPath(returnTo: FormDataEntryValue | null): string {
   const path = getSafeRedirectPath(
     typeof returnTo === "string" ? returnTo : null,
-    "/settings/integrations",
+    DISCORD_LINK_RETURN_PATH,
   );
 
-  if (
-    DISCORD_LINK_RETURN_PATHS.includes(
-      path as (typeof DISCORD_LINK_RETURN_PATHS)[number],
-    )
-  ) {
-    return path;
-  }
-
-  return "/settings/integrations";
+  return path === DISCORD_LINK_RETURN_PATH ? path : DISCORD_LINK_RETURN_PATH;
 }
 
 export async function linkDiscordAccount(formData: FormData) {

@@ -1,4 +1,5 @@
 import type { BotClient, BotEvent } from "../types.js";
+import { wrapInteractionWithLatency } from "../utils/latency.js";
 
 const interactionCreate: BotEvent<"interactionCreate"> = {
   name: "interactionCreate",
@@ -63,6 +64,7 @@ const interactionCreate: BotEvent<"interactionCreate"> = {
     }
 
     try {
+      wrapInteractionWithLatency(interaction);
       await command.execute(interaction);
     } catch (error) {
       console.error(`Error executing /${interaction.commandName}:`, error);

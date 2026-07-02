@@ -14,6 +14,8 @@
     "test:watch": "vitest"
   },
   "dependencies": {
+    "@octokit/auth-app": "^8.2.0",
+    "@octokit/rest": "^22.0.1",
     "@stlvex/database": "workspace:*",
     "@stlvex/ui": "workspace:*",
     "@supabase/ssr": "^0.8.0",

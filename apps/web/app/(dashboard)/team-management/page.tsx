@@ -6,8 +6,8 @@ import { TeamManagementView } from "@/components/team/TeamManagementView";
 import { toTeamMember } from "@/components/team/management/team-management-types";
 import {
   canAccessTeamManagement,
+  canManageTeamIntegrations,
   canManageTeamRoster,
-  isGlobalAdmin,
   verifyUserPermissions,
 } from "@/lib/auth/auth-guards";
 import { getCurrentUser } from "@/lib/auth/current-user";
@@ -53,15 +53,11 @@ export default async function TeamManagementPage() {
     );
   }
 
-  if (isGlobalAdmin(currentUser) || !canAccessTeamManagement(currentUser)) {
+  if (!canAccessTeamManagement(currentUser)) {
     return (
       <TeamManagementFallback
-        title="Not available"
-        description={
-          isGlobalAdmin(currentUser)
-            ? "Platform administrators manage teams from the admin panel, not team management."
-            : "Join or select a team to view your roster."
-        }
+        title="No team found"
+        description="Please join a team to manage team members."
       />
     );
   }
@@ -82,7 +78,21 @@ export default async function TeamManagementPage() {
   const [team, rosterUsers] = await Promise.all([
     prisma.team.findUnique({
       where: { id: teamId },
-      select: { id: true, name: true, number: true },
+      select: {
+        name: true,
+        number: true,
+        githubIntegration: {
+          select: {
+            id: true,
+            repositoryId: true,
+            repositoryFullName: true,
+            repositoryUrl: true,
+            webhookId: true,
+            isActive: true,
+            installationId: true,
+          },
+        },
+      },
     }),
     prisma.user.findMany({
       where: { teamId },
@@ -107,12 +117,17 @@ export default async function TeamManagementPage() {
   }
 
   const canManage = canManageTeamRoster(permissions);
+  const canManageIntegrations = canManageTeamIntegrations(permissions);
 
   return (
-    <TeamManagementView
-      initialMembers={rosterUsers.map(toTeamMember)}
-      teamLabel={`${team.name} (${team.number})`}
-      canManage={canManage}
-    />
+    <div className="flex min-h-0 flex-1 flex-col">
+      <TeamManagementView
+        initialMembers={rosterUsers.map(toTeamMember)}
+        initialGithubIntegration={team.githubIntegration}
+        teamLabel={`${team.name} (${team.number})`}
+        canManage={canManage}
+        canManageIntegrations={canManageIntegrations}
+      />
+    </div>
   );
 }

@@ -30,6 +30,7 @@ type ProfileUpdateResponse = {
   };
   message?: string;
   error?: string;
+  emailConfirmationRequired?: boolean;
 };
 
 const inputClassName =
@@ -141,7 +142,10 @@ export function ProfileSettingsView({
       }
 
       setProfileMessage(payload.message ?? "Profile updated successfully.");
-      router.refresh();
+
+      if (payload.emailConfirmationRequired) {
+        router.refresh();
+      }
     } catch {
       setProfileError("Unable to save profile changes. Please try again.");
     } finally {

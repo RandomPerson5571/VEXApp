@@ -9,8 +9,8 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   return (
-    <Suspense fallback={<DashboardShellSkeleton />}>
-      <DashboardAuthenticatedShell>{children}</DashboardAuthenticatedShell>
-    </Suspense>
+    <DashboardAuthenticatedShell>
+      <Suspense fallback={<DashboardShellSkeleton />}>{children}</Suspense>
+    </DashboardAuthenticatedShell>
   );
 }

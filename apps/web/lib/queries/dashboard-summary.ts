@@ -1,4 +1,4 @@
-import { queryKeys } from "@/lib/query-client";
+import { createDashboardSummaryQueryOptions } from "@/lib/queries/shared/dashboard-summary";
 import type { DashboardSummaryStats } from "@/lib/types/team";
 
 export async function fetchDashboardSummaryFromApi(): Promise<DashboardSummaryStats> {
@@ -12,8 +12,5 @@ export async function fetchDashboardSummaryFromApi(): Promise<DashboardSummarySt
 }
 
 export function dashboardSummaryQueryOptions(teamId: string) {
-  return {
-    queryKey: queryKeys.dashboard.summary(teamId),
-    queryFn: fetchDashboardSummaryFromApi,
-  };
+  return createDashboardSummaryQueryOptions(teamId, fetchDashboardSummaryFromApi);
 }

@@ -24,11 +24,13 @@ export function TeamManagementModal({
 type ModalFormActionsProps = {
   onCancel: () => void;
   submitLabel: string;
+  submitDisabled?: boolean;
 };
 
 export function ModalFormActions({
   onCancel,
   submitLabel,
+  submitDisabled = false,
 }: ModalFormActionsProps) {
   return (
     <div className="flex items-center justify-end gap-3 border-t border-slate-900 pt-3">
@@ -41,7 +43,8 @@ export function ModalFormActions({
       </button>
       <button
         type="submit"
-        className="cursor-pointer rounded-lg bg-orange-600 px-5 py-2 text-xs font-bold text-white shadow-lg hover:bg-orange-500"
+        disabled={submitDisabled}
+        className="cursor-pointer rounded-lg bg-orange-600 px-5 py-2 text-xs font-bold text-white shadow-lg hover:bg-orange-500 disabled:cursor-not-allowed disabled:opacity-60"
       >
         {submitLabel}
       </button>

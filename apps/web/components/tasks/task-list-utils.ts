@@ -78,10 +78,16 @@ export function getInitials(firstName: string, lastName: string): string {
   return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
 }
 
-export function formatPersonName(person: {
-  firstName: string;
-  lastName: string;
-}): string {
+export function formatPersonName(
+  person: {
+    firstName: string;
+    lastName: string;
+  } | null | undefined,
+): string {
+  if (!person) {
+    return "Deleted user";
+  }
+
   return `${person.firstName} ${person.lastName}`;
 }
 

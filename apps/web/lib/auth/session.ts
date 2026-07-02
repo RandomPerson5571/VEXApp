@@ -1,4 +1,5 @@
 import type { User as AuthUser } from "@supabase/supabase-js";
+import { connection } from "next/server";
 import { headers } from "next/headers";
 import { cache } from "react";
 
@@ -11,27 +12,18 @@ export const PROXY_AUTH_USER_ID_HEADER = "x-auth-user-id";
 /**
  * Resolves the authenticated Supabase user once per request.
  *
- * When the request proxy has already called `getUser()` (see `updateSession`),
- * it sets `x-auth-validated` / `x-auth-user-id` on every matched route including
- * dashboard navigations. This path reads the session from cookies via
- * `getSession()` instead of making a second Auth server round-trip.
+ * Always uses `getUser()` so the Auth server validates the session. When the
+ * request proxy has already validated the session it sets `x-auth-validated` /
+ * `x-auth-user-id`; we reject a user id that does not match that header.
  */
 export const getAuthUser = cache(async (): Promise<AuthUser | null> => {
+  await connection();
+
   const supabase = await createClient();
   const headerStore = await headers();
   const validatedByProxy =
     headerStore.get(PROXY_AUTH_VALIDATED_HEADER) === "1";
   const proxyUserId = headerStore.get(PROXY_AUTH_USER_ID_HEADER);
-
-  if (validatedByProxy && proxyUserId) {
-    const {
-      data: { session },
-    } = await supabase.auth.getSession();
-
-    if (session?.user.id === proxyUserId) {
-      return session.user;
-    }
-  }
 
   const {
     data: { user },
@@ -39,6 +31,10 @@ export const getAuthUser = cache(async (): Promise<AuthUser | null> => {
   } = await supabase.auth.getUser();
 
   if (error || !user) {
+    return null;
+  }
+
+  if (validatedByProxy && proxyUserId && user.id !== proxyUserId) {
     return null;
   }
 

@@ -1,11 +1,14 @@
+import type { Server } from "node:http";
 import path from "node:path";
 import { Client, GatewayIntentBits } from "discord.js";
+import { closeWebhookServer, createWebhookServer } from "./api/server.js";
 import { config } from "./config.js";
 import { loadCommands, loadEvents } from "./loaders.js";
 import type { BotClient } from "./types.js";
 import { srcDirectory } from "./utils/paths.js";
 
 // Instantiated outside the function so process event listeners can access it
+let webhookServer: Server | undefined;
 const client = new Client({
   intents: [
     GatewayIntentBits.Guilds,
@@ -30,23 +33,32 @@ async function bootstrap(): Promise<void> {
     client.on(event.name, (...args) => event.execute(...args));
   }
 
+  ({ server: webhookServer } = createWebhookServer(client));
   await client.login(config.token);
 }
 
 // --- Graceful Shutdown Handler ---
-function handleShutdown(signal: string): void {
+async function handleShutdown(signal: string): Promise<void> {
   console.log(`\nReceived ${signal}. Commencing graceful shutdown...`);
-  
-  // Closes the gateway connection and destroys the client
+
+  if (webhookServer) {
+    await closeWebhookServer(webhookServer);
+    console.log("Webhook API stopped.");
+  }
+
   client.destroy();
   console.log("Discord client destroyed safely. Exiting process.");
-  
+
   process.exit(0);
 }
 
 // Listen for termination signals (Ctrl+C, PM2/Docker stops, etc.)
-process.on("SIGINT", () => handleShutdown("SIGINT"));
-process.on("SIGTERM", () => handleShutdown("SIGTERM"));
+process.on("SIGINT", () => {
+  void handleShutdown("SIGINT");
+});
+process.on("SIGTERM", () => {
+  void handleShutdown("SIGTERM");
+});
 
 // Execute bootstrap
 bootstrap().catch((error) => {

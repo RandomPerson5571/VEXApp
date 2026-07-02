@@ -1,5 +1,6 @@
 import { prisma } from "@stlvex/database";
 import type { User as AuthUser } from "@supabase/supabase-js";
+import { connection } from "next/server";
 import { cache } from "react";
 
 import {
@@ -28,6 +29,8 @@ export type CurrentUserState =
  * Wrapped in React cache() so layouts, pages, and server actions share one pass.
  */
 export const getCurrentUserState = cache(async (): Promise<CurrentUserState> => {
+  await connection();
+
   try {
     const authUser = await getAuthUser();
 

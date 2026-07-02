@@ -43,8 +43,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     } else {
       htmlElement.classList.remove("dark");
     }
-    
-    htmlElement.style.colorScheme = newTheme;
+
     localStorage.setItem("theme", newTheme);
   }, []);
 

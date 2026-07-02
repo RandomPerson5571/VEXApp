@@ -2,7 +2,7 @@ import "server-only";
 
 import { listEventsForTeam } from "@/lib/data/events";
 import { toCalendarEvents } from "@/lib/mappers/events";
-import { queryKeys } from "@/lib/query-client";
+import { createTeamEventsQueryOptions } from "@/lib/queries/shared/events";
 import type { CalendarEvent } from "@/lib/types/team";
 
 export async function getTeamCalendarEvents(
@@ -13,8 +13,5 @@ export async function getTeamCalendarEvents(
 }
 
 export function teamEventsQueryOptions(teamId: string) {
-  return {
-    queryKey: queryKeys.events.forTeam(teamId),
-    queryFn: () => getTeamCalendarEvents(teamId),
-  };
+  return createTeamEventsQueryOptions(teamId, () => getTeamCalendarEvents(teamId));
 }

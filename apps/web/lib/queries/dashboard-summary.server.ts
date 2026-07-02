@@ -1,7 +1,7 @@
 import "server-only";
 
 import { getDashboardSummary } from "@/lib/data/dashboard-summary";
-import { queryKeys } from "@/lib/query-client";
+import { createDashboardSummaryQueryOptions } from "@/lib/queries/shared/dashboard-summary";
 import type { DashboardSummaryStats } from "@/lib/types/team";
 
 export async function getTeamDashboardSummary(
@@ -11,8 +11,7 @@ export async function getTeamDashboardSummary(
 }
 
 export function dashboardSummaryQueryOptions(teamId: string) {
-  return {
-    queryKey: queryKeys.dashboard.summary(teamId),
-    queryFn: () => getTeamDashboardSummary(teamId),
-  };
+  return createDashboardSummaryQueryOptions(teamId, () =>
+    getTeamDashboardSummary(teamId),
+  );
 }

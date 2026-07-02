@@ -8,7 +8,7 @@ import {
   type CreateFolderInput,
   type UpdateFolderInput,
 } from "@/lib/data/folders";
-import { queryKeys } from "@/lib/query-client";
+import { createTeamDocumentationTreeQueryOptions } from "@/lib/queries/shared/folders";
 import type { FolderWithDocs } from "@stlvex/database/types";
 
 export async function getTeamDocumentationTree(
@@ -34,8 +34,7 @@ export async function deleteTeamFolder(folderId: string): Promise<void> {
 }
 
 export function teamDocumentationTreeQueryOptions(teamId: string) {
-  return {
-    queryKey: queryKeys.docs.tree(teamId),
-    queryFn: () => getTeamDocumentationTree(teamId),
-  };
+  return createTeamDocumentationTreeQueryOptions(teamId, () =>
+    getTeamDocumentationTree(teamId),
+  );
 }
