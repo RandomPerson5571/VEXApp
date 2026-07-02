@@ -58,15 +58,48 @@ const integrations: IntegrationOption[] = [
 
 type IntegrationsSettingsViewProps = {
   linkedDiscordId: string | null;
+  githubAppUrl?: string | null;
   message?: string | null;
   error?: string | null;
 };
 
+function IntegrationConnectButton({ href }: { href: string | null }) {
+  if (href) {
+    return (
+      <a
+        href={href}
+        className="inline-flex items-center justify-center gap-2 rounded-lg border border-slate-300 bg-slate-900 px-4 py-2 text-xs font-bold text-white transition hover:bg-slate-800 shrink-0 sm:self-center dark:border-slate-700 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-white"
+      >
+        <Link2 className="h-3.5 w-3.5" />
+        Connect
+      </a>
+    );
+  }
+
+  return (
+    <button
+      type="button"
+      disabled
+      className="inline-flex items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2 text-xs font-bold text-slate-500 cursor-not-allowed shrink-0 sm:self-center dark:border-slate-900 dark:bg-[#0a101d] dark:text-slate-600"
+    >
+      <Link2 className="h-3.5 w-3.5" />
+      Connect
+    </button>
+  );
+}
+
 export function IntegrationsSettingsView({
   linkedDiscordId,
+  githubAppUrl = null,
   message,
   error,
 }: IntegrationsSettingsViewProps) {
+  const connectHrefById: Record<string, string | null> = {
+    github: githubAppUrl,
+  };
+
+  const hasAvailableIntegration = Object.values(connectHrefById).some(Boolean);
+
   return (
     <div className="space-y-6">
       <div>
@@ -83,7 +116,6 @@ export function IntegrationsSettingsView({
         description="OAuth connections for third-party platforms used by your team."
       >
         <div className="space-y-4">
-
           {integrations.map((integration) => (
             <article
               key={integration.id}
@@ -115,22 +147,17 @@ export function IntegrationsSettingsView({
                   </p>
                 </div>
 
-                <button
-                  type="button"
-                  disabled
-                  className="inline-flex items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2 text-xs font-bold text-slate-500 cursor-not-allowed shrink-0 sm:self-center dark:border-slate-900 dark:bg-[#0a101d] dark:text-slate-600"
-                >
-                  <Link2 className="h-3.5 w-3.5" />
-                  Connect
-                </button>
+                <IntegrationConnectButton href={connectHrefById[integration.id] ?? null} />
               </div>
             </article>
           ))}
         </div>
 
-        <p className="mt-5 text-[10px] font-semibold uppercase tracking-wide text-slate-600">
-          Integrations are coming soon.
-        </p>
+        {!hasAvailableIntegration ? (
+          <p className="mt-5 text-[10px] font-semibold uppercase tracking-wide text-slate-600">
+            Integrations are coming soon.
+          </p>
+        ) : null}
       </SettingsSection>
     </div>
   );

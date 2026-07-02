@@ -1,5 +1,6 @@
 import { IntegrationsSettingsView } from "@/components/settings/IntegrationsSettingsView";
 import { getCurrentUser } from "@/lib/auth/current-user";
+import { getGitHubAppUrl } from "@/lib/integrations/env";
 
 type SettingsIntegrationsPageProps = {
   searchParams: Promise<{
@@ -21,6 +22,7 @@ export default async function SettingsIntegrationsPage({
   return (
     <IntegrationsSettingsView
       linkedDiscordId={user.profile.discordId}
+      githubAppUrl={getGitHubAppUrl()}
       message={message}
       error={params.error ?? null}
     />

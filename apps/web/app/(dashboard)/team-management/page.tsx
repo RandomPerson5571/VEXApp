@@ -7,7 +7,6 @@ import { toTeamMember } from "@/components/team/management/team-management-types
 import {
   canAccessTeamManagement,
   canManageTeamRoster,
-  isGlobalAdmin,
   verifyUserPermissions,
 } from "@/lib/auth/auth-guards";
 import { getCurrentUser } from "@/lib/auth/current-user";
@@ -53,15 +52,11 @@ export default async function TeamManagementPage() {
     );
   }
 
-  if (isGlobalAdmin(currentUser) || !canAccessTeamManagement(currentUser)) {
+  if (!canAccessTeamManagement(currentUser)) {
     return (
       <TeamManagementFallback
-        title="Not available"
-        description={
-          isGlobalAdmin(currentUser)
-            ? "Platform administrators manage teams from the admin panel, not team management."
-            : "Join or select a team to view your roster."
-        }
+        title="No team found"
+        description="Please join a team to manage team members."
       />
     );
   }

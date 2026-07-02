@@ -54,6 +54,22 @@ model User {
 
   createdTasks    Task[]           @relation("TaskCreator")
   taskAssignments TaskAssignment[]
+
+  notificationSettings NotificationSettings?
+}
+
+model NotificationSettings {
+  id        String   @id @default(uuid())
+  userId    String   @unique
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  enableDiscordPushNotifs Boolean  @default(true)
+  githubNotifsEnabled     Boolean  @default(false)
+  githubEvents            String[] @default(["push", "pull_request"])
+  fusionNotifsEnabled     Boolean  @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model DiscordAccount {
@@ -78,9 +94,47 @@ model Team {
   events          Event[]         @relation("TeamEvents")
   notebookLogs    NotebookLog[]
   inventorySignOuts InventoryItemSignOut[]
-  tasks Task[]
+  tasks           Task[]
   invites         Invite[]
+  githubIntegration TeamGitHubIntegration?
+  fusionIntegration TeamFusionIntegration?
   createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+}
+
+model TeamGitHubIntegration {
+  id                 String   @id @default(uuid())
+  teamId             String   @unique
+  team               Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
+
+  repositoryId       Int?
+  repositoryFullName String
+  repositoryUrl      String?
+  webhookId          String?
+
+  isActive           Boolean  @default(true)
+
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  @@index([repositoryFullName])
+}
+
+model TeamFusionIntegration {
+  id          String   @id @default(uuid())
+  teamId      String   @unique
+  team        Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
+
+  projectUrn  String
+  projectName String?
+  hookId      String?
+
+  isActive    Boolean  @default(true)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([projectUrn])
 }
 
 model Event {

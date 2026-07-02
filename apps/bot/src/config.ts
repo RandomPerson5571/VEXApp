@@ -16,9 +16,27 @@ function readEnv(name: string, required = true): string {
   return value ?? "";
 }
 
+function readPort(name: string, fallback: number): number {
+  const raw = process.env[name]?.trim();
+  if (!raw) {
+    return fallback;
+  }
+
+  const port = Number.parseInt(raw, 10);
+  if (!Number.isInteger(port) || port < 1 || port > 65_535) {
+    throw new Error(`Invalid port in ${name}: ${raw}`);
+  }
+
+  return port;
+}
+
 export const config = {
   token: readEnv("DISCORD_TOKEN"),
   clientId: readEnv("DISCORD_CLIENT_ID"),
   guildId: readEnv("DISCORD_GUILD_ID", false),
   generalMemberRoleId: readEnv("GENERAL_MEMBER_ROLE_ID"),
+  webhookPort: readPort("WEBHOOK_PORT", 3001),
+  webhookSecret: readEnv("WEBHOOK_SECRET"),
+  githubWebhookSecret: readEnv("GITHUB_WEBHOOK_SECRET", false),
+  fusionWebhookSecret: readEnv("FUSION_WEBHOOK_SECRET", false),
 };

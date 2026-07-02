@@ -6,8 +6,14 @@ import type { UserRole } from "@stlvex/database/types";
 import { EditMemberModal } from "./management/EditMemberModal";
 import { GlobalPermissionsPanel } from "./management/GlobalPermissionsPanel";
 import { InviteMemberModal } from "./management/InviteMemberModal";
+import { TeamIntegrationsSection } from "./management/TeamIntegrationsSection";
 import { TeamMembersPanel } from "./management/TeamMembersPanel";
 import { TeamSettingsPanel } from "./management/TeamSettingsPanel";
+import {
+  MOCK_GITHUB_REPOS,
+  type TeamFusionIntegration,
+  type TeamGitHubIntegration,
+} from "./management/team-integration-types";
 import {
   type MemberStatus,
   type TeamMember,
@@ -45,6 +51,11 @@ export function TeamManagementView({
   const [viewFinancials, setViewFinancials] = useState(true);
   const [season, setSeason] = useState("2024-2025 VEX V5 Competition");
   const [robotName, setRobotName] = useState("Chronos");
+
+  const [githubIntegration, setGithubIntegration] =
+    useState<TeamGitHubIntegration | null>(null);
+  const [fusionIntegration, setFusionIntegration] =
+    useState<TeamFusionIntegration | null>(null);
 
   function handleRoleChange(memberId: string, role: UserRole) {
     if (!canManage) return;
@@ -118,6 +129,57 @@ export function TeamManagementView({
     // UI-only placeholder — wiring comes later
   }
 
+  function handleGitHubConnect(repositoryFullName: string) {
+    if (!canManage) return;
+
+    const mockRepo = MOCK_GITHUB_REPOS.find(
+      (repo) => repo.fullName === repositoryFullName,
+    );
+
+    setGithubIntegration({
+      id: `gh-${Date.now()}`,
+      repositoryId: mockRepo ? 42_855 : null,
+      repositoryFullName,
+      repositoryUrl: mockRepo?.url ?? `https://github.com/${repositoryFullName}`,
+      webhookId: `wh_${Date.now().toString(36)}`,
+      isActive: true,
+    });
+  }
+
+  function handleGitHubDisconnect() {
+    if (!canManage) return;
+    setGithubIntegration(null);
+  }
+
+  function handleGitHubActiveChange(isActive: boolean) {
+    if (!canManage) return;
+
+    setGithubIntegration((prev) => (prev ? { ...prev, isActive } : null));
+  }
+
+  function handleFusionConnect(projectUrn: string, projectName: string | null) {
+    if (!canManage) return;
+
+    setFusionIntegration({
+      id: `fu-${Date.now()}`,
+      projectUrn,
+      projectName,
+      hookId: `hk_${Date.now().toString(36)}`,
+      isActive: true,
+    });
+  }
+
+  function handleFusionDisconnect() {
+    if (!canManage) return;
+    setFusionIntegration(null);
+  }
+
+  function handleFusionActiveChange(isActive: boolean) {
+    if (!canManage) return;
+
+    setFusionIntegration((prev) => (prev ? { ...prev, isActive } : null));
+  }
+
   return (
     <div className="flex-1 overflow-y-auto bg-[#03070e] px-8 py-6 font-sans scrollbar-thin scrollbar-thumb-slate-900 scrollbar-track-transparent">
       <div className="mb-6">
@@ -161,6 +223,21 @@ export function TeamManagementView({
           </div>
         ) : null}
       </div>
+
+      {canManage ? (
+        <div className="mt-6">
+          <TeamIntegrationsSection
+            githubIntegration={githubIntegration}
+            fusionIntegration={fusionIntegration}
+            onGitHubConnect={handleGitHubConnect}
+            onGitHubDisconnect={handleGitHubDisconnect}
+            onGitHubActiveChange={handleGitHubActiveChange}
+            onFusionConnect={handleFusionConnect}
+            onFusionDisconnect={handleFusionDisconnect}
+            onFusionActiveChange={handleFusionActiveChange}
+          />
+        </div>
+      ) : null}
 
       {canManage && isInviteModalOpen ? (
         <InviteMemberModal

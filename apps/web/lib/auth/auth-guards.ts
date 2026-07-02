@@ -76,13 +76,9 @@ function resolveUserPermissions(
 }
 
 /**
- * Team management is for roster members only — not platform administrators.
+ * Team management requires an assigned team, including for platform administrators.
  */
 export function canAccessTeamManagement(user: PermissionUserContext): boolean {
-  if (isGlobalAdmin(user)) {
-    return false;
-  }
-
   return Boolean(user.profile.teamId);
 }
 
