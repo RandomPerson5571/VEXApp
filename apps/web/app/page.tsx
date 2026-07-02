@@ -4,7 +4,7 @@ import RoaryIcon from "@/components/roaryicon.png";
 
 export default function Home() {
   return (
-    <main className="min-h-screen bg-[#0b0f16] font-sans">
+    <main className="min-h-screen font-sans">
       {/* Hero */}
       <section className="relative overflow-hidden bg-[#ffa800] text-[#1a1200]">
         <div className="max-w-7xl mx-auto px-6 py-24 lg:py-32">
@@ -14,7 +14,7 @@ export default function Home() {
                 Welcome to STL Robotics
               </h1>
               <p className="mt-4 text-lg text-[#3a2800]/80 max-w-xl">
-                Roary keeps match prep, team documents, calendar updates, and member coordination in one place for the STL VEX Robotics season.
+                Roary keeps match prep, team documents, calendar updates, and member coordination in one place for your VRC season.
               </p>
 
               <div className="mt-8 flex flex-wrap gap-3">
@@ -36,12 +36,12 @@ export default function Home() {
             </div>
 
             <div className="mt-10 lg:mt-0 lg:ml-10 flex-shrink-0">
-              <div className="flex h-56 w-96 max-w-full items-center justify-center">
+              <div className="flex h-96 w-96 max-w-full items-center justify-center">
                 <Image
                   src={RoaryIcon}
                   alt="Roary"
                   priority
-                  className="h-full w-auto object-contain drop-shadow-2xl"
+                  className="h-full w-auto object-contain drop-shadow-2xl transition-transform duration-300 ease-out hover:scale-105 float"
                 />
               </div>
             </div>
@@ -55,17 +55,17 @@ export default function Home() {
           <h2 className="text-2xl font-extrabold mb-6">Built for competition season</h2>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            <div className="rounded-2xl border border-slate-800 bg-[#0f1720]/60 p-6">
+            <div className="rounded-2xl border border-slate-800 bg-[#0f1720]/60 p-6 hover-lift hover:border-slate-600 hover:bg-[#0f1720]/80">
               <h3 className="font-bold text-lg">Match Readiness</h3>
               <p className="mt-2 text-sm text-slate-400">Track upcoming matches, scouting notes, and the details your drive team needs before queueing.</p>
             </div>
 
-            <div className="rounded-2xl border border-slate-800 bg-[#0f1720]/60 p-6">
+            <div className="rounded-2xl border border-slate-800 bg-[#0f1720]/60 p-6 hover-lift hover:border-slate-600 hover:bg-[#0f1720]/80">
               <h3 className="font-bold text-lg">Team Coordination</h3>
               <p className="mt-2 text-sm text-slate-400">Keep members, roles, invites, and permissions organized as the roster changes through the season.</p>
             </div>
 
-            <div className="rounded-2xl border border-slate-800 bg-[#0f1720]/60 p-6">
+            <div className="rounded-2xl border border-slate-800 bg-[#0f1720]/60 p-6 hover-lift hover:border-slate-600 hover:bg-[#0f1720]/80">
               <h3 className="font-bold text-lg">Build Resources</h3>
               <p className="mt-2 text-sm text-slate-400">Centralize documents, schedules, and team resources so the whole team can find what matters fast.</p>
             </div>
