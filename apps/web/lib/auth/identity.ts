@@ -1,7 +1,7 @@
 import { Prisma, prisma } from "@stlvex/database";
 import type { SupabaseClient, User as SupabaseUser } from "@supabase/supabase-js";
 import { cache } from "react";
-import { createClient } from "@/lib/supabase/server";
+// NOTE: removed runtime Supabase auth metadata writes as part of undo.
 
 export type IdentityVerificationResult =
   | { ok: true }
@@ -210,15 +210,7 @@ export async function syncDiscordIdToProfile(
         });
       });
       // Try to copy the Discord avatar into the Supabase auth user metadata
-      try {
-        const avatarUrl = getDiscordAvatarUrlFromAuthUser(authUser);
-        if (avatarUrl) {
-          const supabase = await createClient();
-          await supabase.auth.updateUser({ data: { user_metadata: { avatar_url: avatarUrl, picture: avatarUrl } } });
-        }
-      } catch {
-        // Non-fatal: ignore failures to update auth metadata
-      }
+      // previously: attempted to copy Discord avatar into Supabase auth metadata
     } catch (error) {
       if (
         error instanceof Prisma.PrismaClientKnownRequestError &&
@@ -255,16 +247,7 @@ export async function syncDiscordIdToProfile(
         discordUsername: getDiscordUsernameFromAuthUser(authUser),
       });
     });
-    // Try to copy the Discord avatar into the Supabase auth user metadata
-    try {
-      const avatarUrl = getDiscordAvatarUrlFromAuthUser(authUser);
-      if (avatarUrl) {
-        const supabase = await createClient();
-        await supabase.auth.updateUser({ data: { user_metadata: { avatar_url: avatarUrl, picture: avatarUrl } } });
-      }
-    } catch {
-      // Non-fatal: ignore failures to update auth metadata
-    }
+    // previously: attempted to copy Discord avatar into Supabase auth metadata
   } catch (error) {
     if (
       error instanceof Prisma.PrismaClientKnownRequestError &&
