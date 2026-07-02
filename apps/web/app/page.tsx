@@ -1,7 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import RoboticsLion from "@/public/logos/smaitLion.svg";
-import RoboticsLion2 from "@/app/icon.png";
+import RoaryIcon from "@/components/roaryicon.png";
 
 export default function Home() {
   return (
@@ -23,7 +22,7 @@ export default function Home() {
                   href="/join"
                   className="inline-flex items-center gap-3 rounded-full bg-[#1a1200] text-white font-semibold px-6 py-3 shadow-lg hover:bg-[#2b1d00]"
                 >
-                  <Image src={RoboticsLion2} alt="" width={20} height={20} className="h-5 w-5" />
+                  <Image src={RoaryIcon} alt="" width={20} height={20} className="h-5 w-5" />
                   Join by Invite
                 </Link>
 
@@ -39,8 +38,8 @@ export default function Home() {
             <div className="mt-10 lg:mt-0 lg:ml-10 flex-shrink-0">
               <div className="flex h-96 w-96 max-w-full items-center justify-center">
                 <Image
-                  src={RoboticsLion}
-                  alt="STL Robotics Logo"
+                  src={RoaryIcon}
+                  alt="Roary"
                   priority
                   className="h-full w-auto object-contain drop-shadow-2xl transition-transform duration-300 ease-out hover:scale-105 float"
                 />
