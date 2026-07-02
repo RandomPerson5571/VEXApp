@@ -1,6 +1,7 @@
 import { Prisma, prisma } from "@stlvex/database";
 import type { SupabaseClient, User as SupabaseUser } from "@supabase/supabase-js";
 import { cache } from "react";
+import { createClient } from "@/lib/supabase/server";
 
 export type IdentityVerificationResult =
   | { ok: true }
@@ -123,6 +124,30 @@ export function getDiscordUsernameFromAuthUser(
   return null;
 }
 
+export function getDiscordAvatarUrlFromAuthUser(
+  user: SupabaseUser,
+): string | null {
+  const discordIdentity = user.identities?.find(
+    (identity) => identity.provider === "discord",
+  );
+  const identityData = discordIdentity?.identity_data;
+
+  const candidates = [
+    identityData?.avatar_url,
+    identityData?.picture,
+    user.user_metadata?.avatar_url,
+    user.user_metadata?.picture,
+  ];
+
+  for (const candidate of candidates) {
+    if (typeof candidate === "string" && candidate.startsWith("http")) {
+      return candidate;
+    }
+  }
+
+  return null;
+}
+
 type DiscordLinkWrite = {
   userId: string;
   discordId: string;
@@ -184,6 +209,16 @@ export async function syncDiscordIdToProfile(
           discordUsername: getDiscordUsernameFromAuthUser(authUser),
         });
       });
+      // Try to copy the Discord avatar into the Supabase auth user metadata
+      try {
+        const avatarUrl = getDiscordAvatarUrlFromAuthUser(authUser);
+        if (avatarUrl) {
+          const supabase = await createClient();
+          await supabase.auth.updateUser({ data: { user_metadata: { avatar_url: avatarUrl, picture: avatarUrl } } });
+        }
+      } catch {
+        // Non-fatal: ignore failures to update auth metadata
+      }
     } catch (error) {
       if (
         error instanceof Prisma.PrismaClientKnownRequestError &&
@@ -220,6 +255,16 @@ export async function syncDiscordIdToProfile(
         discordUsername: getDiscordUsernameFromAuthUser(authUser),
       });
     });
+    // Try to copy the Discord avatar into the Supabase auth user metadata
+    try {
+      const avatarUrl = getDiscordAvatarUrlFromAuthUser(authUser);
+      if (avatarUrl) {
+        const supabase = await createClient();
+        await supabase.auth.updateUser({ data: { user_metadata: { avatar_url: avatarUrl, picture: avatarUrl } } });
+      }
+    } catch {
+      // Non-fatal: ignore failures to update auth metadata
+    }
   } catch (error) {
     if (
       error instanceof Prisma.PrismaClientKnownRequestError &&
