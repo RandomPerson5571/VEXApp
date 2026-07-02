@@ -1,16 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import type { UserRole } from "@stlvex/database/types";
 
 import { EditMemberModal } from "./management/EditMemberModal";
-import { GlobalPermissionsPanel } from "./management/GlobalPermissionsPanel";
+import { GitHubRepoPickerModal } from "./management/GitHubRepoPickerModal";
 import { InviteMemberModal } from "./management/InviteMemberModal";
 import { TeamIntegrationsSection } from "./management/TeamIntegrationsSection";
 import { TeamMembersPanel } from "./management/TeamMembersPanel";
-import { TeamSettingsPanel } from "./management/TeamSettingsPanel";
 import {
-  MOCK_GITHUB_REPOS,
   type TeamFusionIntegration,
   type TeamGitHubIntegration,
 } from "./management/team-integration-types";
@@ -23,15 +22,41 @@ export type { TeamMember } from "./management/team-management-types";
 
 type TeamManagementViewProps = {
   initialMembers: TeamMember[];
+  initialGithubIntegration: TeamGitHubIntegration | null;
   teamLabel: string;
   canManage: boolean;
+  canManageIntegrations: boolean;
 };
+
+type GitHubIntegrationResponse = {
+  integration?: TeamGitHubIntegration;
+  error?: string;
+};
+
+function parseInstallationId(value: string | null): number | null {
+  if (!value?.trim()) {
+    return null;
+  }
+
+  const parsed = Number.parseInt(value, 10);
+
+  if (!Number.isInteger(parsed) || parsed <= 0) {
+    return null;
+  }
+
+  return parsed;
+}
 
 export function TeamManagementView({
   initialMembers,
+  initialGithubIntegration,
   teamLabel,
   canManage,
+  canManageIntegrations,
 }: TeamManagementViewProps) {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
   const [members, setMembers] = useState<TeamMember[]>(initialMembers);
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -46,16 +71,39 @@ export function TeamManagementView({
   const [editRole, setEditRole] = useState<UserRole>("TEAM_MEMBER");
   const [editStatus, setEditStatus] = useState<MemberStatus>("Active");
 
-  const [manageMembers, setManageMembers] = useState(true);
-  const [editBuildLog, setEditBuildLog] = useState(true);
-  const [viewFinancials, setViewFinancials] = useState(true);
-  const [season, setSeason] = useState("2024-2025 VEX V5 Competition");
-  const [robotName, setRobotName] = useState("Chronos");
-
   const [githubIntegration, setGithubIntegration] =
-    useState<TeamGitHubIntegration | null>(null);
+    useState<TeamGitHubIntegration | null>(initialGithubIntegration);
   const [fusionIntegration, setFusionIntegration] =
     useState<TeamFusionIntegration | null>(null);
+  const [repoPickerInstallationId, setRepoPickerInstallationId] = useState<
+    number | null
+  >(null);
+  const [githubBannerError, setGithubBannerError] = useState<string | null>(
+    null,
+  );
+
+  useEffect(() => {
+    const errorParam = searchParams.get("githubError");
+
+    if (errorParam) {
+      setGithubBannerError(errorParam);
+      router.replace("/team-management", { scroll: false });
+      return;
+    }
+
+    if (!canManageIntegrations) {
+      return;
+    }
+
+    const installationId = parseInstallationId(
+      searchParams.get("githubInstall"),
+    );
+
+    if (installationId) {
+      setRepoPickerInstallationId(installationId);
+      router.replace("/team-management", { scroll: false });
+    }
+  }, [canManageIntegrations, router, searchParams]);
 
   function handleRoleChange(memberId: string, role: UserRole) {
     if (!canManage) return;
@@ -124,37 +172,64 @@ export function TeamManagementView({
     setEditingMember(null);
   }
 
-  function handleSaveTeamSettings() {
-    if (!canManage) return;
-    // UI-only placeholder — wiring comes later
-  }
+  async function handleGitHubConnect(repositoryFullName: string) {
+    if (!canManageIntegrations || !repoPickerInstallationId) return;
 
-  function handleGitHubConnect(repositoryFullName: string) {
-    if (!canManage) return;
-
-    const mockRepo = MOCK_GITHUB_REPOS.find(
-      (repo) => repo.fullName === repositoryFullName,
-    );
-
-    setGithubIntegration({
-      id: `gh-${Date.now()}`,
-      repositoryId: mockRepo ? 42_855 : null,
-      repositoryFullName,
-      repositoryUrl: mockRepo?.url ?? `https://github.com/${repositoryFullName}`,
-      webhookId: `wh_${Date.now().toString(36)}`,
-      isActive: true,
+    const response = await fetch("/api/team/github/connect", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        installationId: repoPickerInstallationId,
+        repositoryFullName,
+      }),
     });
+
+    const data = (await response.json()) as GitHubIntegrationResponse;
+
+    if (!response.ok || !data.integration) {
+      throw new Error(data.error ?? "Failed to connect GitHub repository.");
+    }
+
+    setGithubIntegration(data.integration);
+    setRepoPickerInstallationId(null);
+    setGithubBannerError(null);
   }
 
-  function handleGitHubDisconnect() {
-    if (!canManage) return;
+  async function handleGitHubDisconnect() {
+    if (!canManageIntegrations) return;
+
+    const response = await fetch("/api/team/github", { method: "DELETE" });
+    const data = (await response.json()) as { error?: string };
+
+    if (!response.ok) {
+      setGithubBannerError(data.error ?? "Failed to disconnect GitHub.");
+      return;
+    }
+
     setGithubIntegration(null);
+    setGithubBannerError(null);
   }
 
-  function handleGitHubActiveChange(isActive: boolean) {
-    if (!canManage) return;
+  async function handleGitHubActiveChange(isActive: boolean) {
+    if (!canManageIntegrations) return;
 
-    setGithubIntegration((prev) => (prev ? { ...prev, isActive } : null));
+    const response = await fetch("/api/team/github", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ isActive }),
+    });
+
+    const data = (await response.json()) as GitHubIntegrationResponse;
+
+    if (!response.ok || !data.integration) {
+      setGithubBannerError(
+        data.error ?? "Failed to update GitHub integration.",
+      );
+      return;
+    }
+
+    setGithubIntegration(data.integration);
+    setGithubBannerError(null);
   }
 
   function handleFusionConnect(projectUrn: string, projectName: string | null) {
@@ -181,63 +256,46 @@ export function TeamManagementView({
   }
 
   return (
-    <div className="flex-1 overflow-y-auto bg-[#03070e] px-8 py-6 font-sans scrollbar-thin scrollbar-thumb-slate-900 scrollbar-track-transparent">
+    <div className="min-h-0 flex-1 overflow-y-auto bg-[#03070e] px-8 py-6 font-sans scrollbar-thin scrollbar-thumb-slate-900 scrollbar-track-transparent">
       <div className="mb-6">
         <h1 className="text-2xl font-black tracking-tight text-slate-100">
           Team Management
         </h1>
         <p className="mt-1 text-xs font-semibold text-slate-400">
           {canManage
-            ? `Manage roles, invites, and permissions for ${teamLabel}.`
+            ? `Manage roles and invites for ${teamLabel}.`
             : `View roster for ${teamLabel}.`}
         </p>
       </div>
 
-      <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-12">
-        <TeamMembersPanel
-          members={members}
-          canManage={canManage}
-          onInvite={() => setIsInviteModalOpen(true)}
-          onRoleChange={handleRoleChange}
-          onEdit={handleStartEdit}
-          onDelete={handleDeleteMember}
-        />
-
-        {canManage ? (
-          <div className="space-y-6 lg:col-span-4">
-            <GlobalPermissionsPanel
-              manageMembers={manageMembers}
-              editBuildLog={editBuildLog}
-              viewFinancials={viewFinancials}
-              onManageMembersChange={setManageMembers}
-              onEditBuildLogChange={setEditBuildLog}
-              onViewFinancialsChange={setViewFinancials}
-            />
-            <TeamSettingsPanel
-              season={season}
-              robotName={robotName}
-              onSeasonChange={setSeason}
-              onRobotNameChange={setRobotName}
-              onSave={handleSaveTeamSettings}
-            />
-          </div>
-        ) : null}
-      </div>
-
-      {canManage ? (
-        <div className="mt-6">
-          <TeamIntegrationsSection
-            githubIntegration={githubIntegration}
-            fusionIntegration={fusionIntegration}
-            onGitHubConnect={handleGitHubConnect}
-            onGitHubDisconnect={handleGitHubDisconnect}
-            onGitHubActiveChange={handleGitHubActiveChange}
-            onFusionConnect={handleFusionConnect}
-            onFusionDisconnect={handleFusionDisconnect}
-            onFusionActiveChange={handleFusionActiveChange}
-          />
+      {githubBannerError ? (
+        <div className="mb-4 rounded-xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-[11px] font-semibold text-red-400">
+          {githubBannerError}
         </div>
       ) : null}
+
+      <TeamMembersPanel
+        members={members}
+        canManage={canManage}
+        onInvite={() => setIsInviteModalOpen(true)}
+        onRoleChange={handleRoleChange}
+        onEdit={handleStartEdit}
+        onDelete={handleDeleteMember}
+      />
+
+      <div className="mt-6">
+        <TeamIntegrationsSection
+          githubIntegration={githubIntegration}
+          fusionIntegration={fusionIntegration}
+          canManage={canManage}
+          canManageIntegrations={canManageIntegrations}
+          onGitHubDisconnect={handleGitHubDisconnect}
+          onGitHubActiveChange={handleGitHubActiveChange}
+          onFusionConnect={handleFusionConnect}
+          onFusionDisconnect={handleFusionDisconnect}
+          onFusionActiveChange={handleFusionActiveChange}
+        />
+      </div>
 
       {canManage && isInviteModalOpen ? (
         <InviteMemberModal
@@ -264,6 +322,14 @@ export function TeamManagementView({
           onStatusChange={setEditStatus}
           onClose={() => setIsEditModalOpen(false)}
           onSubmit={handleEditSubmit}
+        />
+      ) : null}
+
+      {canManageIntegrations && repoPickerInstallationId ? (
+        <GitHubRepoPickerModal
+          installationId={repoPickerInstallationId}
+          onClose={() => setRepoPickerInstallationId(null)}
+          onSelect={handleGitHubConnect}
         />
       ) : null}
     </div>

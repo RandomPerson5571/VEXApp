@@ -1,10 +1,11 @@
-/** Mirrors TeamGitHubIntegration from schema — UI/mock layer only. */
+﻿/** Mirrors TeamGitHubIntegration from schema — UI/mock layer only. */
 export type TeamGitHubIntegration = {
   id: string;
   repositoryId: number | null;
   repositoryFullName: string;
   repositoryUrl: string | null;
   webhookId: string | null;
+  installationId: number | null;
   isActive: boolean;
 };
 

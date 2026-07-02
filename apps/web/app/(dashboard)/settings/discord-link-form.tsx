@@ -23,7 +23,7 @@ export function DiscordLinkForm({
   message,
   error,
   embedded = false,
-  returnTo = "/settings/integrations",
+  returnTo = "/settings/profile",
 }: DiscordLinkFormProps) {
   const isConnected = Boolean(linkedDiscordId);
 

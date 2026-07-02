@@ -1,6 +1,7 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
+import { verifySessionIdentity } from "@/lib/auth/identity";
 import { lookupUserProfile } from "@/lib/auth/profile";
 import {
   PROXY_AUTH_USER_ID_HEADER,
@@ -92,9 +93,24 @@ export async function updateSession(request: NextRequest) {
     // Profile lookup is auth-route only; dashboard/protected paths skip this DB call.
     const profile = await lookupUserProfile(user.id);
 
-    if (profile.status === "found" || profile.status === "missing") {
+    if (profile.status === "found") {
+      const identity = await verifySessionIdentity(user);
+
+      if (identity.ok) {
+        const url = request.nextUrl.clone();
+        url.pathname = "/dashboard";
+
+        const redirectResponse = NextResponse.redirect(url);
+        copySupabaseCookies(supabaseResponse, redirectResponse);
+        return redirectResponse;
+      }
+
+      return passThrough;
+    }
+
+    if (profile.status === "missing") {
       const url = request.nextUrl.clone();
-      url.pathname = profile.status === "found" ? "/dashboard" : "/onboarding";
+      url.pathname = "/onboarding";
 
       const redirectResponse = NextResponse.redirect(url);
       copySupabaseCookies(supabaseResponse, redirectResponse);

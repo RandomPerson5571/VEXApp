@@ -6,6 +6,7 @@ import { TeamManagementView } from "@/components/team/TeamManagementView";
 import { toTeamMember } from "@/components/team/management/team-management-types";
 import {
   canAccessTeamManagement,
+  canManageTeamIntegrations,
   canManageTeamRoster,
   verifyUserPermissions,
 } from "@/lib/auth/auth-guards";
@@ -77,7 +78,21 @@ export default async function TeamManagementPage() {
   const [team, rosterUsers] = await Promise.all([
     prisma.team.findUnique({
       where: { id: teamId },
-      select: { id: true, name: true, number: true },
+      select: {
+        name: true,
+        number: true,
+        githubIntegration: {
+          select: {
+            id: true,
+            repositoryId: true,
+            repositoryFullName: true,
+            repositoryUrl: true,
+            webhookId: true,
+            isActive: true,
+            installationId: true,
+          },
+        },
+      },
     }),
     prisma.user.findMany({
       where: { teamId },
@@ -102,12 +117,17 @@ export default async function TeamManagementPage() {
   }
 
   const canManage = canManageTeamRoster(permissions);
+  const canManageIntegrations = canManageTeamIntegrations(permissions);
 
   return (
-    <TeamManagementView
-      initialMembers={rosterUsers.map(toTeamMember)}
-      teamLabel={`${team.name} (${team.number})`}
-      canManage={canManage}
-    />
+    <div className="flex min-h-0 flex-1 flex-col">
+      <TeamManagementView
+        initialMembers={rosterUsers.map(toTeamMember)}
+        initialGithubIntegration={team.githubIntegration}
+        teamLabel={`${team.name} (${team.number})`}
+        canManage={canManage}
+        canManageIntegrations={canManageIntegrations}
+      />
+    </div>
   );
 }

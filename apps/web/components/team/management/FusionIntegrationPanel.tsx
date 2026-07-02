@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import { Box, ExternalLink, Link2, Unlink } from "lucide-react";
@@ -14,13 +14,6 @@ import {
 } from "./team-integration-types";
 import { TEAM_FIELD_CLASS_NAME } from "./team-management-types";
 
-type FusionIntegrationPanelProps = {
-  integration: TeamFusionIntegration | null;
-  onConnect: (projectUrn: string, projectName: string | null) => void;
-  onDisconnect: () => void;
-  onActiveChange: (isActive: boolean) => void;
-};
-
 function truncateUrn(urn: string, maxLength = 42): string {
   if (urn.length <= maxLength) return urn;
   const head = urn.slice(0, 22);
@@ -28,14 +21,25 @@ function truncateUrn(urn: string, maxLength = 42): string {
   return `${head}…${tail}`;
 }
 
+type FusionIntegrationPanelProps = {
+  integration: TeamFusionIntegration | null;
+  canManage?: boolean;
+  onConnect: (projectUrn: string, projectName: string | null) => void;
+  onDisconnect: () => void;
+  onActiveChange: (isActive: boolean) => void;
+};
+
 export function FusionIntegrationPanel({
   integration,
+  canManage = true,
   onConnect,
   onDisconnect,
   onActiveChange,
 }: FusionIntegrationPanelProps) {
   const [isConnecting, setIsConnecting] = useState(false);
-  const [selectedProject, setSelectedProject] = useState(MOCK_FUSION_PROJECTS[0].urn);
+  const [selectedProject, setSelectedProject] = useState<string>(
+    MOCK_FUSION_PROJECTS[0].urn,
+  );
   const [customUrn, setCustomUrn] = useState("");
   const [customName, setCustomName] = useState("");
 
@@ -90,7 +94,7 @@ export function FusionIntegrationPanel({
             </div>
           </div>
 
-          {isConnected ? (
+          {isConnected && canManage ? (
             <button
               type="button"
               onClick={onDisconnect}
@@ -139,14 +143,16 @@ export function FusionIntegrationPanel({
               ) : null}
             </div>
 
-            <PermissionToggle
-              label="Integration Active"
-              description="Pause Fusion event delivery without removing the project link"
-              enabled={integration.isActive}
-              onToggle={() => onActiveChange(!integration.isActive)}
-            />
+            {canManage ? (
+              <PermissionToggle
+                label="Integration Active"
+                description="Pause Fusion event delivery without removing the project link"
+                enabled={integration.isActive}
+                onToggle={() => onActiveChange(!integration.isActive)}
+              />
+            ) : null}
           </div>
-        ) : (
+        ) : canManage ? (
           <div className="space-y-3">
             {isConnecting ? (
               <form onSubmit={handleConnect} className="space-y-3">
@@ -236,6 +242,10 @@ export function FusionIntegrationPanel({
               </button>
             )}
           </div>
+        ) : (
+          <p className="rounded-lg border border-slate-900 bg-slate-950/60 px-3 py-2.5 text-[10px] font-semibold text-slate-500">
+            No Fusion project linked yet.
+          </p>
         )}
       </div>
     </article>

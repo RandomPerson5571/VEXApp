@@ -2,12 +2,11 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Bell, Link as LinkIcon, User } from "lucide-react";
+import { Bell, User } from "lucide-react";
 
 const settingsItems = [
   { href: "/settings/profile", label: "Profile", icon: User },
   { href: "/settings/notifications", label: "Notifications", icon: Bell },
-  { href: "/settings/integrations", label: "Integrations", icon: LinkIcon },
 ] as const;
 
 export function SettingsSidebar() {

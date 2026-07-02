@@ -40,3 +40,31 @@ Production (`pnpm --filter bot start`) does not auto-register commands — run `
 
 - `/ping`
 - `/server`
+
+## Production deployment
+
+The web app and Discord bot are deployed separately:
+
+| Service | Typical host | Role |
+|---------|--------------|------|
+| **web** | Netlify | Next.js dashboard, GitHub OAuth callback, team integration UI |
+| **bot** | VPS / Docker (`docker-compose` `bot` service) | Discord client + webhook API on port `3001` |
+
+Both services must use the **same** `DATABASE_URL` (and `DIRECT_URL` when applicable) so team integrations, notification preferences, and user profiles stay in sync.
+
+### GitHub webhooks
+
+GitHub must be able to POST events to the bot, not the Netlify-hosted web app:
+
+```
+{BOT_PUBLIC_URL}/api/github
+```
+
+Configure `BOT_PUBLIC_URL` in the bot environment (see `.env.example`). Examples:
+
+- **Docker Compose (local / VPS):** expose `3001:3001` on the `bot` service (already set in `docker-compose.yml`), then set `BOT_PUBLIC_URL` to your public origin (e.g. `https://bot.yourdomain.com` behind a reverse proxy).
+- **TLS:** terminate HTTPS at nginx/Caddy/Traefik and proxy to `bot:3001`. GitHub requires HTTPS for production webhooks.
+
+Set `GITHUB_WEBHOOK_SECRET` to the secret configured on the GitHub App or repository webhook. The bot verifies `x-hub-signature-256` on incoming requests.
+
+The web app uses `GITHUB_INSTALL_STATE_SECRET`, `GITHUB_APP_ID`, and related vars for the install flow; webhook delivery is handled entirely by the bot.

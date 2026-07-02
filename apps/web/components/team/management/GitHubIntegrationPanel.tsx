@@ -1,10 +1,11 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import {
   ExternalLink,
   GitBranch,
   Link2,
+  Loader2,
   Unlink,
   Webhook,
 } from "lucide-react";
@@ -14,40 +15,51 @@ import Github from "@/public/logos/github-icon.svg";
 
 import { IntegrationStatusBadge } from "./IntegrationStatusBadge";
 import { PermissionToggle } from "./PermissionToggle";
-import {
-  MOCK_GITHUB_REPOS,
-  type TeamGitHubIntegration,
-} from "./team-integration-types";
-import { TEAM_FIELD_CLASS_NAME } from "./team-management-types";
+import type { TeamGitHubIntegration } from "./team-integration-types";
 
 type GitHubIntegrationPanelProps = {
   integration: TeamGitHubIntegration | null;
-  onConnect: (repositoryFullName: string) => void;
+  canManageIntegrations: boolean;
   onDisconnect: () => void;
   onActiveChange: (isActive: boolean) => void;
 };
 
 export function GitHubIntegrationPanel({
   integration,
-  onConnect,
+  canManageIntegrations,
   onDisconnect,
   onActiveChange,
 }: GitHubIntegrationPanelProps) {
   const [isConnecting, setIsConnecting] = useState(false);
-  const [selectedRepo, setSelectedRepo] = useState(MOCK_GITHUB_REPOS[0].fullName);
-  const [customRepo, setCustomRepo] = useState("");
+  const [connectError, setConnectError] = useState<string | null>(null);
 
   const isConnected = integration !== null;
-  const useCustomRepo = selectedRepo === "__custom__";
 
-  function handleConnect(event: React.FormEvent) {
-    event.preventDefault();
-    const fullName = useCustomRepo ? customRepo.trim() : selectedRepo;
-    if (!fullName) return;
+  async function handleConnect() {
+    if (!canManageIntegrations || isConnecting) return;
 
-    onConnect(fullName);
-    setIsConnecting(false);
-    setCustomRepo("");
+    setIsConnecting(true);
+    setConnectError(null);
+
+    try {
+      const response = await fetch("/api/team/github/connect");
+      const data = (await response.json()) as {
+        installUrl?: string;
+        error?: string;
+      };
+
+      if (response.ok && data.installUrl) {
+        window.location.href = data.installUrl;
+        return;
+      }
+
+      throw new Error(data.error ?? "GitHub App is not configured.");
+    } catch (error) {
+      setConnectError(
+        error instanceof Error ? error.message : "Failed to start GitHub install.",
+      );
+      setIsConnecting(false);
+    }
   }
 
   return (
@@ -80,7 +92,7 @@ export function GitHubIntegrationPanel({
             </div>
           </div>
 
-          {isConnected ? (
+          {isConnected && canManageIntegrations ? (
             <button
               type="button"
               onClick={onDisconnect}
@@ -131,85 +143,40 @@ export function GitHubIntegrationPanel({
               ) : null}
             </div>
 
-            <PermissionToggle
-              label="Integration Active"
-              description="Pause event delivery without removing the connection"
-              enabled={integration.isActive}
-              onToggle={() => onActiveChange(!integration.isActive)}
-            />
+            {canManageIntegrations ? (
+              <PermissionToggle
+                label="Integration Active"
+                description="Pause event delivery without removing the connection"
+                enabled={integration.isActive}
+                onToggle={() => onActiveChange(!integration.isActive)}
+              />
+            ) : null}
+          </div>
+        ) : canManageIntegrations ? (
+          <div className="space-y-2">
+            <button
+              type="button"
+              onClick={() => void handleConnect()}
+              disabled={isConnecting}
+              className="inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg border border-slate-800 bg-slate-950/80 py-2.5 text-xs font-bold text-slate-200 transition hover:border-slate-700 hover:bg-slate-900 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {isConnecting ? (
+                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+              ) : (
+                <Link2 className="h-3.5 w-3.5" />
+              )}
+              {isConnecting ? "Redirecting…" : "Connect Repository"}
+            </button>
+            {connectError ? (
+              <p className="rounded-lg border border-red-500/20 bg-red-500/10 px-3 py-2 text-[10px] font-semibold text-red-400">
+                {connectError}
+              </p>
+            ) : null}
           </div>
         ) : (
-          <div className="space-y-3">
-            {isConnecting ? (
-              <form onSubmit={handleConnect} className="space-y-3">
-                <div className="space-y-1.5">
-                  <label
-                    htmlFor="github-repo-select"
-                    className="text-[9px] font-bold uppercase tracking-widest text-slate-500"
-                  >
-                    Repository
-                  </label>
-                  <select
-                    id="github-repo-select"
-                    value={selectedRepo}
-                    onChange={(event) => setSelectedRepo(event.target.value)}
-                    className={TEAM_FIELD_CLASS_NAME}
-                  >
-                    {MOCK_GITHUB_REPOS.map((repo) => (
-                      <option key={repo.fullName} value={repo.fullName}>
-                        {repo.fullName}
-                      </option>
-                    ))}
-                    <option value="__custom__">Custom repository…</option>
-                  </select>
-                </div>
-
-                {useCustomRepo ? (
-                  <div className="space-y-1.5">
-                    <label
-                      htmlFor="github-custom-repo"
-                      className="text-[9px] font-bold uppercase tracking-widest text-slate-500"
-                    >
-                      owner/repo
-                    </label>
-                    <input
-                      id="github-custom-repo"
-                      type="text"
-                      value={customRepo}
-                      onChange={(event) => setCustomRepo(event.target.value)}
-                      placeholder="stlvex-robotics/competition-bot"
-                      className={TEAM_FIELD_CLASS_NAME}
-                    />
-                  </div>
-                ) : null}
-
-                <div className="flex gap-2">
-                  <button
-                    type="submit"
-                    className="flex-1 cursor-pointer rounded-lg bg-orange-600 py-2 text-xs font-bold text-white transition hover:bg-orange-500"
-                  >
-                    Link Repository
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setIsConnecting(false)}
-                    className="cursor-pointer rounded-lg border border-slate-800 px-3 py-2 text-xs font-bold text-slate-400 transition hover:border-slate-700 hover:text-slate-200"
-                  >
-                    Cancel
-                  </button>
-                </div>
-              </form>
-            ) : (
-              <button
-                type="button"
-                onClick={() => setIsConnecting(true)}
-                className="inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg border border-slate-800 bg-slate-950/80 py-2.5 text-xs font-bold text-slate-200 transition hover:border-slate-700 hover:bg-slate-900"
-              >
-                <Link2 className="h-3.5 w-3.5" />
-                Connect Repository
-              </button>
-            )}
-          </div>
+          <p className="rounded-lg border border-slate-900 bg-slate-950/60 px-3 py-2.5 text-[10px] font-semibold text-slate-500">
+            No repository linked yet.
+          </p>
         )}
       </div>
     </article>

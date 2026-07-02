@@ -4,86 +4,33 @@ import { Bell, Check } from "lucide-react";
 import Image from "next/image";
 import { useMemo, useState } from "react";
 
+import { cn } from "@stlvex/ui";
 import { Switch } from "@stlvex/ui/components/switch";
 
 import Github from "@/public/logos/github-icon.svg";
 import Fusion360 from "@/public/logos/fusion360-icon.svg";
+import {
+  GITHUB_EVENTS,
+  preferencesEqual,
+  type GitHubEventId,
+  type NotificationPreferences,
+} from "@/lib/notifications/preferences";
 
 import { SettingsSection } from "./SettingsSection";
 
-type GitHubEventId =
-  | "push"
-  | "pull_request"
-  | "issues"
-  | "release"
-  | "deployment"
-  | "workflow_run";
+const notificationSwitchClassName = cn(
+  "shrink-0 border border-slate-300/80 shadow-inner dark:border-slate-600/50",
+  "data-[state=checked]:bg-[#1f883d] dark:data-[state=checked]:bg-[#3fb950]",
+  "data-[state=unchecked]:bg-slate-300 dark:data-[state=unchecked]:bg-slate-700",
+  "[&>span]:bg-white [&>span]:shadow-md",
+  "focus-visible:ring-2 focus-visible:ring-[#1f883d]/40 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-slate-950",
+);
 
-type GitHubEventOption = {
-  id: GitHubEventId;
-  label: string;
-  description: string;
+type NotificationSettingsResponse = {
+  settings?: NotificationPreferences;
+  message?: string;
+  error?: string;
 };
-
-type NotificationPreferences = {
-  enableDiscordPushNotifs: boolean;
-  githubNotifsEnabled: boolean;
-  githubEvents: GitHubEventId[];
-  fusionNotifsEnabled: boolean;
-};
-
-const GITHUB_EVENTS: GitHubEventOption[] = [
-  {
-    id: "push",
-    label: "Pushes",
-    description: "Commits pushed to connected repositories.",
-  },
-  {
-    id: "pull_request",
-    label: "Pull requests",
-    description: "Opened, updated, merged, or closed pull requests.",
-  },
-  {
-    id: "issues",
-    label: "Issues",
-    description: "New issues, comments, and status changes.",
-  },
-  {
-    id: "release",
-    label: "Releases",
-    description: "Published or edited release tags.",
-  },
-  {
-    id: "deployment",
-    label: "Deployments",
-    description: "Deployment status updates from CI/CD pipelines.",
-  },
-  {
-    id: "workflow_run",
-    label: "Workflow runs",
-    description: "GitHub Actions workflow completions and failures.",
-  },
-];
-
-const DEFAULT_SETTINGS: NotificationPreferences = {
-  enableDiscordPushNotifs: true,
-  githubNotifsEnabled: false,
-  githubEvents: ["push", "pull_request"],
-  fusionNotifsEnabled: false,
-};
-
-function sortEvents(events: GitHubEventId[]) {
-  return [...events].sort().join(",");
-}
-
-function preferencesEqual(a: NotificationPreferences, b: NotificationPreferences) {
-  return (
-    a.enableDiscordPushNotifs === b.enableDiscordPushNotifs &&
-    a.githubNotifsEnabled === b.githubNotifsEnabled &&
-    a.fusionNotifsEnabled === b.fusionNotifsEnabled &&
-    sortEvents(a.githubEvents) === sortEvents(b.githubEvents)
-  );
-}
 
 type NotificationSettingRowProps = {
   id: string;
@@ -120,7 +67,7 @@ function NotificationSettingRow({
         checked={checked}
         disabled={disabled}
         onCheckedChange={onCheckedChange}
-        className="mt-0.5 data-[state=checked]:bg-[#1f883d] data-[state=unchecked]:bg-slate-300 dark:data-[state=unchecked]:bg-slate-700"
+        className={notificationSwitchClassName}
         aria-label={label}
       />
     </div>
@@ -213,10 +160,18 @@ function IntegrationHeader({
   );
 }
 
-export function NotificationsSettingsView() {
-  const [saved, setSaved] = useState<NotificationPreferences>(DEFAULT_SETTINGS);
-  const [draft, setDraft] = useState<NotificationPreferences>(DEFAULT_SETTINGS);
+type NotificationsSettingsViewProps = {
+  initialSettings: NotificationPreferences;
+};
+
+export function NotificationsSettingsView({
+  initialSettings,
+}: NotificationsSettingsViewProps) {
+  const [saved, setSaved] = useState<NotificationPreferences>(initialSettings);
+  const [draft, setDraft] = useState<NotificationPreferences>(initialSettings);
   const [saveMessage, setSaveMessage] = useState<string | null>(null);
+  const [saveError, setSaveError] = useState<string | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
 
   const isDirty = useMemo(
     () => !preferencesEqual(draft, saved),
@@ -228,11 +183,13 @@ export function NotificationsSettingsView() {
     value: NotificationPreferences[K],
   ) => {
     setSaveMessage(null);
+    setSaveError(null);
     setDraft((current) => ({ ...current, [key]: value }));
   };
 
   const toggleGithubEvent = (eventId: GitHubEventId, checked: boolean) => {
     setSaveMessage(null);
+    setSaveError(null);
     setDraft((current) => {
       if (checked) {
         return current.githubEvents.includes(eventId)
@@ -247,18 +204,56 @@ export function NotificationsSettingsView() {
     });
   };
 
-  const handleSave = () => {
-    if (!isDirty) {
+  const handleSave = async () => {
+    if (!isDirty || isSaving) {
       return;
     }
 
-    setSaved({ ...draft, githubEvents: [...draft.githubEvents] });
-    setSaveMessage("Notification preferences updated.");
+    setIsSaving(true);
+    setSaveMessage(null);
+    setSaveError(null);
+
+    try {
+      const response = await fetch("/api/profile/notifications", {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(draft),
+      });
+
+      const payload = (await response.json()) as NotificationSettingsResponse;
+
+      if (!response.ok) {
+        setSaveError(
+          payload.error ?? "Unable to save notification preferences.",
+        );
+        return;
+      }
+
+      if (payload.settings) {
+        setSaved(payload.settings);
+        setDraft(payload.settings);
+      } else {
+        setSaved({ ...draft, githubEvents: [...draft.githubEvents] });
+      }
+
+      setSaveMessage(
+        payload.message ?? "Notification preferences updated.",
+      );
+    } catch {
+      setSaveError(
+        "Unable to save notification preferences. Please try again.",
+      );
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const handleReset = () => {
     setDraft({ ...saved, githubEvents: [...saved.githubEvents] });
     setSaveMessage(null);
+    setSaveError(null);
   };
 
   const {
@@ -391,6 +386,12 @@ export function NotificationsSettingsView() {
           </div>
         ) : null}
 
+        {saveError ? (
+          <div className="mb-4 rounded-lg border border-red-500/20 bg-red-500/5 px-3.5 py-2.5 text-sm text-red-600 dark:text-red-300">
+            {saveError}
+          </div>
+        ) : null}
+
         <div className="flex flex-wrap items-center justify-between gap-3">
           <p className="text-xs text-slate-600 dark:text-slate-500">
             {isDirty
@@ -401,7 +402,7 @@ export function NotificationsSettingsView() {
             <button
               type="button"
               onClick={handleReset}
-              disabled={!isDirty}
+              disabled={!isDirty || isSaving}
               className="cursor-pointer rounded-lg border border-slate-200 px-4 py-2 text-xs font-semibold text-slate-600 transition hover:border-slate-300 hover:text-slate-900 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-900 dark:text-slate-400 dark:hover:border-slate-800 dark:hover:text-slate-200"
             >
               Reset
@@ -409,10 +410,14 @@ export function NotificationsSettingsView() {
             <button
               type="button"
               onClick={handleSave}
-              disabled={!isDirty || (githubNotifsEnabled && githubEvents.length === 0)}
+              disabled={
+                !isDirty ||
+                isSaving ||
+                (githubNotifsEnabled && githubEvents.length === 0)
+              }
               className="cursor-pointer rounded-lg bg-blue-600 px-5 py-2 text-xs font-bold tracking-wide text-white transition hover:bg-blue-500 disabled:cursor-not-allowed disabled:bg-blue-600/40 disabled:text-blue-200/70"
             >
-              Save Changes
+              {isSaving ? "Saving..." : "Save Changes"}
             </button>
           </div>
         </div>

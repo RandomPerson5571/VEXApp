@@ -11,9 +11,14 @@ import {
 
 const headersMock = vi.hoisted(() => vi.fn());
 const createClientMock = vi.hoisted(() => vi.fn());
+const connectionMock = vi.hoisted(() => vi.fn().mockResolvedValue(undefined));
 
 vi.mock("next/headers", () => ({
   headers: headersMock,
+}));
+
+vi.mock("next/server", () => ({
+  connection: connectionMock,
 }));
 
 vi.mock("@/lib/supabase/server", () => ({
@@ -61,40 +66,34 @@ describe("getAuthUser proxy fast path", () => {
     createClientMock.mockReset();
   });
 
-  it("uses getSession instead of getUser when the proxy validated the session", async () => {
+  it("uses getUser when the proxy validated the session", async () => {
     const authUser = buildAuthUser();
-    const getSession = vi.fn().mockResolvedValue({
-      data: { session: { user: authUser } },
-    });
-    const getUser = vi.fn();
-
-    createClientMock.mockResolvedValue({
-      auth: { getSession, getUser },
-    });
-    mockProxyHeaders(SUPABASE_USER_ID);
-
-    await expect(getAuthUser()).resolves.toEqual(authUser);
-    expect(getSession).toHaveBeenCalledTimes(1);
-    expect(getUser).not.toHaveBeenCalled();
-  });
-
-  it("falls back to getUser when proxy user id does not match the session", async () => {
-    const authUser = buildAuthUser({ id: "other-user-id" });
-    const getSession = vi.fn().mockResolvedValue({
-      data: { session: { user: authUser } },
-    });
     const getUser = vi.fn().mockResolvedValue({
-      data: { user: buildAuthUser() },
+      data: { user: authUser },
       error: null,
     });
 
     createClientMock.mockResolvedValue({
-      auth: { getSession, getUser },
+      auth: { getUser },
     });
     mockProxyHeaders(SUPABASE_USER_ID);
 
-    await getAuthUser();
-    expect(getSession).toHaveBeenCalledTimes(1);
+    await expect(getAuthUser()).resolves.toEqual(authUser);
+    expect(getUser).toHaveBeenCalledTimes(1);
+  });
+
+  it("returns null when proxy user id does not match getUser", async () => {
+    const getUser = vi.fn().mockResolvedValue({
+      data: { user: buildAuthUser({ id: "other-user-id" }) },
+      error: null,
+    });
+
+    createClientMock.mockResolvedValue({
+      auth: { getUser },
+    });
+    mockProxyHeaders(SUPABASE_USER_ID);
+
+    await expect(getAuthUser()).resolves.toBeNull();
     expect(getUser).toHaveBeenCalledTimes(1);
   });
 });

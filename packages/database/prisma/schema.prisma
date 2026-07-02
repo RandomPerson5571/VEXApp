@@ -111,6 +111,7 @@ model TeamGitHubIntegration {
   repositoryFullName String
   repositoryUrl      String?
   webhookId          String?
+  installationId     Int?     // GitHub App installation ID
 
   isActive           Boolean  @default(true)
 

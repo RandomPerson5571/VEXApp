@@ -90,15 +90,32 @@ export function canViewTeamRoster(permissions: PermissionState): boolean {
 }
 
 /**
- * Only team members (TEAM_MEMBER role) may add, remove, or update roster entries
+ * Team leaders (and platform admins) may add, remove, or update roster entries
  * within their own team.
  */
 export function canManageTeamRoster(permissions: PermissionState): boolean {
-  if (!permissions.authorized || permissions.scope !== "TEAM") {
+  if (!permissions.authorized) {
     return false;
   }
 
-  return permissions.role === "MEMBER";
+  if (permissions.scope === "GLOBAL") {
+    return true;
+  }
+
+  return permissions.role === "TEAM_LEADER";
+}
+
+/**
+ * Any same-team member (or global admin) may connect or manage GitHub integrations.
+ */
+export function canManageTeamIntegrations(
+  permissions: PermissionState,
+): boolean {
+  if (!permissions.authorized) {
+    return false;
+  }
+
+  return permissions.scope === "TEAM" || permissions.scope === "GLOBAL";
 }
 
 /**

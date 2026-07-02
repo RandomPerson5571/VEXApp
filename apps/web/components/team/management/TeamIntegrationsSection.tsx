@@ -1,4 +1,4 @@
-import { FusionIntegrationPanel } from "./FusionIntegrationPanel";
+﻿import { FusionIntegrationPanel } from "./FusionIntegrationPanel";
 import { GitHubIntegrationPanel } from "./GitHubIntegrationPanel";
 import type {
   TeamFusionIntegration,
@@ -8,7 +8,8 @@ import type {
 type TeamIntegrationsSectionProps = {
   githubIntegration: TeamGitHubIntegration | null;
   fusionIntegration: TeamFusionIntegration | null;
-  onGitHubConnect: (repositoryFullName: string) => void;
+  canManage?: boolean;
+  canManageIntegrations: boolean;
   onGitHubDisconnect: () => void;
   onGitHubActiveChange: (isActive: boolean) => void;
   onFusionConnect: (projectUrn: string, projectName: string | null) => void;
@@ -19,7 +20,8 @@ type TeamIntegrationsSectionProps = {
 export function TeamIntegrationsSection({
   githubIntegration,
   fusionIntegration,
-  onGitHubConnect,
+  canManage = true,
+  canManageIntegrations,
   onGitHubDisconnect,
   onGitHubActiveChange,
   onFusionConnect,
@@ -40,12 +42,13 @@ export function TeamIntegrationsSection({
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         <GitHubIntegrationPanel
           integration={githubIntegration}
-          onConnect={onGitHubConnect}
+          canManageIntegrations={canManageIntegrations}
           onDisconnect={onGitHubDisconnect}
           onActiveChange={onGitHubActiveChange}
         />
         <FusionIntegrationPanel
           integration={fusionIntegration}
+          canManage={canManage}
           onConnect={onFusionConnect}
           onDisconnect={onFusionDisconnect}
           onActiveChange={onFusionActiveChange}

@@ -1,4 +1,4 @@
-import { CheckCircle2, CircleDashed } from "lucide-react";
+﻿import { CheckCircle2, CircleDashed } from "lucide-react";
 
 type IntegrationStatusBadgeProps = {
   connected: boolean;

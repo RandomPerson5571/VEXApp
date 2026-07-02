@@ -30,7 +30,7 @@ function discordLinkFlowRedirect(
   error: string,
 ): NextResponse {
   const url = new URL(
-    resolveSameOriginRedirect(next, origin, "/settings/integrations"),
+    resolveSameOriginRedirect(next, origin, "/settings/profile"),
     origin,
   );
   url.searchParams.delete("message");
@@ -127,7 +127,7 @@ export async function GET(request: Request) {
               : discordCheck.error;
 
           return NextResponse.redirect(
-            `${origin}/settings/integrations?error=${encodeURIComponent(errorMessage)}`,
+            `${origin}/settings/profile?error=${encodeURIComponent(errorMessage)}`,
           );
         }
       }
