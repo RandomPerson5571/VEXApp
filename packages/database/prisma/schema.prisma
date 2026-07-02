@@ -54,6 +54,7 @@ model User {
 
   createdTasks    Task[]           @relation("TaskCreator")
   taskAssignments TaskAssignment[]
+  reservedInvites Invite[]         @relation("InviteReservations")
 
   notificationSettings NotificationSettings?
 }
@@ -173,7 +174,7 @@ model NotebookLog {
   teamId      String
   team        Team     @relation(fields: [teamId], references: [id])
   userId      String
-  user        User     @relation(fields: [userId], references: [id])
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   createdAt   DateTime @default(now())
 }
 
@@ -185,6 +186,7 @@ model Invite {
   usesCount        Int       @default(0)
   expiresAt        DateTime
   reservedByUserId String?
+  reservedBy       User?     @relation("InviteReservations", fields: [reservedByUserId], references: [id], onDelete: SetNull)
   reservedAt       DateTime?
   createdAt        DateTime  @default(now())
 
@@ -233,8 +235,8 @@ model Task {
   teamId       String        @map("team_id")
   team         Team          @relation(fields: [teamId], references: [id], onDelete: Cascade)
   
-  createdBy    String        @map("created_by")
-  creator      User          @relation("TaskCreator", fields: [createdBy], references: [id], onDelete: Restrict)
+  createdBy    String?       @map("created_by")
+  creator      User?         @relation("TaskCreator", fields: [createdBy], references: [id], onDelete: SetNull)
 
   // Many-to-Many via Explicit Junction Table
   assignments  TaskAssignment[]
@@ -295,7 +297,7 @@ model InventoryItemSignOut {
   // Relations
   item            InventoryItem @relation(fields: [inventoryItemId], references: [id], onDelete: Cascade)
   team            Team          @relation(fields: [teamId], references: [id])
-  user            User          @relation(fields: [userId], references: [id])
+  user            User          @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([inventoryItemId])
   @@index([teamId])

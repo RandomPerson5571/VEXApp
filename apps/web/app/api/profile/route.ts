@@ -230,42 +230,14 @@ export async function DELETE(request: Request) {
     }
   }
 
-  // 3. Clear the active session token BEFORE nuking the identity
+  // 3. Clear the active session token BEFORE removing the auth identity
   try {
     await supabase.auth.signOut();
   } catch (signOutError) {
     console.error("Sign-out warning:", signOutError);
-    // We can continue here; clearing the token from cookie/headers is the primary goal
   }
 
-  // 4. Run your cleanups and DB deletions first
-  try {
-    await prisma.$transaction(async (tx) => {
-      await tx.notebookLog.deleteMany({
-        where: { userId: user.id },
-      });
-
-      await tx.invite.updateMany({
-        where: { reservedByUserId: user.id },
-        data: {
-          reservedByUserId: null,
-          reservedAt: null,
-        },
-      });
-
-      await tx.user.delete({
-        where: { id: user.id },
-      });
-    });
-  } catch (dbError) {
-    console.error("Database deletion failed:", dbError);
-    return NextResponse.json(
-      { error: "Failed to remove your profile data. Account deletion aborted." },
-      { status: 500 }
-    );
-  }
-
-  // 5. Nuke the Supabase Auth Record Last
+  // 4. Delete the Supabase auth user; DB trigger cascades to public."User"
   const adminClient = createAdminClient();
   const { error: authDeleteError } = await adminClient.auth.admin.deleteUser(
     user.id,
@@ -274,9 +246,7 @@ export async function DELETE(request: Request) {
   if (authDeleteError) {
     console.error("Supabase Admin Auth deletion failed:", authDeleteError);
     return NextResponse.json(
-      {
-        error: "Your app profile was removed, but authentication cleanup failed. Please contact support.",
-      },
+      { error: "Failed to delete your account. Please try again or contact support." },
       { status: 500 },
     );
   }

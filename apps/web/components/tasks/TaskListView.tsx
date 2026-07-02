@@ -39,8 +39,8 @@ function matchesSearch(task: TaskListTask, query: string): boolean {
   const haystack = [
     task.title,
     task.description ?? "",
-    task.creator.firstName,
-    task.creator.lastName,
+    task.creator?.firstName ?? "",
+    task.creator?.lastName ?? "",
     ...assignees.flatMap((a) => [a.firstName, a.lastName]),
     ...task.subTasks.map((s) => s.title),
   ]
