@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import { Geist, Geist_Mono, Inter } from "next/font/google";
 import "./globals.css";
 import { QueryProvider } from "@/components/providers/QueryProvider";
@@ -23,11 +24,11 @@ export const metadata: Metadata = {
     process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000",
   ),
   title: {
-    default: "STL Robotics",
-    template: "%s | STL Robotics",
+    default: "STL VEX Robotics",
+    template: "%s | STL VEX Robotics",
   },
   description:
-    "Team hub for STL Robotics. Manage matches, build logs, inventory, calendar, documents, and members for the 2026-2027 season.",
+    "Team hub for STL VEX Robotics. Manage matches, build logs, inventory, calendar, documents, and members for the 2026-2027 season.",
   keywords: [
     "VEX Robotics",
     "STL Robotics",
@@ -35,25 +36,25 @@ export const metadata: Metadata = {
     "team management",
     "competition",
   ],
-  authors: [{ name: "STL Robotics" }],
-  creator: "STL Robotics",
+  authors: [{ name: "STL VEX Robotics" }],
+  creator: "STL VEX Robotics",
   openGraph: {
     type: "website",
     locale: "en_US",
-    siteName: "STL Robotics",
-    title: "STL Robotics",
+    siteName: "STL VEX Robotics",
+    title: "STL VEX Robotics",
     description:
-      "Team hub for STL Robotics. Manage matches, build logs, inventory, calendar, documents, and members.",
+      "Team hub for STL VEX Robotics. Manage matches, build logs, inventory, calendar, documents, and members.",
   },
   twitter: {
     card: "summary",
-    title: "STL Robotics",
+    title: "STL VEX Robotics",
     description:
-      "Team hub for STL Robotics. Manage matches, build logs, inventory, calendar, documents, and members.",
+      "Team hub for STL VEX Robotics. Manage matches, build logs, inventory, calendar, documents, and members.",
   },
   icons: {
-    icon: "/favicon.ico",
-    apple: "/favicon.ico",
+    icon: "/logos/Robotics_lion.svg",
+    apple: "/icon.png",
   },
   manifest: "/manifest.webmanifest",
   appleWebApp: {
@@ -79,21 +80,17 @@ export default function RootLayout({
       className={cn("h-full dark", "antialiased", geistSans.variable, geistMono.variable, "font-sans", inter.variable)}
     >
       <head>
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              (function() {
-                const theme = localStorage.getItem('theme') || 'dark';
-                if (theme === 'light') {
-                  document.documentElement.classList.remove('dark');
-                } else {
-                  document.documentElement.classList.add('dark');
-                }
-                document.documentElement.style.colorScheme = theme;
-              })();
-            `,
-          }}
-        />
+        <Script id="theme-init" strategy="beforeInteractive">
+          {`(function() {
+              const theme = localStorage.getItem('theme') || 'dark';
+              if (theme === 'light') {
+                document.documentElement.classList.remove('dark');
+              } else {
+                document.documentElement.classList.add('dark');
+              }
+              document.documentElement.style.colorScheme = theme;
+            })();`}
+        </Script>
       </head>
       <body className="min-h-full flex flex-col">
         <ServiceWorkerRegistration />
