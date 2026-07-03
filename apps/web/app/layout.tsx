@@ -1,7 +1,8 @@
 
 import type { Metadata, Viewport } from "next";
 import Script from "next/script";
-import { Geist, Geist_Mono, Inter } from "next/font/google";import "./globals.css";
+import { Geist, Geist_Mono, Inter } from "next/font/google";
+import "./globals.css";
 import { QueryProvider } from "@/components/providers/QueryProvider";
 import { ServiceWorkerRegistration } from "@/components/providers/ServiceWorkerRegistration";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
@@ -24,11 +25,11 @@ export const metadata: Metadata = {
     process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000",
   ),
   title: {
-    default: "STL VEX Robotics",
-    template: "%s | STL VEX Robotics",
+    default: "STL Robotics",
+    template: "%s | STL Robotics",
   },
   description:
-    "Team hub for STL VEX Robotics. Manage matches, build logs, inventory, calendar, documents, and members for the 2026-2027 season.",
+    "Team hub for STL Robotics. Manage matches, build logs, inventory, calendar, documents, and members for the 2026-2027 season.",
   keywords: [
     "VEX Robotics",
     "STL Robotics",
@@ -36,33 +37,33 @@ export const metadata: Metadata = {
     "team management",
     "competition",
   ],
-  authors: [{ name: "STL VEX Robotics" }],
-  creator: "STL VEX Robotics",
+  authors: [{ name: "STL Robotics" }],
+  creator: "STL Robotics",
   openGraph: {
     type: "website",
     locale: "en_US",
-    siteName: "STL VEX Robotics",
-    title: "STL VEX Robotics",
+    siteName: "STL Robotics",
+    title: "STL Robotics",
     description:
-      "Team hub for STL VEX Robotics. Manage matches, build logs, inventory, calendar, documents, and members.",
+      "Team hub for STL Robotics. Manage matches, build logs, inventory, calendar, documents, and members.",
   },
   twitter: {
     card: "summary",
-    title: "STL VEX Robotics",
+    title: "STL Robotics",
     description:
-      "Team hub for STL VEX Robotics. Manage matches, build logs, inventory, calendar, documents, and members.",
+      "Team hub for STL Robotics. Manage matches, build logs, inventory, calendar, documents, and members.",
   },
   icons: {
-    icon: "/logos/Robotics_lion.svg",
-    apple: "/icon.png",
+    icon: "/favicon.ico",
+    apple: "/favicon.ico",
   },
   manifest: "/manifest.webmanifest",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "STL VEX",
+    title: "STL Robotics",
   },
-  applicationName: "STL VEX Robotics",
+  applicationName: "STL Robotics",
 };
 
 export const viewport: Viewport = {
@@ -95,42 +96,10 @@ export default function RootLayout({
               document.documentElement.style.colorScheme = theme;
             })();`}
         </Script>
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              (function() {
-                const theme = localStorage.getItem('theme') || 'dark';
-                if (theme === 'light') {
-                  document.documentElement.classList.remove('dark');
-                } else {
-                  document.documentElement.classList.add('dark');
-                }
-              })();
-            `,
-          }}
-        />
       </head>
       <body className="min-h-full flex flex-col">
-        <Script id="theme-init" strategy="beforeInteractive">
-          {`(function() {
-  if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.getRegistrations().then(function(registrations) {
-        registrations.forEach(function(registration) { registration.unregister(); });
-      });
-    }
-  }
-  const theme = localStorage.getItem('theme');
-  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-  const resolvedTheme = theme === 'light' || theme === 'dark' ? theme : prefersDark ? 'dark' : 'light';
-  if (resolvedTheme === 'dark') {
-    document.documentElement.classList.add('dark');
-  } else {
-    document.documentElement.classList.remove('dark');
-  }
-})();`}
-        </Script>
-        <ServiceWorkerRegistration />        <ThemeProvider>
+        <ServiceWorkerRegistration />
+        <ThemeProvider>
           <QueryProvider>{children}</QueryProvider>
         </ThemeProvider>
       </body>
