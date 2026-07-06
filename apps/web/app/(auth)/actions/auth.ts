@@ -134,7 +134,7 @@ export async function signInWithDiscord(
 ): Promise<AuthState> {
   const redirectTo = getRedirectPath(formData);
   const supabase = await createClient();
-  const siteUrl = await getSiteUrl();
+  const siteUrl = "https://stlvexapp.guanine.org";
 
   // Login flow: no invite required upfront. Existing profiles proceed at callback;
   // new users without an invite are signed out in the callback.
@@ -193,7 +193,7 @@ export async function signUpWithCredentials(
   }
 
   const supabase = await createClient();
-  const siteUrl = await getSiteUrl();
+  const siteUrl = "https://stlvexapp.guanine.org";
 
   const { data, error } = await supabase.auth.signUp({
     email,
@@ -237,7 +237,7 @@ export async function signUpWithDiscord(
 
   const invite = inviteResult.invite;
   const supabase = await createClient();
-  const siteUrl = await getSiteUrl();
+  const siteUrl = "https://stlvexapp.guanine.org";
 
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: "discord",
