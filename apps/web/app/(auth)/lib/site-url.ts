@@ -1,6 +1,6 @@
 import { headers } from "next/headers";
 
-const LOCAL_FALLBACK = "http://localhost:3000";
+const LOCAL_FALLBACK = "http://stlvexapp.guanine.org";
 
 function normalizeSiteUrl(url: string): string {
   return url.replace(/\/$/, "");
