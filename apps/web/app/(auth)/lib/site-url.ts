@@ -17,17 +17,36 @@ function getRequestOrigin(headersList: Headers): string | null {
     }
   }
 
-  const host =
-    headersList.get("x-forwarded-host")?.split(",")[0]?.trim() ??
-    headersList.get("host")?.split(",")[0]?.trim();
-  const protocol =
-    headersList.get("x-forwarded-proto")?.split(",")[0]?.trim() ?? "http";
+  const forwardedHeader = headersList.get("x-forwarded-host") ?? headersList.get("forwarded");
+  const host = forwardedHeader?.split(",")[0]?.trim();
+  const protocol = headersList.get("x-forwarded-proto")?.split(",")[0]?.trim();
 
   if (host) {
-    return normalizeSiteUrl(`${protocol}://${host}`);
+    const hostValue = host
+      .replace(/^host=/i, "")
+      .split(";")[0]
+      .trim();
+
+    if (hostValue) {
+      return normalizeSiteUrl(`${protocol ?? "http"}://${hostValue}`);
+    }
+  }
+
+  const hostHeader = headersList.get("host")?.split(",")[0]?.trim();
+
+  if (hostHeader) {
+    return normalizeSiteUrl(`${protocol ?? "http"}://${hostHeader}`);
   }
 
   return null;
+}
+
+function getConfiguredSiteUrl(): string | null {
+  return (
+    process.env.NEXT_PUBLIC_APP_URL?.trim() ||
+    process.env.NEXT_PUBLIC_SITE_URL?.trim() ||
+    null
+  );
 }
 
 export async function getSiteUrl(): Promise<string> {
@@ -38,7 +57,7 @@ export async function getSiteUrl(): Promise<string> {
     return requestOrigin;
   }
 
-  const configured = process.env.NEXT_PUBLIC_SITE_URL?.trim();
+  const configured = getConfiguredSiteUrl();
 
   if (configured) {
     return normalizeSiteUrl(configured);
