@@ -1,3 +1,9 @@
+import type { Metadata } from "next";
+
+import { PRIVATE_LAYOUT_METADATA } from "@/lib/seo";
+
+export const metadata: Metadata = PRIVATE_LAYOUT_METADATA;
+
 export default function AuthLayout({
   children,
 }: {

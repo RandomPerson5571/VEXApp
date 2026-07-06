@@ -50,6 +50,7 @@ import {
   adminTableHeadClassName,
   adminTableRowClassName,
 } from "./AdminPanelPrimitives";
+import { getInitials } from "@/components/tasks/task-list-utils";
 import {
   formatRole,
   formatTeamLabel,
@@ -75,10 +76,6 @@ type AdminUserManagementTableProps = {
   onUsersChange: (users: AdminUserRow[]) => void;
   onError: (message: string | null) => void;
 };
-
-function getInitials(firstName: string, lastName: string): string {
-  return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
-}
 
 export function AdminUserManagementTable({
   users,

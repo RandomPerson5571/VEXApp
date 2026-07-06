@@ -3,7 +3,7 @@
 import { AlertTriangle, Award, Calendar, Package, Wrench } from "lucide-react";
 
 import { useDashboardSummary } from "@/lib/hooks/use-dashboard-summary";
-import { SummaryStatCard } from "./Header";
+import { SummaryStatCard } from "./SummaryStatCard";
 
 export function SummaryStatsGrid() {
   const { data: stats, isLoading } = useDashboardSummary();

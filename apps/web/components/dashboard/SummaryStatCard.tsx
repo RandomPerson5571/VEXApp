@@ -2,34 +2,6 @@ import Link from "next/link";
 import type { LucideIcon } from "lucide-react";
 import { TrendingUp } from "lucide-react";
 
-export function DashboardHeader() {
-  return (
-    <div className="flex flex-col gap-6 rounded-[32px] border border-slate-300 dark:border-white/10 bg-slate-100 dark:bg-white/5 p-6 shadow-[0_24px_80px_rgba(0,0,0,0.08)] dark:shadow-[0_24px_80px_rgba(0,0,0,0.35)] backdrop-blur-xl">
-      <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-        <div className="space-y-3">
-          <div className="flex flex-wrap items-center gap-3">
-            <h1 className="text-3xl font-black tracking-tight text-slate-900 dark:text-white">Team Dashboard</h1>
-          </div>
-          <p className="max-w-3xl text-sm leading-6 text-slate-600 dark:text-slate-400">
-            Overview of robot build status, event readiness, inventory alerts, and match analytics in one place.
-          </p>
-        </div>
-        <div className="flex flex-wrap items-center gap-3">
-          <Link
-            href="/settings"
-            className="inline-flex items-center justify-center rounded-full border border-slate-300 dark:border-white/10 bg-slate-200 dark:bg-slate-950/70 px-4 py-2 text-sm font-semibold text-slate-900 dark:text-slate-100 transition hover:border-slate-400 dark:hover:border-white/20 hover:bg-slate-300 dark:hover:bg-slate-900/80"
-          >
-            Customize Layout
-          </Link>
-          <span className="rounded-full border border-slate-300 dark:border-slate-800/80 bg-slate-200 dark:bg-slate-950/70 px-3 py-2 text-xs font-semibold uppercase tracking-[0.16em] text-slate-700 dark:text-slate-300">
-            Live team view
-          </span>
-        </div>
-      </div>
-    </div>
-  );
-}
-
 export function SummaryStatCard({
   label,
   value,

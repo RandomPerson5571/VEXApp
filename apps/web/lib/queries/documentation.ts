@@ -2,21 +2,7 @@ import type { DocType, DocumentationDetail } from "@stlvex/database/types";
 
 import { createDocumentationDetailQueryOptions } from "@/lib/queries/shared/documentation";
 
-export const DEFAULT_DOCUMENTATION_TEMPLATE = `## Introduction
-
-## Design Constraints
--
-
-## Concept Sketches
-
-## Prototypes
-
-## Testing Results
-
-## Conclusion
-
-## Next Steps
-`;
+export { DEFAULT_DOCUMENTATION_TEMPLATE } from "@/lib/data/documentation";
 
 export type CreateDocumentationPayload = {
   title: string;

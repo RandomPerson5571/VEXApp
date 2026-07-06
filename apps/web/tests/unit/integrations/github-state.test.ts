@@ -31,18 +31,6 @@ describe("GitHub install state token", () => {
     expect(payload.issuedAt).toBeLessThanOrEqual(Date.now());
   });
 
-  it("exposes signInstallState and verifyInstallState aliases", async () => {
-    const { signInstallState, verifyInstallState } = await loadStateModule();
-
-    const state = signInstallState("team-2", "user-2");
-    const payload = verifyInstallState(state);
-
-    expect(payload).toMatchObject({
-      teamId: "team-2",
-      userId: "user-2",
-    });
-  });
-
   it("rejects tampered signatures", async () => {
     const { createGitHubInstallState, GitHubInstallStateError, verifyGitHubInstallState } =
       await loadStateModule();

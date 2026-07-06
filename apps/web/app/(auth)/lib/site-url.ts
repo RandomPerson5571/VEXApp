@@ -49,6 +49,7 @@ function getConfiguredSiteUrl(): string | null {
   );
 }
 
+// Async, request-header-aware — for OAuth redirects. Metadata/robots/sitemap: lib/seo.ts getSiteUrl()
 export async function getSiteUrl(): Promise<string> {
   const headersList = await headers();
   const requestOrigin = getRequestOrigin(headersList);

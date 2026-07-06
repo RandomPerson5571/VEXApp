@@ -14,22 +14,12 @@ import {
   User,
 } from "lucide-react";
 
+import { formatRole } from "@/components/admin/admin-types";
 import { LogoutButton } from "@/components/auth/LogoutButton";
 import { useTheme } from "@/components/providers/ThemeProvider";
 import { useUser } from "@/components/providers/UserProvider";
-import type { UserRole } from "@stlvex/database/types";
+import { getInitials } from "@/components/tasks/task-list-utils";
 import VEXV5Logo from "@/public/logos/VEXV5-icon.svg";
-
-function formatRole(role: UserRole): string {
-  return role
-    .split("_")
-    .map((word) => word.charAt(0) + word.slice(1).toLowerCase())
-    .join(" ");
-}
-
-function getInitials(firstName: string, lastName: string): string {
-  return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
-}
 
 type AppHeaderProps = {
   isNavigationOpen?: boolean;

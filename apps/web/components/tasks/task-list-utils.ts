@@ -16,58 +16,6 @@ export type CreateTaskFormValues = {
   assigneeIds: string[];
 };
 
-type TaskPerson = {
-  id: string;
-  firstName: string;
-  lastName: string;
-};
-
-export function parseDueDateFromForm(dueDate: string): Date | null {
-  if (!dueDate.trim()) return null;
-  return new Date(`${dueDate.trim()}T17:00:00.000Z`);
-}
-
-export function buildLocalTaskFromForm(
-  values: CreateTaskFormValues,
-  options: {
-    teamId: string;
-    creator: TaskPerson;
-    roster: TaskPerson[];
-  },
-): TaskListTask {
-  const now = new Date();
-  const taskId = `local-${crypto.randomUUID()}`;
-  const dueDate = parseDueDateFromForm(values.dueDate);
-
-  const rosterById = new Map(options.roster.map((person) => [person.id, person]));
-  const selectedAssignees = values.assigneeIds
-    .map((id) => rosterById.get(id))
-    .filter((person): person is TaskPerson => person !== undefined);
-
-  return {
-    id: taskId,
-    title: values.title.trim(),
-    description: values.description.trim() || null,
-    type: values.type,
-    status: "NotStarted",
-    priority: values.priority,
-    dueDate,
-    teamId: options.teamId,
-    createdBy: options.creator.id,
-    parentTaskId: null,
-    creator: options.creator,
-    assignments: selectedAssignees.map((user) => ({
-      taskId,
-      userId: user.id,
-      assignedAt: now,
-      user,
-    })),
-    createdAt: now,
-    updatedAt: now,
-    subTasks: [],
-  };
-}
-
 export function getTaskAssignees(
   task: Pick<TaskListTask, "assignments"> | Pick<TaskListSubTask, "assignments">,
 ): TaskListAssignee[] {
@@ -134,36 +82,4 @@ export function getSubtaskProgress(subTasks: TaskListSubTask[]): {
     total,
     percent: Math.round((completed / total) * 100),
   };
-}
-
-export function countTasksByStatus(
-  tasks: TaskListTask[],
-): Record<TaskStatus, number> {
-  const counts: Record<TaskStatus, number> = {
-    NotStarted: 0,
-    InProgress: 0,
-    Done: 0,
-  };
-
-  for (const task of tasks) {
-    counts[task.status] += 1;
-    for (const sub of task.subTasks) {
-      counts[sub.status] += 1;
-    }
-  }
-
-  return counts;
-}
-
-export function countOverdueTasks(tasks: TaskListTask[]): number {
-  let count = 0;
-
-  for (const task of tasks) {
-    if (isOverdue(task.dueDate, task.status)) count += 1;
-    for (const sub of task.subTasks) {
-      if (isOverdue(sub.dueDate, sub.status)) count += 1;
-    }
-  }
-
-  return count;
 }

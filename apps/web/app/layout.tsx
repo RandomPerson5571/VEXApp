@@ -6,7 +6,8 @@ import "./globals.css";
 import { QueryProvider } from "@/components/providers/QueryProvider";
 import { ServiceWorkerRegistration } from "@/components/providers/ServiceWorkerRegistration";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
-import { cn } from "@/lib/utils";
+import { ROOT_LAYOUT_METADATA } from "@/lib/seo";
+import { cn } from "@stlvex/ui";
 
 const inter = Inter({subsets:['latin'],variable:'--font-sans'});
 
@@ -20,51 +21,7 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export const metadata: Metadata = {
-  metadataBase: new URL(
-    process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000",
-  ),
-  title: {
-    default: "STL Robotics",
-    template: "%s | STL Robotics",
-  },
-  description:
-    "Team hub for STL Robotics. Manage matches, build logs, inventory, calendar, documents, and members for the 2026-2027 season.",
-  keywords: [
-    "VEX Robotics",
-    "STL Robotics",
-    "robotics team",
-    "team management",
-    "competition",
-  ],
-  authors: [{ name: "STL Robotics" }],
-  creator: "STL Robotics",
-  openGraph: {
-    type: "website",
-    locale: "en_US",
-    siteName: "STL Robotics",
-    title: "STL Robotics",
-    description:
-      "Team hub for STL Robotics. Manage matches, build logs, inventory, calendar, documents, and members.",
-  },
-  twitter: {
-    card: "summary",
-    title: "STL Robotics",
-    description:
-      "Team hub for STL Robotics. Manage matches, build logs, inventory, calendar, documents, and members.",
-  },
-  icons: {
-    icon: "/favicon.ico",
-    apple: "/favicon.ico",
-  },
-  manifest: "/manifest.webmanifest",
-  appleWebApp: {
-    capable: true,
-    statusBarStyle: "default",
-    title: "STL Robotics",
-  },
-  applicationName: "STL Robotics",
-};
+export const metadata: Metadata = ROOT_LAYOUT_METADATA;
 
 export const viewport: Viewport = {
   themeColor: [

@@ -1,6 +1,5 @@
 import type { MatchRecord } from "@/lib/types/team";
 
-import { DashboardHeader } from "./Header";
 import { MatchPerformanceChartDynamic } from "./MatchPerformanceChartDynamic";
 import { SummaryStatsGrid } from "./SummaryWidget";
 import { TeamCalendarWidget } from "./CalendarWidget";
@@ -16,7 +15,6 @@ export function DashboardView({ matches }: DashboardViewProps) {
   return (
     <div className="flex-1 overflow-y-auto px-6 py-6 bg-slate-50 dark:bg-[#020617] text-slate-900 dark:text-slate-100 font-sans dashboard-scroll">
       <div className="mx-auto w-full max-w-[1600px] space-y-6">
-        <DashboardHeader />
         <SummaryStatsGrid />
 
         <div className="grid gap-6 lg:grid-cols-2 mb-6">

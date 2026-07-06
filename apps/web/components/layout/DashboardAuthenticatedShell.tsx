@@ -2,13 +2,19 @@ import { redirect } from "next/navigation";
 
 import { DashboardChrome } from "@/components/layout/DashboardChrome";
 import { UserProvider } from "@/components/providers/UserProvider";
-import { getCurrentUserState } from "@/lib/auth/current-user";
+import { getCurrentUserState, type CurrentUser } from "@/lib/auth/current-user";
+
+export type AuthenticatedUser = CurrentUser;
+
+type Props = {
+  children: React.ReactNode;
+  beforeRender?: (user: AuthenticatedUser) => void;
+};
 
 export async function DashboardAuthenticatedShell({
   children,
-}: {
-  children: React.ReactNode;
-}) {
+  beforeRender,
+}: Props) {
   const userState = await getCurrentUserState();
 
   if (userState.status === "unauthenticated") {
@@ -22,6 +28,8 @@ export async function DashboardAuthenticatedShell({
   if (userState.status === "needs_onboarding") {
     redirect("/onboarding");
   }
+
+  beforeRender?.(userState.user);
 
   return (
     <UserProvider value={userState.user}>

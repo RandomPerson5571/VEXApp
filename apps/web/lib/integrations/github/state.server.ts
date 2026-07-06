@@ -44,14 +44,6 @@ function signPayload(encodedPayload: string, secret: string): string {
     .digest("base64url");
 }
 
-export function signInstallState(teamId: string, userId: string): string {
-  return createGitHubInstallState(teamId, userId);
-}
-
-export function verifyInstallState(state: string): GitHubInstallStatePayload {
-  return verifyGitHubInstallState(state);
-}
-
 export function createGitHubInstallState(
   teamId: string,
   userId: string,

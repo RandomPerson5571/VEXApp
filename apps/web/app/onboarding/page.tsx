@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { prisma } from "@stlvex/database";
 import { redirect } from "next/navigation";
 
@@ -15,7 +16,13 @@ import {
 import { isDiscordAuthUser } from "@/lib/auth/identity";
 import { getSafeRedirectPath } from "@/lib/auth/redirect";
 import { createClient } from "@/lib/supabase/server";
+import { createPageMetadata } from "@/lib/seo";
 import { OnboardingClient } from "./onboarding-client";
+
+export const metadata: Metadata = createPageMetadata({
+  index: false,
+  path: "/onboarding",
+});
 
 type OnboardingPageProps = {
   searchParams?: Promise<{ next?: string; message?: string }>;

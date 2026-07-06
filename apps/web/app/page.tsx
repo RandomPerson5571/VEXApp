@@ -1,10 +1,40 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
 import RoaryIcon from "@/components/roaryicon.png";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { createPageMetadata, getSiteUrl, SITE_DESCRIPTION, SITE_NAME } from "@/lib/seo";
+
+export const metadata: Metadata = createPageMetadata({
+  title: "VEX Team Hub for Competition Season",
+  description: SITE_DESCRIPTION,
+  path: "/",
+});
+
+const structuredData = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      name: SITE_NAME,
+      url: getSiteUrl(),
+      description: SITE_DESCRIPTION,
+    },
+    {
+      "@type": "Organization",
+      name: SITE_NAME,
+      url: getSiteUrl(),
+      description: SITE_DESCRIPTION,
+      logo: `${getSiteUrl()}/icon.png`,
+    },
+  ],
+};
 
 export default function Home() {
   return (
-    <main className="min-h-screen font-sans">
+    <>
+      <JsonLd data={structuredData} />
+      <main className="min-h-screen font-sans">
       {/* Hero */}
       <section className="relative overflow-hidden bg-[#ffa800] text-[#1a1200]">
         <div className="max-w-7xl mx-auto px-6 py-24 lg:py-32">
@@ -39,7 +69,7 @@ export default function Home() {
               <div className="flex h-96 w-96 max-w-full items-center justify-center">
                 <Image
                   src={RoaryIcon}
-                  alt="Roary"
+                  alt="Roary, STL Robotics team mascot"
                   priority
                   className="h-full w-auto object-contain drop-shadow-2xl transition-transform duration-300 ease-out hover:scale-105 float"
                 />
@@ -73,5 +103,6 @@ export default function Home() {
         </div>
       </section>
     </main>
+    </>
   );
 }

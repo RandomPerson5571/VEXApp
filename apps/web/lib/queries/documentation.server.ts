@@ -7,7 +7,7 @@ import {
   updateDocumentation,
   type CreateDocumentationInput,
   type UpdateDocumentationInput,
-} from "@/lib/data/documentation";
+} from "@/lib/data/documentation.data";
 import { createDocumentationDetailQueryOptions } from "@/lib/queries/shared/documentation";
 import type { DocumentationDetail } from "@stlvex/database/types";
 

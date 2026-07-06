@@ -11,7 +11,6 @@ export const PROTECTED_ROUTE_PREFIXES = [
   "/settings",
   "/task-list",
   "/team-management",
-  "/organization-management",
   "/admin",
 ] as const;
 
@@ -30,15 +29,4 @@ export function isProtectedRoute(pathname: string): boolean {
 
 export function isAuthRoute(pathname: string): boolean {
   return AUTH_ROUTE_PREFIXES.some((prefix) => matchesPrefix(pathname, prefix));
-}
-
-export function isPublicRoute(pathname: string): boolean {
-  return (
-    pathname === "/" ||
-    pathname === "/invite-invalid" ||
-    pathname === "/update-password" ||
-    pathname.startsWith("/join/") ||
-    pathname.startsWith("/auth/callback") ||
-    isAuthRoute(pathname)
-  );
 }

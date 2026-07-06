@@ -1,36 +1,24 @@
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 
-import { DashboardChrome } from "@/components/layout/DashboardChrome";
-import { UserProvider } from "@/components/providers/UserProvider";
+import { DashboardAuthenticatedShell } from "@/components/layout/DashboardAuthenticatedShell";
 import { isGlobalAdmin } from "@/lib/auth/auth-guards";
-import { getCurrentUserState } from "@/lib/auth/current-user";
+import { PRIVATE_LAYOUT_METADATA } from "@/lib/seo";
 
-export default async function PlatformAdminLayout({
+export const metadata: Metadata = PRIVATE_LAYOUT_METADATA;
+
+export default function PlatformAdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const userState = await getCurrentUserState();
-
-  if (userState.status === "unauthenticated") {
-    redirect("/login");
-  }
-
-  if (userState.status === "needs_verification") {
-    redirect(`/login?error=${encodeURIComponent(userState.error)}`);
-  }
-
-  if (userState.status === "needs_onboarding") {
-    redirect("/onboarding");
-  }
-
-  if (!isGlobalAdmin(userState.user)) {
-    redirect("/dashboard");
-  }
-
   return (
-    <UserProvider value={userState.user}>
-      <DashboardChrome>{children}</DashboardChrome>
-    </UserProvider>
+    <DashboardAuthenticatedShell
+      beforeRender={(user) => {
+        if (!isGlobalAdmin(user)) redirect("/dashboard");
+      }}
+    >
+      {children}
+    </DashboardAuthenticatedShell>
   );
 }

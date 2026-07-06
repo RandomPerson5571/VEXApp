@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 
 import {
@@ -6,6 +7,12 @@ import {
   getInviteFailureReason,
   type InviteJoinFailureReason,
 } from "@/lib/auth/invite";
+import { createPageMetadata } from "@/lib/seo";
+
+export const metadata: Metadata = createPageMetadata({
+  index: false,
+  path: "/invite-invalid",
+});
 
 type InviteInvalidPageProps = {
   searchParams?: Promise<{ reason?: string }>;
