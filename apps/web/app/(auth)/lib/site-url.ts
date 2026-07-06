@@ -6,8 +6,39 @@ function normalizeSiteUrl(url: string): string {
   return url.replace(/\/$/, "");
 }
 
+function getRequestOrigin(headersList: Headers): string | null {
+  const origin = headersList.get("origin");
+
+  if (origin) {
+    try {
+      return normalizeSiteUrl(new URL(origin).origin);
+    } catch {
+      // fall back to the forwarded host/protocol values below
+    }
+  }
+
+  const host =
+    headersList.get("x-forwarded-host")?.split(",")[0]?.trim() ??
+    headersList.get("host")?.split(",")[0]?.trim();
+  const protocol =
+    headersList.get("x-forwarded-proto")?.split(",")[0]?.trim() ?? "http";
+
+  if (host) {
+    return normalizeSiteUrl(`${protocol}://${host}`);
+  }
+
+  return null;
+}
+
 export async function getSiteUrl(): Promise<string> {
-  const configured = process.env.NEXT_PUBLIC_SITE_URL;
+  const headersList = await headers();
+  const requestOrigin = getRequestOrigin(headersList);
+
+  if (requestOrigin) {
+    return requestOrigin;
+  }
+
+  const configured = process.env.NEXT_PUBLIC_SITE_URL?.trim();
 
   if (configured) {
     return normalizeSiteUrl(configured);
@@ -17,21 +48,6 @@ export async function getSiteUrl(): Promise<string> {
     throw new Error(
       "NEXT_PUBLIC_SITE_URL must be set in production for OAuth redirect URLs.",
     );
-  }
-
-  const headersList = await headers();
-  const origin = headersList.get("origin");
-
-  if (origin) {
-    return normalizeSiteUrl(origin);
-  }
-
-  const host =
-    headersList.get("x-forwarded-host") ?? headersList.get("host");
-  const protocol = headersList.get("x-forwarded-proto") ?? "http";
-
-  if (host) {
-    return normalizeSiteUrl(`${protocol}://${host}`);
   }
 
   return LOCAL_FALLBACK;
