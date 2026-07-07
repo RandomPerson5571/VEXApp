@@ -10,10 +10,12 @@ export type {
   Task,
   TaskAssignment,
   Team,
+  TeamDayPlan,
   User,
 } from "../generated/prisma/index.js";
 
 export type {
+  DayPlanType,
   DocType,
   EventType,
   TaskPriority,
@@ -99,3 +101,12 @@ export type DocumentationDetail = import("../generated/prisma/index.js").Prisma.
 
 export type FolderDocSummary = FolderWithDocs["docs"][number];
 export type DocumentationAuthor = DocumentationDetail["authors"][number];
+
+export const teamDayPlanInclude = {
+  creator: { select: { id: true, firstName: true, lastName: true } },
+} satisfies import("../generated/prisma/index.js").Prisma.TeamDayPlanInclude;
+
+/** Team day plan with creator — matches the day-plans query shape. */
+export type TeamDayPlanRecord = import("../generated/prisma/index.js").Prisma.TeamDayPlanGetPayload<{
+  include: typeof teamDayPlanInclude;
+}>;

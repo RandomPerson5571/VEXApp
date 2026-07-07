@@ -1,5 +1,14 @@
 import { describe, expect, it } from "vitest";
 
+import { QueryClient } from "@tanstack/react-query";
+
+import {
+  mergeDayPlanInList,
+  removeDayPlanFromList,
+  removeDayPlanFromListCache,
+  upsertDayPlanInList,
+} from "@/lib/queries/cache-updates/day-plans";
+import { queryKeys } from "@/lib/query-client";
 import {
   mergeDocInTree,
 } from "@/lib/queries/cache-updates/documentation";
@@ -17,6 +26,7 @@ import type {
   TaskStatus,
   TaskType,
 } from "@stlvex/database/types";
+import type { DayPlanType, TeamDayPlan } from "@/lib/types/team";
 
 function buildTaskListTask(
   overrides: Partial<TaskListTask> & Pick<TaskListTask, "id" | "title">,
@@ -109,6 +119,125 @@ describe("cache-updates/tasks", () => {
         title: "New",
         status: "InProgress",
       }),
+    ]);
+  });
+});
+
+describe("cache-updates/day-plans", () => {
+  function buildDayPlan(
+    overrides: Partial<TeamDayPlan> & Pick<TeamDayPlan, "id" | "date" | "type">,
+  ): TeamDayPlan {
+    return {
+      id: overrides.id,
+      date: overrides.date,
+      type: overrides.type,
+    };
+  }
+
+  it("upserts a plan by date", () => {
+    const existing = buildDayPlan({
+      id: "plan-1",
+      date: "2026-07-06",
+      type: "build",
+    });
+    const other = buildDayPlan({
+      id: "plan-2",
+      date: "2026-07-07",
+      type: "coding",
+    });
+    const updated = buildDayPlan({
+      id: "plan-1",
+      date: "2026-07-06",
+      type: "testing",
+    });
+
+    expect(mergeDayPlanInList([existing, other], updated)).toEqual([updated, other]);
+  });
+
+  it("appends a plan when the date is new", () => {
+    const existing = buildDayPlan({
+      id: "plan-1",
+      date: "2026-07-06",
+      type: "build",
+    });
+    const added = buildDayPlan({
+      id: "plan-2",
+      date: "2026-07-07",
+      type: "coding",
+    });
+
+    expect(mergeDayPlanInList([existing], added)).toEqual([existing, added]);
+  });
+
+  it("removes a plan by date", () => {
+    const plans = [
+      buildDayPlan({ id: "plan-1", date: "2026-07-06", type: "build" as DayPlanType }),
+      buildDayPlan({ id: "plan-2", date: "2026-07-07", type: "coding" as DayPlanType }),
+    ];
+
+    expect(removeDayPlanFromList(plans, "2026-07-06")).toEqual([
+      buildDayPlan({ id: "plan-2", date: "2026-07-07", type: "coding" }),
+    ]);
+  });
+
+  it("upsertDayPlanInList merges into the team query cache", () => {
+    const teamId = "team-1";
+    const queryClient = new QueryClient();
+    const existing = buildDayPlan({
+      id: "plan-1",
+      date: "2026-07-06",
+      type: "build",
+    });
+    const other = buildDayPlan({
+      id: "plan-2",
+      date: "2026-07-07",
+      type: "coding",
+    });
+
+    queryClient.setQueryData(queryKeys.dayPlans.forTeam(teamId), [existing, other]);
+
+    const updated = buildDayPlan({
+      id: "plan-1",
+      date: "2026-07-06",
+      type: "testing",
+    });
+    upsertDayPlanInList(queryClient, teamId, updated);
+
+    expect(queryClient.getQueryData(queryKeys.dayPlans.forTeam(teamId))).toEqual([
+      updated,
+      other,
+    ]);
+  });
+
+  it("upsertDayPlanInList seeds cache when empty", () => {
+    const teamId = "team-1";
+    const queryClient = new QueryClient();
+    const plan = buildDayPlan({
+      id: "plan-1",
+      date: "2026-07-06",
+      type: "build",
+    });
+
+    upsertDayPlanInList(queryClient, teamId, plan);
+
+    expect(queryClient.getQueryData(queryKeys.dayPlans.forTeam(teamId))).toEqual([
+      plan,
+    ]);
+  });
+
+  it("removeDayPlanFromListCache drops the date from the team query cache", () => {
+    const teamId = "team-1";
+    const queryClient = new QueryClient();
+    const plans = [
+      buildDayPlan({ id: "plan-1", date: "2026-07-06", type: "build" }),
+      buildDayPlan({ id: "plan-2", date: "2026-07-07", type: "coding" }),
+    ];
+
+    queryClient.setQueryData(queryKeys.dayPlans.forTeam(teamId), plans);
+    removeDayPlanFromListCache(queryClient, teamId, "2026-07-06");
+
+    expect(queryClient.getQueryData(queryKeys.dayPlans.forTeam(teamId))).toEqual([
+      buildDayPlan({ id: "plan-2", date: "2026-07-07", type: "coding" }),
     ]);
   });
 });

@@ -3,6 +3,7 @@ import { describe, expect, it, vi } from "vitest";
 import { queryKeys } from "@/lib/query-client";
 import { dashboardSummaryQueryOptions as clientDashboardSummaryQueryOptions } from "@/lib/queries/dashboard-summary";
 import { documentationDetailQueryOptions as clientDocumentationDetailQueryOptions } from "@/lib/queries/documentation";
+import { teamDayPlansQueryOptions as clientTeamDayPlansQueryOptions } from "@/lib/queries/day-plans";
 import { teamEventsQueryOptions as clientTeamEventsQueryOptions } from "@/lib/queries/events";
 import { teamDocumentationTreeQueryOptions as clientTeamDocumentationTreeQueryOptions } from "@/lib/queries/folders";
 import { teamInventoryQueryOptions as clientTeamInventoryQueryOptions } from "@/lib/queries/inventory";
@@ -18,6 +19,8 @@ const { dashboardSummaryQueryOptions: serverDashboardSummaryQueryOptions } =
   await import("@/lib/queries/dashboard-summary.server");
 const { documentationDetailQueryOptions: serverDocumentationDetailQueryOptions } =
   await import("@/lib/queries/documentation.server");
+const { teamDayPlansQueryOptions: serverTeamDayPlansQueryOptions } =
+  await import("@/lib/queries/day-plans.server");
 const { teamEventsQueryOptions: serverTeamEventsQueryOptions } =
   await import("@/lib/queries/events.server");
 const { teamDocumentationTreeQueryOptions: serverTeamDocumentationTreeQueryOptions } =
@@ -65,6 +68,14 @@ describe("query options key alignment", () => {
 
     expect(clientKey).toEqual(serverKey);
     expect(clientKey).toEqual(queryKeys.inventory.forTeam(TEAM_ID));
+  });
+
+  it("team day plans client and server wrappers share queryKey", () => {
+    const clientKey = clientTeamDayPlansQueryOptions(TEAM_ID).queryKey;
+    const serverKey = serverTeamDayPlansQueryOptions(TEAM_ID).queryKey;
+
+    expect(clientKey).toEqual(serverKey);
+    expect(clientKey).toEqual(queryKeys.dayPlans.forTeam(TEAM_ID));
   });
 
   it("team events client and server wrappers share queryKey", () => {

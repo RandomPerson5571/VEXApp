@@ -2,8 +2,10 @@
 
 import { useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
-import type { CalendarEvent, EventType } from "@/lib/types/team";
+import type { CalendarEvent, DayPlanType, EventType } from "@/lib/types/team";
 import { useTeam } from "@/components/providers/UserProvider";
+import { useTeamDayPlanMutations } from "@/lib/hooks/use-team-day-plan-mutations";
+import { useTeamDayPlans } from "@/lib/hooks/use-team-day-plans";
 import { useTeamEvents } from "@/lib/hooks/use-team-events";
 import { queryKeys } from "@/lib/query-client";
 import {
@@ -38,6 +40,9 @@ export function CalendarView({
   const team = useTeam();
   const queryClient = useQueryClient();
   const { data: events = [], isLoading } = useTeamEvents();
+  const { data: dayPlans = [], isLoading: isDayPlansLoading } = useTeamDayPlans();
+  const { setDayPlan, clearDayPlan, isPending: isDayPlanPending } =
+    useTeamDayPlanMutations();
   const [viewType, setViewType] = useState<CalendarViewMode>("month");
   const [currentMonth, setCurrentMonth] = useState(() => {
     const [year, month] = initialSelectedDate.split("-").map(Number);
@@ -89,7 +94,16 @@ export function CalendarView({
     return map;
   }, [events]);
 
+  const dayPlansByDate = useMemo(() => {
+    const map = new Map<string, (typeof dayPlans)[number]>();
+    for (const plan of dayPlans) {
+      map.set(plan.date, plan);
+    }
+    return map;
+  }, [dayPlans]);
+
   const selectedDayEvents = eventsByDate.get(selectedDate) ?? [];
+  const selectedDayPlan = dayPlansByDate.get(selectedDate);
 
   const shiftMonth = (delta: number) => {
     setCurrentMonth(
@@ -183,11 +197,12 @@ export function CalendarView({
           onAddEvent={openAddEventModal}
         />
 
-        <div className={isLoading ? "animate-pulse opacity-70" : undefined}>
+        <div className={isLoading || isDayPlansLoading ? "animate-pulse opacity-70" : undefined}>
           {viewType === "month" ? (
             <CalendarMonthGrid
               calendarDays={calendarDays}
               eventsByDate={eventsByDate}
+              dayPlansByDate={dayPlansByDate}
               selectedDate={selectedDate}
               todayStr={todayStr}
               onSelectDate={handleSelectDate}
@@ -216,7 +231,11 @@ export function CalendarView({
 
       <CalendarSidePanel
         selectedDate={selectedDate}
+        selectedDayPlan={selectedDayPlan}
         selectedDayEvents={selectedDayEvents}
+        isDayPlanPending={isDayPlanPending}
+        onSetDayPlan={(type: DayPlanType) => setDayPlan(selectedDate, type)}
+        onClearDayPlan={() => clearDayPlan(selectedDate)}
         onAddEvent={openAddEventModal}
       />
 

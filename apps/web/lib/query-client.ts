@@ -21,6 +21,9 @@ export const queryKeys = {
   events: {
     forTeam: (teamId: string) => ["events", "team", teamId] as const,
   },
+  dayPlans: {
+    forTeam: (teamId: string) => ["day-plans", "team", teamId] as const,
+  },
   tasks: {
     forTeam: (teamId: string) => ["tasks", "team", teamId] as const,
   },

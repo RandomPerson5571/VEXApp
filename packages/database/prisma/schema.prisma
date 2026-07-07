@@ -20,6 +20,12 @@ enum EventType {
   WORK_SESSION
 }
 
+enum DayPlanType {
+  BUILD
+  CODING
+  TESTING
+}
+
 enum DocType {
   PROGRAMMING
   CAD
@@ -54,7 +60,7 @@ model User {
 
   createdTasks    Task[]           @relation("TaskCreator")
   taskAssignments TaskAssignment[]
-  reservedInvites Invite[]         @relation("InviteReservations")
+  createdDayPlans TeamDayPlan[]
 
   notificationSettings NotificationSettings?
 }
@@ -99,8 +105,9 @@ model Team {
   invites         Invite[]
   githubIntegration TeamGitHubIntegration?
   fusionIntegration TeamFusionIntegration?
-  createdAt       DateTime        @default(now())
-  updatedAt       DateTime        @updatedAt
+  dayPlans          TeamDayPlan[]
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
 }
 
 model TeamGitHubIntegration {
@@ -151,6 +158,22 @@ model Event {
   createdAt   DateTime  @default(now())
 }
 
+model TeamDayPlan {
+  id        String      @id @default(cuid())
+  teamId    String      @map("team_id")
+  team      Team        @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  date      DateTime    @db.Date
+  type      DayPlanType
+  createdBy String?     @map("created_by")
+  creator   User?       @relation(fields: [createdBy], references: [id], onDelete: SetNull)
+  createdAt DateTime    @default(now()) @map("created_at")
+  updatedAt DateTime    @updatedAt @map("updated_at")
+
+  @@unique([teamId, date])
+  @@index([teamId])
+  @@map("team_day_plans")
+}
+
 model Folder {
   id   String          @id @default(uuid())
   name String
@@ -185,8 +208,8 @@ model Invite {
   maxUses          Int       @default(1)
   usesCount        Int       @default(0)
   expiresAt        DateTime
+  /// Supabase auth user id holding a signup reservation; profile may not exist yet.
   reservedByUserId String?
-  reservedBy       User?     @relation("InviteReservations", fields: [reservedByUserId], references: [id], onDelete: SetNull)
   reservedAt       DateTime?
   createdAt        DateTime  @default(now())
 

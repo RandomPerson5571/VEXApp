@@ -14,7 +14,7 @@ export default defineConfig({
   test: {
     environment: "node",
     globals: false,
-    include: ["tests/**/*.test.ts"],
+    include: ["tests/**/*.test.{ts,tsx}"],
     setupFiles: ["tests/setup/vitest.setup.ts"],
     fileParallelism: false,
     pool: "forks",

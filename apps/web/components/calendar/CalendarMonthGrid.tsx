@@ -1,7 +1,7 @@
 "use client";
 
-import type { CalendarEvent } from "@/lib/types/team";
-import { getEventStyle } from "@/lib/utils/calendar";
+import type { CalendarEvent, TeamDayPlan } from "@/lib/types/team";
+import { getDayPlanStyle, getEventStyle } from "@/lib/utils/calendar";
 import type { CalendarDayCell } from "@/lib/utils/calendar";
 
 const WEEKDAY_LABELS = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
@@ -9,12 +9,14 @@ const WEEKDAY_LABELS = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
 export function CalendarMonthGrid({
   calendarDays,
   eventsByDate,
+  dayPlansByDate,
   selectedDate,
   todayStr,
   onSelectDate,
 }: {
   calendarDays: CalendarDayCell[];
   eventsByDate: Map<string, CalendarEvent[]>;
+  dayPlansByDate: Map<string, TeamDayPlan>;
   selectedDate: string;
   todayStr: string;
   onSelectDate: (date: string) => void;
@@ -30,6 +32,8 @@ export function CalendarMonthGrid({
       <div className="flex-1 grid grid-cols-7 divide-x divide-y divide-slate-200 dark:divide-slate-900/60 bg-white dark:bg-[#090e18]/40">
         {calendarDays.map((cell) => {
           const dayEvents = eventsByDate.get(cell.dateStr) ?? [];
+          const dayPlan = dayPlansByDate.get(cell.dateStr);
+          const dayPlanStyle = dayPlan ? getDayPlanStyle(dayPlan.type) : null;
           const isSelected = selectedDate === cell.dateStr;
           const isToday = cell.dateStr === todayStr;
 
@@ -38,7 +42,9 @@ export function CalendarMonthGrid({
               key={cell.dateStr}
               type="button"
               onClick={() => onSelectDate(cell.dateStr)}
-              className={`min-h-[85px] p-2 flex flex-col justify-between transition relative text-xs cursor-pointer select-none group border-slate-200 dark:border-slate-900/60 text-left ${
+              className={`min-h-[85px] p-2 flex flex-col transition relative text-xs cursor-pointer select-none group border-slate-200 dark:border-slate-900/60 text-left ${
+                dayPlanStyle ? `border-l-2 ${dayPlanStyle.accent}` : ""
+              } ${
                 cell.isCurrentMonth ? "bg-white dark:bg-slate-950/20" : "bg-slate-100 dark:bg-slate-950/60 opacity-50"
               } ${
                 isSelected ? "bg-orange-50 dark:bg-orange-600/10 border-2 border-orange-500/40 z-10" : "hover:bg-slate-100 dark:hover:bg-slate-900/40"
@@ -56,7 +62,15 @@ export function CalendarMonthGrid({
                 </span>
               </div>
 
-              <div className="flex-1 overflow-y-auto mt-2 space-y-1 dashboard-scroll max-h-[50px]">
+              {dayPlanStyle && (
+                <div
+                  className={`mt-1.5 px-1.5 py-0.5 rounded text-[7.5px] font-black uppercase tracking-wide border truncate ${dayPlanStyle.badge}`}
+                >
+                  {dayPlanStyle.label}
+                </div>
+              )}
+
+              <div className="flex-1 overflow-y-auto mt-1 space-y-1 dashboard-scroll max-h-[50px]">
                 {dayEvents.map((ev) => {
                   const style = getEventStyle(ev.type);
                   return (
@@ -77,4 +91,3 @@ export function CalendarMonthGrid({
     </div>
   );
 }
-

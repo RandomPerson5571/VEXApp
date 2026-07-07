@@ -4,6 +4,19 @@ export function hasTestDatabase(): boolean {
   return Boolean(process.env.DATABASE_URL?.trim());
 }
 
+export async function hasDayPlansTable(): Promise<boolean> {
+  if (!hasTestDatabase()) {
+    return false;
+  }
+
+  try {
+    await prisma.$queryRaw`SELECT 1 FROM team_day_plans LIMIT 1`;
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 export const TEST_AUTH_USER_A = "00000000-0000-4000-8000-0000000000a1";
 export const TEST_AUTH_USER_B = "00000000-0000-4000-8000-0000000000b1";
 
@@ -48,6 +61,24 @@ export async function createTestInvite(
 
 export async function deleteTestInvite(inviteId: string) {
   await prisma.invite.deleteMany({ where: { id: inviteId } });
+}
+
+export async function createTestUser(teamId?: string) {
+  const suffix = crypto.randomUUID().replace(/-/g, "").slice(0, 8);
+
+  return prisma.user.create({
+    data: {
+      id: `vitest-user-${suffix}`,
+      firstName: "Vitest",
+      lastName: "User",
+      email: `vitest-${suffix}@example.com`,
+      teamId: teamId ?? null,
+    },
+  });
+}
+
+export async function deleteTestUser(userId: string) {
+  await prisma.user.deleteMany({ where: { id: userId } });
 }
 
 export async function deleteTestTeam(teamId: string) {
