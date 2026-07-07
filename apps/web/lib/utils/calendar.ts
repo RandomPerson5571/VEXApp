@@ -1,4 +1,4 @@
-import type { EventType } from "@/lib/types/team";
+import type { DayPlanType, EventType } from "@/lib/types/team";
 
 export interface CalendarDayCell {
   day: number;
@@ -9,6 +9,14 @@ export interface CalendarDayCell {
 export interface EventStyle {
   bg: string;
   dot: string;
+}
+
+export interface DayPlanStyle {
+  bg: string;
+  accent: string;
+  dot: string;
+  badge: string;
+  label: string;
 }
 
 function toDateStr(year: number, month: number, day: number): string {
@@ -184,6 +192,36 @@ export function getEventTimePosition(
   const height = ((clampedEnd - clampedStart) / totalMinutes) * 100;
 
   return { top, height: Math.max(height, 2.5) };
+}
+
+export function getDayPlanStyle(type: DayPlanType): DayPlanStyle {
+  switch (type) {
+    case "coding":
+      return {
+        bg: "bg-indigo-50 dark:bg-indigo-600/10 border-indigo-500/20 text-indigo-700 dark:text-indigo-400",
+        accent: "border-l-indigo-400",
+        dot: "bg-indigo-400",
+        badge: "bg-indigo-100 dark:bg-indigo-600/20 text-indigo-700 dark:text-indigo-300 border-indigo-500/25",
+        label: "Coding",
+      };
+    case "testing":
+      return {
+        bg: "bg-amber-50 dark:bg-amber-600/10 border-amber-500/20 text-amber-700 dark:text-amber-400",
+        accent: "border-l-amber-400",
+        dot: "bg-amber-400",
+        badge: "bg-amber-100 dark:bg-amber-600/20 text-amber-700 dark:text-amber-300 border-amber-500/25",
+        label: "Testing",
+      };
+    case "build":
+    default:
+      return {
+        bg: "bg-cyan-50 dark:bg-cyan-600/10 border-cyan-500/20 text-cyan-700 dark:text-cyan-400",
+        accent: "border-l-cyan-400",
+        dot: "bg-cyan-400",
+        badge: "bg-cyan-100 dark:bg-cyan-600/20 text-cyan-700 dark:text-cyan-300 border-cyan-500/25",
+        label: "Build",
+      };
+  }
 }
 
 export function getEventStyle(type: EventType): EventStyle {

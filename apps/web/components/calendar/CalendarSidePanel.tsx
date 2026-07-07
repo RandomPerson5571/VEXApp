@@ -1,18 +1,39 @@
 "use client";
 
-import { AlertCircle, Clock, MapPin, Plus } from "lucide-react";
-import type { CalendarEvent } from "@/lib/types/team";
-import { formatSelectedDayLabel, getEventStyle } from "@/lib/utils/calendar";
+import { AlertCircle, Clock, MapPin, Plus, X } from "lucide-react";
+import type { CalendarEvent, DayPlanType, TeamDayPlan } from "@/lib/types/team";
+import { formatSelectedDayLabel, getDayPlanStyle, getEventStyle } from "@/lib/utils/calendar";
+
+const DAY_PLAN_TYPES: DayPlanType[] = ["build", "coding", "testing"];
 
 export function CalendarSidePanel({
   selectedDate,
+  selectedDayPlan,
   selectedDayEvents,
+  isDayPlanPending,
+  onSetDayPlan,
+  onClearDayPlan,
   onAddEvent,
 }: {
   selectedDate: string;
+  selectedDayPlan?: TeamDayPlan;
   selectedDayEvents: CalendarEvent[];
+  isDayPlanPending: boolean;
+  onSetDayPlan: (type: DayPlanType) => void;
+  onClearDayPlan: () => void;
   onAddEvent: () => void;
 }) {
+  const handleDayPlanClick = (type: DayPlanType) => {
+    if (isDayPlanPending) return;
+
+    if (selectedDayPlan?.type === type) {
+      onClearDayPlan();
+      return;
+    }
+
+    onSetDayPlan(type);
+  };
+
   return (
     <aside className="w-[320px] bg-white dark:bg-[#070b13] flex flex-col h-full border-l border-slate-200 dark:border-slate-900 p-6 select-none font-sans justify-between">
       <div className="space-y-6 flex-1 overflow-y-auto dashboard-scroll">
@@ -23,6 +44,62 @@ export function CalendarSidePanel({
           <p className="text-xs font-bold text-slate-900 dark:text-slate-100 leading-tight mt-2.5 font-sans pr-1 break-words">
             {formatSelectedDayLabel(selectedDate)}
           </p>
+        </div>
+
+        <div className="space-y-3">
+          <div className="flex items-center justify-between gap-2">
+            <h4 className="text-[10px] font-black text-slate-600 dark:text-slate-400 uppercase tracking-widest">
+              Day Focus
+            </h4>
+            {selectedDayPlan && (
+              <button
+                type="button"
+                onClick={onClearDayPlan}
+                disabled={isDayPlanPending}
+                className="inline-flex items-center gap-1 text-[10px] font-bold text-slate-500 dark:text-slate-500 hover:text-slate-800 dark:hover:text-slate-300 transition disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <X className="h-3 w-3" />
+                Clear
+              </button>
+            )}
+          </div>
+
+          <div
+            className={`flex items-center gap-1 bg-white dark:bg-slate-950 p-1 border border-slate-200 dark:border-slate-900 rounded-lg ${
+              isDayPlanPending ? "opacity-60 pointer-events-none" : ""
+            }`}
+          >
+            {DAY_PLAN_TYPES.map((type) => {
+              const style = getDayPlanStyle(type);
+              const isActive = selectedDayPlan?.type === type;
+
+              return (
+                <button
+                  key={type}
+                  type="button"
+                  onClick={() => handleDayPlanClick(type)}
+                  disabled={isDayPlanPending}
+                  className={`flex-1 px-2 py-1.5 rounded text-[10px] font-black uppercase tracking-wide transition cursor-pointer disabled:cursor-not-allowed ${
+                    isActive
+                      ? `${style.badge} border shadow-sm`
+                      : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 border border-transparent"
+                  }`}
+                >
+                  {style.label}
+                </button>
+              );
+            })}
+          </div>
+
+          {selectedDayPlan && (
+            <p className="text-[10px] text-slate-600 dark:text-slate-500 font-semibold">
+              Team focus set to{" "}
+              <span className="font-black text-slate-800 dark:text-slate-300">
+                {getDayPlanStyle(selectedDayPlan.type).label}
+              </span>
+              . Tap again to clear.
+            </p>
+          )}
         </div>
 
         <div className="space-y-4">
@@ -86,4 +163,3 @@ export function CalendarSidePanel({
     </aside>
   );
 }
-

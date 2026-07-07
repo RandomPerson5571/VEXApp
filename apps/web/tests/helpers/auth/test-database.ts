@@ -9,6 +9,7 @@ export {
   deleteTestInvite,
   deleteTestTeam,
   deleteTestUser,
+  hasDayPlansTable,
   hasTestDatabase,
   TEST_AUTH_USER_A,
   TEST_AUTH_USER_B,

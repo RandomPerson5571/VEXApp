@@ -10,6 +10,26 @@ export function hasTestDatabase(): boolean {
   return Boolean(process.env.DATABASE_URL?.trim());
 }
 
+export async function hasDayPlansTable(): Promise<boolean> {
+  if (!hasTestDatabase()) {
+    return false;
+  }
+
+  try {
+    const result = await prisma.$queryRaw<{ exists: boolean }[]>`
+      SELECT EXISTS (
+        SELECT 1
+        FROM information_schema.tables
+        WHERE table_schema = 'public'
+          AND table_name = 'team_day_plans'
+      ) AS "exists"
+    `;
+    return result[0]?.exists ?? false;
+  } catch {
+    return false;
+  }
+}
+
 export const TEST_AUTH_USER_A = "00000000-0000-4000-8000-0000000000a1";
 export const TEST_AUTH_USER_B = "00000000-0000-4000-8000-0000000000b1";
 

@@ -5,6 +5,14 @@ export type EventType =
   | "championship"
   | "meeting";
 
+export type DayPlanType = "build" | "coding" | "testing";
+
+export interface TeamDayPlan {
+  id: string;
+  date: string;
+  type: DayPlanType;
+}
+
 export interface CalendarEvent {
   id: string;
   title: string;

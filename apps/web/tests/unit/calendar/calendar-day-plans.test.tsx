@@ -1,0 +1,209 @@
+// @vitest-environment happy-dom
+
+import { act } from "react";
+import { createRoot, type Root } from "react-dom/client";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
+import { CalendarMonthGrid } from "@/components/calendar/CalendarMonthGrid";
+import { CalendarSidePanel } from "@/components/calendar/CalendarSidePanel";
+import type { CalendarEvent, TeamDayPlan } from "@/lib/types/team";
+
+const SELECTED_DATE = "2026-07-06";
+const CALENDAR_CELL = {
+  day: 6,
+  isCurrentMonth: true,
+  dateStr: SELECTED_DATE,
+};
+
+const TIMED_EVENT: CalendarEvent = {
+  id: "ev-1",
+  title: "Driver Practice",
+  date: SELECTED_DATE,
+  startTime: "4:30 PM",
+  endTime: "6:30 PM",
+  type: "build",
+};
+
+function buildPlan(type: TeamDayPlan["type"], id = "plan-1"): TeamDayPlan {
+  return { id, date: SELECTED_DATE, type };
+}
+
+describe("calendar day plans UI", () => {
+  let container: HTMLDivElement;
+  let root: Root;
+
+  beforeEach(() => {
+    container = document.createElement("div");
+    document.body.appendChild(container);
+    root = createRoot(container);
+  });
+
+  afterEach(() => {
+    act(() => {
+      root.unmount();
+    });
+    container.remove();
+  });
+
+  it("shows a Build badge on the month cell after setting Build", async () => {
+    const onSetDayPlan = vi.fn();
+    const onClearDayPlan = vi.fn();
+    let selectedDayPlan: TeamDayPlan | undefined;
+
+    const renderCalendar = () => {
+      const dayPlansByDate = selectedDayPlan
+        ? new Map([[SELECTED_DATE, selectedDayPlan]])
+        : new Map<string, TeamDayPlan>();
+
+      act(() => {
+        root.render(
+          <>
+            <CalendarSidePanel
+              selectedDate={SELECTED_DATE}
+              selectedDayPlan={selectedDayPlan}
+              selectedDayEvents={[TIMED_EVENT]}
+              isDayPlanPending={false}
+              onSetDayPlan={(type) => {
+                onSetDayPlan(type);
+                selectedDayPlan = buildPlan(type);
+                renderCalendar();
+              }}
+              onClearDayPlan={() => {
+                onClearDayPlan();
+                selectedDayPlan = undefined;
+                renderCalendar();
+              }}
+              onAddEvent={() => undefined}
+            />
+            <CalendarMonthGrid
+              calendarDays={[CALENDAR_CELL]}
+              eventsByDate={new Map([[SELECTED_DATE, [TIMED_EVENT]]])}
+              dayPlansByDate={dayPlansByDate}
+              selectedDate={SELECTED_DATE}
+              todayStr="2026-07-01"
+              onSelectDate={() => undefined}
+            />
+          </>,
+        );
+      });
+    };
+
+    renderCalendar();
+
+    const buildButton = Array.from(container.querySelectorAll("button")).find(
+      (button) => button.textContent?.trim() === "Build",
+    );
+    expect(buildButton).toBeDefined();
+    await act(async () => {
+      buildButton?.click();
+    });
+
+    expect(onSetDayPlan).toHaveBeenCalledWith("build");
+    expect(container.textContent).toContain("Build");
+    expect(container.textContent).toContain("Driver Practice");
+  });
+
+  it("changes the badge to Testing and clears it on clear", async () => {
+    let selectedDayPlan: TeamDayPlan | undefined = buildPlan("build");
+
+    const renderCalendar = () => {
+      const dayPlansByDate = selectedDayPlan
+        ? new Map([[SELECTED_DATE, selectedDayPlan]])
+        : new Map<string, TeamDayPlan>();
+
+      act(() => {
+        root.render(
+          <>
+            <CalendarSidePanel
+              selectedDate={SELECTED_DATE}
+              selectedDayPlan={selectedDayPlan}
+              selectedDayEvents={[TIMED_EVENT]}
+              isDayPlanPending={false}
+              onSetDayPlan={(type) => {
+                selectedDayPlan = buildPlan(type);
+                renderCalendar();
+              }}
+              onClearDayPlan={() => {
+                selectedDayPlan = undefined;
+                renderCalendar();
+              }}
+              onAddEvent={() => undefined}
+            />
+            <CalendarMonthGrid
+              calendarDays={[CALENDAR_CELL]}
+              eventsByDate={new Map([[SELECTED_DATE, [TIMED_EVENT]]])}
+              dayPlansByDate={dayPlansByDate}
+              selectedDate={SELECTED_DATE}
+              todayStr="2026-07-01"
+              onSelectDate={() => undefined}
+            />
+          </>,
+        );
+      });
+    };
+
+    renderCalendar();
+    expect(container.textContent).toContain("Build");
+
+    const testingButton = Array.from(container.querySelectorAll("button")).find(
+      (button) => button.textContent?.trim() === "Testing",
+    );
+    await act(async () => {
+      testingButton?.click();
+    });
+
+    expect(container.textContent).toContain("Testing");
+    expect(container.textContent).not.toMatch(/Build.*Build/);
+
+    const clearButton = Array.from(container.querySelectorAll("button")).find(
+      (button) => button.textContent?.includes("Clear"),
+    );
+    await act(async () => {
+      clearButton?.click();
+    });
+
+    const monthCell = Array.from(container.querySelectorAll("button")).find(
+      (button) =>
+        button.textContent?.includes("6") &&
+        button.textContent?.includes("Driver Practice"),
+    );
+
+    expect(monthCell?.textContent).toContain("Driver Practice");
+    expect(monthCell?.textContent).not.toMatch(/\bBuild\b|\bTesting\b|\bCoding\b/);
+    expect(container.textContent).not.toContain("Team focus set to");
+  });
+
+  it("keeps timed events on the same day when day plan badges change", async () => {
+    const eventsByDate = new Map([[SELECTED_DATE, [TIMED_EVENT]]]);
+    const plans: TeamDayPlan[] = [buildPlan("build")];
+
+    const renderGrid = (dayPlans: TeamDayPlan[]) => {
+      const dayPlansByDate = new Map(dayPlans.map((plan) => [plan.date, plan]));
+
+      act(() => {
+        root.render(
+          <CalendarMonthGrid
+            calendarDays={[CALENDAR_CELL]}
+            eventsByDate={eventsByDate}
+            dayPlansByDate={dayPlansByDate}
+            selectedDate={SELECTED_DATE}
+            todayStr="2026-07-01"
+            onSelectDate={() => undefined}
+          />,
+        );
+      });
+    };
+
+    renderGrid(plans);
+    expect(container.textContent).toContain("Driver Practice");
+    expect(container.textContent).toContain("Build");
+
+    renderGrid([buildPlan("testing")]);
+    expect(container.textContent).toContain("Driver Practice");
+    expect(container.textContent).toContain("Testing");
+
+    renderGrid([]);
+    expect(container.textContent).toContain("Driver Practice");
+    expect(container.textContent).not.toContain("Testing");
+  });
+});
