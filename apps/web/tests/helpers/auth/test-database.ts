@@ -6,6 +6,7 @@ export {
   createTestTask,
   createTestTeam,
   createTestUser,
+  deleteTestInventoryItem,
   deleteTestInvite,
   deleteTestTeam,
   deleteTestUser,

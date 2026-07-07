@@ -262,6 +262,13 @@ export async function deleteTestInvite(inviteId: string) {
   await prisma.invite.deleteMany({ where: { id: inviteId } });
 }
 
+export async function deleteTestInventoryItem(itemId: string) {
+  await prisma.inventoryItemSignOut.deleteMany({
+    where: { inventoryItemId: itemId },
+  });
+  await prisma.inventoryItem.deleteMany({ where: { id: itemId } });
+}
+
 export async function deleteTestUser(userId: string) {
   await prisma.taskAssignment.deleteMany({ where: { userId } });
   await prisma.notificationSettings.deleteMany({ where: { userId } });

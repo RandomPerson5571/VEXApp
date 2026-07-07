@@ -17,6 +17,10 @@ export interface DayPlanStyle {
   dot: string;
   badge: string;
   label: string;
+  cellBg: string;
+  cellBgMuted: string;
+  button: string;
+  buttonActive: string;
 }
 
 function toDateStr(year: number, month: number, day: number): string {
@@ -199,27 +203,45 @@ export function getDayPlanStyle(type: DayPlanType): DayPlanStyle {
     case "coding":
       return {
         bg: "bg-indigo-50 dark:bg-indigo-600/10 border-indigo-500/20 text-indigo-700 dark:text-indigo-400",
-        accent: "border-l-indigo-400",
-        dot: "bg-indigo-400",
-        badge: "bg-indigo-100 dark:bg-indigo-600/20 text-indigo-700 dark:text-indigo-300 border-indigo-500/25",
+        accent: "border-l-indigo-500",
+        dot: "bg-indigo-500",
+        badge: "bg-indigo-500/15 dark:bg-indigo-500/25 text-indigo-800 dark:text-indigo-200 border-indigo-400/40",
         label: "Coding",
+        cellBg: "bg-indigo-100/90 dark:bg-indigo-500/20",
+        cellBgMuted: "bg-indigo-50/70 dark:bg-indigo-500/10 opacity-60",
+        button:
+          "bg-indigo-50 dark:bg-indigo-500/15 border-indigo-300 dark:border-indigo-500/50 text-indigo-700 dark:text-indigo-300 hover:bg-indigo-100 dark:hover:bg-indigo-500/25 hover:border-indigo-400 dark:hover:border-indigo-400/70",
+        buttonActive:
+          "bg-indigo-500 dark:bg-indigo-500 border-indigo-600 dark:border-indigo-400 text-white shadow-lg shadow-indigo-500/30 scale-[1.02]",
       };
     case "testing":
       return {
         bg: "bg-amber-50 dark:bg-amber-600/10 border-amber-500/20 text-amber-700 dark:text-amber-400",
-        accent: "border-l-amber-400",
-        dot: "bg-amber-400",
-        badge: "bg-amber-100 dark:bg-amber-600/20 text-amber-700 dark:text-amber-300 border-amber-500/25",
+        accent: "border-l-amber-500",
+        dot: "bg-amber-500",
+        badge: "bg-amber-500/15 dark:bg-amber-500/25 text-amber-800 dark:text-amber-200 border-amber-400/40",
         label: "Testing",
+        cellBg: "bg-amber-100/90 dark:bg-amber-500/20",
+        cellBgMuted: "bg-amber-50/70 dark:bg-amber-500/10 opacity-60",
+        button:
+          "bg-amber-50 dark:bg-amber-500/15 border-amber-300 dark:border-amber-500/50 text-amber-700 dark:text-amber-300 hover:bg-amber-100 dark:hover:bg-amber-500/25 hover:border-amber-400 dark:hover:border-amber-400/70",
+        buttonActive:
+          "bg-amber-500 dark:bg-amber-500 border-amber-600 dark:border-amber-400 text-white shadow-lg shadow-amber-500/30 scale-[1.02]",
       };
     case "build":
     default:
       return {
         bg: "bg-cyan-50 dark:bg-cyan-600/10 border-cyan-500/20 text-cyan-700 dark:text-cyan-400",
-        accent: "border-l-cyan-400",
-        dot: "bg-cyan-400",
-        badge: "bg-cyan-100 dark:bg-cyan-600/20 text-cyan-700 dark:text-cyan-300 border-cyan-500/25",
+        accent: "border-l-cyan-500",
+        dot: "bg-cyan-500",
+        badge: "bg-cyan-500/15 dark:bg-cyan-500/25 text-cyan-800 dark:text-cyan-200 border-cyan-400/40",
         label: "Build",
+        cellBg: "bg-cyan-100/90 dark:bg-cyan-500/20",
+        cellBgMuted: "bg-cyan-50/70 dark:bg-cyan-500/10 opacity-60",
+        button:
+          "bg-cyan-50 dark:bg-cyan-500/15 border-cyan-300 dark:border-cyan-500/50 text-cyan-700 dark:text-cyan-300 hover:bg-cyan-100 dark:hover:bg-cyan-500/25 hover:border-cyan-400 dark:hover:border-cyan-400/70",
+        buttonActive:
+          "bg-cyan-500 dark:bg-cyan-500 border-cyan-600 dark:border-cyan-400 text-white shadow-lg shadow-cyan-500/30 scale-[1.02]",
       };
   }
 }

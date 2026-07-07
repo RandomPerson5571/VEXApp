@@ -45,3 +45,28 @@ export async function listInventoryForTeam(
     orderBy: { name: "asc" },
   });
 }
+
+export type CreateInventoryItemInput = {
+  name: string;
+  description?: string | null;
+  totalStock: number;
+  imageUrl?: string | null;
+};
+
+export async function createInventoryItem(
+  input: CreateInventoryItemInput,
+): Promise<TeamInventoryItem> {
+  if (input.totalStock < 0) {
+    throw new Error("Stock quantity cannot be negative.");
+  }
+
+  return prisma.inventoryItem.create({
+    data: {
+      name: input.name.trim(),
+      description: input.description?.trim() || null,
+      totalStock: input.totalStock,
+      imageUrl: input.imageUrl?.trim() || null,
+    },
+    include: teamInventoryItemInclude,
+  });
+}

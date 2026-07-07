@@ -37,29 +37,43 @@ export function CalendarMonthGrid({
           const isSelected = selectedDate === cell.dateStr;
           const isToday = cell.dateStr === todayStr;
 
+          const defaultBg = cell.isCurrentMonth
+            ? "bg-white dark:bg-slate-950/20"
+            : "bg-slate-100 dark:bg-slate-950/60 opacity-50";
+          const planBg = dayPlanStyle
+            ? cell.isCurrentMonth
+              ? dayPlanStyle.cellBg
+              : dayPlanStyle.cellBgMuted
+            : defaultBg;
+
           return (
             <button
               key={cell.dateStr}
               type="button"
               onClick={() => onSelectDate(cell.dateStr)}
-              className={`min-h-[85px] p-2 flex flex-col transition relative text-xs cursor-pointer select-none group border-slate-200 dark:border-slate-900/60 text-left ${
-                dayPlanStyle ? `border-l-2 ${dayPlanStyle.accent}` : ""
+              className={`min-h-[85px] p-2 flex flex-col transition-all duration-200 relative text-xs cursor-pointer select-none group text-left ${planBg} ${
+                dayPlanStyle ? `border-l-[3px] ${dayPlanStyle.accent}` : "border-slate-200 dark:border-slate-900/60"
               } ${
-                cell.isCurrentMonth ? "bg-white dark:bg-slate-950/20" : "bg-slate-100 dark:bg-slate-950/60 opacity-50"
-              } ${
-                isSelected ? "bg-orange-50 dark:bg-orange-600/10 border-2 border-orange-500/40 z-10" : "hover:bg-slate-100 dark:hover:bg-slate-900/40"
+                isSelected
+                  ? "ring-2 ring-inset ring-orange-500/60 dark:ring-orange-400/50 z-10 shadow-sm"
+                  : "hover:brightness-[0.97] dark:hover:brightness-110"
               }`}
             >
               <div className="flex items-center justify-between">
                 <span
                   className={`h-6 w-6 font-bold font-sans flex items-center justify-center rounded-full ${
                     isToday
-                      ? "bg-orange-100 dark:bg-orange-600/20 text-orange-700 dark:text-orange-400 border border-orange-500/30"
-                      : "text-slate-700 dark:text-slate-300"
+                      ? "bg-orange-500 text-white shadow-sm shadow-orange-500/40"
+                      : dayPlanStyle
+                        ? "text-slate-800 dark:text-slate-100"
+                        : "text-slate-700 dark:text-slate-300"
                   }`}
                 >
                   {cell.day}
                 </span>
+                {dayPlanStyle && (
+                  <span className={`h-2 w-2 rounded-full ${dayPlanStyle.dot} shadow-sm`} />
+                )}
               </div>
 
               {dayPlanStyle && (

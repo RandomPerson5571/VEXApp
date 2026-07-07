@@ -56,7 +56,7 @@ export function CalendarSidePanel({
                 type="button"
                 onClick={onClearDayPlan}
                 disabled={isDayPlanPending}
-                className="inline-flex items-center gap-1 text-[10px] font-bold text-slate-500 dark:text-slate-500 hover:text-slate-800 dark:hover:text-slate-300 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                className="inline-flex items-center gap-1 text-[10px] font-bold text-slate-500 dark:text-slate-500 hover:text-red-600 dark:hover:text-red-400 transition disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <X className="h-3 w-3" />
                 Clear
@@ -65,7 +65,7 @@ export function CalendarSidePanel({
           </div>
 
           <div
-            className={`flex items-center gap-1 bg-white dark:bg-slate-950 p-1 border border-slate-200 dark:border-slate-900 rounded-lg ${
+            className={`grid grid-cols-3 gap-2 ${
               isDayPlanPending ? "opacity-60 pointer-events-none" : ""
             }`}
           >
@@ -79,12 +79,11 @@ export function CalendarSidePanel({
                   type="button"
                   onClick={() => handleDayPlanClick(type)}
                   disabled={isDayPlanPending}
-                  className={`flex-1 px-2 py-1.5 rounded text-[10px] font-black uppercase tracking-wide transition cursor-pointer disabled:cursor-not-allowed ${
-                    isActive
-                      ? `${style.badge} border shadow-sm`
-                      : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 border border-transparent"
+                  className={`flex flex-col items-center gap-1.5 px-2 py-3 rounded-xl border-2 text-[11px] font-black uppercase tracking-wide transition-all duration-200 cursor-pointer disabled:cursor-not-allowed ${
+                    isActive ? style.buttonActive : style.button
                   }`}
                 >
+                  <span className={`h-3 w-3 rounded-full ${style.dot} ${isActive ? "ring-2 ring-white/40" : ""}`} />
                   {style.label}
                 </button>
               );
@@ -92,13 +91,18 @@ export function CalendarSidePanel({
           </div>
 
           {selectedDayPlan && (
-            <p className="text-[10px] text-slate-600 dark:text-slate-500 font-semibold">
-              Team focus set to{" "}
-              <span className="font-black text-slate-800 dark:text-slate-300">
-                {getDayPlanStyle(selectedDayPlan.type).label}
-              </span>
-              . Tap again to clear.
-            </p>
+            <div
+              className={`flex items-center gap-2 px-3 py-2 rounded-lg border ${getDayPlanStyle(selectedDayPlan.type).badge}`}
+            >
+              <span className={`h-2.5 w-2.5 rounded-full flex-shrink-0 ${getDayPlanStyle(selectedDayPlan.type).dot}`} />
+              <p className="text-[10px] font-semibold leading-snug">
+                Team focus:{" "}
+                <span className="font-black">
+                  {getDayPlanStyle(selectedDayPlan.type).label}
+                </span>
+                {" "}— tap again to clear
+              </p>
+            </div>
           )}
         </div>
 
