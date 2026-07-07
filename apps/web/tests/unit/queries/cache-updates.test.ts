@@ -3,6 +3,9 @@ import { describe, expect, it } from "vitest";
 import {
   mergeDocInTree,
 } from "@/lib/queries/cache-updates/documentation";
+import { applyFolderTreePatch } from "@/lib/queries/cache-updates/folders";
+import { queryKeys } from "@/lib/query-client";
+import { QueryClient } from "@tanstack/react-query";
 
 import {
   mergeTaskInList,
@@ -109,6 +112,31 @@ describe("cache-updates/tasks", () => {
         title: "New",
         status: "InProgress",
       }),
+    ]);
+  });
+});
+
+describe("cache-updates/folders", () => {
+  it("inserts a new folder into the documentation tree", () => {
+    const queryClient = new QueryClient();
+    const teamId = "team-1";
+    const existing: FolderWithDocs = {
+      id: "folder-1",
+      name: "Design",
+      docs: [],
+    };
+    const created: FolderWithDocs = {
+      id: "folder-2",
+      name: "Build Logs",
+      docs: [],
+    };
+
+    queryClient.setQueryData(queryKeys.docs.tree(teamId), [existing]);
+    applyFolderTreePatch(queryClient, teamId, created);
+
+    expect(queryClient.getQueryData(queryKeys.docs.tree(teamId))).toEqual([
+      created,
+      existing,
     ]);
   });
 });

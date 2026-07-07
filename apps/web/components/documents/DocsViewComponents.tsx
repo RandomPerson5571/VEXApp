@@ -15,10 +15,8 @@ import {
   DocumentFormModal,
 } from "@/components/documents/DocumentFormModal";
 import { FolderFormModal } from "@/components/documents/FolderFormModal";
-import type { DesignNotebookEntry } from "@/lib/types/team";
 import type { FolderWithDocs } from "@stlvex/database/types";
 
-import { DOCS_TABLE_OF_CONTENTS } from "./docs-view-utils";
 import type { DocsViewState } from "@/lib/hooks/use-docs-view";
 
 export function DocsSidebarSkeleton() {
@@ -208,7 +206,8 @@ export function DocsBreadcrumb({ folderName, docTitle }: DocsBreadcrumbProps) {
 }
 
 type DocsNotebookArticleProps = {
-  entry: DesignNotebookEntry;
+  title: string;
+  content: string;
   canEdit: boolean;
   isLeader: boolean;
   isDeletePending: boolean;
@@ -217,7 +216,8 @@ type DocsNotebookArticleProps = {
 };
 
 export function DocsNotebookArticle({
-  entry,
+  title,
+  content,
   canEdit,
   isLeader,
   isDeletePending,
@@ -229,7 +229,7 @@ export function DocsNotebookArticle({
       <div className="flex items-start justify-between gap-4">
         <div>
           <h1 className="text-2xl font-black text-slate-950 tracking-tight leading-none dark:text-slate-100">
-            {entry.title}
+            {title}
           </h1>
           <div className="h-1 w-16 bg-blue-600 rounded-full mt-4" />
         </div>
@@ -261,71 +261,9 @@ export function DocsNotebookArticle({
         )}
       </div>
 
-      <section id="introduction" className="space-y-3.5 scroll-mt-20">
-        <h2 className="text-base font-black text-slate-950 tracking-tight dark:text-slate-100">Introduction</h2>
-        <p className="text-xs text-slate-700 leading-relaxed font-semibold dark:text-slate-400">
-          {entry.introduction}
-        </p>
-      </section>
-
-      <section id="constraints" className="space-y-3.5 scroll-mt-20">
-        <h2 className="text-base font-black text-slate-950 tracking-tight dark:text-slate-100">
-          Design Constraints
-        </h2>
-        {entry.designConstraints.length > 0 ? (
-          <ul className="space-y-2 list-disc pl-5">
-            {entry.designConstraints.map((constraint) => (
-              <li
-                key={constraint}
-                className="text-xs text-slate-700 leading-normal font-semibold dark:text-slate-400"
-              >
-                {constraint}
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p className="text-xs text-slate-500 font-semibold italic">No constraints listed.</p>
-        )}
-      </section>
-
-      <section id="sketches" className="space-y-4 scroll-mt-20">
-        <h2 className="text-base font-black text-slate-950 tracking-tight dark:text-slate-100">
-          Concept Sketches
-        </h2>
-        <p className="text-xs text-slate-700 leading-relaxed font-semibold dark:text-slate-400">
-          {entry.conceptSketchesDescription}
-        </p>
-      </section>
-
-      <section id="prototypes" className="space-y-3.5 scroll-mt-20">
-        <h2 className="text-base font-black text-slate-950 tracking-tight dark:text-slate-100">Prototypes</h2>
-        <p className="text-xs text-slate-700 leading-relaxed font-semibold dark:text-slate-400">
-          {entry.prototypesText}
-        </p>
-      </section>
-
-      <section id="results" className="space-y-3.5 scroll-mt-20">
-        <h2 className="text-base font-black text-slate-950 tracking-tight dark:text-slate-100">
-          Testing Results
-        </h2>
-        <p className="text-xs text-slate-700 leading-relaxed font-semibold dark:text-slate-400">
-          {entry.testingResults}
-        </p>
-      </section>
-
-      <section id="conclusion" className="space-y-3.5 scroll-mt-20">
-        <h2 className="text-base font-black text-slate-950 tracking-tight dark:text-slate-100">Conclusion</h2>
-        <p className="text-xs text-slate-700 leading-relaxed font-semibold dark:text-slate-400">
-          {entry.conclusion}
-        </p>
-      </section>
-
-      <section id="steps" className="space-y-3.5 scroll-mt-20">
-        <h2 className="text-base font-black text-slate-950 tracking-tight dark:text-slate-100">Next Steps</h2>
-        <p className="text-xs text-slate-700 leading-relaxed font-semibold dark:text-slate-400">
-          {entry.nextSteps}
-        </p>
-      </section>
+      <div className="whitespace-pre-wrap text-xs text-slate-700 leading-relaxed font-semibold dark:text-slate-400">
+        {content}
+      </div>
     </article>
   );
 }
@@ -338,7 +276,8 @@ type DocsMainPanelProps = Pick<
   | "selectedDocId"
   | "isDetailLoading"
   | "isDetailError"
-  | "notebookEntry"
+  | "selectedDocContent"
+  | "selectedDocTitle"
   | "canEditSelectedDoc"
   | "isLeader"
   | "isDeletePending"
@@ -358,7 +297,8 @@ export function DocsMainPanel({
   selectedDocId,
   isDetailLoading,
   isDetailError,
-  notebookEntry,
+  selectedDocContent,
+  selectedDocTitle,
   canEditSelectedDoc,
   isLeader,
   isDeletePending,
@@ -384,8 +324,8 @@ export function DocsMainPanel({
           <FileText className="h-10 w-10 text-slate-500 mx-auto mb-3" />
           <p className="text-sm font-bold text-slate-900 dark:text-slate-300">No documents yet</p>
           <p className="text-xs text-slate-600 mt-1 dark:text-slate-600">
-            Your team has not published any design notebook entries. The directory and outline
-            will populate here once documentation is available.
+            Your team has not published any documents yet. Create a folder and add your first
+            entry to get started.
           </p>
         </div>
       ) : !selectedDocId ? (
@@ -398,7 +338,7 @@ export function DocsMainPanel({
         </div>
       ) : isDetailLoading ? (
         <DocsContentSkeleton sectionCount={5} />
-      ) : isDetailError || !notebookEntry ? (
+      ) : isDetailError || selectedDocContent == null || selectedDocTitle == null ? (
         <div className="border border-red-500/20 bg-red-500/5 p-12 rounded-2xl text-center max-w-2xl mx-auto my-12 shadow-xl">
           <AlertTriangle className="h-10 w-10 text-red-400 mx-auto mb-3" />
           <p className="text-sm font-bold text-slate-900 dark:text-slate-300">Unable to load document</p>
@@ -408,7 +348,8 @@ export function DocsMainPanel({
         </div>
       ) : (
         <DocsNotebookArticle
-          entry={notebookEntry}
+          title={selectedDocTitle}
+          content={selectedDocContent}
           canEdit={canEditSelectedDoc}
           isLeader={isLeader}
           isDeletePending={isDeletePending}
@@ -417,53 +358,6 @@ export function DocsMainPanel({
         />
       )}
     </div>
-  );
-}
-
-type DocsTableOfContentsProps = {
-  showToc: boolean;
-  activeSegment: string;
-  onSelect: (sectionId: string) => void;
-};
-
-export function DocsTableOfContents({
-  showToc,
-  activeSegment,
-  onSelect,
-}: DocsTableOfContentsProps) {
-  return (
-    <aside className="w-[200px] bg-white border-l border-slate-200 flex flex-col h-full select-none p-5 dark:bg-[#070b13] dark:border-slate-900">
-      <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest block mb-4 border-b border-slate-200 pb-2 dark:border-slate-900">
-        Table of Contents
-      </span>
-
-      <div className="space-y-1">
-        {DOCS_TABLE_OF_CONTENTS.map((toc) => {
-          const isSelected = showToc && activeSegment === toc.id;
-
-          return (
-            <button
-              key={toc.id}
-              type="button"
-              disabled={!showToc}
-              onClick={() => onSelect(toc.id)}
-              className={`w-full text-left px-2 py-1.5 rounded-md text-[11px] font-semibold leading-normal transition flex items-center gap-1.5 ${
-                !showToc
-                  ? "text-slate-400 cursor-not-allowed dark:text-slate-700"
-                  : isSelected
-                    ? "bg-blue-600/10 text-blue-600 font-bold border-l border-blue-500 cursor-pointer dark:text-blue-400"
-                    : "text-slate-500 hover:text-slate-800 hover:bg-slate-100 cursor-pointer dark:hover:text-slate-300 dark:hover:bg-slate-900/10"
-              }`}
-            >
-              <div
-                className={`h-1 w-1 rounded-full ${isSelected ? "bg-blue-400" : "bg-slate-600"}`}
-              />
-              <span>{toc.label}</span>
-            </button>
-          );
-        })}
-      </div>
-    </aside>
   );
 }
 

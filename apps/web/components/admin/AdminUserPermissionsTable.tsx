@@ -51,7 +51,7 @@ export function AdminUserPermissionsTable({
   const tabDescription =
     activeTab === "users"
       ? "Edit user profiles, team assignments, and platform administrator access."
-      : "Create teams and manage team identity and Discord integration settings.";
+      : "Create teams, manage identity settings, and remove teams when needed.";
 
   function handleTabChange(tab: AdminTab) {
     setError(null);
@@ -78,6 +78,21 @@ export function AdminUserPermissionsTable({
 
   function handleTeamCreated(team: AdminTeamRow) {
     setTeams((current) => sortTeams([...current, team]));
+  }
+
+  function handleTeamsDeleted(teamIds: string[]) {
+    const deleted = new Set(teamIds);
+
+    setTeams((current) => current.filter((team) => !deleted.has(team.id)));
+    setUsers((current) =>
+      sortUsersByTeam(
+        current.map((user) =>
+          user.teamId && deleted.has(user.teamId)
+            ? { ...user, teamId: null, team: null }
+            : user,
+        ),
+      ),
+    );
   }
 
   return (
@@ -137,6 +152,7 @@ export function AdminUserPermissionsTable({
             teams={teams}
             onTeamCreated={handleTeamCreated}
             onTeamUpdated={handleTeamUpdated}
+            onTeamsDeleted={handleTeamsDeleted}
             onError={setError}
           />
         )}

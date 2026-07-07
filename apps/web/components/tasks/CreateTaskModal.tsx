@@ -116,7 +116,7 @@ function TaskDueDateField({ value, onChange }: TaskDueDateFieldProps) {
         <div
           role="dialog"
           aria-label="Choose due date"
-          className="absolute left-0 right-0 top-[calc(100%+0.375rem)] z-20 overflow-hidden rounded-xl border border-slate-800 bg-[#090e18] p-3 shadow-[0_16px_48px_rgba(0,0,0,0.45)]"
+          className="absolute bottom-[calc(100%+0.375rem)] left-0 right-0 z-20 rounded-xl border border-slate-800 bg-[#090e18] p-3 shadow-[0_16px_48px_rgba(0,0,0,0.45)]"
         >
           <div className="mb-3 flex items-center justify-between">
             <span className="text-xs font-black text-slate-200">
@@ -260,7 +260,7 @@ export function CreateTaskModal({
         aria-modal="true"
         aria-labelledby={titleId}
         aria-describedby={descriptionId}
-        className="relative w-full max-w-lg overflow-hidden rounded-2xl border border-slate-800/80 bg-[#090e18]/95 font-sans shadow-[0_24px_80px_rgba(0,0,0,0.55)] motion-safe:animate-in motion-safe:fade-in-0 motion-safe:zoom-in-95 motion-safe:duration-200 motion-reduce:animate-none"
+        className="relative w-full max-w-lg overflow-visible rounded-2xl border border-slate-800/80 bg-[#090e18]/95 font-sans shadow-[0_24px_80px_rgba(0,0,0,0.55)] motion-safe:animate-in motion-safe:fade-in-0 motion-safe:zoom-in-95 motion-safe:duration-200 motion-reduce:animate-none"
       >
         <div
           aria-hidden

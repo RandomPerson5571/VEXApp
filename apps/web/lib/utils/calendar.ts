@@ -141,6 +141,21 @@ export function parseTimeToMinutes(timeStr: string): number {
   return hours * 60 + minutes;
 }
 
+export function combineDateAndTime(dateStr: string, timeStr: string): Date | null {
+  const [year, month, day] = dateStr.split("-").map(Number);
+  if (!year || !month || !day) return null;
+
+  const totalMinutes = parseTimeToMinutes(timeStr);
+  const hours = Math.floor(totalMinutes / 60);
+  const minutes = totalMinutes % 60;
+
+  if (hours === 0 && minutes === 0 && !/AM|PM/i.test(timeStr)) {
+    return null;
+  }
+
+  return new Date(year, month - 1, day, hours, minutes);
+}
+
 export const SCHEDULE_HOUR_START = 6;
 export const SCHEDULE_HOUR_END = 22;
 export const SCHEDULE_HOUR_HEIGHT = 52;

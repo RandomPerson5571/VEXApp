@@ -15,8 +15,6 @@ import {
   useTeamDocumentationTree,
   useUpdateDocumentation,
 } from "@/lib/hooks/use-team-documentation";
-import { toDesignNotebookEntry } from "@/lib/mappers/documentation";
-
 import {
   emptyDocumentFormValues,
   type DocumentFormValues,
@@ -27,7 +25,6 @@ import {
   findFirstDocId,
   findNextDocId,
   hasAnyDocsInTree,
-  scrollToDocSection,
 } from "@/components/documents/docs-view-utils";
 
 export function useDocsView() {
@@ -46,7 +43,6 @@ export function useDocsView() {
     () => new Set(),
   );
   const [selectedDocId, setSelectedDocId] = useState<string | null>(null);
-  const [activeTocSegment, setActiveTocSegment] = useState("introduction");
 
   const [isFolderModalOpen, setIsFolderModalOpen] = useState(false);
   const [folderName, setFolderName] = useState("");
@@ -83,10 +79,8 @@ export function useDocsView() {
     [folders, selectedDocId],
   );
 
-  const notebookEntry = useMemo(
-    () => (docDetail ? toDesignNotebookEntry(docDetail) : null),
-    [docDetail],
-  );
+  const selectedDocTitle = docDetail?.title ?? null;
+  const selectedDocContent = docDetail?.content ?? null;
 
   const canEditSelectedDoc = useMemo(
     () =>
@@ -97,11 +91,6 @@ export function useDocsView() {
   );
 
   const hasAnyDocs = hasAnyDocsInTree(folders);
-  const showToc =
-    selectedDocId != null &&
-    notebookEntry != null &&
-    !isDetailLoading &&
-    !isDetailError;
 
   const breadcrumbFolderName =
     docDetail?.folder.name ?? treeSelection?.folder.name ?? null;
@@ -146,10 +135,6 @@ export function useDocsView() {
       }
       return next;
     });
-  }, []);
-
-  const handleTocSelect = useCallback((sectionId: string) => {
-    scrollToDocSection(sectionId, setActiveTocSegment);
   }, []);
 
   const openCreateFolderModal = useCallback(() => {
@@ -278,7 +263,6 @@ export function useDocsView() {
     expandedFolderIds,
     selectedDocId,
     setSelectedDocId,
-    activeTocSegment,
     isTreeLoading,
     isTreeError,
     isDetailLoading,
@@ -286,12 +270,11 @@ export function useDocsView() {
     isLeader,
     canEditSelectedDoc,
     hasAnyDocs,
-    showToc,
-    notebookEntry,
+    selectedDocTitle,
+    selectedDocContent,
     breadcrumbFolderName,
     breadcrumbDocTitle,
     toggleFolder,
-    handleTocSelect,
     openCreateFolderModal,
     openCreateDocumentModal,
     openEditDocumentModal,

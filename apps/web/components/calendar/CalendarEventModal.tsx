@@ -30,6 +30,8 @@ export function CalendarEventModal({
   onDescriptionChange,
   onClose,
   onSubmit,
+  isSubmitting = false,
+  error,
 }: {
   isOpen: boolean;
   title: string;
@@ -48,6 +50,8 @@ export function CalendarEventModal({
   onDescriptionChange: (value: string) => void;
   onClose: () => void;
   onSubmit: (event: FormEvent<HTMLFormElement>) => void;
+  isSubmitting?: boolean;
+  error?: string;
 }) {
   if (!isOpen) {
     return null;
@@ -191,19 +195,25 @@ export function CalendarEventModal({
             />
           </div>
 
+          {error ? (
+            <p className="text-xs font-semibold text-red-500">{error}</p>
+          ) : null}
+
           <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-200 dark:border-slate-900">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 rounded-lg bg-slate-100 dark:bg-[#0e1724] hover:bg-slate-200 dark:hover:bg-slate-900 text-xs font-semibold text-slate-700 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition cursor-pointer"
+              disabled={isSubmitting}
+              className="px-4 py-2 rounded-lg bg-slate-100 dark:bg-[#0e1724] hover:bg-slate-200 dark:hover:bg-slate-900 text-xs font-semibold text-slate-700 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition cursor-pointer disabled:opacity-50"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="px-5 py-2 rounded-lg bg-orange-600 hover:bg-orange-500 text-xs font-bold text-white shadow-lg cursor-pointer"
+              disabled={isSubmitting}
+              className="px-5 py-2 rounded-lg bg-orange-600 hover:bg-orange-500 text-xs font-bold text-white shadow-lg cursor-pointer disabled:opacity-50"
             >
-              Save Schedule
+              {isSubmitting ? "Saving..." : "Save Schedule"}
             </button>
           </div>
         </form>

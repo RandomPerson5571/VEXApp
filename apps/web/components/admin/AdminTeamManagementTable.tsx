@@ -8,12 +8,14 @@ import {
   type FormEvent,
 } from "react";
 import {
+  AlertTriangle,
   Building2,
   Hash,
   Link2,
   Plus,
   Server,
   Shield,
+  Trash2,
   X,
 } from "lucide-react";
 
@@ -49,12 +51,14 @@ import {
   adminTableHeadClassName,
   adminTableRowClassName,
 } from "./AdminPanelPrimitives";
+import { ConfirmationDialog } from "@/components/ui/ConfirmationDialog";
 import { type AdminTeamRow } from "./admin-types";
 
 type AdminTeamManagementTableProps = {
   teams: AdminTeamRow[];
   onTeamCreated: (team: AdminTeamRow) => void;
   onTeamUpdated: (team: AdminTeamRow) => void;
+  onTeamsDeleted: (teamIds: string[]) => void;
   onError: (message: string | null) => void;
 };
 
@@ -78,9 +82,13 @@ export function AdminTeamManagementTable({
   teams,
   onTeamCreated,
   onTeamUpdated,
+  onTeamsDeleted,
   onError,
 }: AdminTeamManagementTableProps) {
   const [pendingTeamId, setPendingTeamId] = useState<string | null>(null);
+  const [selectedTeamIds, setSelectedTeamIds] = useState<Set<string>>(() => new Set());
+  const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
+  const [isDeletingTeams, setIsDeletingTeams] = useState(false);
   const [showAddTeamForm, setShowAddTeamForm] = useState(false);
   const [newTeamName, setNewTeamName] = useState("");
   const [newTeamNumber, setNewTeamNumber] = useState("");
@@ -91,6 +99,74 @@ export function AdminTeamManagementTable({
   const discordLinkedCount = teams.filter(
     (team) => team.discordServerId && team.discordRoleId,
   ).length;
+
+  const selectedCount = selectedTeamIds.size;
+  const allSelected = teams.length > 0 && selectedCount === teams.length;
+  const someSelected = selectedCount > 0 && !allSelected;
+  const selectedTeams = teams.filter((team) => selectedTeamIds.has(team.id));
+
+  function toggleTeamSelection(teamId: string, checked: boolean) {
+    setSelectedTeamIds((current) => {
+      const next = new Set(current);
+
+      if (checked) {
+        next.add(teamId);
+      } else {
+        next.delete(teamId);
+      }
+
+      return next;
+    });
+  }
+
+  function toggleSelectAll(checked: boolean) {
+    setSelectedTeamIds(checked ? new Set(teams.map((team) => team.id)) : new Set());
+  }
+
+  async function handleDeleteSelectedTeams() {
+    const teamIds = [...selectedTeamIds];
+
+    if (teamIds.length === 0) {
+      return;
+    }
+
+    onError(null);
+    setIsDeletingTeams(true);
+
+    try {
+      const response = await fetch("/api/admin/delete-team", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ teamIds }),
+      });
+
+      const payload = (await response.json()) as {
+        deletedTeamIds?: string[];
+        error?: string;
+      };
+
+      if (!response.ok) {
+        throw new Error(payload.error ?? "Failed to delete teams.");
+      }
+
+      onTeamsDeleted(payload.deletedTeamIds ?? teamIds);
+      setSelectedTeamIds(new Set());
+      setShowDeleteConfirmation(false);
+    } catch (deleteError) {
+      onError(
+        deleteError instanceof Error
+          ? deleteError.message
+          : "Failed to delete teams.",
+      );
+    } finally {
+      setIsDeletingTeams(false);
+    }
+  }
+
+  const deleteDescription =
+    selectedCount === 1
+      ? `Permanently delete ${selectedTeams[0]?.name ?? "this team"} (${selectedTeams[0]?.number ?? ""})? Members will be unassigned and related invites, notebook logs, inventory sign-outs, and tasks will be removed.`
+      : `Permanently delete ${selectedCount} teams? Members will be unassigned and related invites, notebook logs, inventory sign-outs, and tasks will be removed.`;
 
   async function updateTeam(
     teamId: string,
@@ -226,33 +302,48 @@ export function AdminTeamManagementTable({
           />
         </div>
 
-        <Button
-          type="button"
-          size="sm"
-          variant={showAddTeamForm ? "outline" : "default"}
-          className={cn(
-            !showAddTeamForm &&
-              "shadow-md shadow-blue-600/20 motion-safe:transition-transform motion-safe:hover:scale-[1.02]",
-          )}
-          onClick={() => {
-            if (showAddTeamForm) {
-              resetCreateForm();
-            }
-            setShowAddTeamForm((current) => !current);
-          }}
-        >
-          {showAddTeamForm ? (
-            <>
-              <X data-icon="inline-start" />
-              Cancel
-            </>
-          ) : (
-            <>
-              <Plus data-icon="inline-start" />
-              Add team
-            </>
-          )}
-        </Button>
+        <div className="flex flex-wrap items-center gap-2">
+          {selectedCount > 0 ? (
+            <Button
+              type="button"
+              size="sm"
+              variant="destructive"
+              disabled={isDeletingTeams || pendingTeamId !== null}
+              onClick={() => setShowDeleteConfirmation(true)}
+            >
+              <Trash2 data-icon="inline-start" />
+              Delete {selectedCount} team{selectedCount === 1 ? "" : "s"}
+            </Button>
+          ) : null}
+
+          <Button
+            type="button"
+            size="sm"
+            variant={showAddTeamForm ? "outline" : "default"}
+            className={cn(
+              !showAddTeamForm &&
+                "shadow-md shadow-blue-600/20 motion-safe:transition-transform motion-safe:hover:scale-[1.02]",
+            )}
+            onClick={() => {
+              if (showAddTeamForm) {
+                resetCreateForm();
+              }
+              setShowAddTeamForm((current) => !current);
+            }}
+          >
+            {showAddTeamForm ? (
+              <>
+                <X data-icon="inline-start" />
+                Cancel
+              </>
+            ) : (
+              <>
+                <Plus data-icon="inline-start" />
+                Add team
+              </>
+            )}
+          </Button>
+        </div>
       </div>
 
       {showAddTeamForm ? (
@@ -360,6 +451,21 @@ export function AdminTeamManagementTable({
         <Table className="min-w-[44rem]">
           <TableHeader>
             <TableRow className="border-slate-800/80 hover:bg-transparent">
+              <TableHead className={cn(adminTableHeadClassName, "w-10 pr-0")}>
+                <input
+                  type="checkbox"
+                  className="size-3.5 rounded border-slate-600 bg-slate-950 accent-red-500"
+                  checked={allSelected}
+                  ref={(element) => {
+                    if (element) {
+                      element.indeterminate = someSelected;
+                    }
+                  }}
+                  onChange={(event) => toggleSelectAll(event.target.checked)}
+                  disabled={teams.length === 0 || isDeletingTeams}
+                  aria-label="Select all teams"
+                />
+              </TableHead>
               <TableHead className={cn(adminTableHeadClassName, "w-[14rem]")}>
                 Team
               </TableHead>
@@ -377,7 +483,7 @@ export function AdminTeamManagementTable({
           <TableBody>
             {teams.length === 0 ? (
               <TableRow className="hover:bg-transparent">
-                <TableCell colSpan={4}>
+                <TableCell colSpan={5}>
                   <AdminEmptyState
                     icon={Building2}
                     title="No teams yet"
@@ -388,15 +494,32 @@ export function AdminTeamManagementTable({
             ) : (
               teams.map((team, index) => {
                 const isPending = pendingTeamId === team.id;
+                const isSelected = selectedTeamIds.has(team.id);
                 const hasDiscord =
                   Boolean(team.discordServerId) && Boolean(team.discordRoleId);
 
                 return (
                   <TableRow
                     key={team.id}
-                    className={cn(adminTableRowClassName, isPending && "opacity-60")}
+                    className={cn(
+                      adminTableRowClassName,
+                      (isPending || isDeletingTeams) && "opacity-60",
+                      isSelected && "bg-red-500/5",
+                    )}
                     style={{ animationDelay: `${index * 35}ms` } as CSSProperties}
                   >
+                    <TableCell className="pr-0">
+                      <input
+                        type="checkbox"
+                        className="size-3.5 rounded border-slate-600 bg-slate-950 accent-red-500"
+                        checked={isSelected}
+                        onChange={(event) =>
+                          toggleTeamSelection(team.id, event.target.checked)
+                        }
+                        disabled={isPending || isDeletingTeams}
+                        aria-label={`Select team ${team.number}`}
+                      />
+                    </TableCell>
                     <TableCell>
                       <div className="flex flex-col gap-2">
                         {isPending ? (
@@ -495,6 +618,30 @@ export function AdminTeamManagementTable({
           </TableBody>
         </Table>
       </AdminTableFrame>
+
+      <ConfirmationDialog
+        isOpen={showDeleteConfirmation}
+        title={
+          selectedCount === 1
+            ? "Delete this team?"
+            : `Delete ${selectedCount} teams?`
+        }
+        description={deleteDescription}
+        confirmLabel={selectedCount === 1 ? "Delete team" : "Delete teams"}
+        cancelLabel="Keep teams"
+        variant="danger"
+        pending={isDeletingTeams}
+        pendingLabel="Deleting…"
+        icon={<AlertTriangle className="h-5 w-5 text-red-400" />}
+        onClose={() => {
+          if (!isDeletingTeams) {
+            setShowDeleteConfirmation(false);
+          }
+        }}
+        onConfirm={() => {
+          void handleDeleteSelectedTeams();
+        }}
+      />
     </div>
   );
 }

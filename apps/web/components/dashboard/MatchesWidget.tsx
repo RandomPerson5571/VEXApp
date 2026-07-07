@@ -18,7 +18,7 @@ export function UpcomingMatchesList() {
           Upcoming Matches
         </span>
         <Link
-          href="/matches"
+          href="/calendar"
           className="text-[10px] font-bold text-slate-600 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
         >
           View All

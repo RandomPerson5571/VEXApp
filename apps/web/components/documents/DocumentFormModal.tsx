@@ -123,8 +123,8 @@ export function DocumentFormModal({
               </h2>
               <p id={descriptionId} className="mt-0.5 text-xs font-medium text-slate-500">
                 {isCreate
-                  ? "Add a design notebook entry with markdown sections."
-                  : "Update the title, type, or markdown content."}
+                  ? "Add a document with markdown content."
+                  : "Update the title, type, or content."}
               </p>
             </div>
           </div>
@@ -177,7 +177,7 @@ export function DocumentFormModal({
               id="doc-content"
               required
               rows={14}
-              placeholder="Use ## headings for sections like Introduction, Design Constraints..."
+              placeholder="Write your document content..."
               value={values.content}
               onChange={(event) => patch({ content: event.target.value })}
               className={`${fieldClassName} min-h-[240px] flex-1 resize-y font-mono leading-relaxed`}

@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, Copy, Link2, Loader2 } from "lucide-react";
+import { Check, Copy, Link2, Loader2, Lock } from "lucide-react";
 import { useEffect, useState, useTransition } from "react";
 
 import { createInviteLink } from "@/app/(dashboard)/invite/actions";
@@ -97,6 +97,9 @@ export function InviteCreationView({
 
   const teamSelectDisabled =
     lockTeamSelection || teams.length <= 1 || isPending || !canCreate;
+  const isTeamLocked = lockTeamSelection && !isAdmin;
+  const selectedTeam =
+    teams.find((entry) => entry.id === selectedTeamId) ?? teams[0] ?? null;
 
   return (
     <div className="flex flex-1 overflow-y-auto bg-slate-50 dashboard-scroll dark:bg-[#03070e]">
@@ -135,30 +138,67 @@ export function InviteCreationView({
           </div>
 
           <div className="space-y-5">
-            <div className="space-y-1.5">
-              <label htmlFor="invite-team" className={labelClassName}>
-                Team
-              </label>
-              <select
-                id="invite-team"
-                value={selectedTeamId}
-                disabled={teamSelectDisabled}
-                onChange={(event) => {
-                  setSelectedTeamId(event.target.value);
-                  resetGeneratedLink();
-                }}
-                className={fieldClassName}
-              >
-                {teams.length === 0 ? (
-                  <option value="">No teams available</option>
-                ) : (
-                  teams.map((team) => (
-                    <option key={team.id} value={team.id}>
-                      {team.name} ({team.number})
-                    </option>
-                  ))
-                )}
-              </select>
+            <div className="space-y-2">
+              <p className={labelClassName}>Team</p>
+              {isTeamLocked && selectedTeam ? (
+                <>
+                  <div
+                    aria-label={`Team locked to ${selectedTeam.name}`}
+                    className="relative overflow-hidden rounded-xl border border-slate-200 bg-slate-50/80 px-4 py-3.5 motion-safe:animate-in motion-safe:fade-in motion-safe:duration-300 motion-reduce:animate-none dark:border-slate-800/90 dark:bg-slate-950/50"
+                  >
+                    <div
+                      aria-hidden="true"
+                      className="pointer-events-none absolute inset-y-0 left-0 w-1 bg-gradient-to-b from-blue-500/70 to-blue-600/25"
+                    />
+                    <div className="flex items-center justify-between gap-3">
+                      <div className="min-w-0">
+                        <p className="truncate text-sm font-bold text-slate-900 dark:text-slate-100">
+                          {selectedTeam.name}
+                        </p>
+                        <p className="mt-0.5 text-[11px] font-semibold text-slate-500 dark:text-slate-400">
+                          Team {selectedTeam.number}
+                        </p>
+                      </div>
+                      <span className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-amber-500/25 bg-amber-500/10 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-amber-600 dark:text-amber-400">
+                        <Lock className="h-3 w-3" aria-hidden="true" />
+                        Locked
+                      </span>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-2.5 rounded-lg border border-amber-500/20 bg-amber-500/5 px-3.5 py-3 motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-1 motion-safe:duration-500 motion-reduce:animate-none">
+                    <Lock
+                      className="mt-0.5 h-4 w-4 shrink-0 text-amber-600 dark:text-amber-400"
+                      aria-hidden="true"
+                    />
+                    <p className="text-xs font-medium leading-relaxed text-amber-800 dark:text-amber-300/90">
+                      As a team leader, invite links are scoped to your assigned
+                      team. Platform administrators can create invites for any
+                      team.
+                    </p>
+                  </div>
+                </>
+              ) : (
+                <select
+                  id="invite-team"
+                  value={selectedTeamId}
+                  disabled={teamSelectDisabled}
+                  onChange={(event) => {
+                    setSelectedTeamId(event.target.value);
+                    resetGeneratedLink();
+                  }}
+                  className={fieldClassName}
+                >
+                  {teams.length === 0 ? (
+                    <option value="">No teams available</option>
+                  ) : (
+                    teams.map((team) => (
+                      <option key={team.id} value={team.id}>
+                        {team.name} ({team.number})
+                      </option>
+                    ))
+                  )}
+                </select>
+              )}
             </div>
 
             <InviteSettingsPanel

@@ -12,10 +12,12 @@ export function applyFolderTreePatch(
   queryClient.setQueryData<FolderWithDocs[]>(
     queryKeys.docs.tree(teamId),
     (old) => {
-      if (!old) return old;
+      if (!old) return [folder];
 
       const index = old.findIndex((entry) => entry.id === folder.id);
-      if (index === -1) return old;
+      if (index === -1) {
+        return [...old, folder].sort((a, b) => a.name.localeCompare(b.name));
+      }
 
       const next = [...old];
       next[index] = folder;

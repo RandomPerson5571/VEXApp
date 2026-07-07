@@ -36,6 +36,21 @@ function mapEventType(
   }
 }
 
+export function fromUiEventType(type: UiEventType): PrismaEventType {
+  switch (type) {
+    case "build":
+      return "WORK_SESSION";
+    case "meeting":
+      return "CHECK_IN";
+    case "practice_match":
+    case "scrimmage":
+    case "championship":
+      return "TOURNAMENT";
+    default:
+      return "WORK_SESSION";
+  }
+}
+
 export function toCalendarEvent(event: Event): CalendarEvent {
   return {
     id: event.id,

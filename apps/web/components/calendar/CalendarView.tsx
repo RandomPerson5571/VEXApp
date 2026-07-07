@@ -1,11 +1,10 @@
 "use client";
 
-import { useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import type { CalendarEvent, EventType } from "@/lib/types/team";
 import { useTeam } from "@/components/providers/UserProvider";
+import { useTeamEventMutations } from "@/lib/hooks/use-team-event-mutations";
 import { useTeamEvents } from "@/lib/hooks/use-team-events";
-import { queryKeys } from "@/lib/query-client";
 import {
   addDaysToDateStr,
   formatMonthYear,
@@ -36,8 +35,15 @@ export function CalendarView({
   onActivityLog,
 }: CalendarViewProps) {
   const team = useTeam();
-  const queryClient = useQueryClient();
   const { data: events = [], isLoading } = useTeamEvents();
+  const { createMutation: createEventMutation } = useTeamEventMutations({
+    teamId: team?.id,
+    onCreateSuccess: () => {
+      setIsModalOpen(false);
+      setTitle("");
+      setDescription("");
+    },
+  });
   const [viewType, setViewType] = useState<CalendarViewMode>("month");
   const [currentMonth, setCurrentMonth] = useState(() => {
     const [year, month] = initialSelectedDate.split("-").map(Number);
@@ -143,32 +149,28 @@ export function CalendarView({
 
   const handleAddEvent = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!title.trim() || !team?.id) return;
+    if (!title.trim() || !team?.id || createEventMutation.isPending) return;
 
-    const newEvent: CalendarEvent = {
-      id: `ev-${Date.now()}`,
-      title: title.trim(),
-      date: eventDate,
-      startTime,
-      endTime,
-      type,
-      location,
-      description: description.trim() || undefined,
-    };
-
-    queryClient.setQueryData<CalendarEvent[]>(
-      queryKeys.events.forTeam(team.id),
-      (prev) => [...(prev ?? []), newEvent],
+    createEventMutation.mutate(
+      {
+        title: title.trim(),
+        date: eventDate,
+        startTime,
+        endTime,
+        type,
+        location,
+        description: description.trim() || undefined,
+      },
+      {
+        onSuccess: () => {
+          onActivityLog?.(
+            `Event scheduled`,
+            `${title.trim()} set on ${eventDate}`,
+            "schedule",
+          );
+        },
+      },
     );
-
-    onActivityLog?.(
-      `Event scheduled`,
-      `${title.trim()} set on ${eventDate}`,
-      "schedule",
-    );
-    setIsModalOpen(false);
-    setTitle("");
-    setDescription("");
   };
 
   return (
@@ -236,8 +238,21 @@ export function CalendarView({
         onTypeChange={setType}
         onLocationChange={setLocation}
         onDescriptionChange={setDescription}
-        onClose={() => setIsModalOpen(false)}
+        onClose={() => {
+          if (!createEventMutation.isPending) {
+            createEventMutation.reset();
+            setIsModalOpen(false);
+          }
+        }}
         onSubmit={handleAddEvent}
+        isSubmitting={createEventMutation.isPending}
+        error={
+          createEventMutation.isError
+            ? createEventMutation.error instanceof Error
+              ? createEventMutation.error.message
+              : "Failed to create event."
+            : undefined
+        }
       />
     </div>
   );

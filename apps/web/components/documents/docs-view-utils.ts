@@ -4,16 +4,6 @@ import type {
   FolderWithDocs,
 } from "@stlvex/database/types";
 
-export const DOCS_TABLE_OF_CONTENTS = [
-  { id: "introduction", label: "Introduction" },
-  { id: "constraints", label: "Design Constraints" },
-  { id: "sketches", label: "Concept Sketches" },
-  { id: "prototypes", label: "Prototypes" },
-  { id: "results", label: "Testing Results" },
-  { id: "conclusion", label: "Conclusion" },
-  { id: "steps", label: "Next Steps" },
-] as const;
-
 export type DocsTreeSelection = {
   folder: FolderWithDocs;
   doc: FolderDocSummary;
@@ -85,12 +75,4 @@ export function canEditDocumentation(
 ): boolean {
   if (isLeader) return true;
   return doc.authors.some((author) => author.id === profileId);
-}
-
-export function scrollToDocSection(
-  sectionId: string,
-  onActiveChange: (sectionId: string) => void,
-): void {
-  onActiveChange(sectionId);
-  document.getElementById(sectionId)?.scrollIntoView({ behavior: "smooth" });
 }

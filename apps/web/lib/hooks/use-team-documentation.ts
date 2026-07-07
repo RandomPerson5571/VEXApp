@@ -55,12 +55,21 @@ export function useDocumentationDetail(docId: string | null | undefined) {
 
 export function useCreateFolder() {
   const team = useTeam();
+  const queryClient = useQueryClient();
+  const teamId = team?.id;
   const invalidate = useBackgroundInvalidateDocumentation();
 
   return useMutation({
     mutationFn: createFolderFromApi,
+    onSuccess: (folder) => {
+      if (!teamId) {
+        return;
+      }
+
+      applyFolderTreePatch(queryClient, teamId, folder);
+    },
     onSettled: () => {
-      if (team?.id) {
+      if (teamId) {
         invalidate();
       }
     },

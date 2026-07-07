@@ -3,7 +3,6 @@
 import {
   DocsDirectorySidebar,
   DocsMainPanel,
-  DocsTableOfContents,
   DocsViewModals,
 } from "@/components/documents/DocsViewComponents";
 import { useDocsView } from "@/lib/hooks/use-docs-view";
@@ -35,18 +34,13 @@ export function DocsView() {
         selectedDocId={view.selectedDocId}
         isDetailLoading={view.isDetailLoading}
         isDetailError={view.isDetailError}
-        notebookEntry={view.notebookEntry}
+        selectedDocTitle={view.selectedDocTitle}
+        selectedDocContent={view.selectedDocContent}
         canEditSelectedDoc={view.canEditSelectedDoc}
         isLeader={view.isLeader}
         isDeletePending={view.isDeletePending}
         openEditDocumentModal={view.openEditDocumentModal}
         handleDeleteDocument={view.handleDeleteDocument}
-      />
-
-      <DocsTableOfContents
-        showToc={view.showToc}
-        activeSegment={view.activeTocSegment}
-        onSelect={view.handleTocSelect}
       />
 
       <DocsViewModals
