@@ -51,6 +51,15 @@ function getConfiguredSiteUrl(): string | null {
 
 // Async, request-header-aware — for OAuth redirects. Metadata/robots/sitemap: lib/seo.ts getSiteUrl()
 export async function getSiteUrl(): Promise<string> {
+  const configured = getConfiguredSiteUrl();
+
+  if (process.env.NODE_ENV === "production") {
+    if (!configured) {
+      throw new Error("NEXT_PUBLIC_SITE_URL must be set in production.");
+    }
+    return normalizeSiteUrl(configured);
+  }
+
   const headersList = await headers();
   const requestOrigin = getRequestOrigin(headersList);
 
@@ -58,16 +67,8 @@ export async function getSiteUrl(): Promise<string> {
     return requestOrigin;
   }
 
-  const configured = getConfiguredSiteUrl();
-
   if (configured) {
     return normalizeSiteUrl(configured);
-  }
-
-  if (process.env.NODE_ENV === "production") {
-    throw new Error(
-      "NEXT_PUBLIC_SITE_URL must be set in production for OAuth redirect URLs.",
-    );
   }
 
   return LOCAL_FALLBACK;

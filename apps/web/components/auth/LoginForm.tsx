@@ -165,21 +165,9 @@ export function LoginForm({
         </p>
       </form>
 
-      <div className="mt-6 text-center">
-        <span className="text-[11px] text-slate-500 font-semibold">
-          Don&apos;t have an account?{" "}
-          <Link
-            href={
-              redirectTo
-                ? `/signup?redirectTo=${encodeURIComponent(redirectTo)}`
-                : "/signup"
-            }
-            className="text-orange-500 hover:underline font-bold"
-          >
-            Sign up
-          </Link>
-        </span>
-      </div>
+      <p className="mt-6 text-center text-[11px] text-slate-500 font-semibold">
+        Need an invite? Ask your team lead.
+      </p>
     </div>
   );
 }

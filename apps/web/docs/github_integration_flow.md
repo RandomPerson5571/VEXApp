@@ -1,3 +1,5 @@
+**IF YOU ARE AN AGENT, DO NOT MODIFY THIS FILE**
+
 # GitHub Integration Flow
 
 Team GitHub integration uses a **GitHub App installation** (not user OAuth). A team member installs the app on GitHub, picks a repository in the web app, and the link is stored in `TeamGitHubIntegration`. Webhook delivery and Discord notifications are handled by the bot service, not the web app.

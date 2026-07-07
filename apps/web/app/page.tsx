@@ -47,14 +47,11 @@ export default function Home() {
                 Roary keeps match prep, team documents, calendar updates, and member coordination in one place for your VRC season.
               </p>
 
-              <div className="mt-8 flex flex-wrap gap-3">
-                <Link
-                  href="/join"
-                  className="inline-flex items-center gap-3 rounded-full bg-[#1a1200] text-white font-semibold px-6 py-3 shadow-lg hover:bg-[#2b1d00]"
-                >
+              <div className="mt-8 flex flex-wrap items-center gap-3">
+                <p className="inline-flex items-center gap-3 rounded-full bg-[#1a1200]/10 border border-[#1a1200]/20 text-[#3a2800] font-semibold px-6 py-3">
                   <Image src={RoaryIcon} alt="" width={20} height={20} className="h-5 w-5" />
-                  Join by Invite
-                </Link>
+                  Ask your team lead for an invite link
+                </p>
 
                 <Link
                   href="/dashboard"

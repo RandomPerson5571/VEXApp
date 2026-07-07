@@ -3,6 +3,11 @@
 import { redirect } from "next/navigation";
 
 import { getPasswordResetRedirectUrl } from "@/lib/auth/password-reset";
+import { getServerActionClientIp } from "@/lib/security/client-ip";
+import {
+  authRateLimitErrorMessage,
+  enforceAuthRateLimit,
+} from "@/lib/security/rate-limit";
 import { createClient } from "@/lib/supabase/server";
 
 export type PasswordResetState =
@@ -42,6 +47,16 @@ export async function requestPasswordReset(
     return {
       error: "Reset links can only be sent to your signed-in email address.",
     };
+  }
+
+  const clientIp = await getServerActionClientIp();
+  const rateLimit = await enforceAuthRateLimit("reset", {
+    ip: clientIp,
+    email,
+  });
+
+  if (!rateLimit.ok) {
+    return { error: authRateLimitErrorMessage(rateLimit.retryAfterSeconds) };
   }
 
   const redirectTo = await getPasswordResetRedirectUrl();

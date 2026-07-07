@@ -45,6 +45,50 @@ export async function consumeRateLimit(
   return { allowed: true };
 }
 
+export const AUTH_RATE_LIMITS = {
+  loginIp: { limit: 20, windowMs: 15 * 60 * 1000 },
+  loginEmail: { limit: 10, windowMs: 15 * 60 * 1000 },
+  signupIp: { limit: 10, windowMs: 60 * 60 * 1000 },
+  signupEmail: { limit: 5, windowMs: 60 * 60 * 1000 },
+  resetIp: { limit: 10, windowMs: 60 * 60 * 1000 },
+  resetEmail: { limit: 5, windowMs: 60 * 60 * 1000 },
+} as const;
+
+export type AuthRateLimitBucket = "login" | "signup" | "reset";
+
+export function authRateLimitErrorMessage(retryAfterSeconds: number): string {
+  const minutes = Math.max(1, Math.ceil(retryAfterSeconds / 60));
+  return `Too many attempts. Try again in ${minutes} minute${minutes === 1 ? "" : "s"}.`;
+}
+
+export async function enforceAuthRateLimit(
+  bucket: AuthRateLimitBucket,
+  { ip, email }: { ip: string; email?: string },
+): Promise<{ ok: true } | { ok: false; retryAfterSeconds: number }> {
+  const ipConfig = AUTH_RATE_LIMITS[`${bucket}Ip`];
+  const ipResult = await consumeRateLimit(`auth-${bucket}:ip`, ip, ipConfig);
+
+  if (!ipResult.allowed) {
+    return { ok: false, retryAfterSeconds: ipResult.retryAfterSeconds };
+  }
+
+  if (email) {
+    const emailConfig = AUTH_RATE_LIMITS[`${bucket}Email`];
+    const normalizedEmail = email.trim().toLowerCase();
+    const emailResult = await consumeRateLimit(
+      `auth-${bucket}:email`,
+      normalizedEmail,
+      emailConfig,
+    );
+
+    if (!emailResult.allowed) {
+      return { ok: false, retryAfterSeconds: emailResult.retryAfterSeconds };
+    }
+  }
+
+  return { ok: true };
+}
+
 export const JOIN_INVITE_RATE_LIMITS = {
   ip: { limit: 60, windowMs: 15 * 60 * 1000 },
 } as const satisfies Record<string, RateLimitConfig>;

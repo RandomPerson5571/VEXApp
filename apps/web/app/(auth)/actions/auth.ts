@@ -12,6 +12,11 @@ import {
   type ValidInvite,
 } from "@/lib/auth/invite";
 import { getSafeRedirectPath } from "@/lib/auth/redirect";
+import { getServerActionClientIp } from "@/lib/security/client-ip";
+import {
+  authRateLimitErrorMessage,
+  enforceAuthRateLimit,
+} from "@/lib/security/rate-limit";
 import { createClient } from "@/lib/supabase/server";
 import { prisma } from "@stlvex/database";
 
@@ -89,6 +94,16 @@ export async function signInWithCredentials(
     return { error: "Please provide correct credentials." };
   }
 
+  const clientIp = await getServerActionClientIp();
+  const rateLimit = await enforceAuthRateLimit("login", {
+    ip: clientIp,
+    email,
+  });
+
+  if (!rateLimit.ok) {
+    return { error: authRateLimitErrorMessage(rateLimit.retryAfterSeconds) };
+  }
+
   const supabase = await createClient();
   const { error } = await supabase.auth.signInWithPassword({
     email,
@@ -133,6 +148,14 @@ export async function signInWithDiscord(
   formData: FormData,
 ): Promise<AuthState> {
   const redirectTo = getRedirectPath(formData);
+
+  const clientIp = await getServerActionClientIp();
+  const rateLimit = await enforceAuthRateLimit("login", { ip: clientIp });
+
+  if (!rateLimit.ok) {
+    return { error: authRateLimitErrorMessage(rateLimit.retryAfterSeconds) };
+  }
+
   const supabase = await createClient();
   const siteUrl = await getSiteUrl();
 
@@ -192,6 +215,16 @@ export async function signUpWithCredentials(
     return { error: "Passwords do not match." };
   }
 
+  const clientIp = await getServerActionClientIp();
+  const rateLimit = await enforceAuthRateLimit("signup", {
+    ip: clientIp,
+    email,
+  });
+
+  if (!rateLimit.ok) {
+    return { error: authRateLimitErrorMessage(rateLimit.retryAfterSeconds) };
+  }
+
   const supabase = await createClient();
   const siteUrl = await getSiteUrl();
 
@@ -236,6 +269,14 @@ export async function signUpWithDiscord(
   }
 
   const invite = inviteResult.invite;
+
+  const clientIp = await getServerActionClientIp();
+  const rateLimit = await enforceAuthRateLimit("signup", { ip: clientIp });
+
+  if (!rateLimit.ok) {
+    return { error: authRateLimitErrorMessage(rateLimit.retryAfterSeconds) };
+  }
+
   const supabase = await createClient();
   const siteUrl = await getSiteUrl();
 

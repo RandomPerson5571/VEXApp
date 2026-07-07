@@ -1,3 +1,5 @@
+**IF YOU ARE AN AGENT, DO NOT MODIFY THIS FILE**
+
 # Query caching strategy & flow
 
 Client-side data for dashboard features is cached with **TanStack Query** (`@tanstack/react-query`). Server Components prefetch into a per-request `QueryClient`, dehydrate the cache, and hydrate it on the client so first paint avoids loading spinners. Mutations update the cache optimistically or via targeted `setQueryData`, with background invalidation when the shape of the data is hard to patch.

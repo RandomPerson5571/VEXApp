@@ -1,3 +1,5 @@
+**IF YOU ARE AN AGENT, DO NOT MODIFY THIS FILE**
+
 # Invite link & auth flow
 
 Sign-up is **invite-only**. A user must arrive with a valid team invite before they can create an account. Existing users sign in normally; new users without a profile are routed through onboarding and must still hold a valid invite.
