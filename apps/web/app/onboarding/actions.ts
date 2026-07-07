@@ -6,6 +6,7 @@ import { redirect } from "next/navigation";
 import {
   clearInviteCookie,
   consumeInvite,
+  getInviteInvalidReasonForAuthUser,
   InviteExhaustedError,
   InviteExpiredError,
   InviteNotFoundError,
@@ -69,9 +70,34 @@ export async function completeOnboarding(
     };
   }
 
+  const existingUser = await prisma.user.findUnique({
+    where: { id: user.id },
+    select: { id: true },
+  });
+
+  if (existingUser) {
+    await confirmProfileVerification(user);
+    await clearInviteCookie();
+    redirect("/dashboard");
+  }
+
   const { invite } = await resolveInviteForAuthUser(user);
 
   if (!invite) {
+    const reason = await getInviteInvalidReasonForAuthUser(user);
+
+    if (reason === "expired") {
+      return { error: new InviteExpiredError().message };
+    }
+
+    if (reason === "exhausted") {
+      return { error: new InviteExhaustedError().message };
+    }
+
+    if (reason === "reserved") {
+      return { error: new InviteReservedError().message };
+    }
+
     return { error: INVITE_REQUIRED_MESSAGE };
   }
 

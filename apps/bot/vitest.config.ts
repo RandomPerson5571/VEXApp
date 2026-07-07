@@ -9,7 +9,12 @@ export default defineConfig({
   test: {
     environment: "node",
     globals: false,
-    include: ["tests/**/*.test.ts"],
+    include: ["tests/**/*.test.ts", "tests/**/*.integration.test.ts"],
+    setupFiles: ["tests/setup/vitest.setup.ts"],
+    fileParallelism: false,
+    pool: "forks",
+    testTimeout: 30_000,
+    hookTimeout: 30_000,
   },
   resolve: {
     alias: {

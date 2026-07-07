@@ -1,5 +1,4 @@
 import { prisma } from "@stlvex/database";
-import type { User as SupabaseUser } from "@supabase/supabase-js";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { verifySessionIdentity } from "@/lib/auth/identity";
@@ -8,6 +7,10 @@ import {
   PROXY_AUTH_USER_ID_HEADER,
   PROXY_AUTH_VALIDATED_HEADER,
 } from "@/lib/auth/session";
+import {
+  buildAuthUser,
+  DEFAULT_SUPABASE_USER_ID,
+} from "../../helpers/auth/supabase-fixtures";
 
 const headersMock = vi.hoisted(() => vi.fn());
 const createClientMock = vi.hoisted(() => vi.fn());
@@ -25,26 +28,7 @@ vi.mock("@/lib/supabase/server", () => ({
   createClient: createClientMock,
 }));
 
-const SUPABASE_USER_ID = "22222222-2222-2222-2222-222222222222";
 const DISCORD_SNOWFLAKE = "987654321098765432";
-
-function buildAuthUser(
-  overrides: Partial<SupabaseUser> = {},
-): SupabaseUser {
-  return {
-    id: SUPABASE_USER_ID,
-    aud: "authenticated",
-    role: "authenticated",
-    email: "user@example.com",
-    app_metadata: { provider: "email" },
-    user_metadata: { sub: SUPABASE_USER_ID },
-    identities: [],
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-    email_confirmed_at: new Date().toISOString(),
-    ...overrides,
-  } as SupabaseUser;
-}
 
 function mockProxyHeaders(userId: string | null) {
   headersMock.mockResolvedValue({
@@ -76,7 +60,7 @@ describe("getAuthUser proxy fast path", () => {
     createClientMock.mockResolvedValue({
       auth: { getUser },
     });
-    mockProxyHeaders(SUPABASE_USER_ID);
+    mockProxyHeaders(DEFAULT_SUPABASE_USER_ID);
 
     await expect(getAuthUser()).resolves.toEqual(authUser);
     expect(getUser).toHaveBeenCalledTimes(1);
@@ -91,7 +75,7 @@ describe("getAuthUser proxy fast path", () => {
     createClientMock.mockResolvedValue({
       auth: { getUser },
     });
-    mockProxyHeaders(SUPABASE_USER_ID);
+    mockProxyHeaders(DEFAULT_SUPABASE_USER_ID);
 
     await expect(getAuthUser()).resolves.toBeNull();
     expect(getUser).toHaveBeenCalledTimes(1);
@@ -105,7 +89,7 @@ describe("verifySessionIdentity verified-profile fast path", () => {
 
   it("skips profile writes for a verified email user", async () => {
     const findUnique = vi.spyOn(prisma.user, "findUnique").mockResolvedValue({
-      id: SUPABASE_USER_ID,
+      id: DEFAULT_SUPABASE_USER_ID,
       isVerified: true,
       verificationMethod: "EMAIL",
       discordId: null,
@@ -127,7 +111,7 @@ describe("verifySessionIdentity verified-profile fast path", () => {
           id: DISCORD_SNOWFLAKE,
           provider: "discord",
           identity_data: { sub: DISCORD_SNOWFLAKE },
-          user_id: SUPABASE_USER_ID,
+          user_id: DEFAULT_SUPABASE_USER_ID,
           identity_id: DISCORD_SNOWFLAKE,
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
@@ -137,7 +121,7 @@ describe("verifySessionIdentity verified-profile fast path", () => {
     });
 
     const findUnique = vi.spyOn(prisma.user, "findUnique").mockResolvedValue({
-      id: SUPABASE_USER_ID,
+      id: DEFAULT_SUPABASE_USER_ID,
       isVerified: true,
       verificationMethod: "DISCORD",
       discordId: DISCORD_SNOWFLAKE,

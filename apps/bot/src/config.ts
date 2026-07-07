@@ -5,7 +5,7 @@ import dotenv from "dotenv";
 
 const botRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
-dotenv.config({ path: path.join(botRoot, ".env"), override: true });
+dotenv.config({ path: path.join(botRoot, ".env") });
 
 function readEnv(name: string, required = true): string {
   const value = process.env[name]?.trim();

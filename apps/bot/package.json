@@ -9,7 +9,8 @@
     "start": "tsx src/index.ts",
     "register:commands": "tsx src/deploy-commands.ts",
     "check-types": "tsc --noEmit",
-    "test": "vitest run",
+    "test": "node ../web/node_modules/vitest/vitest.mjs run",
+    "test:integration": "node ../web/node_modules/vitest/vitest.mjs run tests/integration",
     "test:watch": "vitest"
   },
   "keywords": [],
@@ -33,6 +34,8 @@
   "devDependencies": {
     "@types/express": "^5.0.6",
     "@types/node": "^26.0.0",
+    "@types/supertest": "^6.0.3",
+    "supertest": "^7.2.2",
     "tsx": "^4.22.4",
     "typescript": "^6.0.3",
     "vitest": "^3.2.4"
