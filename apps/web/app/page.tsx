@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
+import { redirect } from "next/navigation";
 import RoaryIcon from "@/components/roaryicon.png";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { createPageMetadata, getSiteUrl, SITE_DESCRIPTION, SITE_NAME } from "@/lib/seo";
@@ -30,7 +31,31 @@ const structuredData = {
   ],
 };
 
-export default function Home() {
+export default async function Home({
+  searchParams,
+}: {
+  searchParams?: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  const params = await searchParams;
+
+  if (params) {
+    const code = params.code;
+
+    if (typeof code === "string" && code.trim()) {
+      const target = new URL("/auth/callback", "https://stlvexapp.guanine.org");
+
+      for (const [key, value] of Object.entries(params)) {
+        if (typeof value === "string" && value) {
+          target.searchParams.set(key, value);
+        } else if (Array.isArray(value)) {
+          target.searchParams.set(key, value.join(","));
+        }
+      }
+
+      redirect(target.toString());
+    }
+  }
+
   return (
     <>
       <JsonLd data={structuredData} />

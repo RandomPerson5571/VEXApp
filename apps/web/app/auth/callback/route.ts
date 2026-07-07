@@ -51,7 +51,7 @@ function inviteInvalidRedirect(
 export async function GET(request: Request) {
   const requestUrl = new URL(request.url);
   const code = requestUrl.searchParams.get("code");
-  const origin = requestUrl.origin;
+  const origin = "https://stlvexapp.guanine.org";
   const secure = requestUrl.protocol === "https:";
   const next = resolveSameOriginRedirect(
     requestUrl.searchParams.get("next"),

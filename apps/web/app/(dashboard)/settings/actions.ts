@@ -28,7 +28,7 @@ export async function linkDiscordAccount(formData: FormData) {
     redirect("/login?error=Not%20authenticated");
   }
 
-  const siteUrl = await getSiteUrl();
+  const siteUrl = "https://stlvexapp.guanine.org";
   const next = `${returnPath}?message=discord_linked`;
   const { data, error } = await supabase.auth.linkIdentity({
     provider: "discord",
