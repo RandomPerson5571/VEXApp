@@ -1,6 +1,10 @@
 export { Prisma } from "../generated/prisma/index.js";
 export { findUserByDiscordId } from "./discord";
 export {
+  findFusionNotificationRecipients,
+  findTeamFusionIntegrationByProjectUrn,
+} from "./fusion";
+export {
   findGitHubNotificationRecipients,
   findTeamGitHubIntegrationByRepo,
 } from "./github";

@@ -115,7 +115,7 @@ describe("documentation detail server queryFn", () => {
     );
 
     vi.spyOn(
-      await import("@/lib/data/documentation"),
+      await import("@/lib/data/documentation.data"),
       "getDocumentationById",
     ).mockResolvedValueOnce(null);
 

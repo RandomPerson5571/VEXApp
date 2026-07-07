@@ -92,6 +92,15 @@ export default async function TeamManagementPage() {
             installationId: true,
           },
         },
+        fusionIntegration: {
+          select: {
+            id: true,
+            projectUrn: true,
+            projectName: true,
+            hookId: true,
+            isActive: true,
+          },
+        },
       },
     }),
     prisma.user.findMany({
@@ -124,6 +133,7 @@ export default async function TeamManagementPage() {
       <TeamManagementView
         initialMembers={rosterUsers.map(toTeamMember)}
         initialGithubIntegration={team.githubIntegration}
+        initialFusionIntegration={team.fusionIntegration}
         teamLabel={`${team.name} (${team.number})`}
         canManage={canManage}
         canManageIntegrations={canManageIntegrations}

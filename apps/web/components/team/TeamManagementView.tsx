@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import type { UserRole } from "@stlvex/database/types";
 
 import { EditMemberModal } from "./management/EditMemberModal";
+import { FusionProjectPickerModal } from "./management/FusionProjectPickerModal";
 import { GitHubRepoPickerModal } from "./management/GitHubRepoPickerModal";
 import { InviteMemberModal } from "./management/InviteMemberModal";
 import { TeamIntegrationsSection } from "./management/TeamIntegrationsSection";
@@ -23,6 +24,7 @@ export type { TeamMember } from "./management/team-management-types";
 type TeamManagementViewProps = {
   initialMembers: TeamMember[];
   initialGithubIntegration: TeamGitHubIntegration | null;
+  initialFusionIntegration: TeamFusionIntegration | null;
   teamLabel: string;
   canManage: boolean;
   canManageIntegrations: boolean;
@@ -30,6 +32,11 @@ type TeamManagementViewProps = {
 
 type GitHubIntegrationResponse = {
   integration?: TeamGitHubIntegration;
+  error?: string;
+};
+
+type FusionIntegrationResponse = {
+  integration?: TeamFusionIntegration;
   error?: string;
 };
 
@@ -50,6 +57,7 @@ function parseInstallationId(value: string | null): number | null {
 export function TeamManagementView({
   initialMembers,
   initialGithubIntegration,
+  initialFusionIntegration,
   teamLabel,
   canManage,
   canManageIntegrations,
@@ -74,19 +82,32 @@ export function TeamManagementView({
   const [githubIntegration, setGithubIntegration] =
     useState<TeamGitHubIntegration | null>(initialGithubIntegration);
   const [fusionIntegration, setFusionIntegration] =
-    useState<TeamFusionIntegration | null>(null);
+    useState<TeamFusionIntegration | null>(initialFusionIntegration);
   const [repoPickerInstallationId, setRepoPickerInstallationId] = useState<
     number | null
+  >(null);
+  const [fusionConnectSession, setFusionConnectSession] = useState<
+    string | null
   >(null);
   const [githubBannerError, setGithubBannerError] = useState<string | null>(
     null,
   );
+  const [fusionBannerError, setFusionBannerError] = useState<string | null>(
+    null,
+  );
 
   useEffect(() => {
-    const errorParam = searchParams.get("githubError");
+    const githubErrorParam = searchParams.get("githubError");
+    const fusionErrorParam = searchParams.get("fusionError");
 
-    if (errorParam) {
-      setGithubBannerError(errorParam);
+    if (githubErrorParam) {
+      setGithubBannerError(githubErrorParam);
+      router.replace("/team-management", { scroll: false });
+      return;
+    }
+
+    if (fusionErrorParam) {
+      setFusionBannerError(fusionErrorParam);
       router.replace("/team-management", { scroll: false });
       return;
     }
@@ -98,9 +119,16 @@ export function TeamManagementView({
     const installationId = parseInstallationId(
       searchParams.get("githubInstall"),
     );
+    const connectSession = searchParams.get("fusionConnect")?.trim() || null;
 
     if (installationId) {
       setRepoPickerInstallationId(installationId);
+      router.replace("/team-management", { scroll: false });
+      return;
+    }
+
+    if (connectSession) {
+      setFusionConnectSession(connectSession);
       router.replace("/team-management", { scroll: false });
     }
   }, [canManageIntegrations, router, searchParams]);
@@ -232,27 +260,65 @@ export function TeamManagementView({
     setGithubBannerError(null);
   }
 
-  function handleFusionConnect(projectUrn: string, projectName: string | null) {
-    if (!canManage) return;
+  async function handleFusionConnect(projectUrn: string, projectName: string) {
+    if (!canManageIntegrations || !fusionConnectSession) return;
 
-    setFusionIntegration({
-      id: `fu-${Date.now()}`,
-      projectUrn,
-      projectName,
-      hookId: `hk_${Date.now().toString(36)}`,
-      isActive: true,
+    const response = await fetch("/api/team/fusion/connect", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        connectSession: fusionConnectSession,
+        projectUrn,
+        projectName,
+      }),
     });
+
+    const data = (await response.json()) as FusionIntegrationResponse;
+
+    if (!response.ok || !data.integration) {
+      throw new Error(data.error ?? "Failed to connect Fusion project.");
+    }
+
+    setFusionIntegration(data.integration);
+    setFusionConnectSession(null);
+    setFusionBannerError(null);
   }
 
-  function handleFusionDisconnect() {
-    if (!canManage) return;
+  async function handleFusionDisconnect() {
+    if (!canManageIntegrations) return;
+
+    const response = await fetch("/api/team/fusion", { method: "DELETE" });
+    const data = (await response.json()) as { error?: string };
+
+    if (!response.ok) {
+      setFusionBannerError(data.error ?? "Failed to disconnect Fusion.");
+      return;
+    }
+
     setFusionIntegration(null);
+    setFusionBannerError(null);
   }
 
-  function handleFusionActiveChange(isActive: boolean) {
-    if (!canManage) return;
+  async function handleFusionActiveChange(isActive: boolean) {
+    if (!canManageIntegrations) return;
 
-    setFusionIntegration((prev) => (prev ? { ...prev, isActive } : null));
+    const response = await fetch("/api/team/fusion", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ isActive }),
+    });
+
+    const data = (await response.json()) as FusionIntegrationResponse;
+
+    if (!response.ok || !data.integration) {
+      setFusionBannerError(
+        data.error ?? "Failed to update Fusion integration.",
+      );
+      return;
+    }
+
+    setFusionIntegration(data.integration);
+    setFusionBannerError(null);
   }
 
   return (
@@ -274,6 +340,12 @@ export function TeamManagementView({
         </div>
       ) : null}
 
+      {fusionBannerError ? (
+        <div className="mb-4 rounded-xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-[11px] font-semibold text-red-400">
+          {fusionBannerError}
+        </div>
+      ) : null}
+
       <TeamMembersPanel
         members={members}
         canManage={canManage}
@@ -287,11 +359,9 @@ export function TeamManagementView({
         <TeamIntegrationsSection
           githubIntegration={githubIntegration}
           fusionIntegration={fusionIntegration}
-          canManage={canManage}
           canManageIntegrations={canManageIntegrations}
           onGitHubDisconnect={handleGitHubDisconnect}
           onGitHubActiveChange={handleGitHubActiveChange}
-          onFusionConnect={handleFusionConnect}
           onFusionDisconnect={handleFusionDisconnect}
           onFusionActiveChange={handleFusionActiveChange}
         />
@@ -330,6 +400,14 @@ export function TeamManagementView({
           installationId={repoPickerInstallationId}
           onClose={() => setRepoPickerInstallationId(null)}
           onSelect={handleGitHubConnect}
+        />
+      ) : null}
+
+      {canManageIntegrations && fusionConnectSession ? (
+        <FusionProjectPickerModal
+          connectSession={fusionConnectSession}
+          onClose={() => setFusionConnectSession(null)}
+          onSelect={handleFusionConnect}
         />
       ) : null}
     </div>

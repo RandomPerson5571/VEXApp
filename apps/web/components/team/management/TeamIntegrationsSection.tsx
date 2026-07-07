@@ -8,11 +8,9 @@ import type {
 type TeamIntegrationsSectionProps = {
   githubIntegration: TeamGitHubIntegration | null;
   fusionIntegration: TeamFusionIntegration | null;
-  canManage?: boolean;
   canManageIntegrations: boolean;
   onGitHubDisconnect: () => void;
   onGitHubActiveChange: (isActive: boolean) => void;
-  onFusionConnect: (projectUrn: string, projectName: string | null) => void;
   onFusionDisconnect: () => void;
   onFusionActiveChange: (isActive: boolean) => void;
 };
@@ -20,11 +18,9 @@ type TeamIntegrationsSectionProps = {
 export function TeamIntegrationsSection({
   githubIntegration,
   fusionIntegration,
-  canManage = true,
   canManageIntegrations,
   onGitHubDisconnect,
   onGitHubActiveChange,
-  onFusionConnect,
   onFusionDisconnect,
   onFusionActiveChange,
 }: TeamIntegrationsSectionProps) {
@@ -48,8 +44,7 @@ export function TeamIntegrationsSection({
         />
         <FusionIntegrationPanel
           integration={fusionIntegration}
-          canManage={canManage}
-          onConnect={onFusionConnect}
+          canManageIntegrations={canManageIntegrations}
           onDisconnect={onFusionDisconnect}
           onActiveChange={onFusionActiveChange}
         />
