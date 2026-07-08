@@ -13,7 +13,12 @@ Copy `.env.example` and fill in your values:
 
 - `DISCORD_TOKEN` (required)
 - `DISCORD_CLIENT_ID` (required)
+- `GENERAL_MEMBER_ROLE_ID` (required)
+- `WEBHOOK_SECRET` (required)
+- `DATABASE_URL` / `DIRECT_URL` (required — same values as the web app)
 - `DISCORD_GUILD_ID` (optional, for guild-scoped command registration)
+
+On Render (or any PaaS), set these in the service **Environment** tab — a `.env` file is not deployed. Render injects `PORT`; the bot prefers `PORT` over `WEBHOOK_PORT` when both are present.
 
 ## 2) Register slash commands
 
