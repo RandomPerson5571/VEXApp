@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { requireTeamIntegrationAccess } from "@/lib/integrations/github/api-auth.server";
+import { enforceApiRateLimit } from "@/lib/security/enforce-api-rate-limit";
 import {
   disconnectTeamFusionIntegration,
   getTeamFusionIntegration,
@@ -30,6 +31,13 @@ export async function PATCH(request: Request) {
   if (!access.ok) {
     return access.response;
   }
+
+  const limited = await enforceApiRateLimit(
+    request,
+    access.userId,
+    "integrations",
+  );
+  if (limited) return limited;
 
   let body: ToggleActivePayload;
 
@@ -67,12 +75,30 @@ export async function PATCH(request: Request) {
   }
 }
 
-export async function DELETE() {
+export async function DELETE(request: Request) {
+  // #region agent log
+  try {
+    const { appendFileSync } = await import("node:fs");
+    appendFileSync(
+      "c:/Users/griff/OneDrive/Documents/coding-workspace/VexRobotics/VEXApp/debug-d8eb0f.log",
+      `${JSON.stringify({ sessionId: "d8eb0f", runId: "post-fix", hypothesisId: "H-D", location: "fusion/route.ts:DELETE", message: "fusion DELETE entry", data: { hasRequest: request != null, argCount: arguments.length }, timestamp: Date.now() })}\n`,
+    );
+  } catch {
+    /* ignore */
+  }
+  // #endregion
   const access = await requireTeamIntegrationAccess();
 
   if (!access.ok) {
     return access.response;
   }
+
+  const limited = await enforceApiRateLimit(
+    request,
+    access.userId,
+    "integrations",
+  );
+  if (limited) return limited;
 
   const disconnected = await disconnectTeamFusionIntegration(access.teamId);
 

@@ -5,6 +5,7 @@ import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { CalendarMonthGrid } from "@/components/calendar/CalendarMonthGrid";
+import { CalendarScheduleGrid } from "@/components/calendar/CalendarScheduleGrid";
 import { CalendarSidePanel } from "@/components/calendar/CalendarSidePanel";
 import type { CalendarEvent, TeamDayPlan } from "@/lib/types/team";
 
@@ -205,5 +206,24 @@ describe("calendar day plans UI", () => {
     renderGrid([]);
     expect(container.textContent).toContain("Driver Practice");
     expect(container.textContent).not.toContain("Testing");
+  });
+
+  it("shows day plan badge and keeps events in week schedule view", () => {
+    act(() => {
+      root.render(
+        <CalendarScheduleGrid
+          mode="week"
+          days={[CALENDAR_CELL]}
+          eventsByDate={new Map([[SELECTED_DATE, [TIMED_EVENT]]])}
+          dayPlansByDate={new Map([[SELECTED_DATE, buildPlan("build")]])}
+          selectedDate={SELECTED_DATE}
+          todayStr="2026-07-01"
+          onSelectDate={() => undefined}
+        />,
+      );
+    });
+
+    expect(container.textContent).toContain("Build");
+    expect(container.textContent).toContain("Driver Practice");
   });
 });

@@ -11,6 +11,7 @@ import {
   upsertNotificationSettings,
 } from "@/lib/notifications/settings.server";
 import { createClient } from "@/lib/supabase/server";
+import { enforceApiRateLimit } from "@/lib/security/enforce-api-rate-limit";
 
 type UpdateNotificationSettingsPayload = {
   enableDiscordPushNotifs?: boolean;
@@ -100,6 +101,9 @@ export async function PATCH(request: Request) {
   if (!user) {
     return NextResponse.json({ error: "Not authenticated." }, { status: 401 });
   }
+
+  const limited = await enforceApiRateLimit(request, user.id, "notifications");
+  if (limited) return limited;
 
   let body: UpdateNotificationSettingsPayload;
 

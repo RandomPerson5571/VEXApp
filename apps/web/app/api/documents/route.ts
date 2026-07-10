@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { getCurrentUser } from "@/lib/auth/current-user";
+import { enforceApiRateLimit } from "@/lib/security/enforce-api-rate-limit";
 import { DEFAULT_DOCUMENTATION_TEMPLATE } from "@/lib/data/documentation";
 import { createTeamDocumentation } from "@/lib/queries/documentation.server";
 import type { DocType } from "@stlvex/database/types";
@@ -29,6 +30,13 @@ export async function POST(request: Request) {
       { status: 400 },
     );
   }
+
+  const limited = await enforceApiRateLimit(
+    request,
+    currentUser.profile.id,
+    "team",
+  );
+  if (limited) return limited;
 
   let body: CreateDocumentRequestBody;
 

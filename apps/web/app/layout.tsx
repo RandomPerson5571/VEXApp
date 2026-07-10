@@ -42,6 +42,7 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <head>
+        <link rel="preload" href="/logos/Robotics_lion.svg" as="image" />
         <Script id="theme-init" strategy="beforeInteractive">
           {`(function() {
               const theme = localStorage.getItem('theme') || 'dark';

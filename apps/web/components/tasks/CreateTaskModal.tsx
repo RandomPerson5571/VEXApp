@@ -1,9 +1,9 @@
 "use client";
 
 import { useEffect, useId, useRef, useState, type FormEvent } from "react";
-import { Calendar, ChevronLeft, ChevronRight, ClipboardList, Plus, X } from "lucide-react";
+import { Calendar, ChevronLeft, ChevronRight, ClipboardList, Plus, Save, X } from "lucide-react";
 
-import type { TaskPriority, TaskType } from "@stlvex/database/types";
+import type { TaskListSubTask, TaskPriority, TaskStatus, TaskType } from "@stlvex/database/types";
 import {
   formatMonthYear,
   formatSelectedDayLabel,
@@ -11,8 +11,8 @@ import {
   getTodayDateStr,
   parseDateStr,
 } from "@/lib/utils/calendar";
-import type { CreateTaskFormValues } from "./task-list-utils";
-import { formatPersonName, getInitials } from "./task-list-utils";
+import type { CreateTaskFormValues, EditTaskFormValues } from "./task-list-utils";
+import { formatPersonName, getInitials, getSubtaskProgress } from "./task-list-utils";
 
 const TASK_TYPE_OPTIONS: { value: TaskType; label: string }[] = [
   { value: "Hardware", label: "Hardware" },
@@ -25,6 +25,12 @@ const TASK_PRIORITY_OPTIONS: { value: TaskPriority; label: string }[] = [
   { value: "Low", label: "Low" },
   { value: "Medium", label: "Medium" },
   { value: "High", label: "High" },
+];
+
+const TASK_STATUS_OPTIONS: { value: TaskStatus; label: string }[] = [
+  { value: "NotStarted", label: "Not started" },
+  { value: "InProgress", label: "In progress" },
+  { value: "Done", label: "Done" },
 ];
 
 const fieldClassName =
@@ -193,19 +199,27 @@ type AssigneeOption = {
   lastName: string;
 };
 
+type TaskModalMeta = {
+  creatorName: string;
+  subTasks: TaskListSubTask[];
+};
+
 export type CreateTaskModalProps = {
   isOpen: boolean;
-  values: CreateTaskFormValues;
+  mode?: "create" | "edit";
+  values: CreateTaskFormValues | EditTaskFormValues;
   assigneeOptions: AssigneeOption[];
-  onChange: (values: CreateTaskFormValues) => void;
+  onChange: (values: CreateTaskFormValues | EditTaskFormValues) => void;
   onClose: () => void;
   onSubmit: (event: FormEvent<HTMLFormElement>) => void;
   isSubmitting?: boolean;
   submitError?: string | null;
+  taskMeta?: TaskModalMeta;
 };
 
 export function CreateTaskModal({
   isOpen,
+  mode = "create",
   values,
   assigneeOptions,
   onChange,
@@ -213,9 +227,13 @@ export function CreateTaskModal({
   onSubmit,
   isSubmitting = false,
   submitError = null,
+  taskMeta,
 }: CreateTaskModalProps) {
   const titleId = useId();
   const descriptionId = useId();
+  const isEditMode = mode === "edit";
+  const editValues = isEditMode ? (values as EditTaskFormValues) : null;
+  const subtaskProgress = taskMeta ? getSubtaskProgress(taskMeta.subTasks) : null;
 
   useEffect(() => {
     if (!isOpen) return;
@@ -236,7 +254,7 @@ export function CreateTaskModal({
 
   if (!isOpen) return null;
 
-  function patch(partial: Partial<CreateTaskFormValues>) {
+  function patch(partial: Partial<CreateTaskFormValues & EditTaskFormValues>) {
     onChange({ ...values, ...partial });
   }
 
@@ -286,10 +304,12 @@ export function CreateTaskModal({
                 id={titleId}
                 className="text-lg font-black tracking-tight text-slate-100"
               >
-                Create task
+                {isEditMode ? "Edit task" : "Create task"}
               </h2>
               <p id={descriptionId} className="mt-0.5 text-xs font-medium text-slate-500">
-                Add work for your team — visible to all members.
+                {isEditMode
+                  ? "Review details and update this team task."
+                  : "Add work for your team — visible to all members."}
               </p>
             </div>
           </div>
@@ -367,6 +387,28 @@ export function CreateTaskModal({
             </div>
           </div>
 
+          {isEditMode && editValues ? (
+            <div className="space-y-1.5">
+              <label htmlFor="task-status" className={labelClassName}>
+                Status
+              </label>
+              <select
+                id="task-status"
+                value={editValues.status}
+                onChange={(event) =>
+                  patch({ status: event.target.value as TaskStatus })
+                }
+                className={fieldClassName}
+              >
+                {TASK_STATUS_OPTIONS.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+          ) : null}
+
           <div className="space-y-1.5">
             <span className={labelClassName}>
               Due date <span className="normal-case tracking-normal text-slate-600">(optional)</span>
@@ -415,6 +457,51 @@ export function CreateTaskModal({
             </fieldset>
           ) : null}
 
+          {isEditMode && taskMeta ? (
+            <div className="space-y-3 rounded-xl border border-slate-900/80 bg-slate-950/40 p-4">
+              <div className="flex items-center justify-between gap-3 text-xs">
+                <span className="font-semibold text-slate-500">Created by</span>
+                <span className="font-bold text-slate-200">{taskMeta.creatorName}</span>
+              </div>
+
+              {taskMeta.subTasks.length > 0 && subtaskProgress ? (
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between text-[10px] font-bold uppercase tracking-wide text-slate-500">
+                    <span>Subtasks</span>
+                    <span className="font-mono text-slate-400">
+                      {subtaskProgress.completed}/{subtaskProgress.total}
+                    </span>
+                  </div>
+                  <div className="h-1.5 overflow-hidden rounded-full bg-slate-900">
+                    <div
+                      className="h-full rounded-full bg-gradient-to-r from-blue-600 to-indigo-500 transition-all duration-500"
+                      style={{ width: `${subtaskProgress.percent}%` }}
+                    />
+                  </div>
+                  <div className="max-h-32 space-y-1 overflow-y-auto">
+                    {taskMeta.subTasks.map((subtask) => (
+                      <div
+                        key={subtask.id}
+                        className="flex items-center justify-between gap-2 rounded-lg border border-slate-900/80 bg-slate-950/50 px-3 py-2"
+                      >
+                        <span className="truncate text-[11px] font-semibold text-slate-300">
+                          {subtask.title}
+                        </span>
+                        <span className="shrink-0 text-[10px] font-bold uppercase tracking-wide text-slate-500">
+                          {subtask.status === "Done"
+                            ? "Done"
+                            : subtask.status === "InProgress"
+                              ? "In progress"
+                              : "Not started"}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ) : null}
+            </div>
+          ) : null}
+
           {submitError ? (
             <p className="rounded-lg border border-red-500/20 bg-red-500/5 px-3 py-2 text-xs font-semibold text-red-300">
               {submitError}
@@ -435,8 +522,18 @@ export function CreateTaskModal({
               disabled={isSubmitting}
               className="inline-flex items-center gap-1.5 rounded-lg bg-blue-600 px-5 py-2 text-xs font-bold text-white shadow-lg shadow-blue-900/25 transition hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-50 motion-safe:hover:scale-[1.02] motion-reduce:transition-none"
             >
-              <Plus className="h-3.5 w-3.5" />
-              {isSubmitting ? "Creating..." : "Create task"}
+              {isEditMode ? (
+                <Save className="h-3.5 w-3.5" />
+              ) : (
+                <Plus className="h-3.5 w-3.5" />
+              )}
+              {isSubmitting
+                ? isEditMode
+                  ? "Saving..."
+                  : "Creating..."
+                : isEditMode
+                  ? "Save changes"
+                  : "Create task"}
             </button>
           </div>
         </form>

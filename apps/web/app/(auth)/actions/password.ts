@@ -59,8 +59,9 @@ export async function requestPasswordReset(
     return { error: authRateLimitErrorMessage(rateLimit.retryAfterSeconds) };
   }
 
+  const authSupabase = await createClient({ forwardedIp: clientIp });
   const redirectTo = await getPasswordResetRedirectUrl();
-  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+  const { error } = await authSupabase.auth.resetPasswordForEmail(email, {
     redirectTo,
   });
 

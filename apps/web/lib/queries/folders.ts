@@ -1,6 +1,7 @@
 import type { FolderWithDocs } from "@stlvex/database/types";
 
 import { createTeamDocumentationTreeQueryOptions } from "@/lib/queries/shared/folders";
+import { throwIfRateLimited } from "@/lib/queries/api-response";
 
 export type CreateFolderPayload = {
   name: string;
@@ -30,6 +31,8 @@ export async function createFolderFromApi(
     body: JSON.stringify(payload),
   });
 
+  throwIfRateLimited(response);
+
   const body = (await response.json()) as FolderWithDocs | { error?: string };
 
   if (!response.ok) {
@@ -51,6 +54,8 @@ export async function updateFolderFromApi(
     body: JSON.stringify({ name }),
   });
 
+  throwIfRateLimited(response);
+
   const body = (await response.json()) as FolderWithDocs | { error?: string };
 
   if (!response.ok) {
@@ -66,6 +71,8 @@ export async function deleteFolderFromApi(folderId: string): Promise<void> {
   const response = await fetch(`/api/folders/${folderId}`, {
     method: "DELETE",
   });
+
+  throwIfRateLimited(response);
 
   if (!response.ok) {
     const body = (await response.json()) as { error?: string };

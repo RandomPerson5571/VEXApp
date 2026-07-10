@@ -4,11 +4,16 @@ const getCurrentUserMock = vi.hoisted(() => vi.fn());
 const getTeamDayPlansMock = vi.hoisted(() => vi.fn());
 const setTeamDayPlanMock = vi.hoisted(() => vi.fn());
 const clearTeamDayPlanMock = vi.hoisted(() => vi.fn());
+const enforceApiRateLimitMock = vi.hoisted(() => vi.fn());
 
 vi.mock("server-only", () => ({}));
 
 vi.mock("@/lib/auth/current-user", () => ({
   getCurrentUser: getCurrentUserMock,
+}));
+
+vi.mock("@/lib/security/enforce-api-rate-limit", () => ({
+  enforceApiRateLimit: enforceApiRateLimitMock,
 }));
 
 vi.mock("@/lib/queries/day-plans.server", () => ({
@@ -40,6 +45,7 @@ function mockCurrentUser(overrides: { teamId?: string | null } = {}) {
 describe("api/day-plans", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    enforceApiRateLimitMock.mockResolvedValue(null);
   });
 
   describe("GET", () => {
@@ -115,12 +121,37 @@ describe("api/day-plans", () => {
         date: PLAN_DATE,
         type: "build",
       });
+      expect(enforceApiRateLimitMock).toHaveBeenCalledWith(
+        expect.any(Request),
+        USER_ID,
+        "team",
+      );
       expect(setTeamDayPlanMock).toHaveBeenCalledWith({
         teamId: TEAM_ID,
         date: PLAN_DATE,
         type: "build",
         createdBy: USER_ID,
       });
+    });
+
+    it("returns 429 when the rate limit is exceeded", async () => {
+      getCurrentUserMock.mockResolvedValue(mockCurrentUser());
+      enforceApiRateLimitMock.mockResolvedValue(
+        new Response(JSON.stringify({ error: "Too many requests. Please try again later." }), {
+          status: 429,
+          headers: { "Retry-After": "30" },
+        }),
+      );
+
+      const response = await PUT(
+        new Request("http://localhost/api/day-plans", {
+          method: "PUT",
+          body: JSON.stringify({ date: PLAN_DATE, type: "build" }),
+        }),
+      );
+
+      expect(response.status).toBe(429);
+      expect(setTeamDayPlanMock).not.toHaveBeenCalled();
     });
 
     it("updates the day plan type for an existing date", async () => {

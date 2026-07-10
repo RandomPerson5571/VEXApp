@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { getCurrentUser } from "@/lib/auth/current-user";
+import { enforceApiRateLimit } from "@/lib/security/enforce-api-rate-limit";
 import {
   clearTeamDayPlan,
   getTeamDayPlans,
@@ -62,6 +63,13 @@ export async function PUT(request: Request) {
     );
   }
 
+  const limited = await enforceApiRateLimit(
+    request,
+    currentUser.profile.id,
+    "team",
+  );
+  if (limited) return limited;
+
   let body: SetDayPlanRequestBody;
 
   try {
@@ -113,6 +121,13 @@ export async function DELETE(request: Request) {
       { status: 400 },
     );
   }
+
+  const limited = await enforceApiRateLimit(
+    request,
+    currentUser.profile.id,
+    "team",
+  );
+  if (limited) return limited;
 
   const { searchParams } = new URL(request.url);
   const date = parsePlanDate(searchParams.get("date") ?? undefined);

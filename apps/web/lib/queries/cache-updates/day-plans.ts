@@ -1,7 +1,7 @@
 import type { QueryClient } from "@tanstack/react-query";
 
 import { queryKeys } from "@/lib/query-client";
-import type { TeamDayPlan } from "@/lib/types/team";
+import type { DayPlanType, TeamDayPlan } from "@/lib/types/team";
 
 /** Pure merge: replace or append a plan keyed by date. */
 export function mergeDayPlanInList(
@@ -45,4 +45,40 @@ export function removeDayPlanFromListCache(
     queryKeys.dayPlans.forTeam(teamId),
     (old) => (old ? removeDayPlanFromList(old, date) : old),
   );
+}
+
+export function optimisticallySetDayPlan(
+  queryClient: QueryClient,
+  teamId: string,
+  date: string,
+  type: DayPlanType,
+): TeamDayPlan[] | undefined {
+  const queryKey = queryKeys.dayPlans.forTeam(teamId);
+  const previous = queryClient.getQueryData<TeamDayPlan[]>(queryKey);
+  const optimistic: TeamDayPlan = {
+    id: `optimistic-${date}`,
+    date,
+    type,
+  };
+
+  queryClient.setQueryData<TeamDayPlan[]>(queryKey, (old) =>
+    old ? mergeDayPlanInList(old, optimistic) : [optimistic],
+  );
+
+  return previous;
+}
+
+export function optimisticallyClearDayPlan(
+  queryClient: QueryClient,
+  teamId: string,
+  date: string,
+): TeamDayPlan[] | undefined {
+  const queryKey = queryKeys.dayPlans.forTeam(teamId);
+  const previous = queryClient.getQueryData<TeamDayPlan[]>(queryKey);
+
+  queryClient.setQueryData<TeamDayPlan[]>(queryKey, (old) =>
+    old ? removeDayPlanFromList(old, date) : old,
+  );
+
+  return previous;
 }

@@ -21,6 +21,7 @@ import type {
 } from "@stlvex/database/types";
 
 const TASK_STATUS_OPTIONS: TaskStatus[] = ["NotStarted", "InProgress", "Done"];
+const TASK_PRIORITY_OPTIONS: TaskPriority[] = ["Low", "Medium", "High"];
 
 const statusConfig: Record<
   TaskStatus,
@@ -178,6 +179,58 @@ export function TaskPriorityBadge({ priority }: { priority: TaskPriority | null 
     >
       {config.label}
     </span>
+  );
+}
+
+type TaskPriorityPickerProps = {
+  priority: TaskPriority | null;
+  onPriorityChange: (priority: TaskPriority) => void | Promise<void>;
+  disabled?: boolean;
+};
+
+export function TaskPriorityPicker({
+  priority,
+  onPriorityChange,
+  disabled = false,
+}: TaskPriorityPickerProps) {
+  if (!priority) return null;
+
+  const config = priorityConfig[priority];
+
+  return (
+    <Select
+      value={priority}
+      onValueChange={(value) => {
+        void onPriorityChange(value as TaskPriority);
+      }}
+      disabled={disabled}
+    >
+      <SelectTrigger
+        aria-label="Change task priority"
+        className={`h-auto w-auto gap-1 rounded-md border px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide shadow-none transition hover:brightness-110 focus:ring-2 focus:ring-blue-500/30 data-[placeholder]:text-inherit [&_svg:last-child]:h-3 [&_svg:last-child]:w-3 [&_svg:last-child]:opacity-60 ${config.className}`}
+      >
+        <SelectValue />
+      </SelectTrigger>
+      <SelectContent className="min-w-[9rem] border-slate-200 bg-white text-slate-800 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-200">
+        {TASK_PRIORITY_OPTIONS.map((option) => {
+          const optionConfig = priorityConfig[option];
+
+          return (
+            <SelectItem
+              key={option}
+              value={option}
+              className="pr-2 text-xs font-semibold focus:bg-slate-100 focus:text-slate-950 dark:focus:bg-slate-800 dark:focus:text-slate-100 [&>span:first-child]:hidden"
+            >
+              <span
+                className={`inline-flex items-center rounded-md border px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide ${optionConfig.className}`}
+              >
+                {optionConfig.label}
+              </span>
+            </SelectItem>
+          );
+        })}
+      </SelectContent>
+    </Select>
   );
 }
 

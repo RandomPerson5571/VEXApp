@@ -4,8 +4,10 @@ import Link from "next/link";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useMemo, useState } from "react";
 import type { CalendarEvent } from "@/lib/types/team";
+import { isQueryInitiallyLoading } from "@/lib/hooks/use-query-loading";
 import { useTeamEvents } from "@/lib/hooks/use-team-events";
 import { formatMonthYear, getDaysInMonth, getTodayDateStr } from "@/lib/utils/calendar";
+import { DashboardRowSkeleton } from "./dashboard-skeletons";
 
 const WEEKDAY_LABELS = ["S", "M", "T", "W", "T", "F", "S"];
 
@@ -18,7 +20,9 @@ const eventDotClass: Record<CalendarEvent["type"], string> = {
 };
 
 export function TeamCalendarWidget() {
-  const { data: events = [], isLoading } = useTeamEvents();
+  const eventsQuery = useTeamEvents();
+  const { data: events = [] } = eventsQuery;
+  const isInitialLoading = isQueryInitiallyLoading(eventsQuery);
   const today = getTodayDateStr();
   const [currentMonth, setCurrentMonth] = useState(() => {
     const now = new Date();
@@ -86,10 +90,15 @@ export function TeamCalendarWidget() {
         ))}
       </div>
 
-      <div
-        className={`grid grid-cols-7 gap-1 text-center pt-2 ${isLoading ? "opacity-60" : ""}`}
-      >
-        {daysGrid.map((cell) => {
+      <div className="grid grid-cols-7 gap-1 pt-2 text-center">
+        {isInitialLoading
+          ? daysGrid.map((cell) => (
+              <div
+                key={cell.dateStr}
+                className="h-8 animate-pulse rounded-3xl bg-slate-100 dark:bg-slate-950/60"
+              />
+            ))
+          : daysGrid.map((cell) => {
           const dayEvents = eventsByDate.get(cell.dateStr) ?? [];
           const isSelectedDay = cell.dateStr === today;
 

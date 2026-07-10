@@ -7,9 +7,14 @@ import {
 } from "../../helpers/auth/test-database";
 
 const verifyCurrentUserPermissionsMock = vi.hoisted(() => vi.fn());
+const getCurrentUserMock = vi.hoisted(() => vi.fn());
 
 vi.mock("@/lib/auth/auth-guards-server", () => ({
   verifyCurrentUserPermissions: verifyCurrentUserPermissionsMock,
+}));
+
+vi.mock("@/lib/auth/current-user", () => ({
+  getCurrentUser: getCurrentUserMock,
 }));
 
 import { POST } from "@/app/api/inventory/route";
@@ -21,6 +26,7 @@ describeIntegration("POST /api/inventory integration", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    getCurrentUserMock.mockResolvedValue({ profile: { id: "admin-user" } });
   });
 
   afterEach(async () => {

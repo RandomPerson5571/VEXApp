@@ -7,6 +7,7 @@ import {
   canDelegateTeamLeaders,
   verifyUserPermissions,
 } from "@/lib/auth/auth-guards";
+import { isQueryInitiallyLoading } from "@/lib/hooks/use-query-loading";
 import {
   useCreateDocumentation,
   useCreateFolder,
@@ -26,6 +27,8 @@ import {
   findNextDocId,
   hasAnyDocsInTree,
 } from "@/components/documents/docs-view-utils";
+import { DOC_SELECTION_DELAY_MS } from "@/lib/constants/request-timing";
+import { useDebouncedValue } from "@/lib/hooks/use-debounced-value";
 
 export function useDocsView() {
   const user = useUser();
@@ -33,16 +36,21 @@ export function useDocsView() {
   const team = useTeam();
   const teamId = team?.id;
 
+  const treeQuery = useTeamDocumentationTree();
   const {
     data: folders = [],
-    isLoading: isTreeLoading,
     isError: isTreeError,
-  } = useTeamDocumentationTree();
+  } = treeQuery;
+  const isTreeLoading = isQueryInitiallyLoading(treeQuery);
 
   const [expandedFolderIds, setExpandedFolderIds] = useState<Set<string>>(
     () => new Set(),
   );
   const [selectedDocId, setSelectedDocId] = useState<string | null>(null);
+  const debouncedSelectedDocId = useDebouncedValue(
+    selectedDocId,
+    DOC_SELECTION_DELAY_MS,
+  );
 
   const [isFolderModalOpen, setIsFolderModalOpen] = useState(false);
   const [folderName, setFolderName] = useState("");
@@ -60,11 +68,13 @@ export function useDocsView() {
     null,
   );
 
+  const detailQuery = useDocumentationDetail(debouncedSelectedDocId);
   const {
     data: docDetail,
-    isLoading: isDetailLoading,
     isError: isDetailError,
-  } = useDocumentationDetail(selectedDocId);
+  } = detailQuery;
+  const isDetailLoading =
+    debouncedSelectedDocId !== null && isQueryInitiallyLoading(detailQuery);
 
   const createFolderMutation = useCreateFolder();
   const createDocumentationMutation = useCreateDocumentation();

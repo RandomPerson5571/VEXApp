@@ -24,6 +24,25 @@ export type AuthState = {
   error: string;
 } | null;
 
+export type ResendConfirmationState =
+  | { error: string }
+  | { success: string }
+  | null;
+
+const SIGNUP_EMAIL_REDIRECT_PATH = "/auth/callback?next=/onboarding";
+
+function getEmailFromForm(formData: FormData): string | null {
+  const email = formData.get("email");
+
+  if (typeof email !== "string") {
+    return null;
+  }
+
+  const trimmed = email.trim();
+
+  return trimmed.length > 0 ? trimmed : null;
+}
+
 function getRedirectPath(formData: FormData) {
   return getSafeRedirectPath(formData.get("redirectTo")?.toString());
 }
@@ -104,7 +123,7 @@ export async function signInWithCredentials(
     return { error: authRateLimitErrorMessage(rateLimit.retryAfterSeconds) };
   }
 
-  const supabase = await createClient();
+  const supabase = await createClient({ forwardedIp: clientIp });
   const { error } = await supabase.auth.signInWithPassword({
     email,
     password,
@@ -156,7 +175,7 @@ export async function signInWithDiscord(
     return { error: authRateLimitErrorMessage(rateLimit.retryAfterSeconds) };
   }
 
-  const supabase = await createClient();
+  const supabase = await createClient({ forwardedIp: clientIp });
   const siteUrl = "https://stlvexapp.guanine.org";
 
   // Login flow: no invite required upfront. Existing profiles proceed at callback;
@@ -225,7 +244,7 @@ export async function signUpWithCredentials(
     return { error: authRateLimitErrorMessage(rateLimit.retryAfterSeconds) };
   }
 
-  const supabase = await createClient();
+  const supabase = await createClient({ forwardedIp: clientIp });
   const siteUrl = "https://stlvexapp.guanine.org";
 
   const { data, error } = await supabase.auth.signUp({
@@ -233,7 +252,7 @@ export async function signUpWithCredentials(
     password,
     options: {
       data: { invite_code: invite.id },
-      emailRedirectTo: `${siteUrl}/auth/callback?next=/onboarding`,
+      emailRedirectTo: `${siteUrl}${SIGNUP_EMAIL_REDIRECT_PATH}`,
     },
   });
 
@@ -254,8 +273,64 @@ export async function signUpWithCredentials(
   redirect(
     `/onboarding?message=${encodeURIComponent(
       "Check your email to confirm your account.",
-    )}&next=${encodeURIComponent(redirectTo)}`,
+    )}&email=${encodeURIComponent(email)}&next=${encodeURIComponent(redirectTo)}`,
   );
+}
+
+export async function resendSignupConfirmation(
+  _prevState: ResendConfirmationState,
+  formData: FormData,
+): Promise<ResendConfirmationState> {
+  const clientIp = await getServerActionClientIp();
+  const supabase = await createClient({ forwardedIp: clientIp });
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  const emailFromForm = getEmailFromForm(formData);
+  const email = user?.email ?? emailFromForm;
+
+  if (!email) {
+    return { error: "Enter the email address you used to sign up." };
+  }
+
+  if (user?.email && emailFromForm && emailFromForm !== user.email) {
+    return {
+      error:
+        "Confirmation emails can only be resent to your signed-in email address.",
+    };
+  }
+
+  if (user?.email_confirmed_at) {
+    return { error: "Your email is already confirmed." };
+  }
+
+  const rateLimit = await enforceAuthRateLimit("signup", {
+    ip: clientIp,
+    email,
+  });
+
+  if (!rateLimit.ok) {
+    return { error: authRateLimitErrorMessage(rateLimit.retryAfterSeconds) };
+  }
+
+  const siteUrl = "https://stlvexapp.guanine.org";
+  const { error } = await supabase.auth.resend({
+    type: "signup",
+    email,
+    options: {
+      emailRedirectTo: `${siteUrl}${SIGNUP_EMAIL_REDIRECT_PATH}`,
+    },
+  });
+
+  if (error) {
+    return { error: error.message };
+  }
+
+  return {
+    success:
+      "Confirmation email sent. Check your inbox and spam folder.",
+  };
 }
 
 export async function signUpWithDiscord(
@@ -277,7 +352,7 @@ export async function signUpWithDiscord(
     return { error: authRateLimitErrorMessage(rateLimit.retryAfterSeconds) };
   }
 
-  const supabase = await createClient();
+  const supabase = await createClient({ forwardedIp: clientIp });
   const siteUrl = "https://stlvexapp.guanine.org";
 
   const { data, error } = await supabase.auth.signInWithOAuth({

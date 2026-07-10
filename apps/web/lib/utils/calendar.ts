@@ -168,9 +168,9 @@ export function combineDateAndTime(dateStr: string, timeStr: string): Date | nul
   return new Date(year, month - 1, day, hours, minutes);
 }
 
-export const SCHEDULE_HOUR_START = 6;
-export const SCHEDULE_HOUR_END = 22;
-export const SCHEDULE_HOUR_HEIGHT = 52;
+export const SCHEDULE_HOUR_START = 0;
+export const SCHEDULE_HOUR_END = 23;
+export const SCHEDULE_HOUR_HEIGHT = 44;
 
 export function getScheduleHours(): number[] {
   const hours: number[] = [];

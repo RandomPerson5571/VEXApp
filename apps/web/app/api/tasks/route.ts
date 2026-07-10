@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { getCurrentUser } from "@/lib/auth/current-user";
+import { enforceApiRateLimit } from "@/lib/security/enforce-api-rate-limit";
 import { createTeamTask, getTeamTasks } from "@/lib/queries/tasks.server";
 import type { TaskPriority, TaskType } from "@stlvex/database/types";
 
@@ -51,6 +52,13 @@ export async function POST(request: Request) {
       { status: 400 },
     );
   }
+
+  const limited = await enforceApiRateLimit(
+    request,
+    currentUser.profile.id,
+    "team",
+  );
+  if (limited) return limited;
 
   let body: CreateTaskRequestBody;
 

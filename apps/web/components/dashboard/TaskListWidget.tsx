@@ -13,6 +13,7 @@ import {
 import type { DashboardTask, TaskListAssignee } from "@stlvex/database/types";
 import { useDashboardSummary } from "@/lib/hooks/use-dashboard-summary";
 import { useDashboardTasks } from "@/lib/hooks/use-dashboard-tasks";
+import { isQueryInitiallyLoading } from "@/lib/hooks/use-query-loading";
 import {
   TaskPriorityBadge,
   TaskStatusDot,
@@ -24,6 +25,7 @@ import {
   getTaskAssignees,
   isOverdue,
 } from "@/components/tasks/task-list-utils";
+import { DashboardRowSkeleton } from "./dashboard-skeletons";
 
 function AssigneeStack({ assignees }: { assignees: TaskListAssignee[] }) {
   if (assignees.length === 0) {
@@ -114,18 +116,20 @@ export type TaskListWidgetProps = {
 };
 
 export function TaskListWidget({ maxItems = 4 }: TaskListWidgetProps) {
-  const { data: tasks = [], isLoading: tasksLoading } = useDashboardTasks();
-  const { data: summary, isLoading: summaryLoading } = useDashboardSummary();
-  const isLoading = tasksLoading || summaryLoading;
+  const tasksQuery = useDashboardTasks();
+  const summaryQuery = useDashboardSummary();
+  const { data: tasks = [] } = tasksQuery;
+  const { data: summary } = summaryQuery;
+  const isInitialLoading =
+    isQueryInitiallyLoading(tasksQuery) ||
+    isQueryInitiallyLoading(summaryQuery);
   const displayTasks = tasks.slice(0, maxItems);
   const activeCount = summary?.incompleteTasks ?? 0;
   const overdueCount = summary?.overdueTasks ?? 0;
   const completedCount = summary?.completedTasks ?? 0;
 
   return (
-    <div
-      className={`relative overflow-hidden rounded-[32px] border border-slate-200 dark:border-white/10 bg-white dark:bg-[#091126]/80 p-6 shadow-[0_24px_80px_rgba(0,0,0,0.08)] dark:shadow-[0_24px_80px_rgba(0,0,0,0.35)] ${isLoading ? "opacity-60" : ""}`}
-    >
+    <div className="relative overflow-hidden rounded-[32px] border border-slate-200 dark:border-white/10 bg-white dark:bg-[#091126]/80 p-6 shadow-[0_24px_80px_rgba(0,0,0,0.08)] dark:shadow-[0_24px_80px_rgba(0,0,0,0.35)]">
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(56,189,248,0.16),transparent_35%)]"
@@ -156,23 +160,36 @@ export function TaskListWidget({ maxItems = 4 }: TaskListWidgetProps) {
         </div>
 
         <div className="mb-4 flex flex-wrap gap-2">
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-blue-400/20 bg-blue-500/10 px-3 py-1.5 text-[10px] font-bold text-blue-600 dark:text-blue-300">
-            <Clock className="h-3 w-3" />
-            {activeCount} active
-          </span>
-          {overdueCount > 0 ? (
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-red-400/20 bg-red-500/10 px-3 py-1.5 text-[10px] font-bold text-red-600 dark:text-red-300">
-              <AlertCircle className="h-3 w-3" />
-              {overdueCount} overdue
-            </span>
-          ) : null}
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-400/20 bg-emerald-500/10 px-3 py-1.5 text-[10px] font-bold text-emerald-600 dark:text-emerald-300">
-            {completedCount} completed
-          </span>
+          {isInitialLoading ? (
+            <>
+              <div className="h-7 w-24 animate-pulse rounded-full bg-slate-100 dark:bg-slate-950/60" />
+              <div className="h-7 w-28 animate-pulse rounded-full bg-slate-100 dark:bg-slate-950/60" />
+            </>
+          ) : (
+            <>
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-blue-400/20 bg-blue-500/10 px-3 py-1.5 text-[10px] font-bold text-blue-600 dark:text-blue-300">
+                <Clock className="h-3 w-3" />
+                {activeCount} active
+              </span>
+              {overdueCount > 0 ? (
+                <span className="inline-flex items-center gap-1.5 rounded-full border border-red-400/20 bg-red-500/10 px-3 py-1.5 text-[10px] font-bold text-red-600 dark:text-red-300">
+                  <AlertCircle className="h-3 w-3" />
+                  {overdueCount} overdue
+                </span>
+              ) : null}
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-400/20 bg-emerald-500/10 px-3 py-1.5 text-[10px] font-bold text-emerald-600 dark:text-emerald-300">
+                {completedCount} completed
+              </span>
+            </>
+          )}
         </div>
 
         <div className="space-y-2.5 motion-safe:[&>*]:animate-in motion-safe:[&>*]:fade-in motion-safe:[&>*]:slide-in-from-bottom-1 motion-safe:[&>*]:duration-300">
-          {displayTasks.length === 0 ? (
+          {isInitialLoading ? (
+            Array.from({ length: maxItems }).map((_, index) => (
+              <DashboardRowSkeleton key={index} className="h-[88px]" />
+            ))
+          ) : displayTasks.length === 0 ? (
             <div className="rounded-3xl border border-slate-300 dark:border-white/10 bg-slate-100 dark:bg-slate-950/60 px-4 py-8 text-center">
               <p className="text-sm font-bold text-slate-900 dark:text-white">All caught up</p>
               <p className="mt-1 text-[11px] text-slate-600 dark:text-slate-400">No open tasks right now.</p>

@@ -1,6 +1,7 @@
 import type { TeamInventoryItem } from "@stlvex/database/types";
 
 import { createTeamInventoryQueryOptions } from "@/lib/queries/shared/inventory";
+import { throwIfRateLimited } from "@/lib/queries/api-response";
 
 export type CreateInventoryItemPayload = {
   name: string;
@@ -27,6 +28,8 @@ export async function createInventoryItemFromApi(
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),
   });
+
+  throwIfRateLimited(response);
 
   const body = (await response.json()) as TeamInventoryItem | { error?: string };
 

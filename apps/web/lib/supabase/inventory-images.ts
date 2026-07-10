@@ -1,97 +1,56 @@
-import { createClient } from "@supabase/supabase-js";
-
-import { getSupabaseAnonKey, getSupabaseUrl } from "@/lib/supabase/env";
-
-const INVENTORY_IMAGES_BUCKET = "inventory-images";
-const SIGNED_URL_TTL_SECONDS = 60 * 60;
-
-function isAbsoluteUrl(value: string): boolean {
-  return /^https?:\/\//i.test(value);
-}
-
-function normalizeStoragePath(value: string): string {
-  const trimmed = value.trim().replace(/^\/+/, "");
-  const bucketPrefix = `${INVENTORY_IMAGES_BUCKET}/`;
-
-  if (trimmed.startsWith(bucketPrefix)) {
-    return trimmed.slice(bucketPrefix.length);
-  }
-
-  return trimmed;
-}
-
-function createStorageClient() {
-  return createClient(getSupabaseUrl(), getSupabaseAnonKey(), {
-    auth: {
-      autoRefreshToken: false,
-      persistSession: false,
-    },
-  });
-}
-
-function getPublicUrlForPath(
-  supabase: ReturnType<typeof createStorageClient>,
-  path: string,
-): string {
-  const { data } = supabase.storage
-    .from(INVENTORY_IMAGES_BUCKET)
-    .getPublicUrl(path);
-
-  return data.publicUrl;
-}
+import { throwIfRateLimited } from "@/lib/queries/api-response";
 
 /**
  * Resolves stored object paths (or existing URLs) to fetchable image URLs
- * using a single batched Storage request for all bucket paths.
+ * through the rate-limited Next.js API route.
  */
 export async function resolveInventoryImageUrls(
   imageUrls: readonly (string | null | undefined)[],
 ): Promise<(string | null)[]> {
   if (imageUrls.length === 0) return [];
 
-  const supabase = createStorageClient();
-  const resolved: (string | null)[] = new Array(imageUrls.length).fill(null);
-  const storagePaths: { index: number; path: string }[] = [];
-
-  imageUrls.forEach((imageUrl, index) => {
-    if (!imageUrl) return;
-
-    if (isAbsoluteUrl(imageUrl)) {
-      resolved[index] = imageUrl;
-      return;
-    }
-
-    storagePaths.push({
-      index,
-      path: normalizeStoragePath(imageUrl),
-    });
+  const paths = imageUrls.map((imageUrl) => imageUrl ?? "");
+  const response = await fetch("/api/inventory/signed-urls", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ paths }),
   });
 
-  if (storagePaths.length === 0) return resolved;
+  throwIfRateLimited(response);
 
-  const { data, error } = await supabase.storage
-    .from(INVENTORY_IMAGES_BUCKET)
-    .createSignedUrls(
-      storagePaths.map(({ path }) => path),
-      SIGNED_URL_TTL_SECONDS,
-    );
-
-  if (error || !data) {
-    for (const { index, path } of storagePaths) {
-      resolved[index] = getPublicUrlForPath(supabase, path);
-    }
-    return resolved;
+  if (!response.ok) {
+    throw new Error("Failed to resolve inventory image URLs.");
   }
 
-  for (let i = 0; i < storagePaths.length; i++) {
-    const { index, path } = storagePaths[i];
-    const signed = data[i];
+  const body = (await response.json()) as { urls?: (string | null)[] };
+  return body.urls ?? paths.map(() => null);
+}
 
-    resolved[index] =
-      signed?.signedUrl && !signed.error
-        ? signed.signedUrl
-        : getPublicUrlForPath(supabase, path);
+/** Uploads an image via the rate-limited Next.js API route. */
+export async function uploadInventoryImage(file: File): Promise<string> {
+  if (!file.type.startsWith("image/")) {
+    throw new Error("File must be an image.");
   }
 
-  return resolved;
+  const formData = new FormData();
+  formData.set("file", file);
+
+  const response = await fetch("/api/inventory/upload", {
+    method: "POST",
+    body: formData,
+  });
+
+  throwIfRateLimited(response);
+
+  const body = (await response.json()) as { path?: string; error?: string };
+
+  if (!response.ok) {
+    throw new Error(body.error ?? "Failed to upload image.");
+  }
+
+  if (!body.path) {
+    throw new Error("Failed to upload image.");
+  }
+
+  return body.path;
 }

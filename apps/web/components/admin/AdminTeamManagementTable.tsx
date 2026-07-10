@@ -52,6 +52,10 @@ import {
   adminTableRowClassName,
 } from "./AdminPanelPrimitives";
 import { ConfirmationDialog } from "@/components/ui/ConfirmationDialog";
+import { ADMIN_INLINE_SAVE_DELAY_MS } from "@/lib/constants/request-timing";
+import { RateLimitError } from "@/lib/errors/rate-limit-error";
+import { useDebouncedSaver } from "@/lib/hooks/use-debounced-saver";
+import { throwIfRateLimited } from "@/lib/queries/api-response";
 import { type AdminTeamRow } from "./admin-types";
 
 type AdminTeamManagementTableProps = {
@@ -187,6 +191,8 @@ export function AdminTeamManagementTable({
         body: JSON.stringify({ teamId, ...updates }),
       });
 
+      throwIfRateLimited(response);
+
       const payload = (await response.json()) as AdminTeamRow & { error?: string };
 
       if (!response.ok) {
@@ -196,14 +202,27 @@ export function AdminTeamManagementTable({
       onTeamUpdated(payload);
     } catch (updateError) {
       onError(
-        updateError instanceof Error
+        updateError instanceof RateLimitError
           ? updateError.message
-          : "Failed to update team.",
+          : updateError instanceof Error
+            ? updateError.message
+            : "Failed to update team.",
       );
     } finally {
       setPendingTeamId(null);
     }
   }
+
+  const scheduleTeamUpdate = useDebouncedSaver<
+    {
+      name?: string;
+      number?: string;
+      discordServerId?: string | null;
+      discordRoleId?: string | null;
+    }
+  >(ADMIN_INLINE_SAVE_DELAY_MS, async (teamId, updates) => {
+    await updateTeam(teamId, updates);
+  });
 
   function handleTeamFieldBlur(
     team: AdminTeamRow,
@@ -218,7 +237,7 @@ export function AdminTeamManagementTable({
         return;
       }
 
-      void updateTeam(team.id, {
+      void scheduleTeamUpdate(team.id, {
         [field]: field === "number" ? trimmed.toUpperCase() : trimmed,
       });
       return;
@@ -230,7 +249,7 @@ export function AdminTeamManagementTable({
       return;
     }
 
-    void updateTeam(team.id, { [field]: nextValue });
+    void scheduleTeamUpdate(team.id, { [field]: nextValue });
   }
 
   function resetCreateForm() {

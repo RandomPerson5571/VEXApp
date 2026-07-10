@@ -10,5 +10,6 @@ export function createDashboardSummaryQueryOptions(
   return queryOptions({
     queryKey: queryKeys.dashboard.summary(teamId),
     queryFn,
+    placeholderData: (previousData) => previousData,
   });
 }

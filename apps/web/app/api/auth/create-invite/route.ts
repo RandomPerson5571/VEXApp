@@ -4,6 +4,7 @@ import { NextResponse } from "next/server";
 import { canCreateInvites } from "@/lib/auth/auth-guards";
 import { getCurrentUser } from "@/lib/auth/current-user";
 import { verifyCurrentUserPermissions } from "@/lib/auth/auth-guards-server";
+import { enforceApiRateLimit } from "@/lib/security/enforce-api-rate-limit";
 
 export async function POST(req: Request) {
   const currentUser = await getCurrentUser();
@@ -11,6 +12,13 @@ export async function POST(req: Request) {
   if (!currentUser) {
     return NextResponse.json({ error: "Authentication required." }, { status: 401 });
   }
+
+  const limited = await enforceApiRateLimit(
+    req,
+    currentUser.profile.id,
+    "invite",
+  );
+  if (limited) return limited;
 
   const body = await req.json().catch(() => null);
 

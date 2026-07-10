@@ -10,6 +10,7 @@ export function createTeamTasksQueryOptions(
   return queryOptions({
     queryKey: queryKeys.tasks.forTeam(teamId),
     queryFn,
+    placeholderData: (previousData) => previousData,
   });
 }
 
@@ -21,5 +22,6 @@ export function createDashboardTasksQueryOptions(
   return queryOptions({
     queryKey: queryKeys.dashboard.tasks(teamId, limit),
     queryFn,
+    placeholderData: (previousData) => previousData,
   });
 }

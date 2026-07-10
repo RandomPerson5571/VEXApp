@@ -4,9 +4,11 @@ import { Mail } from "lucide-react";
 import { useActionState } from "react";
 
 import {
+  resendSignupConfirmation,
   signUpWithDiscord,
   signUpWithCredentials,
   type AuthState,
+  type ResendConfirmationState,
 } from "@/app/(auth)/actions/auth";
 import { SignupForm } from "@/components/auth/SignupForm";
 import { completeOnboarding, type OnboardingState } from "./actions";
@@ -19,6 +21,7 @@ type OnboardingClientProps = {
   redirectTo: string;
   needsEmailConfirmation: boolean;
   message?: string;
+  pendingEmail?: string;
 };
 
 export function OnboardingClient({
@@ -29,6 +32,7 @@ export function OnboardingClient({
   redirectTo,
   needsEmailConfirmation,
   message,
+  pendingEmail,
 }: OnboardingClientProps) {
   const [signupState, signupAction, signupPending] = useActionState<
     AuthState,
@@ -38,10 +42,17 @@ export function OnboardingClient({
     AuthState,
     FormData
   >(signUpWithDiscord, null);
+  const [resendState, resendAction, resendPending] = useActionState<
+    ResendConfirmationState,
+    FormData
+  >(resendSignupConfirmation, null);
   const [profileState, profileAction, profilePending] = useActionState<
     OnboardingState,
     FormData
   >(completeOnboarding, null);
+
+  const showResendConfirmation = Boolean(message) || needsEmailConfirmation;
+  const resendEmail = authEmail ?? pendingEmail;
 
   if (step === "verify") {
     return (
@@ -54,6 +65,14 @@ export function OnboardingClient({
         redirectTo={redirectTo}
         pending={signupPending}
         discordPending={discordPending}
+        defaultEmail={pendingEmail}
+        resendAction={resendAction}
+        resendError={resendState && "error" in resendState ? resendState.error : null}
+        resendSuccess={
+          resendState && "success" in resendState ? resendState.success : null
+        }
+        resendPending={resendPending}
+        showResendConfirmation={showResendConfirmation}
       />
     );
   }
@@ -78,6 +97,32 @@ export function OnboardingClient({
             here to finish joining the team.
           </p>
         </div>
+
+        {resendState && "error" in resendState ? (
+          <div className="rounded-lg border border-red-900/40 bg-red-950/20 px-3 py-2 text-sm text-red-300 text-left">
+            {resendState.error}
+          </div>
+        ) : null}
+
+        {resendState && "success" in resendState ? (
+          <div className="rounded-lg border border-emerald-900/40 bg-emerald-950/20 px-3 py-2 text-sm text-emerald-300 text-left">
+            {resendState.success}
+          </div>
+        ) : null}
+
+        <form action={resendAction} className="space-y-3 text-left">
+          {resendEmail ? (
+            <input type="hidden" name="email" value={resendEmail} />
+          ) : null}
+          <button
+            type="submit"
+            disabled={resendPending || Boolean(resendState && "success" in resendState)}
+            className="w-full rounded-lg border border-slate-800 bg-slate-900 px-4 py-2.5 text-sm font-semibold text-slate-200 hover:bg-slate-800 disabled:opacity-60"
+          >
+            {resendPending ? "Sending..." : "Resend confirmation email"}
+          </button>
+        </form>
+
         <p className="text-xs text-slate-500">
           Joining {teamName} ({teamNumber})
         </p>

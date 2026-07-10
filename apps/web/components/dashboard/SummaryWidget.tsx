@@ -3,16 +3,24 @@
 import { AlertTriangle, Award, Calendar, Package, Wrench } from "lucide-react";
 
 import { useDashboardSummary } from "@/lib/hooks/use-dashboard-summary";
+import { isQueryInitiallyLoading } from "@/lib/hooks/use-query-loading";
+import { SummaryStatCardSkeleton } from "./dashboard-skeletons";
 import { SummaryStatCard } from "./SummaryStatCard";
 
 export function SummaryStatsGrid() {
-  const { data: stats, isLoading } = useDashboardSummary();
+  const summaryQuery = useDashboardSummary();
+  const { data: stats } = summaryQuery;
+  const isInitialLoading = isQueryInitiallyLoading(summaryQuery);
 
   if (!stats) {
     return (
-      <div
-        className={`grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5 mb-7 transition-opacity ${isLoading ? "opacity-40" : "opacity-100"}`}
-      />
+      <div className="mb-7 grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-4">
+        {isInitialLoading
+          ? Array.from({ length: 4 }).map((_, index) => (
+              <SummaryStatCardSkeleton key={index} />
+            ))
+          : null}
+      </div>
     );
   }
 

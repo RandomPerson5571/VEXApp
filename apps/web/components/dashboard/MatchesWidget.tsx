@@ -4,11 +4,15 @@ import Link from "next/link";
 import { ChevronRight } from "lucide-react";
 import { useMemo } from "react";
 
+import { isQueryInitiallyLoading } from "@/lib/hooks/use-query-loading";
 import { useTeamEvents } from "@/lib/hooks/use-team-events";
 import { toUpcomingMatches } from "@/lib/mappers/upcoming-matches";
+import { DashboardRowSkeleton } from "./dashboard-skeletons";
 
 export function UpcomingMatchesList() {
-  const { data: events = [], isLoading } = useTeamEvents();
+  const eventsQuery = useTeamEvents();
+  const { data: events = [] } = eventsQuery;
+  const isInitialLoading = isQueryInitiallyLoading(eventsQuery);
   const matches = useMemo(() => toUpcomingMatches(events), [events]);
 
   return (
@@ -25,8 +29,12 @@ export function UpcomingMatchesList() {
         </Link>
       </div>
 
-      <div className={`space-y-3 ${isLoading ? "opacity-60" : ""}`}>
-        {matches.length === 0 && !isLoading ? (
+      <div className="space-y-3">
+        {isInitialLoading ? (
+          Array.from({ length: 3 }).map((_, index) => (
+            <DashboardRowSkeleton key={index} className="h-[72px]" />
+          ))
+        ) : matches.length === 0 ? (
           <p className="text-[11px] text-slate-600 dark:text-slate-400 font-medium py-2">
             No upcoming matches scheduled.
           </p>

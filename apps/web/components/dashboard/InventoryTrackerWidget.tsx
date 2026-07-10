@@ -13,6 +13,7 @@ import {
 import type { TeamInventoryItem } from "@stlvex/database/types";
 import { InventoryItemImage } from "@/components/inventory/InventoryComponents";
 import { useTeam } from "@/components/providers/UserProvider";
+import { isQueryInitiallyLoading } from "@/lib/hooks/use-query-loading";
 import { useTeamInventory } from "@/lib/hooks/use-team-inventory";
 import {
   formatUpdatedAt,
@@ -22,6 +23,7 @@ import {
   summarizeInventory,
   type StockStatus,
 } from "@/lib/inventory/inventory-utils";
+import { DashboardRowSkeleton } from "./dashboard-skeletons";
 
 const statusBarClass: Record<StockStatus, string> = {
   nominal: "bg-emerald-500 shadow-[0_0_12px_rgba(16,185,129,0.35)]",
@@ -101,7 +103,9 @@ function InventoryRow({ item, index }: { item: TeamInventoryItem; index: number 
 export function InventoryTrackerWidget() {
   const team = useTeam();
   const teamId = team?.id ?? "";
-  const { data: items = [], isLoading } = useTeamInventory();
+  const inventoryQuery = useTeamInventory();
+  const { data: items = [] } = inventoryQuery;
+  const isInitialLoading = isQueryInitiallyLoading(inventoryQuery);
   const [search, setSearch] = useState("");
 
   const filteredItems = useMemo(() => {
@@ -151,25 +155,36 @@ export function InventoryTrackerWidget() {
       </div>
 
       <div className="relative mb-4 grid grid-cols-3 gap-3">
-        <SummaryPill
-          label="SKUs"
-          value={summary.totalSkus}
-          icon={Box}
-          tone="slate"
-        />
-        <SummaryPill
-          label="Available"
-          value={summary.availableUnits}
-          icon={Package}
-          tone="blue"
-        />
-        <SummaryPill
-          label="Alerts"
-          value={summary.alerts}
-          icon={AlertTriangle}
-          tone={summary.depleted > 0 ? "red" : summary.alerts > 0 ? "yellow" : "green"}
-          pulse={summary.depleted > 0}
-        />
+        {isInitialLoading
+          ? Array.from({ length: 3 }).map((_, index) => (
+              <div
+                key={index}
+                className="h-[4.25rem] animate-pulse rounded-3xl border border-slate-300 bg-slate-100 dark:border-white/10 dark:bg-slate-950/60"
+              />
+            ))
+          : (
+            <>
+              <SummaryPill
+                label="SKUs"
+                value={summary.totalSkus}
+                icon={Box}
+                tone="slate"
+              />
+              <SummaryPill
+                label="Available"
+                value={summary.availableUnits}
+                icon={Package}
+                tone="blue"
+              />
+              <SummaryPill
+                label="Alerts"
+                value={summary.alerts}
+                icon={AlertTriangle}
+                tone={summary.depleted > 0 ? "red" : summary.alerts > 0 ? "yellow" : "green"}
+                pulse={summary.depleted > 0}
+              />
+            </>
+          )}
       </div>
 
       <div className="relative mb-3 flex flex-col gap-2 sm:flex-row sm:items-center">
@@ -186,12 +201,9 @@ export function InventoryTrackerWidget() {
       </div>
 
       <div className="relative flex-1 space-y-2.5 overflow-y-auto pr-0.5 dashboard-scroll max-h-[340px]">
-        {isLoading ? (
+        {isInitialLoading ? (
           Array.from({ length: 4 }).map((_, index) => (
-            <div
-              key={index}
-              className="h-20 animate-pulse rounded-3xl border border-slate-300 bg-slate-100 dark:border-white/10 dark:bg-slate-950/60"
-            />
+            <DashboardRowSkeleton key={index} className="h-20" />
           ))
         ) : filteredItems.length === 0 ? (
           <div className="flex flex-col items-center justify-center rounded-3xl border border-slate-300 bg-slate-100 py-10 text-center dark:border-white/10 dark:bg-slate-950/60">

@@ -1,12 +1,15 @@
 "use client";
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useCallback, useRef } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 
 import { useTeam } from "@/components/providers/UserProvider";
+import { TOGGLE_MUTATION_DELAY_MS } from "@/lib/constants/request-timing";
+import { useDebouncedMutation } from "@/lib/hooks/use-debounced-mutation";
 import { queryKeys } from "@/lib/query-client";
 import {
-  mergeDayPlanInList,
-  removeDayPlanFromList,
+  optimisticallyClearDayPlan,
+  optimisticallySetDayPlan,
   removeDayPlanFromListCache,
   upsertDayPlanInList,
 } from "@/lib/queries/cache-updates/day-plans";
@@ -16,79 +19,104 @@ import {
 } from "@/lib/queries/day-plans";
 import type { DayPlanType, TeamDayPlan } from "@/lib/types/team";
 
+type DayPlanMutationInput =
+  | { action: "set"; date: string; type: DayPlanType }
+  | { action: "clear"; date: string };
+
 export function useTeamDayPlanMutations() {
   const team = useTeam();
   const teamId = team?.id;
   const queryClient = useQueryClient();
+  const rollbackSnapshotRef = useRef<TeamDayPlan[] | undefined>(undefined);
 
-  const setMutation = useMutation({
-    mutationFn: setDayPlanFromApi,
-    onMutate: async (variables) => {
-      if (!teamId) return {};
+  const captureRollbackSnapshot = useCallback(() => {
+    if (!teamId || rollbackSnapshotRef.current !== undefined) {
+      return;
+    }
 
-      const queryKey = queryKeys.dayPlans.forTeam(teamId);
-      await queryClient.cancelQueries({ queryKey });
+    rollbackSnapshotRef.current = queryClient.getQueryData<TeamDayPlan[]>(
+      queryKeys.dayPlans.forTeam(teamId),
+    );
+  }, [queryClient, teamId]);
 
-      const previous = queryClient.getQueryData<TeamDayPlan[]>(queryKey);
-      const optimistic: TeamDayPlan = {
-        id: `optimistic-${variables.date}`,
-        date: variables.date,
-        type: variables.type,
-      };
+  const clearRollbackSnapshot = useCallback(() => {
+    rollbackSnapshotRef.current = undefined;
+  }, []);
 
-      queryClient.setQueryData<TeamDayPlan[]>(queryKey, (old) =>
-        old ? mergeDayPlanInList(old, optimistic) : [optimistic],
-      );
-
-      return { previous, queryKey };
-    },
-    onSuccess: (plan) => {
-      if (teamId) {
-        upsertDayPlanInList(queryClient, teamId, plan);
+  const applyOptimistic = useCallback(
+    (input: DayPlanMutationInput) => {
+      if (!teamId) {
+        return;
       }
-    },
-    onError: (_error, _variables, context) => {
-      if (context?.previous && context?.queryKey) {
-        queryClient.setQueryData(context.queryKey, context.previous);
+
+      captureRollbackSnapshot();
+
+      if (input.action === "set") {
+        optimisticallySetDayPlan(queryClient, teamId, input.date, input.type);
+        return;
       }
+
+      optimisticallyClearDayPlan(queryClient, teamId, input.date);
     },
-  });
+    [captureRollbackSnapshot, queryClient, teamId],
+  );
 
-  const clearMutation = useMutation({
-    mutationFn: clearDayPlanFromApi,
-    onMutate: async (date) => {
-      if (!teamId) return {};
+  const { mutate, isPending, flush, cancel } =
+    useDebouncedMutation<DayPlanMutationInput>({
+      delayMs: TOGGLE_MUTATION_DELAY_MS,
+      applyOptimistic,
+      mutateFn: async (input) => {
+        if (input.action === "set") {
+          const plan = await setDayPlanFromApi({
+            date: input.date,
+            type: input.type,
+          });
 
-      const queryKey = queryKeys.dayPlans.forTeam(teamId);
-      await queryClient.cancelQueries({ queryKey });
+          if (teamId) {
+            upsertDayPlanInList(queryClient, teamId, plan);
+          }
+        } else {
+          await clearDayPlanFromApi(input.date);
 
-      const previous = queryClient.getQueryData<TeamDayPlan[]>(queryKey);
+          if (teamId) {
+            removeDayPlanFromListCache(queryClient, teamId, input.date);
+          }
+        }
 
-      queryClient.setQueryData<TeamDayPlan[]>(queryKey, (old) =>
-        old ? removeDayPlanFromList(old, date) : old,
-      );
+        clearRollbackSnapshot();
+      },
+      onError: () => {
+        if (!teamId || rollbackSnapshotRef.current === undefined) {
+          return;
+        }
 
-      return { previous, queryKey };
+        queryClient.setQueryData(
+          queryKeys.dayPlans.forTeam(teamId),
+          rollbackSnapshotRef.current,
+        );
+        clearRollbackSnapshot();
+      },
+    });
+
+  const setDayPlan = useCallback(
+    (date: string, type: DayPlanType) => {
+      mutate({ action: "set", date, type });
     },
-    onSuccess: (_data, date) => {
-      if (teamId) {
-        removeDayPlanFromListCache(queryClient, teamId, date);
-      }
+    [mutate],
+  );
+
+  const clearDayPlan = useCallback(
+    (date: string) => {
+      mutate({ action: "clear", date });
     },
-    onError: (_error, _variables, context) => {
-      if (context?.previous && context?.queryKey) {
-        queryClient.setQueryData(context.queryKey, context.previous);
-      }
-    },
-  });
+    [mutate],
+  );
 
   return {
-    setDayPlan: (date: string, type: DayPlanType) => {
-      setMutation.mutate({ date, type });
-    },
-    clearDayPlan: (date: string) => {
-      clearMutation.mutate(date);
-    },
-    isPending: setMutation.isPending || clearMutation.isPending,
+    setDayPlan,
+    clearDayPlan,
+    isPending,
+    flush,
+    cancel,
   };
 }

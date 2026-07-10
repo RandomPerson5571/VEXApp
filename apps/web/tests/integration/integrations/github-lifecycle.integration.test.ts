@@ -78,7 +78,9 @@ describeIntegration("GitHub integration lifecycle", () => {
   it("DELETE removes the integration row", async () => {
     await createTestGitHubIntegration(teamId);
 
-    const response = await DELETE();
+    const response = await DELETE(
+      new Request("https://example.test/api/team/github", { method: "DELETE" }),
+    );
     const body = await response.json();
 
     expect(response.status).toBe(200);

@@ -10,5 +10,6 @@ export function createTeamInventoryQueryOptions(
   return queryOptions({
     queryKey: queryKeys.inventory.forTeam(teamId),
     queryFn,
+    placeholderData: (previousData) => previousData,
   });
 }

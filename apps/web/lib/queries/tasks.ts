@@ -4,6 +4,7 @@ import {
   createDashboardTasksQueryOptions,
   createTeamTasksQueryOptions,
 } from "@/lib/queries/shared/tasks";
+import { throwIfRateLimited } from "@/lib/queries/api-response";
 
 export type CreateTaskPayload = {
   title: string;
@@ -19,6 +20,10 @@ export type UpdateTaskPayload = {
   title?: string;
   description?: string;
   status?: TaskStatus;
+  type?: TaskType;
+  priority?: TaskPriority;
+  dueDate?: string | null;
+  assigneeIds?: string[];
 };
 
 export async function fetchTeamTasksFromApi(): Promise<TaskListTask[]> {
@@ -50,6 +55,8 @@ export async function createTeamTaskFromApi(
     body: JSON.stringify(payload),
   });
 
+  throwIfRateLimited(response);
+
   const body = (await response.json()) as TaskListTask | { error?: string };
 
   if (!response.ok) {
@@ -70,6 +77,8 @@ export async function updateTeamTaskFromApi(
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
   });
+
+  throwIfRateLimited(response);
 
   const responseBody = (await response.json()) as TaskListTask | { error?: string };
 

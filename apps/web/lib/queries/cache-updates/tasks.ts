@@ -4,7 +4,10 @@ import { queryKeys } from "@/lib/query-client";
 import type { DashboardTask, TaskListTask } from "@stlvex/database/types";
 
 type TaskListPatch = Partial<
-  Pick<TaskListTask, "title" | "description" | "status">
+  Pick<
+    TaskListTask,
+    "title" | "description" | "status" | "type" | "priority" | "dueDate"
+  >
 >;
 
 /** Pure merge: replace one task in a team list by id. */

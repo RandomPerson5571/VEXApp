@@ -26,13 +26,10 @@ describeIntegration("day plans integration", () => {
   const PLAN_DATE = "2026-07-06";
 
   beforeEach(async () => {
-    const [teamA, teamB, user] = await Promise.all([
-      createTestTeam(),
-      createTestTeam(),
-      createTestUser(),
-    ]);
+    const [teamA, teamB] = await Promise.all([createTestTeam(), createTestTeam()]);
     teamAId = teamA.id;
     teamBId = teamB.id;
+    const user = await createTestUser(teamAId);
     userId = user.id;
   });
 

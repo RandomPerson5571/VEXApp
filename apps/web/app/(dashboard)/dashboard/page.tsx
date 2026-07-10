@@ -8,8 +8,9 @@ import { createQueryClient } from "@/lib/query-client";
 
 export default async function DashboardPage() {
   const currentUser = await getCurrentUser();
-  const queryClient = createQueryClient();
   const teamId = currentUser?.profile.teamId;
+
+  const queryClient = createQueryClient();
 
   if (teamId) {
     await prefetchDashboard(queryClient, teamId);

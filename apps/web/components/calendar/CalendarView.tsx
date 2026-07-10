@@ -1,8 +1,9 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { CalendarEvent, DayPlanType, EventType } from "@/lib/types/team";
 import { useTeam } from "@/components/providers/UserProvider";
+import { isQueryInitiallyLoading } from "@/lib/hooks/use-query-loading";
 import { useTeamEventMutations } from "@/lib/hooks/use-team-event-mutations";
 import { useTeamDayPlanMutations } from "@/lib/hooks/use-team-day-plan-mutations";
 import { useTeamDayPlans } from "@/lib/hooks/use-team-day-plans";
@@ -37,7 +38,8 @@ export function CalendarView({
   onActivityLog,
 }: CalendarViewProps) {
   const team = useTeam();
-  const { data: events = [], isLoading } = useTeamEvents();
+  const eventsQuery = useTeamEvents();
+  const { data: events = [] } = eventsQuery;
   const { createMutation: createEventMutation } = useTeamEventMutations({
     teamId: team?.id,
     onCreateSuccess: () => {
@@ -46,8 +48,12 @@ export function CalendarView({
       setDescription("");
     },
   });
-  const { data: dayPlans = [], isLoading: isDayPlansLoading } = useTeamDayPlans();
-  const { setDayPlan, clearDayPlan, isPending: isDayPlanPending } =
+  const dayPlansQuery = useTeamDayPlans();
+  const { data: dayPlans = [] } = dayPlansQuery;
+  const isInitialLoading =
+    isQueryInitiallyLoading(eventsQuery) ||
+    isQueryInitiallyLoading(dayPlansQuery);
+  const { setDayPlan, clearDayPlan, isPending: isDayPlanPending, flush: flushDayPlans, cancel: cancelDayPlans } =
     useTeamDayPlanMutations();
   const [viewType, setViewType] = useState<CalendarViewMode>("month");
   const [currentMonth, setCurrentMonth] = useState(() => {
@@ -64,6 +70,13 @@ export function CalendarView({
   const [type, setType] = useState<EventType>("build");
   const [location, setLocation] = useState(DEFAULT_LOCATION);
   const [description, setDescription] = useState("");
+
+  useEffect(() => {
+    return () => {
+      flushDayPlans();
+      cancelDayPlans();
+    };
+  }, [flushDayPlans, cancelDayPlans]);
 
   const todayStr = getTodayDateStr();
 
@@ -189,7 +202,11 @@ export function CalendarView({
 
   return (
     <div className="flex-1 flex overflow-hidden bg-slate-50 dark:bg-[#03070e] font-sans">
-      <div className="flex-1 overflow-y-auto px-8 py-6 flex flex-col h-full dashboard-scroll border-r border-slate-200 dark:border-slate-900/60">
+      <div
+        className={`flex-1 px-8 py-6 flex flex-col h-full min-h-0 border-r border-slate-200 dark:border-slate-900/60 ${
+          viewType === "month" ? "overflow-y-auto dashboard-scroll" : "overflow-hidden"
+        }`}
+      >
         <CalendarHeader viewType={viewType} onViewTypeChange={setViewType} />
         <CalendarMonthToolbar
           label={toolbarLabel}
@@ -199,7 +216,11 @@ export function CalendarView({
           onAddEvent={openAddEventModal}
         />
 
-        <div className={isLoading || isDayPlansLoading ? "animate-pulse opacity-70" : undefined}>
+        <div
+          className={`${viewType !== "month" ? "flex-1 min-h-0 flex flex-col" : ""} ${
+            isInitialLoading ? "animate-pulse opacity-70" : ""
+          }`}
+        >
           {viewType === "month" ? (
             <CalendarMonthGrid
               calendarDays={calendarDays}
@@ -214,6 +235,7 @@ export function CalendarView({
               mode="week"
               days={weekDays}
               eventsByDate={eventsByDate}
+              dayPlansByDate={dayPlansByDate}
               selectedDate={selectedDate}
               todayStr={todayStr}
               onSelectDate={handleSelectDate}
@@ -223,6 +245,7 @@ export function CalendarView({
               mode="day"
               days={dayCell}
               eventsByDate={eventsByDate}
+              dayPlansByDate={dayPlansByDate}
               selectedDate={selectedDate}
               todayStr={todayStr}
               onSelectDate={handleSelectDate}

@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 
 import { verifyCurrentUserPermissions } from "@/lib/auth/auth-guards-server";
 import { getCurrentUser } from "@/lib/auth/current-user";
+import { enforceApiRateLimit } from "@/lib/security/enforce-api-rate-limit";
 
 type TogglePermissionsPayload = {
   userId?: string;
@@ -21,6 +22,13 @@ export async function POST(request: Request) {
   if (!currentUser) {
     return NextResponse.json({ error: "Not authenticated." }, { status: 401 });
   }
+
+  const limited = await enforceApiRateLimit(
+    request,
+    currentUser.profile.id,
+    "admin",
+  );
+  if (limited) return limited;
 
   let body: TogglePermissionsPayload;
 

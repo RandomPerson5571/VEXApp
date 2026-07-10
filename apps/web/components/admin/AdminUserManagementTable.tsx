@@ -51,6 +51,10 @@ import {
   adminTableRowClassName,
 } from "./AdminPanelPrimitives";
 import { getInitials } from "@/components/tasks/task-list-utils";
+import { ADMIN_INLINE_SAVE_DELAY_MS } from "@/lib/constants/request-timing";
+import { RateLimitError } from "@/lib/errors/rate-limit-error";
+import { useDebouncedSaver } from "@/lib/hooks/use-debounced-saver";
+import { throwIfRateLimited } from "@/lib/queries/api-response";
 import {
   formatRole,
   formatTeamLabel,
@@ -135,6 +139,8 @@ export function AdminUserManagementTable({
         body: JSON.stringify({ userId, ...updates }),
       });
 
+      throwIfRateLimited(response);
+
       const payload = (await response.json()) as AdminUserRow & { error?: string };
 
       if (!response.ok) {
@@ -159,9 +165,11 @@ export function AdminUserManagementTable({
       );
     } catch (updateError) {
       onError(
-        updateError instanceof Error
+        updateError instanceof RateLimitError
           ? updateError.message
-          : "Failed to update user.",
+          : updateError instanceof Error
+            ? updateError.message
+            : "Failed to update user.",
       );
     } finally {
       setPendingUserId(null);
@@ -179,6 +187,8 @@ export function AdminUserManagementTable({
         body: JSON.stringify({ userId, isAdmin: nextIsAdmin }),
       });
 
+      throwIfRateLimited(response);
+
       const payload = (await response.json()) as { error?: string };
 
       if (!response.ok) {
@@ -192,14 +202,27 @@ export function AdminUserManagementTable({
       );
     } catch (toggleError) {
       onError(
-        toggleError instanceof Error
+        toggleError instanceof RateLimitError
           ? toggleError.message
-          : "Failed to update permissions.",
+          : toggleError instanceof Error
+            ? toggleError.message
+            : "Failed to update permissions.",
       );
     } finally {
       setPendingUserId(null);
     }
   }
+
+  const scheduleUserUpdate = useDebouncedSaver<
+    {
+      firstName?: string;
+      lastName?: string;
+      role?: UserRole;
+      teamId?: string | null;
+    }
+  >(ADMIN_INLINE_SAVE_DELAY_MS, async (userId, updates) => {
+    await updateUser(userId, updates);
+  });
 
   function handleNameBlur(
     user: AdminUserRow,
@@ -212,7 +235,7 @@ export function AdminUserManagementTable({
       return;
     }
 
-    void updateUser(user.id, { [field]: trimmed });
+    void scheduleUserUpdate(user.id, { [field]: trimmed });
   }
 
   return (
@@ -361,7 +384,7 @@ export function AdminUserManagementTable({
                                 return;
                               }
 
-                              void updateUser(user.id, { teamId: nextTeamId });
+                              void scheduleUserUpdate(user.id, { teamId: nextTeamId });
                             }}
                           >
                             <SelectTrigger
@@ -451,7 +474,7 @@ export function AdminUserManagementTable({
                                 return;
                               }
 
-                              void updateUser(user.id, { role: nextRole });
+                              void scheduleUserUpdate(user.id, { role: nextRole });
                             }}
                           >
                             <SelectTrigger

@@ -28,6 +28,10 @@ export type UpdateTaskInput = {
   title?: string;
   description?: string | null;
   status?: TaskStatus;
+  type?: TaskType;
+  priority?: TaskPriority;
+  dueDate?: Date | null;
+  assigneeIds?: string[];
 };
 
 export async function listTasksForTeam(teamId: string): Promise<TaskListTask[]> {
@@ -103,6 +107,13 @@ export async function updateTaskForTeam(
     title?: string;
     description?: string | null;
     status?: TaskStatus;
+    type?: TaskType;
+    priority?: TaskPriority;
+    dueDate?: Date | null;
+    assignments?: {
+      deleteMany: Record<string, never>;
+      create: { userId: string }[];
+    };
   } = {};
 
   if (input.title !== undefined) {
@@ -119,6 +130,37 @@ export async function updateTaskForTeam(
 
   if (input.status !== undefined) {
     data.status = input.status;
+  }
+
+  if (input.type !== undefined) {
+    data.type = input.type;
+  }
+
+  if (input.priority !== undefined) {
+    data.priority = input.priority;
+  }
+
+  if (input.dueDate !== undefined) {
+    data.dueDate = input.dueDate;
+  }
+
+  if (input.assigneeIds !== undefined) {
+    const assigneeIds = [...new Set(input.assigneeIds)];
+
+    if (assigneeIds.length > 0) {
+      const validAssigneeCount = await prisma.user.count({
+        where: { teamId: input.teamId, id: { in: assigneeIds } },
+      });
+
+      if (validAssigneeCount !== assigneeIds.length) {
+        throw new Error("One or more assignees are not on this team.");
+      }
+    }
+
+    data.assignments = {
+      deleteMany: {},
+      create: assigneeIds.map((userId) => ({ userId })),
+    };
   }
 
   if (Object.keys(data).length === 0) {

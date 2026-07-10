@@ -10,5 +10,6 @@ export function createTeamDocumentationTreeQueryOptions(
   return queryOptions({
     queryKey: queryKeys.docs.tree(teamId),
     queryFn,
+    placeholderData: (previousData) => previousData,
   });
 }

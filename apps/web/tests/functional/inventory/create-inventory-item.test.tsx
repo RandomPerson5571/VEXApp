@@ -14,19 +14,19 @@ function CreateInventoryHarness({
   initialName = "",
   initialDescription = "",
   initialTotalStock = "",
-  initialImageUrl = "",
+  initialImageFile = null,
 }: {
   onCreate: (payload: CreateInventoryItemPayload) => void;
   initialError?: string;
   initialName?: string;
   initialDescription?: string;
   initialTotalStock?: string;
-  initialImageUrl?: string;
+  initialImageFile?: File | null;
 }) {
   const [name, setName] = useState(initialName);
   const [description, setDescription] = useState(initialDescription);
   const [totalStock, setTotalStock] = useState(initialTotalStock);
-  const [imageUrl, setImageUrl] = useState(initialImageUrl);
+  const [imageFile, setImageFile] = useState<File | null>(initialImageFile);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState(initialError);
 
@@ -43,7 +43,6 @@ function CreateInventoryHarness({
       name: trimmedName,
       description: description.trim() || undefined,
       totalStock: stock,
-      imageUrl: imageUrl.trim() || undefined,
     });
     setIsSubmitting(false);
     setError(undefined);
@@ -55,11 +54,11 @@ function CreateInventoryHarness({
       name={name}
       description={description}
       totalStock={totalStock}
-      imageUrl={imageUrl}
+      imageFile={imageFile}
       onNameChange={setName}
       onDescriptionChange={setDescription}
       onTotalStockChange={setTotalStock}
-      onImageUrlChange={setImageUrl}
+      onImageFileChange={setImageFile}
       onClose={() => undefined}
       onSubmit={handleSubmit}
       isSubmitting={isSubmitting}
@@ -95,7 +94,6 @@ describe("inventory item creation UI", () => {
           initialName="  REV HD Hex Motor  "
           initialDescription="  Green cartridge  "
           initialTotalStock="4"
-          initialImageUrl="  parts/motor.png  "
         />,
       );
     });
@@ -112,8 +110,30 @@ describe("inventory item creation UI", () => {
       name: "REV HD Hex Motor",
       description: "Green cartridge",
       totalStock: 4,
-      imageUrl: "parts/motor.png",
     });
+  });
+
+  it("updates image file state when an image is selected", async () => {
+    const onCreate = vi.fn();
+    const file = new File(["image-bytes"], "motor.png", { type: "image/png" });
+
+    await act(async () => {
+      root.render(<CreateInventoryHarness onCreate={onCreate} />);
+    });
+
+    const fileInput = container.querySelector(
+      "#inventory-image",
+    ) as HTMLInputElement;
+
+    await act(async () => {
+      Object.defineProperty(fileInput, "files", {
+        configurable: true,
+        value: [file],
+      });
+      fileInput.dispatchEvent(new Event("change", { bubbles: true }));
+    });
+
+    expect(container.textContent).toContain("motor.png");
   });
 
   it("does not submit when stock is invalid", async () => {

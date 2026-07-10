@@ -16,6 +16,12 @@ export type SignupFormProps = {
   pending?: boolean;
   discordPending?: boolean;
   discordError?: string | null;
+  defaultEmail?: string;
+  resendAction?: (formData: FormData) => void;
+  resendError?: string | null;
+  resendSuccess?: string | null;
+  resendPending?: boolean;
+  showResendConfirmation?: boolean;
 };
 
 export function SignupForm({
@@ -27,6 +33,12 @@ export function SignupForm({
   pending = false,
   discordPending = false,
   discordError,
+  defaultEmail,
+  resendAction,
+  resendError,
+  resendSuccess,
+  resendPending = false,
+  showResendConfirmation = false,
 }: SignupFormProps) {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -60,6 +72,74 @@ export function SignupForm({
         </div>
       )}
 
+      {showResendConfirmation && resendAction ? (
+        <div className="mb-5 space-y-3 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/40 p-4">
+          <p className="text-xs font-semibold text-slate-600 dark:text-slate-400">
+            Didn&apos;t receive the email?
+          </p>
+
+          {resendError ? (
+            <div className="flex items-start gap-2.5 p-3 rounded-lg bg-red-950/20 border border-red-900/40 text-red-400 text-xs">
+              <ShieldAlert className="h-4.5 w-4.5 shrink-0 mt-0.5" />
+              <span className="font-semibold leading-snug">{resendError}</span>
+            </div>
+          ) : null}
+
+          {resendSuccess ? (
+            <div className="flex items-start gap-2.5 p-3 rounded-lg bg-emerald-950/20 border border-emerald-900/40 text-emerald-300 text-xs">
+              <ShieldAlert className="h-4.5 w-4.5 shrink-0 mt-0.5" />
+              <span className="font-semibold leading-snug">{resendSuccess}</span>
+            </div>
+          ) : null}
+
+          <form action={resendAction} className="space-y-3">
+            {defaultEmail ? (
+              <>
+                <input type="hidden" name="email" value={defaultEmail} />
+                <p className="text-[11px] text-slate-600 dark:text-slate-500">
+                  We&apos;ll resend the confirmation link to{" "}
+                  <span className="font-semibold text-slate-800 dark:text-slate-200">
+                    {defaultEmail}
+                  </span>
+                  .
+                </p>
+              </>
+            ) : (
+              <div className="space-y-1.5">
+                <label
+                  htmlFor="resend-email"
+                  className="text-[11px] font-bold text-slate-600 dark:text-slate-400 tracking-wide uppercase"
+                >
+                  Email Address
+                </label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                    <Mail className="h-4 w-4 text-slate-600 dark:text-slate-500" />
+                  </div>
+                  <input
+                    id="resend-email"
+                    name="email"
+                    type="email"
+                    required
+                    autoComplete="email"
+                    placeholder="name@team.com"
+                    className="w-full pl-10 pr-4 py-2.5 rounded-lg bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-900/60 text-slate-900 dark:text-slate-200 text-xs font-semibold placeholder-slate-500 dark:placeholder-slate-600 focus:outline-none focus:border-orange-500 dark:focus:border-slate-800 focus:ring-1 focus:ring-orange-500 dark:focus:ring-slate-800 transition"
+                  />
+                </div>
+              </div>
+            )}
+
+            <button
+              type="submit"
+              disabled={resendPending || Boolean(resendSuccess)}
+              className="w-full py-2.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 disabled:opacity-60 disabled:cursor-not-allowed font-bold text-xs tracking-wide text-slate-700 dark:text-slate-200 transition cursor-pointer"
+            >
+              {resendPending ? "Sending..." : "Resend confirmation email"}
+            </button>
+          </form>
+        </div>
+      ) : null}
+
       <form action={signupAction} className="space-y-5">
         {redirectTo ? (
           <input type="hidden" name="redirectTo" value={redirectTo} />
@@ -81,6 +161,7 @@ export function SignupForm({
               name="email"
               type="email"
               required
+              defaultValue={defaultEmail}
               placeholder="name@team.com"
               className="w-full pl-10 pr-4 py-2.5 rounded-lg bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-900/60 text-slate-900 dark:text-slate-200 text-xs font-semibold placeholder-slate-500 dark:placeholder-slate-600 focus:outline-none focus:border-orange-500 dark:focus:border-slate-800 focus:ring-1 focus:ring-orange-500 dark:focus:ring-slate-800 transition"
             />

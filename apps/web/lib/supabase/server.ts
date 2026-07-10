@@ -3,10 +3,19 @@ import { cookies } from "next/headers";
 
 import { getSupabaseAnonKey, getSupabaseUrl } from "@/lib/supabase/env";
 
-export async function createClient() {
+export async function createClient(options?: { forwardedIp?: string }) {
   const cookieStore = await cookies();
 
   return createServerClient(getSupabaseUrl(), getSupabaseAnonKey(), {
+    ...(options?.forwardedIp
+      ? {
+          global: {
+            headers: {
+              "Sb-Forwarded-For": options.forwardedIp,
+            },
+          },
+        }
+      : {}),
     cookies: {
       getAll() {
         return cookieStore.getAll();

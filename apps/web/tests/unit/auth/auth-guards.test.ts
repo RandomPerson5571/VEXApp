@@ -46,7 +46,7 @@ describe("canManageTeamIntegrations", () => {
 describe("roster permissions stay leader-only", () => {
   it("lets members view the roster but not manage it", () => {
     const memberPermissions = {
-      authorized: true,
+      authorized: true as const,
       scope: "TEAM" as const,
       teamId: "team-1",
       role: "MEMBER" as const,

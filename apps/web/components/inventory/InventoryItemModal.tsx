@@ -1,18 +1,19 @@
 "use client";
 
-import type { FormEvent } from "react";
-import { Package, Plus } from "lucide-react";
+import type { ChangeEvent, FormEvent } from "react";
+import { useEffect, useRef, useState } from "react";
+import { ImagePlus, Package, Plus, X } from "lucide-react";
 
 export function InventoryItemModal({
   isOpen,
   name,
   description,
   totalStock,
-  imageUrl,
+  imageFile,
   onNameChange,
   onDescriptionChange,
   onTotalStockChange,
-  onImageUrlChange,
+  onImageFileChange,
   onClose,
   onSubmit,
   isSubmitting = false,
@@ -22,19 +23,54 @@ export function InventoryItemModal({
   name: string;
   description: string;
   totalStock: string;
-  imageUrl: string;
+  imageFile: File | null;
   onNameChange: (value: string) => void;
   onDescriptionChange: (value: string) => void;
   onTotalStockChange: (value: string) => void;
-  onImageUrlChange: (value: string) => void;
+  onImageFileChange: (file: File | null) => void;
   onClose: () => void;
   onSubmit: (event: FormEvent<HTMLFormElement>) => void;
   isSubmitting?: boolean;
   error?: string;
 }) {
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!imageFile) {
+      setPreviewUrl(null);
+      return;
+    }
+
+    const objectUrl = URL.createObjectURL(imageFile);
+    setPreviewUrl(objectUrl);
+
+    return () => {
+      URL.revokeObjectURL(objectUrl);
+    };
+  }, [imageFile]);
+
   if (!isOpen) {
     return null;
   }
+
+  const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0] ?? null;
+
+    if (file && !file.type.startsWith("image/")) {
+      event.target.value = "";
+      return;
+    }
+
+    onImageFileChange(file);
+  };
+
+  const clearImage = () => {
+    onImageFileChange(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/40 p-4 backdrop-blur-sm select-none dark:bg-[#000]/70">
@@ -87,45 +123,76 @@ export function InventoryItemModal({
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-3.5">
-              <div className="space-y-1">
-                <label
-                  htmlFor="inventory-stock"
-                  className="block text-[10px] font-bold uppercase tracking-widest text-slate-600 dark:text-slate-400"
-                >
-                  Total Stock
-                </label>
-                <input
-                  id="inventory-stock"
-                  type="number"
-                  required
-                  min={0}
-                  step={1}
-                  placeholder="0"
-                  value={totalStock}
-                  onChange={(e) => onTotalStockChange(e.target.value)}
-                  className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 font-mono text-xs text-slate-900 transition-[border-color,box-shadow] focus:border-yellow-500 focus:outline-none focus:ring-1 focus:ring-yellow-500/30 dark:border-slate-900 dark:bg-slate-950 dark:text-slate-200 dark:focus:border-yellow-500/40"
-                />
-              </div>
-              <div className="space-y-1">
+            <div className="space-y-1">
+              <label
+                htmlFor="inventory-stock"
+                className="block text-[10px] font-bold uppercase tracking-widest text-slate-600 dark:text-slate-400"
+              >
+                Total Stock
+              </label>
+              <input
+                id="inventory-stock"
+                type="number"
+                required
+                min={0}
+                step={1}
+                placeholder="0"
+                value={totalStock}
+                onChange={(e) => onTotalStockChange(e.target.value)}
+                className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 font-mono text-xs text-slate-900 transition-[border-color,box-shadow] focus:border-yellow-500 focus:outline-none focus:ring-1 focus:ring-yellow-500/30 dark:border-slate-900 dark:bg-slate-950 dark:text-slate-200 dark:focus:border-yellow-500/40"
+              />
+            </div>
+
+            <div className="space-y-1">
+              <label
+                htmlFor="inventory-image"
+                className="block text-[10px] font-bold uppercase tracking-widest text-slate-600 dark:text-slate-400"
+              >
+                Part Image
+                <span className="ml-1 font-semibold normal-case tracking-normal text-slate-500">
+                  (optional)
+                </span>
+              </label>
+              <div className="flex items-center gap-3">
                 <label
                   htmlFor="inventory-image"
-                  className="block text-[10px] font-bold uppercase tracking-widest text-slate-600 dark:text-slate-400"
+                  className="flex flex-1 cursor-pointer items-center gap-2 rounded-lg border border-dashed border-slate-300 bg-slate-50 px-3 py-2 text-xs font-semibold text-slate-600 transition hover:border-yellow-500/50 hover:bg-yellow-500/5 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-400 dark:hover:border-yellow-500/30"
                 >
-                  Image Path
-                  <span className="ml-1 font-semibold normal-case tracking-normal text-slate-500">
-                    (optional)
+                  <ImagePlus className="h-4 w-4 shrink-0 text-yellow-600 dark:text-yellow-400" />
+                  <span className="truncate">
+                    {imageFile ? imageFile.name : "Choose image file"}
                   </span>
                 </label>
-                <input
-                  id="inventory-image"
-                  type="text"
-                  placeholder="storage/object-path"
-                  value={imageUrl}
-                  onChange={(e) => onImageUrlChange(e.target.value)}
-                  className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-900 transition-[border-color,box-shadow] focus:border-yellow-500 focus:outline-none focus:ring-1 focus:ring-yellow-500/30 dark:border-slate-900 dark:bg-slate-950 dark:text-slate-200 dark:focus:border-yellow-500/40"
-                />
+                {imageFile ? (
+                  <button
+                    type="button"
+                    onClick={clearImage}
+                    disabled={isSubmitting}
+                    aria-label="Remove image"
+                    className="flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-500 transition hover:border-red-500/30 hover:bg-red-500/5 hover:text-red-500 disabled:opacity-50 dark:border-slate-900 dark:bg-slate-950 dark:hover:text-red-400"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                ) : null}
               </div>
+              <input
+                ref={fileInputRef}
+                id="inventory-image"
+                type="file"
+                accept="image/*"
+                onChange={handleFileChange}
+                className="sr-only"
+              />
+              {previewUrl ? (
+                <div className="overflow-hidden rounded-lg border border-slate-200 bg-slate-50 dark:border-slate-900 dark:bg-slate-950">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={previewUrl}
+                    alt="Selected part preview"
+                    className="h-28 w-full object-contain"
+                  />
+                </div>
+              ) : null}
             </div>
 
             <div className="space-y-1">

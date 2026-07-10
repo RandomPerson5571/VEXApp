@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { requireTeamIntegrationAccess } from "@/lib/integrations/github/api-auth.server";
+import { enforceApiRateLimit } from "@/lib/security/enforce-api-rate-limit";
 import { buildGitHubInstallUrl } from "@/lib/integrations/github/install-url.server";
 import { GitHubApiError } from "@/lib/integrations/github/app.server";
 import {
@@ -83,6 +84,13 @@ export async function POST(request: Request) {
   if (!access.ok) {
     return access.response;
   }
+
+  const limited = await enforceApiRateLimit(
+    request,
+    access.userId,
+    "integrations",
+  );
+  if (limited) return limited;
 
   let body: ConnectRepositoryPayload;
 

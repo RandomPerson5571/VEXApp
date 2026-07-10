@@ -9,9 +9,14 @@ import {
 } from "../../helpers/auth/test-database";
 
 const verifyCurrentUserPermissionsMock = vi.hoisted(() => vi.fn());
+const getCurrentUserMock = vi.hoisted(() => vi.fn());
 
 vi.mock("@/lib/auth/auth-guards-server", () => ({
   verifyCurrentUserPermissions: verifyCurrentUserPermissionsMock,
+}));
+
+vi.mock("@/lib/auth/current-user", () => ({
+  getCurrentUser: getCurrentUserMock,
 }));
 
 import { POST } from "@/app/api/admin/create-team/route";
@@ -33,6 +38,7 @@ describeIntegration("admin create-team integration", () => {
     const admin = await createTestUser(orphanTeam.id, { isAdmin: true });
     adminUserId = admin.id;
     createdTeamIds = [orphanTeam.id];
+    getCurrentUserMock.mockResolvedValue({ profile: { id: adminUserId } });
   });
 
   afterEach(async () => {

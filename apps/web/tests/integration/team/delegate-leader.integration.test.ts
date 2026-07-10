@@ -9,9 +9,14 @@ import {
 } from "../../helpers/auth/test-database";
 
 const verifyCurrentUserPermissionsMock = vi.hoisted(() => vi.fn());
+const getCurrentUserMock = vi.hoisted(() => vi.fn());
 
 vi.mock("@/lib/auth/auth-guards-server", () => ({
   verifyCurrentUserPermissions: verifyCurrentUserPermissionsMock,
+}));
+
+vi.mock("@/lib/auth/current-user", () => ({
+  getCurrentUser: getCurrentUserMock,
 }));
 
 import { POST } from "@/app/api/team/delegate-leader/route";
@@ -21,6 +26,7 @@ const describeIntegration = hasTestDatabase() ? describe : describe.skip;
 describeIntegration("delegate leader integration", () => {
   let teamId = "";
   let memberId = "";
+  let leaderId = "";
 
   beforeEach(async () => {
     vi.clearAllMocks();
@@ -28,8 +34,11 @@ describeIntegration("delegate leader integration", () => {
     const team = await createTestTeam();
     teamId = team.id;
 
+    const leader = await createTestUser(teamId, { role: "TEAM_LEADER" });
     const member = await createTestUser(teamId, { role: "TEAM_MEMBER" });
+    leaderId = leader.id;
     memberId = member.id;
+    getCurrentUserMock.mockResolvedValue({ profile: { id: leaderId } });
   });
 
   afterEach(async () => {
@@ -39,6 +48,7 @@ describeIntegration("delegate leader integration", () => {
 
     teamId = "";
     memberId = "";
+    leaderId = "";
   });
 
   it("promotes a member when caller is team leader", async () => {

@@ -10,5 +10,6 @@ export function createTeamEventsQueryOptions(
   return queryOptions({
     queryKey: queryKeys.events.forTeam(teamId),
     queryFn,
+    placeholderData: (previousData) => previousData,
   });
 }

@@ -4,6 +4,7 @@ import { useMemo, useState, type FormEvent } from "react";
 import { AlertTriangle, ClipboardList, Plus } from "lucide-react";
 
 import { useProfile, useTeam } from "@/components/providers/UserProvider";
+import { isQueryInitiallyLoading } from "@/lib/hooks/use-query-loading";
 import { useTeamMembers } from "@/lib/hooks/use-team-members";
 import { useTeamTaskMutations } from "@/lib/hooks/use-team-task-mutations";
 import { useTeamTasks } from "@/lib/hooks/use-team-tasks";
@@ -24,7 +25,10 @@ import {
 } from "./TaskListComponents";
 import {
   type CreateTaskFormValues,
+  type EditTaskFormValues,
+  formatPersonName,
   getTaskAssignees,
+  taskToEditFormValues,
 } from "./task-list-utils";
 
 type TaskStatusFilter = TaskStatus | "all";
@@ -65,19 +69,40 @@ function filterTasks(
   });
 }
 
+function TaskListFallback() {
+  return (
+    <div className="flex flex-1 items-center justify-center bg-slate-100 dark:bg-[#03070e] p-8">
+      <div className="w-full max-w-md rounded-2xl border border-slate-300 dark:border-slate-900 bg-white dark:bg-[#090e18]/80 p-8 text-center shadow-md dark:shadow-lg">
+        <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full border border-slate-800 bg-slate-900/60">
+          <ClipboardList className="h-7 w-7 text-slate-400" />
+        </div>
+        <h1 className="text-xl font-black text-slate-100">No team assigned</h1>
+        <p className="mt-2 text-sm text-slate-400">
+          Join or select a team to view your task list.
+        </p>
+      </div>
+    </div>
+  );
+}
+
 export function TaskListView() {
   const team = useTeam();
   const profile = useProfile();
-  const { data: fetchedTasks = [], isLoading, isError } = useTeamTasks();
+  const tasksQuery = useTeamTasks();
+  const { data: fetchedTasks = [], isError } = tasksQuery;
+  const isInitialLoading = isQueryInitiallyLoading(tasksQuery);
   const { data: teamMembers = [] } = useTeamMembers();
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<TaskStatusFilter>("all");
   const [typeFilter, setTypeFilter] = useState<TaskTypeFilter>("all");
   const [priorityFilter, setPriorityFilter] = useState<TaskPriorityFilter>("all");
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editingTaskId, setEditingTaskId] = useState<string | null>(null);
   const [createForm, setCreateForm] = useState<CreateTaskFormValues>(
     emptyCreateTaskFormValues,
   );
+  const [editForm, setEditForm] = useState<EditTaskFormValues | null>(null);
 
   const label = team ? `${team.name} (${team.number})` : "Your team";
   const teamId = team?.id;
@@ -87,16 +112,24 @@ export function TaskListView() {
     lastName: profile.lastName,
   };
 
-  const { createMutation: createTaskMutation, updateMutation: updateTaskMutation } =
+  const { createMutation: createTaskMutation, updateMutation: updateTaskMutation, updateTaskStatus, isStatusUpdating } =
     useTeamTaskMutations({
       teamId,
       onCreateSuccess: () => {
         setIsCreateModalOpen(false);
         setCreateForm(emptyCreateTaskFormValues);
       },
+      onUpdateSuccess: () => {
+        setIsEditModalOpen(false);
+        setEditingTaskId(null);
+        setEditForm(null);
+      },
     });
 
   const tasks = fetchedTasks;
+  const editingTask = editingTaskId
+    ? tasks.find((task) => task.id === editingTaskId) ?? null
+    : null;
 
   const assigneeOptions = useMemo(() => {
     const roster = new Map(
@@ -117,6 +150,22 @@ export function TaskListView() {
     setIsCreateModalOpen(true);
   }
 
+  function openEditModal(task: TaskListTask) {
+    setEditingTaskId(task.id);
+    setEditForm(taskToEditFormValues(task));
+    updateTaskMutation.reset();
+    setIsEditModalOpen(true);
+  }
+
+  function closeEditModal() {
+    if (!updateTaskMutation.isPending) {
+      setIsEditModalOpen(false);
+      setEditingTaskId(null);
+      setEditForm(null);
+      updateTaskMutation.reset();
+    }
+  }
+
   function handleCreateTask(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
@@ -128,6 +177,27 @@ export function TaskListView() {
       dueDate: createForm.dueDate || undefined,
       assigneeIds: createForm.assigneeIds,
     });
+  }
+
+  function handleEditTask(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    if (!editingTaskId || !editForm) return;
+
+    updateTaskMutation.mutate({
+      taskId: editingTaskId,
+      title: editForm.title,
+      description: editForm.description,
+      status: editForm.status,
+      type: editForm.type,
+      priority: editForm.priority,
+      dueDate: editForm.dueDate || null,
+      assigneeIds: editForm.assigneeIds,
+    });
+  }
+
+  if (!team) {
+    return <TaskListFallback />;
   }
 
   return (
@@ -163,7 +233,7 @@ export function TaskListView() {
             <button
               type="button"
               onClick={openCreateModal}
-              disabled={isLoading}
+              disabled={isInitialLoading}
               className="inline-flex shrink-0 items-center gap-1.5 self-start rounded-lg bg-blue-600 px-4 py-2.5 text-xs font-bold text-white shadow-lg shadow-blue-900/25 transition hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-50 motion-safe:hover:scale-[1.02] motion-reduce:transition-none"
             >
               <Plus className="h-4 w-4" />
@@ -172,7 +242,7 @@ export function TaskListView() {
           </div>
         </header>
 
-        {isLoading ? (
+        {isInitialLoading ? (
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
               {Array.from({ length: 4 }).map((_, index) => (
@@ -253,6 +323,7 @@ export function TaskListView() {
                     key={task.id}
                     task={task}
                     defaultExpanded={index === 0}
+                    onOpen={() => openEditModal(task)}
                     onUpdateTitle={async (title) => {
                       await updateTaskMutation.mutateAsync({ taskId: task.id, title });
                     }}
@@ -263,15 +334,19 @@ export function TaskListView() {
                       });
                     }}
                     onUpdateStatus={async (status) => {
+                      updateTaskStatus(task.id, status);
+                    }}
+                    onUpdatePriority={async (priority) => {
                       await updateTaskMutation.mutateAsync({
                         taskId: task.id,
-                        status,
+                        priority,
                       });
                     }}
-                    isStatusUpdating={
+                    isStatusUpdating={isStatusUpdating(task.id)}
+                    isPriorityUpdating={
                       updateTaskMutation.isPending &&
                       updateTaskMutation.variables?.taskId === task.id &&
-                      updateTaskMutation.variables?.status !== undefined
+                      updateTaskMutation.variables?.priority !== undefined
                     }
                   />
                 ))}
@@ -302,6 +377,30 @@ export function TaskListView() {
             : null
         }
       />
+
+      {editForm && editingTask ? (
+        <CreateTaskModal
+          mode="edit"
+          isOpen={isEditModalOpen}
+          values={editForm}
+          assigneeOptions={assigneeOptions}
+          onChange={(values) => setEditForm(values as EditTaskFormValues)}
+          onClose={closeEditModal}
+          onSubmit={handleEditTask}
+          isSubmitting={updateTaskMutation.isPending}
+          submitError={
+            updateTaskMutation.isError
+              ? updateTaskMutation.error instanceof Error
+                ? updateTaskMutation.error.message
+                : "Failed to update task."
+              : null
+          }
+          taskMeta={{
+            creatorName: formatPersonName(editingTask.creator),
+            subTasks: editingTask.subTasks,
+          }}
+        />
+      ) : null}
     </div>
   );
 }

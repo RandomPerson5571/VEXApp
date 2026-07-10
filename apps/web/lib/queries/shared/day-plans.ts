@@ -10,5 +10,6 @@ export function createTeamDayPlansQueryOptions(
   return queryOptions({
     queryKey: queryKeys.dayPlans.forTeam(teamId),
     queryFn,
+    placeholderData: (previousData) => previousData,
   });
 }

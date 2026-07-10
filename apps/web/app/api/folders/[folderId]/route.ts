@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { canDelegateTeamLeaders } from "@/lib/auth/auth-guards";
 import { verifyCurrentUserPermissions } from "@/lib/auth/auth-guards-server";
 import { getCurrentUser } from "@/lib/auth/current-user";
+import { enforceApiRateLimit } from "@/lib/security/enforce-api-rate-limit";
 import {
   deleteTeamFolder,
   updateTeamFolder,
@@ -38,6 +39,13 @@ export async function PATCH(request: Request, context: RouteContext) {
     return NextResponse.json({ error: "Forbidden." }, { status: 403 });
   }
 
+  const limited = await enforceApiRateLimit(
+    request,
+    currentUser.profile.id,
+    "team",
+  );
+  if (limited) return limited;
+
   const { folderId } = await context.params;
 
   if (!folderId?.trim()) {
@@ -70,7 +78,7 @@ export async function PATCH(request: Request, context: RouteContext) {
   }
 }
 
-export async function DELETE(_request: Request, context: RouteContext) {
+export async function DELETE(request: Request, context: RouteContext) {
   const currentUser = await getCurrentUser();
 
   if (!currentUser) {
@@ -91,6 +99,13 @@ export async function DELETE(_request: Request, context: RouteContext) {
   if (!canDelegateTeamLeaders(permissions)) {
     return NextResponse.json({ error: "Forbidden." }, { status: 403 });
   }
+
+  const limited = await enforceApiRateLimit(
+    request,
+    currentUser.profile.id,
+    "team",
+  );
+  if (limited) return limited;
 
   const { folderId } = await context.params;
 

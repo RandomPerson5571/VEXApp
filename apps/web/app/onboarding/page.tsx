@@ -25,7 +25,7 @@ export const metadata: Metadata = createPageMetadata({
 });
 
 type OnboardingPageProps = {
-  searchParams?: Promise<{ next?: string; message?: string }>;
+  searchParams?: Promise<{ next?: string; message?: string; email?: string }>;
 };
 
 async function redirectInviteInvalid(
@@ -101,6 +101,7 @@ export default async function OnboardingPage({
 
   const resolvedSearchParams = searchParams ? await searchParams : undefined;
   const redirectTo = getSafeRedirectPath(resolvedSearchParams?.next);
+  const pendingEmail = resolvedSearchParams?.email?.trim() || undefined;
   const needsEmailConfirmation = Boolean(
     user && !isDiscordAuthUser(user) && !user.email_confirmed_at,
   );
@@ -115,6 +116,7 @@ export default async function OnboardingPage({
         redirectTo={redirectTo}
         needsEmailConfirmation={needsEmailConfirmation}
         message={resolvedSearchParams?.message}
+        pendingEmail={pendingEmail}
       />
     </div>
   );

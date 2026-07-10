@@ -10,5 +10,6 @@ export function createDocumentationDetailQueryOptions(
   return queryOptions({
     queryKey: queryKeys.docs.detail(docId),
     queryFn,
+    placeholderData: (previousData) => previousData,
   });
 }

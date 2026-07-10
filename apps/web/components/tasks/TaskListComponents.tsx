@@ -17,11 +17,12 @@ import type {
   TaskListAssignee,
   TaskListSubTask,
   TaskListTask,
+  TaskPriority,
   TaskStatus,
 } from "@stlvex/database/types";
 import { InlineEdit } from "@/components/InlineEdit";
 import {
-  TaskPriorityBadge,
+  TaskPriorityPicker,
   TaskStatusPicker,
   TaskStatusDot,
   TaskTypeBadge,
@@ -125,19 +126,25 @@ function SubtaskRow({ task }: { task: TaskListSubTask }) {
 type TaskCardProps = {
   task: TaskListTask;
   defaultExpanded?: boolean;
+  onOpen?: () => void;
   onUpdateTitle: (title: string) => Promise<void>;
   onUpdateDescription: (description: string) => Promise<void>;
   onUpdateStatus: (status: TaskStatus) => Promise<void>;
+  onUpdatePriority: (priority: TaskPriority) => Promise<void>;
   isStatusUpdating?: boolean;
+  isPriorityUpdating?: boolean;
 };
 
 export function TaskCard({
   task,
   defaultExpanded = false,
+  onOpen,
   onUpdateTitle,
   onUpdateDescription,
   onUpdateStatus,
+  onUpdatePriority,
   isStatusUpdating = false,
+  isPriorityUpdating = false,
 }: TaskCardProps) {
   const [expanded, setExpanded] = useState(defaultExpanded);
   const dueLabel = formatDueDate(task.dueDate);
@@ -147,13 +154,38 @@ export function TaskCard({
   const hasSubtasks = task.subTasks.length > 0;
 
   return (
-    <article className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:border-slate-300 dark:border-slate-900/80 dark:bg-[#090e18]/80 dark:shadow-md dark:hover:border-slate-800">
+    <article
+      className={`overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:border-slate-300 dark:border-slate-900/80 dark:bg-[#090e18]/80 dark:shadow-md dark:hover:border-slate-800 ${
+        onOpen ? "cursor-pointer" : ""
+      }`}
+      onClick={onOpen}
+      onKeyDown={
+        onOpen
+          ? (event) => {
+              if (event.key === "Enter" || event.key === " ") {
+                event.preventDefault();
+                onOpen();
+              }
+            }
+          : undefined
+      }
+      role={onOpen ? "button" : undefined}
+      tabIndex={onOpen ? 0 : undefined}
+      aria-label={onOpen ? `Open task: ${task.title}` : undefined}
+    >
       <div className="p-5">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
           <div className="min-w-0 flex-1">
-            <div className="flex flex-wrap items-center gap-2">
+            <div
+              className="flex flex-wrap items-center gap-2"
+              onClick={(event) => event.stopPropagation()}
+            >
               <TaskTypeBadge type={task.type} />
-              <TaskPriorityBadge priority={task.priority} />
+              <TaskPriorityPicker
+                priority={task.priority}
+                onPriorityChange={onUpdatePriority}
+                disabled={isPriorityUpdating}
+              />
               <TaskStatusPicker
                 status={task.status}
                 onStatusChange={onUpdateStatus}
@@ -162,15 +194,20 @@ export function TaskCard({
             </div>
 
             <h3 className="mt-3 text-lg font-black tracking-tight text-slate-950 dark:text-slate-100">
-              <InlineEdit
-                value={task.title}
-                placeholder="Task title"
-                onSave={onUpdateTitle}
-                className="text-lg font-black tracking-tight"
-              />
+              <span onClick={(event) => event.stopPropagation()}>
+                <InlineEdit
+                  value={task.title}
+                  placeholder="Task title"
+                  onSave={onUpdateTitle}
+                  className="text-lg font-black tracking-tight"
+                />
+              </span>
             </h3>
 
-            <div className="mt-2 max-w-3xl">
+            <div
+              className="mt-2 max-w-3xl"
+              onClick={(event) => event.stopPropagation()}
+            >
               <InlineEdit
                 value={task.description ?? ""}
                 placeholder="Add a description..."
@@ -237,7 +274,10 @@ export function TaskCard({
         {hasSubtasks ? (
           <button
             type="button"
-            onClick={() => setExpanded((open) => !open)}
+            onClick={(event) => {
+              event.stopPropagation();
+              setExpanded((open) => !open);
+            }}
             className="mt-4 inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 px-3 py-1.5 text-[11px] font-bold text-slate-600 transition hover:border-slate-300 hover:text-slate-900 dark:border-slate-900 dark:bg-slate-950/50 dark:text-slate-400 dark:hover:border-slate-800 dark:hover:text-slate-200"
             aria-expanded={expanded}
           >

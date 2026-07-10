@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { canDelegateTeamLeaders } from "@/lib/auth/auth-guards";
 import { verifyCurrentUserPermissions } from "@/lib/auth/auth-guards-server";
 import { getCurrentUser } from "@/lib/auth/current-user";
+import { enforceApiRateLimit } from "@/lib/security/enforce-api-rate-limit";
 import {
   createTeamFolder,
   getTeamDocumentationTree,
@@ -48,6 +49,13 @@ export async function POST(request: Request) {
   if (!canDelegateTeamLeaders(permissions)) {
     return NextResponse.json({ error: "Forbidden." }, { status: 403 });
   }
+
+  const limited = await enforceApiRateLimit(
+    request,
+    currentUser.profile.id,
+    "team",
+  );
+  if (limited) return limited;
 
   let body: CreateFolderRequestBody;
 

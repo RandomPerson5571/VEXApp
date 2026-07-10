@@ -11,8 +11,10 @@ import {
 } from "@/components/inventory/InventoryComponents";
 import { InventoryItemModal } from "@/components/inventory/InventoryItemModal";
 import { isGlobalAdmin } from "@/lib/auth/auth-guards";
+import { isQueryInitiallyLoading } from "@/lib/hooks/use-query-loading";
 import { useTeamInventoryMutations } from "@/lib/hooks/use-team-inventory-mutations";
 import { useTeamInventory } from "@/lib/hooks/use-team-inventory";
+import { uploadInventoryImage } from "@/lib/supabase/inventory-images";
 import {
   type AvailabilityFilter,
   matchesAvailabilityFilter,
@@ -34,12 +36,30 @@ function filterInventory(
   );
 }
 
+function InventoryFallback() {
+  return (
+    <div className="flex flex-1 items-center justify-center bg-slate-100 dark:bg-[#03070e] p-8">
+      <div className="w-full max-w-md rounded-2xl border border-slate-300 dark:border-slate-900 bg-white dark:bg-[#090e18]/80 p-8 text-center shadow-md dark:shadow-lg">
+        <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full border border-slate-800 bg-slate-900/60">
+          <Package className="h-7 w-7 text-slate-400" />
+        </div>
+        <h1 className="text-xl font-black text-slate-100">No team assigned</h1>
+        <p className="mt-2 text-sm text-slate-400">
+          Join or select a team to view workshop inventory.
+        </p>
+      </div>
+    </div>
+  );
+}
+
 export function InventoryView() {
   const user = useUser();
   const team = useTeam();
   const teamId = team?.id ?? "";
   const isAdmin = isGlobalAdmin(user);
-  const { data: items = [], isLoading, isError } = useTeamInventory();
+  const inventoryQuery = useTeamInventory();
+  const { data: items = [], isError } = inventoryQuery;
+  const isInitialLoading = isQueryInitiallyLoading(inventoryQuery);
   const { createMutation } = useTeamInventoryMutations({
     teamId: team?.id,
     onCreateSuccess: () => {
@@ -47,7 +67,8 @@ export function InventoryView() {
       setName("");
       setDescription("");
       setTotalStock("");
-      setImageUrl("");
+      setImageFile(null);
+      setCreateError(undefined);
     },
   });
   const [search, setSearch] = useState("");
@@ -57,11 +78,12 @@ export function InventoryView() {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [totalStock, setTotalStock] = useState("");
-  const [imageUrl, setImageUrl] = useState("");
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [createError, setCreateError] = useState<string | undefined>();
 
   const openCreateModal = () => setIsModalOpen(true);
 
-  const handleCreateItem = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleCreateItem = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const trimmedName = name.trim();
     const stock = Number.parseInt(totalStock, 10);
@@ -69,12 +91,26 @@ export function InventoryView() {
     if (!trimmedName || createMutation.isPending) return;
     if (!Number.isInteger(stock) || stock < 0) return;
 
-    createMutation.mutate({
-      name: trimmedName,
-      description: description.trim() || undefined,
-      totalStock: stock,
-      imageUrl: imageUrl.trim() || undefined,
-    });
+    setCreateError(undefined);
+
+    try {
+      const imageUrl = imageFile
+        ? await uploadInventoryImage(imageFile)
+        : undefined;
+
+      await createMutation.mutateAsync({
+        name: trimmedName,
+        description: description.trim() || undefined,
+        totalStock: stock,
+        imageUrl,
+      });
+    } catch (error) {
+      setCreateError(
+        error instanceof Error
+          ? error.message
+          : "Failed to create inventory item.",
+      );
+    }
   };
 
   const teamLabel = team ? `${team.name} (${team.number})` : "Your team";
@@ -88,6 +124,10 @@ export function InventoryView() {
     () => summarizeInventory(items, teamId),
     [items, teamId],
   );
+
+  if (!team) {
+    return <InventoryFallback />;
+  }
 
   return (
     <div className="relative flex-1 overflow-y-auto bg-white dark:bg-[#03070e] px-8 py-6 font-sans dashboard-scroll">
@@ -140,7 +180,7 @@ export function InventoryView() {
           </div>
         </header>
 
-        {isLoading ? (
+        {isInitialLoading ? (
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-3 lg:grid-cols-5">
               {Array.from({ length: 5 }).map((_, index) => (
@@ -238,26 +278,21 @@ export function InventoryView() {
         name={name}
         description={description}
         totalStock={totalStock}
-        imageUrl={imageUrl}
+        imageFile={imageFile}
         onNameChange={setName}
         onDescriptionChange={setDescription}
         onTotalStockChange={setTotalStock}
-        onImageUrlChange={setImageUrl}
+        onImageFileChange={setImageFile}
         onClose={() => {
           if (!createMutation.isPending) {
             createMutation.reset();
+            setCreateError(undefined);
             setIsModalOpen(false);
           }
         }}
         onSubmit={handleCreateItem}
         isSubmitting={createMutation.isPending}
-        error={
-          createMutation.isError
-            ? createMutation.error instanceof Error
-              ? createMutation.error.message
-              : "Failed to create inventory item."
-            : undefined
-        }
+        error={createError}
       />
     </div>
   );

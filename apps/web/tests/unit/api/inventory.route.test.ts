@@ -4,6 +4,7 @@ const verifyCurrentUserPermissionsMock = vi.hoisted(() => vi.fn());
 const createTeamInventoryItemMock = vi.hoisted(() => vi.fn());
 const getTeamInventoryMock = vi.hoisted(() => vi.fn());
 const getCurrentUserMock = vi.hoisted(() => vi.fn());
+const enforceApiRateLimitMock = vi.hoisted(() => vi.fn());
 
 vi.mock("server-only", () => ({}));
 
@@ -15,6 +16,10 @@ vi.mock("@/lib/auth/current-user", () => ({
   getCurrentUser: getCurrentUserMock,
 }));
 
+vi.mock("@/lib/security/enforce-api-rate-limit", () => ({
+  enforceApiRateLimit: enforceApiRateLimitMock,
+}));
+
 vi.mock("@/lib/queries/inventory.server", () => ({
   createTeamInventoryItem: createTeamInventoryItemMock,
   getTeamInventory: getTeamInventoryMock,
@@ -23,11 +28,15 @@ vi.mock("@/lib/queries/inventory.server", () => ({
 const { GET, POST } = await import("@/app/api/inventory/route");
 
 const TEAM_ID = "team-abc";
+const USER_ID = "user-abc";
 
 function mockGlobalAdmin() {
   verifyCurrentUserPermissionsMock.mockResolvedValue({
     authorized: true,
     scope: "GLOBAL",
+  });
+  getCurrentUserMock.mockResolvedValue({
+    profile: { id: USER_ID, teamId: TEAM_ID },
   });
 }
 
@@ -48,6 +57,7 @@ function buildCreatedItem(overrides: Record<string, unknown> = {}) {
 describe("api/inventory POST", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    enforceApiRateLimitMock.mockResolvedValue(null);
   });
 
   it("returns 403 when the user is not a global admin", async () => {

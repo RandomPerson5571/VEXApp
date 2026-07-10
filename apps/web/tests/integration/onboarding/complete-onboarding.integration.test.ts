@@ -210,8 +210,14 @@ describeIntegration("completeOnboarding integration", () => {
               user_metadata: { invite_code: inviteId, provider_id: existingDiscordId },
               identities: [
                 {
+                  id: existingDiscordId,
                   provider: "discord",
                   identity_data: { sub: existingDiscordId },
+                  user_id: TEST_AUTH_USER_A,
+                  identity_id: existingDiscordId,
+                  created_at: new Date().toISOString(),
+                  updated_at: new Date().toISOString(),
+                  last_sign_in_at: new Date().toISOString(),
                 },
               ],
             }),

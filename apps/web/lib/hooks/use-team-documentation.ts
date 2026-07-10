@@ -1,6 +1,6 @@
 "use client";
 
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { useTeam } from "@/components/providers/UserProvider";
 import {
@@ -50,6 +50,7 @@ export function useDocumentationDetail(docId: string | null | undefined) {
   return useQuery({
     ...documentationDetailQueryOptions(docId ?? ""),
     enabled: !!docId,
+    placeholderData: keepPreviousData,
   });
 }
 

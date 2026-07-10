@@ -1,6 +1,7 @@
 import type { DocType, DocumentationDetail } from "@stlvex/database/types";
 
 import { createDocumentationDetailQueryOptions } from "@/lib/queries/shared/documentation";
+import { throwIfRateLimited } from "@/lib/queries/api-response";
 
 export { DEFAULT_DOCUMENTATION_TEMPLATE } from "@/lib/data/documentation";
 
@@ -39,6 +40,8 @@ export async function createDocumentationFromApi(
     body: JSON.stringify(payload),
   });
 
+  throwIfRateLimited(response);
+
   const body = (await response.json()) as DocumentationDetail | { error?: string };
 
   if (!response.ok) {
@@ -60,6 +63,8 @@ export async function updateDocumentationFromApi(
     body: JSON.stringify(body),
   });
 
+  throwIfRateLimited(response);
+
   const responseBody = (await response.json()) as
     | DocumentationDetail
     | { error?: string };
@@ -79,6 +84,8 @@ export async function deleteDocumentationFromApi(docId: string): Promise<void> {
   const response = await fetch(`/api/documents/${docId}`, {
     method: "DELETE",
   });
+
+  throwIfRateLimited(response);
 
   if (!response.ok) {
     const body = (await response.json()) as { error?: string };

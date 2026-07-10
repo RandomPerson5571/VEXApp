@@ -80,7 +80,9 @@ describeIntegration("Fusion integration lifecycle", () => {
   it("DELETE removes the integration row", async () => {
     await createTestFusionIntegration(teamId);
 
-    const response = await DELETE();
+    const response = await DELETE(
+      new Request("https://example.test/api/team/fusion", { method: "DELETE" }),
+    );
     const body = await response.json();
 
     expect(response.status).toBe(200);

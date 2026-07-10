@@ -24,8 +24,6 @@ export function CalendarSidePanel({
   onAddEvent: () => void;
 }) {
   const handleDayPlanClick = (type: DayPlanType) => {
-    if (isDayPlanPending) return;
-
     if (selectedDayPlan?.type === type) {
       onClearDayPlan();
       return;
@@ -55,8 +53,7 @@ export function CalendarSidePanel({
               <button
                 type="button"
                 onClick={onClearDayPlan}
-                disabled={isDayPlanPending}
-                className="inline-flex items-center gap-1 text-[10px] font-bold text-slate-500 dark:text-slate-500 hover:text-red-600 dark:hover:text-red-400 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                className="inline-flex items-center gap-1 text-[10px] font-bold text-slate-500 dark:text-slate-500 hover:text-red-600 dark:hover:text-red-400 transition"
               >
                 <X className="h-3 w-3" />
                 Clear
@@ -64,11 +61,7 @@ export function CalendarSidePanel({
             )}
           </div>
 
-          <div
-            className={`grid grid-cols-3 gap-2 ${
-              isDayPlanPending ? "opacity-60 pointer-events-none" : ""
-            }`}
-          >
+          <div className="grid grid-cols-3 gap-2">
             {DAY_PLAN_TYPES.map((type) => {
               const style = getDayPlanStyle(type);
               const isActive = selectedDayPlan?.type === type;
@@ -78,10 +71,9 @@ export function CalendarSidePanel({
                   key={type}
                   type="button"
                   onClick={() => handleDayPlanClick(type)}
-                  disabled={isDayPlanPending}
-                  className={`flex flex-col items-center gap-1.5 px-2 py-3 rounded-xl border-2 text-[11px] font-black uppercase tracking-wide transition-all duration-200 cursor-pointer disabled:cursor-not-allowed ${
+                  className={`flex flex-col items-center gap-1.5 px-2 py-3 rounded-xl border-2 text-[11px] font-black uppercase tracking-wide transition-all duration-200 cursor-pointer ${
                     isActive ? style.buttonActive : style.button
-                  }`}
+                  } ${isDayPlanPending ? "opacity-80" : ""}`}
                 >
                   <span className={`h-3 w-3 rounded-full ${style.dot} ${isActive ? "ring-2 ring-white/40" : ""}`} />
                   {style.label}
