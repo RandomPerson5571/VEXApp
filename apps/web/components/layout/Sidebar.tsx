@@ -52,7 +52,7 @@ export function AppSidebar({ onClose }: AppSidebarProps) {
   );
 
   return (
-    <aside className="w-[240px] flex-shrink-0 bg-white dark:bg-[#070b13] border-r border-slate-200 dark:border-slate-900/60 flex flex-col h-screen select-none font-sans">
+    <aside className="flex h-full w-[240px] flex-shrink-0 flex-col select-none border-r border-slate-200 bg-white font-sans dark:border-slate-900/60 dark:bg-[#070b13]">
       <div className="relative flex items-center border-b border-slate-200 p-5 pr-14 dark:border-slate-900/40">
         <div className="flex min-w-0 flex-1 items-center gap-3">
           <STLRoboticsLogoComponent width={44} height={44} />

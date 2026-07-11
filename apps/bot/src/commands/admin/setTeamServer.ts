@@ -1,5 +1,5 @@
 import { findUserByDiscordId, prisma } from "@stlvex/database";
-import { SlashCommandBuilder, inlineCode, roleMention } from "discord.js";
+import { SlashCommandBuilder, inlineCode } from "discord.js";
 import type { SlashCommand } from "../../types.js";
 import {
   autocompleteTeamOption,
@@ -7,23 +7,20 @@ import {
   resolveTargetTeam,
 } from "../../utils/team-options.js";
 
-const setTeamRole: SlashCommand = {
+const setTeamServer: SlashCommand = {
   data: new SlashCommandBuilder()
-    .setName("set-team-role")
-    .setDescription("Set the Discord role for a team")
+    .setName("set-team-server")
+    .setDescription("Link a team to this Discord server")
     .addStringOption((option) =>
       option
         .setName("team")
-        .setDescription("Team to set the role for")
+        .setDescription("Team to link to this server")
         .setRequired(true)
         .setAutocomplete(true),
-    )
-    .addRoleOption((option) =>
-      option.setName("role").setDescription("The role to assign to the team").setRequired(true),
     ),
   autocomplete: autocompleteTeamOption,
   async execute(interaction) {
-    if (!interaction.inGuild() || !interaction.guild) {
+    if (!interaction.inGuild() || !interaction.guildId) {
       await interaction.reply({
         content: "This command can only be used in a server.",
         ephemeral: true,
@@ -44,17 +41,16 @@ const setTeamRole: SlashCommand = {
 
     if (!isPlatformAdmin(dbUser)) {
       await interaction.editReply({
-        content: "❌ Only admins can set a team's Discord role.",
+        content: "❌ Only admins can set a team's Discord server.",
       });
       return;
     }
 
     const teamIdInput = interaction.options.getString("team");
-    const role = interaction.options.getRole("role", true);
 
     const targetTeam = await resolveTargetTeam(dbUser, teamIdInput, {
       adminRequiredMessage: "❌ Admins must select a team.",
-      leaderScopeMessage: "❌ Only admins can set a team's Discord role.",
+      leaderScopeMessage: "❌ Only admins can set a team's Discord server.",
     });
 
     if (!targetTeam.ok) {
@@ -65,19 +61,19 @@ const setTeamRole: SlashCommand = {
     try {
       const updatedTeam = await prisma.team.update({
         where: { id: targetTeam.teamId },
-        data: { discordRoleId: role.id },
+        data: { discordServerId: interaction.guildId },
       });
 
       await interaction.editReply({
-        content: `✅ Role for team ${inlineCode(updatedTeam.number)} set to ${roleMention(role.id)}.`,
+        content: `✅ Team ${inlineCode(updatedTeam.number)} linked to this server.`,
       });
     } catch {
       await interaction.editReply({
         content:
-          "❌ Could not update that team. Another team may already use that role.",
+          "❌ Could not update that team. Another team may already be linked to this server.",
       });
     }
   },
 };
 
-export default setTeamRole;
+export default setTeamServer;

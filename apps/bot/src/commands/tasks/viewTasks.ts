@@ -255,7 +255,7 @@ const tasksCommand: SlashCommand = {
     const statusInput = interaction.options.getString("status") as TaskStatus | "ALL" | null;
     const priorityFilter = interaction.options.getString("priority") as TaskPriority | null;
     const taskTypeFilter = interaction.options.getString("task-type") as TaskType | null;
-    const assignedToMe = interaction.options.getBoolean("assigned-to-me") ?? false;
+    const assignedToMe = interaction.options.getBoolean("assigned-to-me") ?? true;
     const sortBy = (interaction.options.getString("sort-by") ?? "priority") as SortField;
     const sortOrder = (interaction.options.getString("sort-order") ??
       (sortBy === "due-date" || sortBy === "created" || sortBy === "title" ? "asc" : "desc")) as SortOrder;

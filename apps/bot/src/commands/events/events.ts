@@ -31,7 +31,7 @@ const eventsCommand: SlashCommand = {
     // Defer reply immediately so slow database lookups don't crash the command
     await interaction.deferReply({ ephemeral: true });
 
-    const range = interaction.options.getString("range") || "week";
+    const range = interaction.options.getString("time-range") ?? "week";
     const discordId = interaction.user.id;
 
     // Fetch user and their team assignment

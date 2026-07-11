@@ -1,5 +1,5 @@
 import { findUserByDiscordId, prisma } from "@stlvex/database";
-import { SlashCommandBuilder, inlineCode, roleMention } from "discord.js";
+import { ChannelType, SlashCommandBuilder, channelMention, inlineCode } from "discord.js";
 import type { SlashCommand } from "../../types.js";
 import {
   autocompleteTeamOption,
@@ -7,23 +7,27 @@ import {
   resolveTargetTeam,
 } from "../../utils/team-options.js";
 
-const setTeamRole: SlashCommand = {
+const setAnnouncementsChannel: SlashCommand = {
   data: new SlashCommandBuilder()
-    .setName("set-team-role")
-    .setDescription("Set the Discord role for a team")
+    .setName("set-announcements-channel")
+    .setDescription("Set the announcements channel for a team")
     .addStringOption((option) =>
       option
         .setName("team")
-        .setDescription("Team to set the role for")
+        .setDescription("Team to set the announcements channel for")
         .setRequired(true)
         .setAutocomplete(true),
     )
-    .addRoleOption((option) =>
-      option.setName("role").setDescription("The role to assign to the team").setRequired(true),
+    .addChannelOption((option) =>
+      option
+        .setName("channel")
+        .setDescription("The announcements channel")
+        .setRequired(true)
+        .addChannelTypes(ChannelType.GuildText, ChannelType.GuildAnnouncement),
     ),
   autocomplete: autocompleteTeamOption,
   async execute(interaction) {
-    if (!interaction.inGuild() || !interaction.guild) {
+    if (!interaction.inGuild()) {
       await interaction.reply({
         content: "This command can only be used in a server.",
         ephemeral: true,
@@ -44,17 +48,17 @@ const setTeamRole: SlashCommand = {
 
     if (!isPlatformAdmin(dbUser)) {
       await interaction.editReply({
-        content: "❌ Only admins can set a team's Discord role.",
+        content: "❌ Only admins can set a team's announcements channel.",
       });
       return;
     }
 
     const teamIdInput = interaction.options.getString("team");
-    const role = interaction.options.getRole("role", true);
+    const channel = interaction.options.getChannel("channel", true);
 
     const targetTeam = await resolveTargetTeam(dbUser, teamIdInput, {
       adminRequiredMessage: "❌ Admins must select a team.",
-      leaderScopeMessage: "❌ Only admins can set a team's Discord role.",
+      leaderScopeMessage: "❌ Only admins can set a team's announcements channel.",
     });
 
     if (!targetTeam.ok) {
@@ -65,19 +69,18 @@ const setTeamRole: SlashCommand = {
     try {
       const updatedTeam = await prisma.team.update({
         where: { id: targetTeam.teamId },
-        data: { discordRoleId: role.id },
+        data: { annoucementsChannelId: channel.id },
       });
 
       await interaction.editReply({
-        content: `✅ Role for team ${inlineCode(updatedTeam.number)} set to ${roleMention(role.id)}.`,
+        content: `✅ Announcements channel for team ${inlineCode(updatedTeam.number)} set to ${channelMention(channel.id)}.`,
       });
     } catch {
       await interaction.editReply({
-        content:
-          "❌ Could not update that team. Another team may already use that role.",
+        content: "❌ Could not update that team. It may not exist.",
       });
     }
   },
 };
 
-export default setTeamRole;
+export default setAnnouncementsChannel;

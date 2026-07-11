@@ -1,4 +1,4 @@
-import { findUserByDiscordId } from "@stlvex/database";
+import { findUserByDiscordId, prisma } from "@stlvex/database";
 import { SlashCommandBuilder } from "discord.js";
 import { config } from "../../config.js";
 import type { SlashCommand } from "../../types.js";
@@ -22,7 +22,7 @@ const verify: SlashCommand = {
 
     if (!user) {
       await interaction.reply({
-        content: "No matching account was found. Please link your discord account first.",
+        content: "No matching account was found. Please link your discord account first at stlvexapp.guanine.org/settings/profile.",
         ephemeral: true,
       });
       return;
@@ -47,7 +47,17 @@ const verify: SlashCommand = {
       }
 
       await member.roles.add(user.team.discordRoleId, "Verified user sync");
-      await member.roles.add(config.generalMemberRoleId, "Verified user sync");
+
+      const guildSettings = await prisma.discordGuildSettings.findUnique({
+        where: { guildId: interaction.guildId },
+        select: { generalMemberRoleId: true },
+      });
+      const generalMemberRoleId =
+        guildSettings?.generalMemberRoleId || config.generalMemberRoleId;
+      if (!generalMemberRoleId) {
+        throw new Error("General member role is not configured");
+      }
+      await member.roles.add(generalMemberRoleId, "Verified user sync");
 
       await interaction.reply({
         content: `Verified. Your nickname is now: ${nickname}`,

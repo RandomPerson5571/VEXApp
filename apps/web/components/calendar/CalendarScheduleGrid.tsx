@@ -33,72 +33,70 @@ export function CalendarScheduleGrid({
 }) {
   const hours = getScheduleHours();
   const gridHeight = hours.length * SCHEDULE_HOUR_HEIGHT;
+  const cols =
+    mode === "week" ? "grid-cols-[56px_repeat(7,1fr)]" : "grid-cols-[56px_1fr]";
 
   return (
     <div className="flex-1 min-h-0 bg-[#090e18]/80 border border-slate-900 rounded-2xl overflow-hidden flex flex-col">
-      <div
-        className={`grid border-b border-slate-900 bg-slate-950 ${
-          mode === "week" ? "grid-cols-[56px_repeat(7,1fr)]" : "grid-cols-[56px_1fr]"
-        }`}
-      >
-        <div className="border-r border-slate-900" />
-        {days.map((cell) => {
-          const date = parseDateStr(cell.dateStr);
-          const weekday = WEEKDAY_LABELS[date.getDay()];
-          const isSelected = selectedDate === cell.dateStr;
-          const isToday = cell.dateStr === todayStr;
-          const dayPlan = dayPlansByDate.get(cell.dateStr);
-          const dayPlanStyle = dayPlan ? getDayPlanStyle(dayPlan.type) : null;
-
-          return (
-            <button
-              key={cell.dateStr}
-              type="button"
-              onClick={() => onSelectDate(cell.dateStr)}
-              className={`py-2 px-1 text-center border-r border-slate-900/60 transition cursor-pointer ${
-                dayPlanStyle
-                  ? `${dayPlanStyle.cellBg} border-l-[3px] ${dayPlanStyle.accent}`
-                  : isSelected
-                    ? "bg-blue-600/10"
-                    : "hover:bg-slate-900/40"
-              } ${isSelected ? "ring-2 ring-inset ring-orange-500/50" : ""}`}
-            >
-              <div className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">
-                {weekday}
-              </div>
-              <div className="mt-1 flex items-center justify-center gap-1.5">
-                <div
-                  className={`h-7 w-7 flex items-center justify-center rounded-full text-sm font-black ${
-                    isToday
-                      ? "bg-blue-600/20 text-blue-400 border border-blue-500/30"
-                      : "text-slate-200"
-                  }`}
-                >
-                  {cell.day}
-                </div>
-                {dayPlanStyle && (
-                  <span className={`h-2 w-2 rounded-full ${dayPlanStyle.dot} shadow-sm flex-shrink-0`} />
-                )}
-              </div>
-              {dayPlanStyle && (
-                <div
-                  className={`mt-1 mx-auto max-w-full px-1.5 py-0.5 rounded text-[7.5px] font-black uppercase tracking-wide border truncate ${dayPlanStyle.badge}`}
-                >
-                  {dayPlanStyle.label}
-                </div>
-              )}
-            </button>
-          );
-        })}
-      </div>
-
+      {/* ponytail: sticky header inside scroll so scrollbar doesn't desync week cols */}
       <div className="flex-1 min-h-0 overflow-y-auto dashboard-scroll">
         <div
-          className={`grid ${
-            mode === "week" ? "grid-cols-[56px_repeat(7,1fr)]" : "grid-cols-[56px_1fr]"
-          }`}
-          style={{ minHeight: gridHeight }}
+          className={`sticky top-0 z-20 grid border-b border-slate-900 bg-slate-950 ${cols}`}
         >
+          <div className="border-r border-slate-900" />
+          {days.map((cell) => {
+            const date = parseDateStr(cell.dateStr);
+            const weekday = WEEKDAY_LABELS[date.getDay()];
+            const isSelected = selectedDate === cell.dateStr;
+            const isToday = cell.dateStr === todayStr;
+            const dayPlan = dayPlansByDate.get(cell.dateStr);
+            const dayPlanStyle = dayPlan ? getDayPlanStyle(dayPlan.type) : null;
+
+            return (
+              <button
+                key={cell.dateStr}
+                type="button"
+                onClick={() => onSelectDate(cell.dateStr)}
+                className={`py-2 px-1 text-center border-r border-slate-900/60 transition cursor-pointer ${
+                  dayPlanStyle
+                    ? `${dayPlanStyle.cellBg} border-l-[3px] ${dayPlanStyle.accent}`
+                    : isSelected
+                      ? "bg-blue-600/10"
+                      : "hover:bg-slate-900/40"
+                } ${isSelected ? "ring-2 ring-inset ring-orange-500/50" : ""}`}
+              >
+                <div className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">
+                  {weekday}
+                </div>
+                <div className="mt-1 flex items-center justify-center gap-1.5">
+                  <div
+                    className={`h-7 w-7 flex items-center justify-center rounded-full text-sm font-black ${
+                      isToday
+                        ? "bg-blue-600/20 text-blue-400 border border-blue-500/30"
+                        : "text-slate-200"
+                    }`}
+                  >
+                    {cell.day}
+                  </div>
+                  {dayPlanStyle && (
+                    <span
+                      className={`h-2 w-2 rounded-full ${dayPlanStyle.dot} shadow-sm flex-shrink-0`}
+                    />
+                  )}
+                </div>
+                {dayPlanStyle && (
+                  <div
+                    className={`mt-1 mx-auto max-w-full px-1.5 py-0.5 rounded text-[7.5px] font-black uppercase tracking-wide border truncate ${dayPlanStyle.badge}`}
+                  >
+                    {dayPlanStyle.label}
+                  </div>
+                )}
+              </button>
+            );
+          })}
+        </div>
+
+        <div className={`grid ${cols}`} style={{ minHeight: gridHeight }}>
           <div className="border-r border-slate-900 bg-slate-950/80">
             {hours.map((hour) => (
               <div

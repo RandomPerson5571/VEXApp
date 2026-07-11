@@ -1,7 +1,7 @@
 import { findUserByDiscordId, prisma } from "@stlvex/database";
 import type { EventType } from "@stlvex/database/types";
 import {
-  LabelBuilder,
+  ActionRowBuilder,
   ModalBuilder,
   TextInputBuilder,
   TextInputStyle,
@@ -62,54 +62,49 @@ function buildScheduleEventModal(eventType: EventType, teamId: string | null): M
   return new ModalBuilder()
     .setCustomId(buildModalCustomId(eventType, teamId))
     .setTitle("Schedule Event")
-    .addLabelComponents(
-      new LabelBuilder()
-        .setLabel("Event Name")
-        .setTextInputComponent(
-          new TextInputBuilder()
-            .setCustomId("event-name")
-            .setStyle(TextInputStyle.Short)
-            .setRequired(true)
-            .setMaxLength(100),
-        ),
-      new LabelBuilder()
-        .setLabel("Description")
-        .setTextInputComponent(
-          new TextInputBuilder()
-            .setCustomId("event-description")
-            .setStyle(TextInputStyle.Paragraph)
-            .setRequired(true)
-            .setMaxLength(1000),
-        ),
-      new LabelBuilder()
-        .setLabel("Location")
-        .setTextInputComponent(
-          new TextInputBuilder()
-            .setCustomId("event-location")
-            .setStyle(TextInputStyle.Short)
-            .setRequired(true)
-            .setMaxLength(200),
-        ),
-      new LabelBuilder()
-        .setLabel("Start Date & Time")
-        .setTextInputComponent(
-          new TextInputBuilder()
-            .setCustomId("event-start-date")
-            .setStyle(TextInputStyle.Short)
-            .setPlaceholder(datePlaceholder)
-            .setRequired(true)
-            .setMaxLength(32),
-        ),
-      new LabelBuilder()
-        .setLabel("End Date & Time (optional)")
-        .setTextInputComponent(
-          new TextInputBuilder()
-            .setCustomId("event-end-date")
-            .setStyle(TextInputStyle.Short)
-            .setPlaceholder(datePlaceholder)
-            .setRequired(false)
-            .setMaxLength(32),
-        ),
+    .addComponents(
+      new ActionRowBuilder<TextInputBuilder>().addComponents(
+        new TextInputBuilder()
+          .setCustomId("event-name")
+          .setLabel("Event Name")
+          .setStyle(TextInputStyle.Short)
+          .setRequired(true)
+          .setMaxLength(100),
+      ),
+      new ActionRowBuilder<TextInputBuilder>().addComponents(
+        new TextInputBuilder()
+          .setCustomId("event-description")
+          .setLabel("Description")
+          .setStyle(TextInputStyle.Paragraph)
+          .setRequired(true)
+          .setMaxLength(1000),
+      ),
+      new ActionRowBuilder<TextInputBuilder>().addComponents(
+        new TextInputBuilder()
+          .setCustomId("event-location")
+          .setLabel("Location")
+          .setStyle(TextInputStyle.Short)
+          .setRequired(true)
+          .setMaxLength(200),
+      ),
+      new ActionRowBuilder<TextInputBuilder>().addComponents(
+        new TextInputBuilder()
+          .setCustomId("event-start-date")
+          .setLabel("Start Date & Time")
+          .setStyle(TextInputStyle.Short)
+          .setPlaceholder(datePlaceholder)
+          .setRequired(true)
+          .setMaxLength(32),
+      ),
+      new ActionRowBuilder<TextInputBuilder>().addComponents(
+        new TextInputBuilder()
+          .setCustomId("event-end-date")
+          .setLabel("End Date & Time (optional)")
+          .setStyle(TextInputStyle.Short)
+          .setPlaceholder(datePlaceholder)
+          .setRequired(false)
+          .setMaxLength(32),
+      ),
     );
 }
 

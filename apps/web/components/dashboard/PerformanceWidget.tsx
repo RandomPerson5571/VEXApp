@@ -117,15 +117,6 @@ export function MatchPerformanceChart({ matches }: { matches: MatchRecord[] }) {
           <span className="rounded-full bg-slate-300 dark:bg-slate-900 px-2 py-0.5 text-slate-900 dark:text-white font-black">{avgScore}</span>
         </div>
       </div>
-
-      <div className="mt-5 rounded-[24px] border border-slate-300 dark:border-white/10 bg-slate-100 dark:bg-slate-950/60 p-3 text-xs text-slate-700 dark:text-slate-400">
-        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-          <span className="font-bold text-slate-800 dark:text-slate-300">Showing last 7 scouting records.</span>
-          <Link href="/scouting" className="text-orange-600 dark:text-orange-300 font-bold hover:text-orange-700 dark:hover:text-orange-200">
-            Manage Match Records →
-          </Link>
-        </div>
-      </div>
     </div>
   );
 }

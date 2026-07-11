@@ -97,6 +97,7 @@ model Team {
   number          String          @unique // e.g., "82855T"
   discordServerId String?         @unique
   discordRoleId   String?         @unique
+  annoucementsChannelId String?
   members         User[]
   events          Event[]         @relation("TeamEvents")
   notebookLogs    NotebookLog[]
@@ -108,6 +109,13 @@ model Team {
   dayPlans          TeamDayPlan[]
   createdAt         DateTime        @default(now())
   updatedAt         DateTime        @updatedAt
+}
+
+model DiscordGuildSettings {
+  guildId             String   @id
+  generalMemberRoleId String?
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
 }
 
 model TeamGitHubIntegration {

@@ -13,7 +13,7 @@ export interface DashboardViewProps {
 
 export function DashboardView({ matches }: DashboardViewProps) {
   return (
-    <div className="flex-1 overflow-y-auto px-6 py-6 bg-slate-50 dark:bg-[#020617] text-slate-900 dark:text-slate-100 font-sans dashboard-scroll">
+    <div className="min-h-0 flex-1 overflow-y-auto bg-slate-50 px-6 py-6 font-sans text-slate-900 dashboard-scroll dark:bg-[#020617] dark:text-slate-100">
       <div className="mx-auto w-full max-w-[1600px] space-y-6">
         <SummaryStatsGrid />
 
