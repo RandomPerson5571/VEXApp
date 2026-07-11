@@ -25,7 +25,7 @@ packages/database/node_modules/.prisma
 .netlify
 
 # Cursor
-.cursor
+.cursor/*
 
 # Debug
 npm-debug.log*
