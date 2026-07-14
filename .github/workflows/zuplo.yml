@@ -30,3 +30,4 @@ jobs:
           github.ref_name }}"
         env:
           ZUPLO_API_KEY: ${{ secrets.ZUPLO_API_KEY }}
+          
