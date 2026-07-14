@@ -1,0 +1,32 @@
+{
+    "$schema": "https://schema.zuplo.com/v1/policies.json",
+    "policies": [
+      {
+        "name": "global-cors-policy",
+        "policyType": "cors",
+        "handler": {
+          "export": "CorsPolicy",
+          "module": "$import(@zuplo/runtime)",
+          "options": {
+            "origins": ["https://example.com", "https://admin.example.com"],
+            "allowedMethods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+            "allowedHeaders": ["Authorization", "Content-Type", "apikey", "X-Client-Info"],
+            "maxAge": 86400
+          }
+        }
+      },
+      {
+        "name": "per-user-rate-limit",
+        "policyType": "rate-limit-inbound",
+        "handler": {
+          "export": "RateLimitInboundPolicy",
+          "module": "$import(@zuplo/runtime)",
+          "options": {
+            "rateLimitBy": "user",
+            "requestsAllowed": 60,
+            "timeWindowMinutes": 1
+          }
+        }
+      }
+    ]
+  }

@@ -1,0 +1,39 @@
+{
+    "openapi": "3.1.0",
+    "info": {
+      "title": "Production API Gateway",
+      "version": "1.0.0"
+    },
+    "paths": {
+      "/v1/todos": {
+        "get": {
+          "summary": "Fetch user tasks securely from backend",
+          "x-zuplo-route": {
+            "corsPolicy": "global-cors-policy",
+            "policies": {
+              "inbound": [
+                "supabase-jwt-auth",
+                "per-user-rate-limit"
+              ]
+            },
+            "urlRewrite": "$env(SUPABASE_URL)/rest/v1/todos",
+            "forwardHeaders": [
+              "Authorization",
+              "Prefer"
+            ],
+            "internalHeaders": [
+              {
+                "name": "apikey",
+                "value": "$env(SUPABASE_ANON_KEY)"
+              }
+            ]
+          },
+          "responses": {
+            "200": {
+              "description": "Success"
+            }
+          }
+        }
+      }
+    }
+  }

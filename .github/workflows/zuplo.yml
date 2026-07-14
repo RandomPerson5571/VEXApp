@@ -1,0 +1,31 @@
+name: Deploy Zuplo API
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "packages/api-gateway/**"
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: packages/api-gateway
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Deploy to Zuplo
+        run:
+          npx zuplo deploy --api-key "$ZUPLO_API_KEY" --environment "${{
+          github.ref_name }}"
+        env:
+          ZUPLO_API_KEY: ${{ secrets.ZUPLO_API_KEY }}

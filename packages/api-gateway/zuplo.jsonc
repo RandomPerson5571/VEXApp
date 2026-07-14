@@ -1,0 +1,6 @@
+{
+    "$schema": "https://schema.zuplo.com/v1/zuplo.json",
+    "version": 1,
+    "projectType": "typescript",
+    "compatibilityDate": "2026-03-01"
+  }
