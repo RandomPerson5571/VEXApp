@@ -8,7 +8,7 @@
           "export": "CorsPolicy",
           "module": "$import(@zuplo/runtime)",
           "options": {
-            "origins": ["https://example.com", "https://admin.example.com"],
+            "origins": ["https://vex-app.zuplo.app", "https://admin.vex-app.zuplo.app"],
             "allowedMethods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
             "allowedHeaders": ["Authorization", "Content-Type", "apikey", "X-Client-Info"],
             "maxAge": 86400
