@@ -1,0 +1,32 @@
+name: Deploy Zuplo API
+
+on:
+  push:
+    branches:
+      - main
+      - api-gateway
+    paths:
+      - "packages/api-gateway/**"
+
+jobs:
+  deploy:
+    if: ${{ secrets.ZUPLO_API_KEY != '' }}
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: packages/api-gateway
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Deploy to Zuplo
+        run: |
+          npx zuplo deploy --project "vex-app" --api-key "${{ secrets.ZUPLO_API_KEY }}" --environment "${{ github.head_ref || github.ref_name }}"
+        env:
+          ZUPLO_API_KEY: ${{ secrets.ZUPLO_API_KEY }}
