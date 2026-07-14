@@ -1,16 +1,14 @@
 {
-    "name": "@my-monorepo/api-gateway",
-    "version": "1.0.0",
-    "private": true,
-    "main": ".zuplo/worker.ts",
-    "scripts": {
-      "dev": "zuplo dev",
-      "test": "zuplo test"
-    },
-    "dependencies": {
-      "@zuplo/runtime": "^2.0.0"
-    },
-    "devDependencies": {
-      "@zuplo/cli": "^2.0.0"
-    }
+  "name": "@my-monorepo/api-gateway",
+  "version": "1.0.0",
+  "private": true,
+  "main": ".zuplo/worker.ts",
+  "scripts": {
+    "dev": "zuplo dev",
+    "test": "zuplo test",
+    "deploy": "zuplo deploy"
+  },
+  "devDependencies": {
+    "@zuplo/cli": "^6.72.3"
   }
+}
