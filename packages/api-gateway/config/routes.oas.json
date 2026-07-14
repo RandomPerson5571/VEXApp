@@ -12,7 +12,6 @@
             "corsPolicy": "global-cors-policy",
             "policies": {
               "inbound": [
-                "supabase-jwt-auth",
                 "per-user-rate-limit"
               ]
             },
