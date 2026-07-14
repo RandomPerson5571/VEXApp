@@ -5,10 +5,13 @@ packages:
 # ADD THIS BLOCK
 allowBuilds:
   '@prisma/engines': true
+  '@swc/core': set this to true or false
+  deno: set this to true or false
   esbuild: true
   prisma: true
   sharp: true
   unrs-resolver: true
+  workerd: set this to true or false
 
 minimumReleaseAgeExclude:
   - events.vex@7.0.0
