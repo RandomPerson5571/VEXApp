@@ -8,6 +8,9 @@ on:
     paths:
       - "packages/api-gateway/**"
 
+permissions:
+  contents: read
+
 jobs:
   deploy:
     if: ${{ secrets.ZUPLO_API_KEY != '' }}
