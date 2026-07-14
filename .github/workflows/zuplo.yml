@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - api-gateway
     paths:
       - "packages/api-gateway/**"
 
