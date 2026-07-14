@@ -1,0 +1,14 @@
+packages:
+  - "docs"
+allowBuilds:
+  '@swc/core': true
+  deno: true
+  esbuild: true
+  protobufjs: true
+  workerd: true
+onlyBuiltDependencies:
+  - "@swc/core"
+  - deno
+  - esbuild
+  - protobufjs
+  - workerd

@@ -1,14 +1,26 @@
 {
-  "name": "@my-monorepo/api-gateway",
-  "version": "1.0.0",
+  "name": "api-gateway",
+  "version": "0.1.0",
+  "type": "module",
   "private": true,
-  "main": ".zuplo/worker.ts",
   "scripts": {
     "dev": "zuplo dev",
     "test": "zuplo test",
-    "deploy": "zuplo deploy"
+    "typecheck": "tsc --noEmit",
+    "docs": "zuplo docs",
+    "lint": "eslint"
+  },
+  "dependencies": {
+    "@zuplo/otel": "^6",
+    "zuplo": "^6"
   },
   "devDependencies": {
-    "@zuplo/cli": "^6.72.3"
+    "@eslint/js": "^10",
+    "@types/node": "^22",
+    "eslint": "^10",
+    "eslint-config-prettier": "^10",
+    "prettier": "^3",
+    "typescript": "^5",
+    "typescript-eslint": "^8"
   }
 }
