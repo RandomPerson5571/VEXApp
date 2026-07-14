@@ -26,9 +26,6 @@ jobs:
 
       - name: Deploy to Zuplo
         run: |
-          npx zuplo deploy \
-            --project "vex-app" \
-            --api-key "$ZUPLO_API_KEY" \
-            --environment "${{ github.head_ref || github.ref_name }}"
+          npx zuplo deploy --project "vex-app" --api-key "$ZUPLO_API_KEY" --environment "${{ github.head_ref || github.ref_name }}"
         env:
           ZUPLO_API_KEY: ${{ secrets.ZUPLO_API_KEY }}
