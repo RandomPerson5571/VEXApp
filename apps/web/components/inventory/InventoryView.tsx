@@ -67,6 +67,7 @@ export function InventoryView() {
       setName("");
       setDescription("");
       setTotalStock("");
+      setCheckoutLimit("");
       setImageFile(null);
       setCreateError(undefined);
     },
@@ -78,6 +79,7 @@ export function InventoryView() {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [totalStock, setTotalStock] = useState("");
+  const [checkoutLimit, setCheckoutLimit] = useState("");
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [createError, setCreateError] = useState<string | undefined>();
 
@@ -87,9 +89,14 @@ export function InventoryView() {
     e.preventDefault();
     const trimmedName = name.trim();
     const stock = Number.parseInt(totalStock, 10);
+    const limit =
+      checkoutLimit.trim() === ""
+        ? undefined
+        : Number.parseInt(checkoutLimit, 10);
 
     if (!trimmedName || createMutation.isPending) return;
     if (!Number.isInteger(stock) || stock < 0) return;
+    if (limit !== undefined && (!Number.isInteger(limit) || limit < 1)) return;
 
     setCreateError(undefined);
 
@@ -102,6 +109,7 @@ export function InventoryView() {
         name: trimmedName,
         description: description.trim() || undefined,
         totalStock: stock,
+        checkoutLimit: limit,
         imageUrl,
       });
     } catch (error) {
@@ -278,10 +286,12 @@ export function InventoryView() {
         name={name}
         description={description}
         totalStock={totalStock}
+        checkoutLimit={checkoutLimit}
         imageFile={imageFile}
         onNameChange={setName}
         onDescriptionChange={setDescription}
         onTotalStockChange={setTotalStock}
+        onCheckoutLimitChange={setCheckoutLimit}
         onImageFileChange={setImageFile}
         onClose={() => {
           if (!createMutation.isPending) {

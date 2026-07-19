@@ -7,7 +7,18 @@ export type CreateInventoryItemPayload = {
   name: string;
   description?: string;
   totalStock: number;
+  checkoutLimit?: number;
   imageUrl?: string;
+};
+
+export type SignOutInventoryItemPayload = {
+  itemId: string;
+  quantity: number;
+};
+
+export type ReturnInventorySignOutPayload = {
+  itemId: string;
+  signOutId: string;
 };
 
 export async function fetchTeamInventoryFromApi(): Promise<TeamInventoryItem[]> {
@@ -36,6 +47,49 @@ export async function createInventoryItemFromApi(
   if (!response.ok) {
     throw new Error(
       "error" in body && body.error ? body.error : "Failed to create inventory item.",
+    );
+  }
+
+  return body as TeamInventoryItem;
+}
+
+export async function signOutInventoryItemFromApi(
+  payload: SignOutInventoryItemPayload,
+): Promise<TeamInventoryItem> {
+  const response = await fetch(`/api/inventory/${payload.itemId}/sign-outs`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ quantity: payload.quantity }),
+  });
+
+  throwIfRateLimited(response);
+
+  const body = (await response.json()) as TeamInventoryItem | { error?: string };
+
+  if (!response.ok) {
+    throw new Error(
+      "error" in body && body.error ? body.error : "Failed to sign out inventory item.",
+    );
+  }
+
+  return body as TeamInventoryItem;
+}
+
+export async function returnInventorySignOutFromApi(
+  payload: ReturnInventorySignOutPayload,
+): Promise<TeamInventoryItem> {
+  const response = await fetch(
+    `/api/inventory/${payload.itemId}/sign-outs/${payload.signOutId}`,
+    { method: "PATCH" },
+  );
+
+  throwIfRateLimited(response);
+
+  const body = (await response.json()) as TeamInventoryItem | { error?: string };
+
+  if (!response.ok) {
+    throw new Error(
+      "error" in body && body.error ? body.error : "Failed to return inventory item.",
     );
   }
 

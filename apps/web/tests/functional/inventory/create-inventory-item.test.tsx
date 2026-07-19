@@ -14,6 +14,7 @@ function CreateInventoryHarness({
   initialName = "",
   initialDescription = "",
   initialTotalStock = "",
+  initialCheckoutLimit = "",
   initialImageFile = null,
 }: {
   onCreate: (payload: CreateInventoryItemPayload) => void;
@@ -21,11 +22,13 @@ function CreateInventoryHarness({
   initialName?: string;
   initialDescription?: string;
   initialTotalStock?: string;
+  initialCheckoutLimit?: string;
   initialImageFile?: File | null;
 }) {
   const [name, setName] = useState(initialName);
   const [description, setDescription] = useState(initialDescription);
   const [totalStock, setTotalStock] = useState(initialTotalStock);
+  const [checkoutLimit, setCheckoutLimit] = useState(initialCheckoutLimit);
   const [imageFile, setImageFile] = useState<File | null>(initialImageFile);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState(initialError);
@@ -34,15 +37,21 @@ function CreateInventoryHarness({
     event.preventDefault();
     const trimmedName = name.trim();
     const stock = Number.parseInt(totalStock, 10);
+    const limit =
+      checkoutLimit.trim() === ""
+        ? undefined
+        : Number.parseInt(checkoutLimit, 10);
 
     if (!trimmedName || isSubmitting) return;
     if (!Number.isInteger(stock) || stock < 0) return;
+    if (limit !== undefined && (!Number.isInteger(limit) || limit < 1)) return;
 
     setIsSubmitting(true);
     onCreate({
       name: trimmedName,
       description: description.trim() || undefined,
       totalStock: stock,
+      checkoutLimit: limit,
     });
     setIsSubmitting(false);
     setError(undefined);
@@ -54,10 +63,12 @@ function CreateInventoryHarness({
       name={name}
       description={description}
       totalStock={totalStock}
+      checkoutLimit={checkoutLimit}
       imageFile={imageFile}
       onNameChange={setName}
       onDescriptionChange={setDescription}
       onTotalStockChange={setTotalStock}
+      onCheckoutLimitChange={setCheckoutLimit}
       onImageFileChange={setImageFile}
       onClose={() => undefined}
       onSubmit={handleSubmit}
@@ -94,6 +105,7 @@ describe("inventory item creation UI", () => {
           initialName="  REV HD Hex Motor  "
           initialDescription="  Green cartridge  "
           initialTotalStock="4"
+          initialCheckoutLimit="2"
         />,
       );
     });
@@ -110,6 +122,7 @@ describe("inventory item creation UI", () => {
       name: "REV HD Hex Motor",
       description: "Green cartridge",
       totalStock: 4,
+      checkoutLimit: 2,
     });
   });
 

@@ -88,14 +88,16 @@ export default async function Home({
             </div>
 
             <div className="mt-10 lg:mt-0 lg:ml-10 flex-shrink-0">
-              <div className="flex h-96 w-96 max-w-full items-center justify-center">
-                <Image
-                  src={RoaryIcon}
-                  alt="Roary, STL Robotics team mascot"
-                  priority
-                  className="h-full w-auto object-contain drop-shadow-2xl transition-transform duration-300 ease-out hover:scale-105 float"
-                />
-              </div>
+              <video
+                src="/models/wow.mp4"
+                poster={RoaryIcon.src}
+                autoPlay
+                loop
+                muted
+                playsInline
+                aria-label="Looping STL Robotics video"
+                className="h-[450px] w-[450px] object-contain transition-transform duration-300 ease-out hover:scale-105 float"
+              />
             </div>
           </div>
         </div>

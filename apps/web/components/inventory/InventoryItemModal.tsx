@@ -9,10 +9,12 @@ export function InventoryItemModal({
   name,
   description,
   totalStock,
+  checkoutLimit,
   imageFile,
   onNameChange,
   onDescriptionChange,
   onTotalStockChange,
+  onCheckoutLimitChange,
   onImageFileChange,
   onClose,
   onSubmit,
@@ -23,10 +25,12 @@ export function InventoryItemModal({
   name: string;
   description: string;
   totalStock: string;
+  checkoutLimit: string;
   imageFile: File | null;
   onNameChange: (value: string) => void;
   onDescriptionChange: (value: string) => void;
   onTotalStockChange: (value: string) => void;
+  onCheckoutLimitChange: (value: string) => void;
   onImageFileChange: (file: File | null) => void;
   onClose: () => void;
   onSubmit: (event: FormEvent<HTMLFormElement>) => void;
@@ -141,6 +145,31 @@ export function InventoryItemModal({
                 onChange={(e) => onTotalStockChange(e.target.value)}
                 className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 font-mono text-xs text-slate-900 transition-[border-color,box-shadow] focus:border-yellow-500 focus:outline-none focus:ring-1 focus:ring-yellow-500/30 dark:border-slate-900 dark:bg-slate-950 dark:text-slate-200 dark:focus:border-yellow-500/40"
               />
+            </div>
+
+            <div className="space-y-1">
+              <label
+                htmlFor="inventory-checkout-limit"
+                className="block text-[10px] font-bold uppercase tracking-widest text-slate-600 dark:text-slate-400"
+              >
+                Checkout Limit
+                <span className="ml-1 font-semibold normal-case tracking-normal text-slate-500">
+                  (optional)
+                </span>
+              </label>
+              <input
+                id="inventory-checkout-limit"
+                type="number"
+                min={1}
+                step={1}
+                placeholder="No limit"
+                value={checkoutLimit}
+                onChange={(e) => onCheckoutLimitChange(e.target.value)}
+                className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 font-mono text-xs text-slate-900 transition-[border-color,box-shadow] focus:border-yellow-500 focus:outline-none focus:ring-1 focus:ring-yellow-500/30 dark:border-slate-900 dark:bg-slate-950 dark:text-slate-200 dark:focus:border-yellow-500/40"
+              />
+              <p className="text-[10px] font-semibold leading-relaxed text-slate-500">
+                Maximum units someone can check out at once.
+              </p>
             </div>
 
             <div className="space-y-1">
