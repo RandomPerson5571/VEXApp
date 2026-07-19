@@ -92,7 +92,7 @@ export default async function Home({
                 src={RoaryIcon}
                 alt="Roary, STL Robotics team mascot"
                 priority
-                className="h-full w-auto object-contain transition-opacity duration-300 ease-out group-hover:opacity-0 float"
+                className="h-full w-auto object-contain transition-opacity duration-1000 ease-out group-hover:opacity-0 float"
               />
               <video
                 src="/models/wow.mp4"
@@ -101,7 +101,7 @@ export default async function Home({
                 muted
                 playsInline
                 aria-label="Looping STL Robotics video"
-                className="absolute inset-0 h-full w-full object-contain transition-opacity duration-300 ease-out opacity-0 group-hover:opacity-100 float"
+                className="absolute inset-0 h-full w-full object-contain transition-opacity duration-1000 ease-out opacity-0 group-hover:opacity-100 float"
               />
             </div>
           </div>
