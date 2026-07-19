@@ -35,6 +35,7 @@ type CreateInventoryItemRequestBody = {
   name?: string;
   description?: string;
   totalStock?: number;
+  checkoutLimit?: number | null;
   imageUrl?: string;
 };
 
@@ -132,11 +133,24 @@ export async function POST(request: Request) {
     );
   }
 
+  const checkoutLimit = body.checkoutLimit ?? null;
+
+  if (
+    checkoutLimit !== null &&
+    (!Number.isInteger(checkoutLimit) || checkoutLimit < 1)
+  ) {
+    return NextResponse.json(
+      { error: "Checkout limit must be a whole number of at least 1." },
+      { status: 400 },
+    );
+  }
+
   try {
     const item = await createTeamInventoryItem({
       name,
       description: body.description ?? null,
       totalStock,
+      checkoutLimit,
       imageUrl: body.imageUrl ?? null,
     });
 
