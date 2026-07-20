@@ -353,6 +353,7 @@ model InventoryItem {
   name        String
   description String?
   totalStock  Int      // Total units the organization owns
+  checkoutLimit Int?    // Optional max units a user can check out in one sign-out
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 

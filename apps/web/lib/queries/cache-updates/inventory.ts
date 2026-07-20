@@ -16,3 +16,17 @@ export function prependTeamInventoryItem(
     },
   );
 }
+
+export function replaceTeamInventoryItem(
+  queryClient: QueryClient,
+  teamId: string,
+  updatedItem: TeamInventoryItem,
+): void {
+  queryClient.setQueryData<TeamInventoryItem[]>(
+    queryKeys.inventory.forTeam(teamId),
+    (old) => {
+      if (!old) return [updatedItem];
+      return old.map((item) => (item.id === updatedItem.id ? updatedItem : item));
+    },
+  );
+}
