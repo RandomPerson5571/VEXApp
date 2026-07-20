@@ -50,6 +50,7 @@ export function KnowledgeGraph({
 }: KnowledgeGraphProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const graphRef = useRef<GraphApi | null>(null);
+  const hasFittedRef = useRef(false);
   const [size, setSize] = useState({ width: 0, height: 0 });
 
   const graphData = useMemo(() => toGraphData(nodes, edges), [nodes, edges]);
@@ -62,76 +63,87 @@ export function KnowledgeGraph({
     [highlightedIds],
   );
 
+  const showGraph =
+    !isLoading && !isError && nodes.length > 0 && size.width > 0 && size.height > 0;
+
+  // Keep the measure target mounted so first paint gets real dimensions.
   useEffect(() => {
     const el = containerRef.current;
     if (!el) return;
 
     const updateSize = () => {
-      setSize({ width: el.clientWidth, height: el.clientHeight });
+      const width = el.clientWidth;
+      const height = el.clientHeight;
+      setSize((prev) =>
+        prev.width === width && prev.height === height
+          ? prev
+          : { width, height },
+      );
     };
-    updateSize();
 
+    updateSize();
+    const raf = requestAnimationFrame(updateSize);
     const observer = new ResizeObserver(updateSize);
     observer.observe(el);
-    return () => observer.disconnect();
+
+    return () => {
+      cancelAnimationFrame(raf);
+      observer.disconnect();
+    };
   }, []);
 
+  // Reset fit when the graph set changes substantially (empty → data).
+  useEffect(() => {
+    if (nodes.length === 0) {
+      hasFittedRef.current = false;
+    }
+  }, [nodes.length]);
+
+  // Soft pan to selection — no hard zoom.
   useEffect(() => {
     if (!selectedId || !graphRef.current) return;
     const node = graphData.nodes.find((entry) => entry.id === selectedId) as
       | (GraphNode & { x?: number; y?: number })
       | undefined;
     if (node?.x == null || node?.y == null) return;
-    graphRef.current.centerAt(node.x, node.y, 400);
-    graphRef.current.zoom(2.2, 400);
-  }, [graphData.nodes, selectedId]);
+    graphRef.current.centerAt(node.x, node.y, 350);
+  }, [selectedId, graphData.nodes]);
 
-  useEffect(() => {
-    if (selectedId || !graphRef.current || nodes.length === 0) return;
-    if (size.width <= 0 || size.height <= 0) return;
-
-    const timer = window.setTimeout(() => {
-      graphRef.current?.zoomToFit(400, 80);
-    }, 150);
-
-    return () => window.clearTimeout(timer);
-  }, [graphData.nodes, graphData.links, nodes.length, selectedId, size.height, size.width]);
-
-  if (isLoading) {
-    return (
-      <div className="flex h-full items-center justify-center text-sm text-slate-500">
-        Loading graph…
-      </div>
-    );
-  }
-
-  if (isError) {
-    return (
-      <div className="flex h-full items-center justify-center text-sm text-rose-500">
-        Failed to load knowledge graph.
-      </div>
-    );
-  }
-
-  if (nodes.length === 0) {
-    return (
-      <div className="flex h-full flex-col items-center justify-center gap-2 p-8 text-center">
-        <Network className="h-10 w-10 text-slate-400" />
-        <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">
-          No nodes yet
-        </p>
-        <p className="max-w-sm text-xs text-slate-500">
-          {isAdmin
-            ? "Add your first node from the sidebar to start the graph."
-            : "Nodes will appear here once an admin adds them."}
-        </p>
-      </div>
-    );
-  }
+  const fitGraph = (ms = 300) => {
+    if (!graphRef.current || size.width <= 0 || size.height <= 0) return;
+    // Generous padding so the whole web stays in view (not clipped to an edge).
+    graphRef.current.zoomToFit(ms, Math.max(100, Math.min(size.width, size.height) * 0.18));
+  };
 
   return (
-    <div ref={containerRef} className="h-full w-full">
-      {size.width > 0 && size.height > 0 ? (
+    <div ref={containerRef} className="relative h-full min-h-[420px] w-full">
+      {isLoading ? (
+        <div className="absolute inset-0 z-10 flex items-center justify-center text-sm text-slate-500">
+          Loading graph…
+        </div>
+      ) : null}
+
+      {isError ? (
+        <div className="absolute inset-0 z-10 flex items-center justify-center text-sm text-rose-500">
+          Failed to load knowledge graph.
+        </div>
+      ) : null}
+
+      {!isLoading && !isError && nodes.length === 0 ? (
+        <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-2 p-8 text-center">
+          <Network className="h-10 w-10 text-slate-400" />
+          <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">
+            No nodes yet
+          </p>
+          <p className="max-w-sm text-xs text-slate-500">
+            {isAdmin
+              ? "Add your first node from the sidebar to start the graph."
+              : "Nodes will appear here once an admin adds them."}
+          </p>
+        </div>
+      ) : null}
+
+      {showGraph ? (
         <ForceGraph2D
           ref={graphRef as never}
           width={size.width}
@@ -144,10 +156,12 @@ export function KnowledgeGraph({
           nodeRelSize={8}
           linkDirectionalArrowLength={3.5}
           linkDirectionalArrowRelPos={1}
+          cooldownTicks={80}
           onEngineStop={() => {
-            if (!selectedId) {
-              graphRef.current?.zoomToFit(400, 80);
-            }
+            // Fit once after the first layout pass — avoid re-zooming on every settle.
+            if (hasFittedRef.current) return;
+            hasFittedRef.current = true;
+            fitGraph(400);
           }}
           onNodeClick={(node) => onSelectNode(String((node as GraphNode).id))}
           onBackgroundClick={onClearSelection}
@@ -169,7 +183,11 @@ export function KnowledgeGraph({
             ctx.fill();
 
             if (isSelected || isHit || isLinkSource) {
-              ctx.strokeStyle = isHit ? "#facc15" : isLinkSource ? "#38bdf8" : "#f8fafc";
+              ctx.strokeStyle = isHit
+                ? "#facc15"
+                : isLinkSource
+                  ? "#38bdf8"
+                  : "#f8fafc";
               ctx.lineWidth = 2 / globalScale;
               ctx.stroke();
             }
