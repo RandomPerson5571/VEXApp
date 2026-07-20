@@ -1,28 +1,34 @@
 "use client";
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { Bell, User } from "lucide-react";
 
+export type SettingsSectionId = "profile" | "notifications";
+
 const settingsItems = [
-  { href: "/settings/profile", label: "Profile", icon: User },
-  { href: "/settings/notifications", label: "Notifications", icon: Bell },
+  { id: "profile" as const, label: "Profile", icon: User },
+  { id: "notifications" as const, label: "Notifications", icon: Bell },
 ] as const;
 
-export function SettingsSidebar() {
-  const pathname = usePathname();
+type SettingsSidebarProps = {
+  section: SettingsSectionId;
+  onSectionChange: (section: SettingsSectionId) => void;
+};
 
+export function SettingsSidebar({
+  section,
+  onSectionChange,
+}: SettingsSidebarProps) {
   return (
     <nav className="lg:col-span-3 rounded-2xl bg-white border border-slate-200 p-4 space-y-1 shadow-sm dark:bg-[#0a0a0a] dark:border-[#1a1a1a]">
       {settingsItems.map((item) => {
         const Icon = item.icon;
-        const isActive =
-          pathname === item.href || pathname.startsWith(`${item.href}/`);
+        const isActive = section === item.id;
 
         return (
-          <Link
-            key={item.href}
-            href={item.href}
+          <button
+            key={item.id}
+            type="button"
+            onClick={() => onSectionChange(item.id)}
             className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-bold transition border ${
               isActive
                 ? "bg-blue-600/10 text-blue-600 border-blue-500/10 dark:text-blue-400"
@@ -33,7 +39,7 @@ export function SettingsSidebar() {
               className={`h-4.5 w-4.5 ${isActive ? "text-blue-600 dark:text-blue-400" : "text-slate-500"}`}
             />
             <span>{item.label}</span>
-          </Link>
+          </button>
         );
       })}
     </nav>
