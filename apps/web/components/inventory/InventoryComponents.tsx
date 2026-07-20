@@ -140,7 +140,7 @@ function StatCard({
   pulse?: boolean;
 }) {
   const toneClasses = {
-    slate: "border-slate-300 dark:border-slate-800/80 bg-slate-200 dark:bg-slate-950/50 text-slate-700 dark:text-slate-300",
+    slate: "border-slate-300 dark:border-[#1a1a1a] bg-slate-200 dark:bg-[#121212]/50 text-slate-700 dark:text-slate-300",
     blue: "border-blue-300 dark:border-blue-500/20 bg-blue-100 dark:bg-blue-500/5 text-blue-700 dark:text-blue-300",
     yellow: "border-yellow-300 dark:border-yellow-500/20 bg-yellow-100 dark:bg-yellow-500/5 text-yellow-700 dark:text-yellow-300",
     red: "border-red-300 dark:border-red-500/20 bg-red-100 dark:bg-red-500/5 text-red-700 dark:text-red-300",
@@ -186,7 +186,7 @@ export function InventoryFilters({
   resultCount: number;
 }) {
   return (
-    <div className="space-y-3 rounded-2xl border border-slate-300 dark:border-slate-900/80 bg-slate-50 dark:bg-[#090e18]/70 p-4 shadow-md dark:shadow-md backdrop-blur-sm dark:backdrop-blur-sm">
+    <div className="space-y-3 rounded-2xl border border-slate-300 dark:border-[#1a1a1a] bg-slate-50 dark:bg-[#0a0a0a] p-4 shadow-md backdrop-blur-sm dark:backdrop-blur-sm">
       <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
         <div className="relative flex-1">
           <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-600" />
@@ -195,7 +195,7 @@ export function InventoryFilters({
             value={search}
             onChange={(event) => onSearchChange(event.target.value)}
             placeholder="Search parts by name or description…"
-            className="w-full rounded-xl border border-slate-300 dark:border-slate-900 bg-white dark:bg-slate-950/80 py-2.5 pl-10 pr-4 text-sm font-semibold text-slate-900 dark:text-slate-200 outline-none transition-[border-color,box-shadow] placeholder:text-slate-600 dark:placeholder:text-slate-600 focus:border-yellow-500 dark:focus:border-yellow-500/40 focus:shadow-[0_0_0_3px_rgba(234,179,8,0.12)]"
+            className="w-full rounded-xl border border-slate-300 dark:border-[#1a1a1a] bg-white dark:bg-[#121212]/80 py-2.5 pl-10 pr-4 text-sm font-semibold text-slate-900 dark:text-slate-200 outline-none transition-[border-color,box-shadow] placeholder:text-slate-600 dark:placeholder:text-slate-600 focus:border-yellow-500 dark:focus:border-yellow-500/40 focus:shadow-[0_0_0_3px_rgba(234,179,8,0.12)]"
           />
         </div>
         <p className="text-[11px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-500">
@@ -214,7 +214,7 @@ export function InventoryFilters({
               className={`rounded-lg border px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider transition-[transform,background-color,border-color,color] duration-200 motion-safe:active:scale-95 motion-reduce:transition-none ${
                 active
                   ? "border-yellow-500/30 bg-yellow-500/15 text-yellow-600 dark:text-yellow-300"
-                  : "border-slate-300 dark:border-slate-900 bg-slate-200 dark:bg-slate-950/60 text-slate-700 dark:text-slate-500 hover:border-slate-400 dark:hover:border-slate-800 hover:text-slate-900 dark:hover:text-slate-300"
+                  : "border-slate-300 dark:border-[#1a1a1a] bg-slate-200 dark:bg-[#121212]/60 text-slate-700 dark:text-slate-500 hover:border-slate-400 dark:hover:border-slate-800 hover:text-slate-900 dark:hover:text-slate-300"
               }`}
             >
               {filter.label}
@@ -247,7 +247,7 @@ export function InventoryCard({
 
   return (
     <article
-      className="group relative overflow-hidden rounded-2xl border border-slate-300 dark:border-slate-900/80 bg-slate-100 dark:bg-[#090e18]/80 p-5 shadow-md dark:shadow-md backdrop-blur-sm transition-[transform,border-color] duration-300 motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-2 motion-safe:fill-mode-backwards motion-safe:hover:-translate-y-1 motion-safe:hover:border-slate-400 dark:motion-safe:hover:border-slate-800 motion-reduce:animate-none motion-reduce:transition-none"
+      className="group relative overflow-hidden rounded-2xl border border-slate-300 dark:border-[#1a1a1a] bg-slate-100 dark:bg-[#0a0a0a] p-5 shadow-md backdrop-blur-sm transition-[transform,border-color] duration-300 motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-2 motion-safe:fill-mode-backwards motion-safe:hover:-translate-y-1 motion-safe:hover:border-slate-400 dark:motion-safe:hover:border-slate-800 motion-reduce:animate-none motion-reduce:transition-none"
       style={staggerStyle}
     >
       <div
@@ -306,7 +306,7 @@ export function InventoryCard({
               </span>
             ) : null}
           </div>
-          <div className="h-2 w-full overflow-hidden rounded-full border border-slate-300 dark:border-slate-900/80 bg-slate-200 dark:bg-slate-950">
+          <div className="h-2 w-full overflow-hidden rounded-full border border-slate-300 dark:border-[#1a1a1a] bg-slate-200 dark:bg-[#121212]">
             <div
               className={`h-full rounded-full transition-[width] duration-500 ease-out motion-reduce:transition-none ${statusBarClass[status]}`}
               style={{ width: `${fill}%` }}
@@ -315,7 +315,7 @@ export function InventoryCard({
         </div>
 
         {teamSignOuts.length > 0 ? (
-          <div className="rounded-xl border border-slate-300 dark:border-slate-900/80 bg-slate-100 dark:bg-slate-950/40 p-3">
+          <div className="rounded-xl border border-slate-300 dark:border-[#1a1a1a] bg-slate-100 dark:bg-[#121212]/40 p-3">
             <p className="mb-2 text-[9px] font-bold uppercase tracking-widest text-slate-600 dark:text-slate-500">
               Checked out by your team
             </p>

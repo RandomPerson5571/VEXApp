@@ -79,7 +79,7 @@ export function OnboardingClient({
 
   if (needsEmailConfirmation) {
     return (
-      <div className="w-full max-w-lg rounded-2xl bg-[#090e18]/80 border border-slate-900 shadow-2xl p-8 space-y-5 text-center">
+      <div className="w-full max-w-lg rounded-2xl bg-[#0a0a0a] border border-[#1a1a1a]  p-8 space-y-5 text-center">
         <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-blue-950/40 border border-blue-900/40">
           <Mail className="h-5 w-5 text-blue-400" />
         </div>
@@ -117,7 +117,7 @@ export function OnboardingClient({
           <button
             type="submit"
             disabled={resendPending || Boolean(resendState && "success" in resendState)}
-            className="w-full rounded-lg border border-slate-800 bg-slate-900 px-4 py-2.5 text-sm font-semibold text-slate-200 hover:bg-slate-800 disabled:opacity-60"
+            className="w-full rounded-lg border border-[#1a1a1a] bg-slate-900 px-4 py-2.5 text-sm font-semibold text-slate-200 hover:bg-slate-800 disabled:opacity-60"
           >
             {resendPending ? "Sending..." : "Resend confirmation email"}
           </button>
@@ -133,7 +133,7 @@ export function OnboardingClient({
   return (
     <form
       action={profileAction}
-      className="w-full max-w-lg rounded-2xl bg-[#090e18]/80 border border-slate-900 shadow-2xl p-8 space-y-5"
+      className="w-full max-w-lg rounded-2xl bg-[#0a0a0a] border border-[#1a1a1a]  p-8 space-y-5"
     >
       <div>
         <p className="text-xs font-semibold uppercase tracking-wide text-blue-400">
@@ -159,7 +159,7 @@ export function OnboardingClient({
           <input
             name="firstName"
             type="text"
-            className="rounded-lg border border-slate-900/60 bg-slate-950 px-3 py-2 text-slate-100"
+            className="rounded-lg border border-[#1a1a1a]/60 bg-slate-950 px-3 py-2 text-slate-100"
             required
           />
         </label>
@@ -171,7 +171,7 @@ export function OnboardingClient({
           <input
             name="lastName"
             type="text"
-            className="rounded-lg border border-slate-900/60 bg-slate-950 px-3 py-2 text-slate-100"
+            className="rounded-lg border border-[#1a1a1a]/60 bg-slate-950 px-3 py-2 text-slate-100"
             required
           />
         </label>

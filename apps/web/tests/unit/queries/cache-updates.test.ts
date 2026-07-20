@@ -8,10 +8,6 @@ import {
   removeDayPlanFromListCache,
   upsertDayPlanInList,
 } from "@/lib/queries/cache-updates/day-plans";
-import {
-  mergeDocInTree,
-} from "@/lib/queries/cache-updates/documentation";
-import { applyFolderTreePatch } from "@/lib/queries/cache-updates/folders";
 import { queryKeys } from "@/lib/query-client";
 
 import {
@@ -20,9 +16,6 @@ import {
 } from "@/lib/queries/cache-updates/tasks";
 import type {
   DashboardTask,
-  DocType,
-  DocumentationDetail,
-  FolderWithDocs,
   TaskListTask,
   TaskStatus,
   TaskType,
@@ -120,31 +113,6 @@ describe("cache-updates/tasks", () => {
         title: "New",
         status: "InProgress",
       }),
-    ]);
-  });
-});
-
-describe("cache-updates/folders", () => {
-  it("inserts a new folder into the documentation tree", () => {
-    const queryClient = new QueryClient();
-    const teamId = "team-1";
-    const existing: FolderWithDocs = {
-      id: "folder-1",
-      name: "Design",
-      docs: [],
-    };
-    const created: FolderWithDocs = {
-      id: "folder-2",
-      name: "Build Logs",
-      docs: [],
-    };
-
-    queryClient.setQueryData(queryKeys.docs.tree(teamId), [existing]);
-    applyFolderTreePatch(queryClient, teamId, created);
-
-    expect(queryClient.getQueryData(queryKeys.docs.tree(teamId))).toEqual([
-      created,
-      existing,
     ]);
   });
 });
@@ -264,53 +232,6 @@ describe("cache-updates/day-plans", () => {
 
     expect(queryClient.getQueryData(queryKeys.dayPlans.forTeam(teamId))).toEqual([
       buildDayPlan({ id: "plan-2", date: "2026-07-07", type: "coding" }),
-    ]);
-  });
-});
-
-describe("cache-updates/documentation", () => {
-  it("merges doc title and type into the documentation tree", () => {
-    const folders: FolderWithDocs[] = [
-      {
-        id: "folder-1",
-        name: "Design",
-        docs: [
-          {
-            id: "doc-1",
-            title: "Old title",
-            type: "GENERAL" as DocType,
-            folderId: "folder-1",
-            createdAt: new Date("2026-01-01"),
-          },
-        ],
-      },
-    ];
-
-    const detail = {
-      id: "doc-1",
-      title: "New title",
-      type: "CAD" as DocType,
-      content: "Body",
-      folderId: "folder-1",
-      createdAt: new Date("2026-01-01"),
-      updatedAt: new Date("2026-01-02"),
-      authors: [],
-      folder: { id: "folder-1", name: "Design" },
-    } as DocumentationDetail;
-
-    expect(mergeDocInTree(folders, detail)).toEqual([
-      {
-        ...folders[0],
-        docs: [
-          {
-            id: "doc-1",
-            title: "New title",
-            type: "CAD",
-            folderId: "folder-1",
-            createdAt: new Date("2026-01-01"),
-          },
-        ],
-      },
     ]);
   });
 });

@@ -97,7 +97,7 @@ function NotificationEventCheckbox({
       className={`flex cursor-pointer items-start gap-3 rounded-lg border px-3 py-3 transition duration-200 motion-reduce:transition-none ${
         checked
           ? "border-[#1f883d]/30 bg-[#1f883d]/5 dark:border-[#3fb950]/25 dark:bg-[#3fb950]/5"
-          : "border-slate-200 bg-white hover:border-slate-300 dark:border-slate-800 dark:bg-slate-950/40 dark:hover:border-slate-700"
+          : "border-slate-200 bg-white hover:border-slate-300 dark:border-slate-800 dark:bg-[#121212]/40 dark:hover:border-slate-700"
       } ${disabled ? "cursor-not-allowed opacity-50" : ""}`}
     >
       <span
@@ -142,7 +142,7 @@ function IntegrationHeader({
   accentClassName: string;
 }) {
   return (
-    <div className="mb-4 flex items-start gap-3 border-b border-slate-200 pb-4 dark:border-slate-900/80">
+    <div className="mb-4 flex items-start gap-3 border-b border-slate-200 pb-4 dark:border-[#1a1a1a]">
       <div
         className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border ${accentClassName}`}
       >
@@ -306,7 +306,7 @@ export function NotificationsSettingsView({
         description="Fine-tune which repository and design events trigger notifications."
       >
         <div className="space-y-6">
-          <div className="rounded-xl border border-slate-200 bg-slate-50/80 p-5 transition duration-200 dark:border-slate-900 dark:bg-slate-950/40">
+          <div className="rounded-xl border border-slate-200 bg-slate-50/80 p-5 transition duration-200 dark:border-[#1a1a1a] dark:bg-[#121212]/40">
             <IntegrationHeader
               icon={Github.src}
               name="GitHub"
@@ -328,7 +328,7 @@ export function NotificationsSettingsView({
             </div>
 
             {githubNotifsEnabled && enableDiscordPushNotifs ? (
-              <div className="mt-4 rounded-xl border border-slate-200 bg-white/80 p-4 backdrop-blur-sm dark:border-slate-800 dark:bg-slate-950/50">
+              <div className="mt-4 rounded-xl border border-slate-200 bg-white/80 p-4 backdrop-blur-sm dark:border-slate-800 dark:bg-[#121212]/50">
                 <p className="mb-3 text-[10px] font-black uppercase tracking-widest text-slate-500">
                   Events
                 </p>
@@ -355,7 +355,7 @@ export function NotificationsSettingsView({
             ) : null}
           </div>
 
-          <div className="rounded-xl border border-slate-200 bg-slate-50/80 p-5 transition duration-200 dark:border-slate-900 dark:bg-slate-950/40">
+          <div className="rounded-xl border border-slate-200 bg-slate-50/80 p-5 transition duration-200 dark:border-[#1a1a1a] dark:bg-[#121212]/40">
             <IntegrationHeader
               icon={Fusion360.src}
               name="Fusion 360"
@@ -379,7 +379,7 @@ export function NotificationsSettingsView({
         </div>
       </SettingsSection>
 
-      <div className="rounded-2xl border border-slate-200 bg-white px-5 py-4 shadow-sm dark:border-slate-900 dark:bg-[#090e18]/80">
+      <div className="rounded-2xl border border-slate-200 bg-white px-5 py-4 shadow-sm dark:border-[#1a1a1a] dark:bg-[#0a0a0a]">
         {saveMessage ? (
           <div className="mb-4 rounded-lg border border-emerald-500/20 bg-emerald-500/5 px-3.5 py-2.5 text-sm text-emerald-600 dark:text-emerald-300">
             {saveMessage}
@@ -403,7 +403,7 @@ export function NotificationsSettingsView({
               type="button"
               onClick={handleReset}
               disabled={!isDirty || isSaving}
-              className="cursor-pointer rounded-lg border border-slate-200 px-4 py-2 text-xs font-semibold text-slate-600 transition hover:border-slate-300 hover:text-slate-900 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-900 dark:text-slate-400 dark:hover:border-slate-800 dark:hover:text-slate-200"
+              className="cursor-pointer rounded-lg border border-slate-200 px-4 py-2 text-xs font-semibold text-slate-600 transition hover:border-slate-300 hover:text-slate-900 disabled:cursor-not-allowed disabled:opacity-50 dark:border-[#1a1a1a] dark:text-slate-400 dark:hover:border-slate-800 dark:hover:text-slate-200"
             >
               Reset
             </button>

@@ -53,7 +53,7 @@ function AssigneeStack({ assignees }: { assignees: TaskListAssignee[] }) {
           <div
             key={person.id}
             title={formatPersonName(person)}
-            className="flex h-7 w-7 items-center justify-center rounded-full border-2 border-white bg-gradient-to-br from-blue-700 to-indigo-800 text-[9px] font-bold text-white shadow-sm dark:border-[#090e18]"
+            className="flex h-7 w-7 items-center justify-center rounded-full border-2 border-white bg-gradient-to-br from-blue-700 to-indigo-800 text-[9px] font-bold text-white shadow-sm dark:border-[#0a0a0a]"
           >
             {getInitials(person.firstName, person.lastName)}
           </div>
@@ -72,7 +72,7 @@ function SubtaskRow({ task }: { task: TaskListSubTask }) {
   const assignees = getTaskAssignees(task);
 
   return (
-    <div className="group/sub flex items-start gap-3 rounded-lg border border-transparent px-3 py-2.5 transition hover:border-slate-200 hover:bg-slate-100 dark:hover:border-slate-800/80 dark:hover:bg-slate-950/40">
+    <div className="group/sub flex items-start gap-3 rounded-lg border border-transparent px-3 py-2.5 transition hover:border-slate-200 hover:bg-slate-100 dark:hover:border-[#1a1a1a] dark:hover:bg-slate-950/40">
       <div className="mt-1.5 flex h-4 w-4 shrink-0 items-center justify-center">
         {task.status === "Done" ? (
           <CheckCircle2 className="h-4 w-4 text-emerald-500" />
@@ -155,7 +155,7 @@ export function TaskCard({
 
   return (
     <article
-      className={`overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:border-slate-300 dark:border-slate-900/80 dark:bg-[#090e18]/80 dark:shadow-md dark:hover:border-slate-800 ${
+      className={`overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:border-slate-300 dark:border-[#1a1a1a] dark:bg-[#0a0a0a] dark:hover:border-slate-800 ${
         onOpen ? "cursor-pointer" : ""
       }`}
       onClick={onOpen}
@@ -250,7 +250,7 @@ export function TaskCard({
 
           {hasSubtasks ? (
             <div className="w-full shrink-0 lg:w-44">
-              <div className="rounded-xl border border-slate-200 bg-slate-50 p-3 dark:border-slate-900/80 dark:bg-slate-950/50">
+              <div className="rounded-xl border border-slate-200 bg-slate-50 p-3 dark:border-[#1a1a1a] dark:bg-[#121212]/50">
                 <div className="flex items-center justify-between text-[10px] font-bold uppercase tracking-wide text-slate-500">
                   <span>Subtasks</span>
                   <span className="font-mono text-slate-600 dark:text-slate-400">
@@ -278,7 +278,7 @@ export function TaskCard({
               event.stopPropagation();
               setExpanded((open) => !open);
             }}
-            className="mt-4 inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 px-3 py-1.5 text-[11px] font-bold text-slate-600 transition hover:border-slate-300 hover:text-slate-900 dark:border-slate-900 dark:bg-slate-950/50 dark:text-slate-400 dark:hover:border-slate-800 dark:hover:text-slate-200"
+            className="mt-4 inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 px-3 py-1.5 text-[11px] font-bold text-slate-600 transition hover:border-slate-300 hover:text-slate-900 dark:border-[#1a1a1a] dark:bg-[#121212]/50 dark:text-slate-400 dark:hover:border-slate-800 dark:hover:text-slate-200"
             aria-expanded={expanded}
           >
             <ChevronDown
@@ -293,7 +293,7 @@ export function TaskCard({
       </div>
 
       {hasSubtasks && expanded ? (
-        <div className="border-t border-slate-200 bg-slate-50/70 px-2 py-2 dark:border-slate-900/80 dark:bg-slate-950/30">
+        <div className="border-t border-slate-200 bg-slate-50/70 px-2 py-2 dark:border-[#1a1a1a] dark:bg-[#121212]/30">
           <div className="space-y-0.5">
             {task.subTasks.map((subtask) => (
               <SubtaskRow key={subtask.id} task={subtask} />
@@ -354,7 +354,7 @@ export function TaskListStats({ tasks }: TaskListStatsProps) {
         return (
           <div
             key={stat.label}
-            className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-900/80 dark:bg-[#090e18]/80 dark:shadow-md"
+            className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm dark:border-[#1a1a1a] dark:bg-[#0a0a0a]"
           >
             <div className="flex items-center justify-between">
               <span className="text-[10px] font-bold uppercase tracking-widest text-slate-500">
@@ -389,7 +389,7 @@ type TaskFiltersProps = {
 };
 
 const selectClassName =
-  "rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 outline-none transition focus:border-blue-500/40 focus:ring-1 focus:ring-blue-500/20 dark:border-slate-900 dark:bg-slate-950/60 dark:text-slate-300";
+  "rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 outline-none transition focus:border-blue-500/40 focus:ring-1 focus:ring-blue-500/20 dark:border-[#1a1a1a] dark:bg-[#121212]/60 dark:text-slate-300";
 
 export function TaskFilters({
   search,
@@ -403,7 +403,7 @@ export function TaskFilters({
   resultCount,
 }: TaskFiltersProps) {
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-900/80 dark:bg-[#090e18]/80 dark:shadow-md">
+    <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm dark:border-[#1a1a1a] dark:bg-[#0a0a0a]">
       <div className="flex flex-col gap-3 lg:flex-row lg:items-center">
         <div className="relative min-w-0 flex-1">
           <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
@@ -412,7 +412,7 @@ export function TaskFilters({
             value={search}
             onChange={(event) => onSearchChange(event.target.value)}
             placeholder="Search tasks..."
-            className="w-full rounded-lg border border-slate-200 bg-white py-2 pl-9 pr-3 text-xs font-semibold text-slate-900 outline-none transition placeholder:text-slate-500 focus:border-blue-500/40 focus:ring-1 focus:ring-blue-500/20 dark:border-slate-900 dark:bg-slate-950/60 dark:text-slate-200 dark:placeholder:text-slate-600"
+            className="w-full rounded-lg border border-slate-200 bg-white py-2 pl-9 pr-3 text-xs font-semibold text-slate-900 outline-none transition placeholder:text-slate-500 focus:border-blue-500/40 focus:ring-1 focus:ring-blue-500/20 dark:border-[#1a1a1a] dark:bg-[#121212]/60 dark:text-slate-200 dark:placeholder:text-slate-600"
           />
         </div>
 

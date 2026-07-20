@@ -26,11 +26,17 @@ enum DayPlanType {
   TESTING
 }
 
-enum DocType {
+enum TopicCategory {
   PROGRAMMING
   CAD
   HARDWARE
   GENERAL
+}
+
+enum ContentType {
+  SLIDESHOW
+  LINK
+  MARKDOWN
 }
 
 enum VerificationMethod {
@@ -52,15 +58,16 @@ model User {
   teamId             String?
   team               Team?              @relation(fields: [teamId], references: [id])
   discordAccount     DiscordAccount?
-  authoredDocs       Documentation[]    @relation("AuthoredDocs")
   notebookLogs       NotebookLog[]
   inventorySignOuts InventoryItemSignOut[]
   createdAt          DateTime           @default(now())
   updatedAt          DateTime           @updatedAt
 
-  createdTasks    Task[]           @relation("TaskCreator")
-  taskAssignments TaskAssignment[]
-  createdDayPlans TeamDayPlan[]
+  createdTasks           Task[]           @relation("TaskCreator")
+  taskAssignments        TaskAssignment[]
+  createdDayPlans        TeamDayPlan[]
+  createdKnowledgeNodes  KnowledgeNode[]
+  createdScoutNotes      ScoutNote[]
 
   notificationSettings NotificationSettings?
 }
@@ -107,6 +114,8 @@ model Team {
   githubIntegration TeamGitHubIntegration?
   fusionIntegration TeamFusionIntegration?
   dayPlans          TeamDayPlan[]
+  knowledgeNodes    KnowledgeNode[]
+  scoutNotes        ScoutNote[]
   createdAt         DateTime        @default(now())
   updatedAt         DateTime        @updatedAt
 }
@@ -182,21 +191,56 @@ model TeamDayPlan {
   @@map("team_day_plans")
 }
 
-model Folder {
-  id   String          @id @default(uuid())
-  name String
-  docs Documentation[]
+model KnowledgeNode {
+  id            String         @id @default(uuid())
+  teamId        String
+  team          Team           @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  title         String
+  topicCategory TopicCategory
+  contentType   ContentType
+  contentUrl    String?
+  content       String?
+  embedding     Unsupported("vector(1536)")?
+  createdById   String
+  createdBy     User           @relation(fields: [createdById], references: [id], onDelete: Cascade)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  outgoingEdges KnowledgeEdge[] @relation("EdgeSource")
+  incomingEdges KnowledgeEdge[] @relation("EdgeTarget")
+
+  @@index([teamId])
+  @@index([topicCategory])
 }
 
-model Documentation {
-  id        String   @id @default(uuid())
-  title     String
-  type      DocType
-  content   String
-  folderId  String
-  folder    Folder   @relation(fields: [folderId], references: [id])
-  authors   User[]   @relation("AuthoredDocs")
-  createdAt DateTime @default(now())
+model KnowledgeEdge {
+  id               String        @id @default(uuid())
+  sourceId         String
+  targetId         String
+  source           KnowledgeNode @relation("EdgeSource", fields: [sourceId], references: [id], onDelete: Cascade)
+  target           KnowledgeNode @relation("EdgeTarget", fields: [targetId], references: [id], onDelete: Cascade)
+  relationshipType String
+  createdAt        DateTime      @default(now())
+
+  @@unique([sourceId, targetId, relationshipType])
+  @@index([sourceId])
+  @@index([targetId])
+}
+
+/// Admin notepad about an opponent team, scoped to the creating org team.
+model ScoutNote {
+  id               String   @id @default(uuid())
+  teamId           String
+  team             Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  targetTeamNumber String
+  targetTeamName   String?
+  content          String   @default("")
+  createdById      String
+  createdBy        User     @relation(fields: [createdById], references: [id], onDelete: Cascade)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@unique([teamId, targetTeamNumber])
+  @@index([teamId])
 }
 
 model NotebookLog {

@@ -73,7 +73,7 @@ function discordLinkBadge(linked: boolean) {
         "inline-flex items-center gap-1 rounded-md border px-1.5 py-0.5 text-[10px] font-bold",
         linked
           ? "border-emerald-500/25 bg-emerald-500/10 text-emerald-300"
-          : "border-slate-800/80 bg-slate-950/40 text-slate-500",
+          : "border-[#1a1a1a] bg-slate-950/40 text-slate-500",
       )}
     >
       <Link2 className="size-3" aria-hidden />
@@ -368,12 +368,12 @@ export function AdminTeamManagementTable({
       {showAddTeamForm ? (
         <Card
           className={cn(
-            "border-slate-800/80 bg-slate-950/40 shadow-md backdrop-blur-sm",
+            "border-[#1a1a1a] bg-slate-950/40 shadow-md backdrop-blur-sm",
             "motion-safe:animate-in motion-safe:fade-in-0 motion-safe:slide-in-from-top-2 motion-safe:duration-300",
             "motion-reduce:animate-none",
           )}
         >
-          <CardHeader className="border-b border-slate-800/80">
+          <CardHeader className="border-b border-[#1a1a1a]">
             <CardTitle className="flex items-center gap-2 text-base text-slate-100">
               <Building2 className="size-4 text-blue-400" />
               Create team
@@ -457,7 +457,7 @@ export function AdminTeamManagementTable({
               </div>
             </CardContent>
 
-            <CardFooter className="justify-end border-t border-slate-800/80">
+            <CardFooter className="justify-end border-t border-[#1a1a1a]">
               <Button type="submit" disabled={isCreatingTeam}>
                 {isCreatingTeam ? "Creating…" : "Create team"}
               </Button>
@@ -469,7 +469,7 @@ export function AdminTeamManagementTable({
       <AdminTableFrame>
         <Table className="min-w-[44rem]">
           <TableHeader>
-            <TableRow className="border-slate-800/80 hover:bg-transparent">
+            <TableRow className="border-[#1a1a1a] hover:bg-transparent">
               <TableHead className={cn(adminTableHeadClassName, "w-10 pr-0")}>
                 <input
                   type="checkbox"

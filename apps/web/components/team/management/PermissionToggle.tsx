@@ -32,7 +32,7 @@ export function PermissionToggle({
             <ToggleRight className="h-5 w-5" />
           </div>
         ) : (
-          <div className="flex items-center gap-1 rounded border border-slate-900 bg-slate-950 px-2 py-0.5 text-[10px] font-bold text-slate-500">
+          <div className="flex items-center gap-1 rounded border border-[#1a1a1a] bg-slate-950 px-2 py-0.5 text-[10px] font-bold text-slate-500">
             <span>Off</span>
             <ToggleLeft className="h-5 w-5" />
           </div>

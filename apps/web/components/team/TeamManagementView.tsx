@@ -322,7 +322,7 @@ export function TeamManagementView({
   }
 
   return (
-    <div className="min-h-0 flex-1 overflow-y-auto bg-[#03070e] px-8 py-6 font-sans scrollbar-thin scrollbar-thumb-slate-900 scrollbar-track-transparent">
+    <div className="min-h-0 flex-1 overflow-y-auto bg-[#000000] px-8 py-6 font-sans scrollbar-thin scrollbar-thumb-slate-900 scrollbar-track-transparent">
       <div className="mb-6">
         <h1 className="text-2xl font-black tracking-tight text-slate-100">
           Team Management

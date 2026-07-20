@@ -11,8 +11,8 @@ export function TeamManagementModal({
 }: TeamManagementModalProps) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#000]/70 p-4 backdrop-blur-sm select-none">
-      <div className="relative w-full max-w-sm rounded-2xl border border-slate-900 bg-[#090e18] p-6 font-sans shadow-2xl">
-        <h3 className="mb-4 flex items-center gap-2 border-b border-slate-900 pb-3 text-sm font-black text-slate-100">
+      <div className="surface-elevated relative w-full max-w-sm rounded-2xl p-6 font-sans">
+        <h3 className="mb-4 flex items-center gap-2 border-b border-[#1a1a1a] pb-3 text-sm font-black text-slate-100">
           {title}
         </h3>
         {children}
@@ -33,11 +33,11 @@ export function ModalFormActions({
   submitDisabled = false,
 }: ModalFormActionsProps) {
   return (
-    <div className="flex items-center justify-end gap-3 border-t border-slate-900 pt-3">
+    <div className="flex items-center justify-end gap-3 border-t border-[#1a1a1a] pt-3">
       <button
         type="button"
         onClick={onCancel}
-        className="cursor-pointer rounded-lg bg-[#0e1724] px-4 py-2 text-xs font-semibold text-slate-400 transition hover:bg-slate-900 hover:text-white"
+        className="cursor-pointer rounded-lg bg-[#121212] px-4 py-2 text-xs font-semibold text-slate-400 transition hover:bg-slate-900 hover:text-white"
       >
         Cancel
       </button>

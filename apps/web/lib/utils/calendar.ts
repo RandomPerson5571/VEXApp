@@ -15,6 +15,7 @@ export interface DayPlanStyle {
   bg: string;
   accent: string;
   dot: string;
+  icon: string;
   badge: string;
   label: string;
   cellBg: string;
@@ -205,6 +206,7 @@ export function getDayPlanStyle(type: DayPlanType): DayPlanStyle {
         bg: "bg-indigo-50 dark:bg-indigo-600/10 border-indigo-500/20 text-indigo-700 dark:text-indigo-400",
         accent: "border-l-indigo-500",
         dot: "bg-indigo-500",
+        icon: "text-indigo-600 dark:text-indigo-400",
         badge: "bg-indigo-500/15 dark:bg-indigo-500/25 text-indigo-800 dark:text-indigo-200 border-indigo-400/40",
         label: "Coding",
         cellBg: "bg-indigo-100/90 dark:bg-indigo-500/20",
@@ -219,6 +221,7 @@ export function getDayPlanStyle(type: DayPlanType): DayPlanStyle {
         bg: "bg-amber-50 dark:bg-amber-600/10 border-amber-500/20 text-amber-700 dark:text-amber-400",
         accent: "border-l-amber-500",
         dot: "bg-amber-500",
+        icon: "text-amber-600 dark:text-amber-400",
         badge: "bg-amber-500/15 dark:bg-amber-500/25 text-amber-800 dark:text-amber-200 border-amber-400/40",
         label: "Testing",
         cellBg: "bg-amber-100/90 dark:bg-amber-500/20",
@@ -234,6 +237,7 @@ export function getDayPlanStyle(type: DayPlanType): DayPlanStyle {
         bg: "bg-cyan-50 dark:bg-cyan-600/10 border-cyan-500/20 text-cyan-700 dark:text-cyan-400",
         accent: "border-l-cyan-500",
         dot: "bg-cyan-500",
+        icon: "text-cyan-600 dark:text-cyan-400",
         badge: "bg-cyan-500/15 dark:bg-cyan-500/25 text-cyan-800 dark:text-cyan-200 border-cyan-400/40",
         label: "Build",
         cellBg: "bg-cyan-100/90 dark:bg-cyan-500/20",

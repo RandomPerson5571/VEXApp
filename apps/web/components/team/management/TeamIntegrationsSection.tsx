@@ -1,4 +1,4 @@
-﻿import { FusionIntegrationPanel } from "./FusionIntegrationPanel";
+import { FusionIntegrationPanel } from "./FusionIntegrationPanel";
 import { GitHubIntegrationPanel } from "./GitHubIntegrationPanel";
 import type {
   TeamFusionIntegration,
@@ -25,8 +25,8 @@ export function TeamIntegrationsSection({
   onFusionActiveChange,
 }: TeamIntegrationsSectionProps) {
   return (
-    <section className="rounded-2xl border border-slate-900 bg-[#090e18]/80 p-6 shadow-md">
-      <div className="mb-5 border-b border-slate-900 pb-3.5">
+    <section className="rounded-2xl border border-[#1a1a1a] bg-[#0a0a0a] p-6 shadow-md">
+      <div className="mb-5 border-b border-[#1a1a1a] pb-3.5">
         <h2 className="text-sm font-black uppercase tracking-wide text-slate-200">
           Workspace Integrations
         </h2>

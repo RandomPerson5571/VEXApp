@@ -14,18 +14,14 @@ export function invalidateTaskDashboard(
   });
 }
 
-export function invalidateDocsTree(
+export function invalidateKnowledgeGraph(
   queryClient: QueryClient,
   teamId: string,
-  docId?: string,
 ): void {
   void queryClient.invalidateQueries({
-    queryKey: queryKeys.docs.tree(teamId),
+    queryKey: queryKeys.knowledge.nodes(teamId),
   });
-
-  if (docId) {
-    void queryClient.invalidateQueries({
-      queryKey: queryKeys.docs.detail(docId),
-    });
-  }
+  void queryClient.invalidateQueries({
+    queryKey: queryKeys.knowledge.edges(teamId),
+  });
 }

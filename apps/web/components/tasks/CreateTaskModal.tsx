@@ -34,7 +34,7 @@ const TASK_STATUS_OPTIONS: { value: TaskStatus; label: string }[] = [
 ];
 
 const fieldClassName =
-  "w-full rounded-lg border border-slate-900 bg-slate-950/80 px-3 py-2.5 text-xs font-semibold text-slate-200 outline-none transition placeholder:text-slate-600 focus:border-blue-500/40 focus:ring-1 focus:ring-blue-500/20";
+  "w-full rounded-lg border border-[#1a1a1a] bg-slate-950/80 px-3 py-2.5 text-xs font-semibold text-slate-200 outline-none transition placeholder:text-slate-600 focus:border-blue-500/40 focus:ring-1 focus:ring-blue-500/20";
 
 const labelClassName =
   "text-[10px] font-bold uppercase tracking-[0.18em] text-slate-500";
@@ -112,7 +112,7 @@ function TaskDueDateField({ value, onChange }: TaskDueDateFieldProps) {
         <button
           type="button"
           onClick={setToday}
-          className="shrink-0 rounded-lg border border-slate-900 bg-slate-950/80 px-3 py-2.5 text-xs font-bold text-slate-300 transition hover:border-blue-500/30 hover:bg-blue-600/10 hover:text-blue-200"
+          className="shrink-0 rounded-lg border border-[#1a1a1a] bg-slate-950/80 px-3 py-2.5 text-xs font-bold text-slate-300 transition hover:border-blue-500/30 hover:bg-blue-600/10 hover:text-blue-200"
         >
           Now
         </button>
@@ -122,7 +122,7 @@ function TaskDueDateField({ value, onChange }: TaskDueDateFieldProps) {
         <div
           role="dialog"
           aria-label="Choose due date"
-          className="absolute bottom-[calc(100%+0.375rem)] left-0 right-0 z-20 rounded-xl border border-slate-800 bg-[#090e18] p-3 shadow-[0_16px_48px_rgba(0,0,0,0.45)]"
+          className="absolute bottom-[calc(100%+0.375rem)] left-0 right-0 z-20 rounded-xl border border-[#1a1a1a] bg-[#0a0a0a] p-3 "
         >
           <div className="mb-3 flex items-center justify-between">
             <span className="text-xs font-black text-slate-200">
@@ -136,7 +136,7 @@ function TaskDueDateField({ value, onChange }: TaskDueDateFieldProps) {
                     (prev) => new Date(prev.getFullYear(), prev.getMonth() - 1, 1),
                   )
                 }
-                className="flex h-7 w-7 items-center justify-center rounded-lg border border-slate-900 bg-slate-950 text-slate-400 transition hover:border-slate-800 hover:text-slate-200"
+                className="flex h-7 w-7 items-center justify-center rounded-lg border border-[#1a1a1a] bg-slate-950 text-slate-400 transition hover:border-[#1a1a1a] hover:text-slate-200"
                 aria-label="Previous month"
               >
                 <ChevronLeft className="h-3.5 w-3.5" />
@@ -148,7 +148,7 @@ function TaskDueDateField({ value, onChange }: TaskDueDateFieldProps) {
                     (prev) => new Date(prev.getFullYear(), prev.getMonth() + 1, 1),
                   )
                 }
-                className="flex h-7 w-7 items-center justify-center rounded-lg border border-slate-900 bg-slate-950 text-slate-400 transition hover:border-slate-800 hover:text-slate-200"
+                className="flex h-7 w-7 items-center justify-center rounded-lg border border-[#1a1a1a] bg-slate-950 text-slate-400 transition hover:border-[#1a1a1a] hover:text-slate-200"
                 aria-label="Next month"
               >
                 <ChevronRight className="h-3.5 w-3.5" />
@@ -278,18 +278,18 @@ export function CreateTaskModal({
         aria-modal="true"
         aria-labelledby={titleId}
         aria-describedby={descriptionId}
-        className="relative w-full max-w-lg overflow-visible rounded-2xl border border-slate-800/80 bg-[#090e18]/95 font-sans shadow-[0_24px_80px_rgba(0,0,0,0.55)] motion-safe:animate-in motion-safe:fade-in-0 motion-safe:zoom-in-95 motion-safe:duration-200 motion-reduce:animate-none"
+        className="surface-elevated relative w-full max-w-lg overflow-visible rounded-2xl font-sans motion-safe:animate-in motion-safe:fade-in-0 motion-safe:zoom-in-95 motion-safe:duration-200 motion-reduce:animate-none"
       >
         <div
           aria-hidden
           className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(59,130,246,0.08),transparent_60%)]"
         />
 
-        <div className="relative border-b border-slate-900/80 px-6 py-5">
+        <div className="relative border-b border-[#1a1a1a] px-6 py-5">
           <button
             type="button"
             onClick={onClose}
-            className="absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-lg border border-slate-900 bg-slate-950/60 text-slate-500 transition hover:border-slate-800 hover:text-slate-200 motion-safe:hover:scale-105 motion-reduce:transition-none"
+            className="absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-lg border border-[#1a1a1a] bg-slate-950/60 text-slate-500 transition hover:border-[#1a1a1a] hover:text-slate-200 motion-safe:hover:scale-105 motion-reduce:transition-none"
             aria-label="Close"
           >
             <X className="h-4 w-4" />
@@ -437,7 +437,7 @@ export function CreateTaskModal({
                       className={`inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-[11px] font-bold transition motion-safe:hover:scale-[1.02] motion-reduce:transition-none ${
                         selected
                           ? "border-blue-500/40 bg-blue-600/15 text-blue-200 shadow-[0_0_16px_rgba(59,130,246,0.15)]"
-                          : "border-slate-900 bg-slate-950/50 text-slate-400 hover:border-slate-800 hover:text-slate-200"
+                          : "border-[#1a1a1a] bg-slate-950/50 text-slate-400 hover:border-[#1a1a1a] hover:text-slate-200"
                       }`}
                     >
                       <span
@@ -458,7 +458,7 @@ export function CreateTaskModal({
           ) : null}
 
           {isEditMode && taskMeta ? (
-            <div className="space-y-3 rounded-xl border border-slate-900/80 bg-slate-950/40 p-4">
+            <div className="space-y-3 rounded-xl border border-[#1a1a1a] bg-slate-950/40 p-4">
               <div className="flex items-center justify-between gap-3 text-xs">
                 <span className="font-semibold text-slate-500">Created by</span>
                 <span className="font-bold text-slate-200">{taskMeta.creatorName}</span>
@@ -482,7 +482,7 @@ export function CreateTaskModal({
                     {taskMeta.subTasks.map((subtask) => (
                       <div
                         key={subtask.id}
-                        className="flex items-center justify-between gap-2 rounded-lg border border-slate-900/80 bg-slate-950/50 px-3 py-2"
+                        className="flex items-center justify-between gap-2 rounded-lg border border-[#1a1a1a] bg-slate-950/50 px-3 py-2"
                       >
                         <span className="truncate text-[11px] font-semibold text-slate-300">
                           {subtask.title}
@@ -508,12 +508,12 @@ export function CreateTaskModal({
             </p>
           ) : null}
 
-          <div className="flex items-center justify-end gap-3 border-t border-slate-900/80 pt-5">
+          <div className="flex items-center justify-end gap-3 border-t border-[#1a1a1a] pt-5">
             <button
               type="button"
               onClick={onClose}
               disabled={isSubmitting}
-              className="rounded-lg border border-slate-900 bg-slate-950/60 px-4 py-2 text-xs font-semibold text-slate-400 transition hover:border-slate-800 hover:text-slate-200 disabled:cursor-not-allowed disabled:opacity-50"
+              className="rounded-lg border border-[#1a1a1a] bg-slate-950/60 px-4 py-2 text-xs font-semibold text-slate-400 transition hover:border-[#1a1a1a] hover:text-slate-200 disabled:cursor-not-allowed disabled:opacity-50"
             >
               Cancel
             </button>

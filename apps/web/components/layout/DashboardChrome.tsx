@@ -14,7 +14,7 @@ export function DashboardChrome({ children }: DashboardChromeProps) {
 
   return (
     // ponytail: h-dvh + min-h-0 — h-screen was taller than the visual viewport and flex min-content grew the document
-    <div className="flex h-dvh max-h-dvh min-h-0 overflow-hidden bg-slate-50 text-slate-900 selection:bg-orange-600/30 selection:text-orange-200 dark:bg-[#03070e] dark:text-slate-100">
+    <div className="flex h-dvh max-h-dvh min-h-0 overflow-hidden bg-slate-50 text-slate-900 selection:bg-orange-600/30 selection:text-orange-200 dark:bg-[#000000] dark:text-slate-100">
       {isNavigationOpen ? (
         <AppSidebar onClose={() => setIsNavigationOpen(false)} />
       ) : null}

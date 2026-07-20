@@ -22,12 +22,12 @@ export function CalendarMonthToolbar({
     viewType === "month" ? "Next month" : viewType === "week" ? "Next week" : "Next day";
 
   return (
-    <div className="flex items-center justify-between bg-white dark:bg-[#090e18] border border-slate-200 dark:border-slate-900 p-4.5 rounded-xl mb-5 shadow-sm">
+    <div className="flex items-center justify-between bg-white dark:bg-[#0a0a0a] border border-slate-200 dark:border-[#1a1a1a] p-4.5 rounded-xl mb-5 shadow-sm">
       <div className="flex items-center gap-2">
         <button
           type="button"
           onClick={onPrevious}
-          className="p-1 px-2.5 rounded bg-white dark:bg-slate-950 hover:bg-slate-100 dark:hover:bg-slate-900 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-900 cursor-pointer"
+          className="p-1 px-2.5 rounded bg-white dark:bg-[#121212] hover:bg-slate-100 dark:hover:bg-[#121212] text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-[#1a1a1a] cursor-pointer"
           aria-label={previousLabel}
         >
           <ChevronLeft className="h-4 w-4" />
@@ -35,7 +35,7 @@ export function CalendarMonthToolbar({
         <button
           type="button"
           onClick={onNext}
-          className="p-1 px-2.5 rounded bg-white dark:bg-slate-950 hover:bg-slate-100 dark:hover:bg-slate-900 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-900 cursor-pointer"
+          className="p-1 px-2.5 rounded bg-white dark:bg-[#121212] hover:bg-slate-100 dark:hover:bg-[#121212] text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-[#1a1a1a] cursor-pointer"
           aria-label={nextLabel}
         >
           <ChevronRight className="h-4 w-4" />

@@ -3,9 +3,10 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
+  Binoculars,
   Calendar,
   ClipboardList,
-  FileCode,
+  Network,
   LayoutDashboard,
   Package,
   Settings,
@@ -28,7 +29,8 @@ const menuItems: SidebarItem[] = [
   { href: "/inventory", label: "Inventory", icon: Package },
   { href: "/calendar", label: "Calendar", icon: Calendar },
   { href: "/task-list", label: "Task List", icon: ClipboardList },
-  { href: "/documents", label: "Documents", icon: FileCode },
+  { href: "/knowledge", label: "Knowledge", icon: Network },
+  { href: "/knowledge/scouting", label: "Scouting", icon: Binoculars },
   { href: "/team-management", label: "Members", icon: Users2 },
   { href: "/invite", label: "Invites", icon: LinkIcon, requiresInviteAccess: true },
   { href: "/settings", label: "Settings", icon: Settings },
@@ -52,8 +54,8 @@ export function AppSidebar({ onClose }: AppSidebarProps) {
   );
 
   return (
-    <aside className="flex h-full w-[240px] flex-shrink-0 flex-col select-none border-r border-slate-200 bg-white font-sans dark:border-slate-900/60 dark:bg-[#070b13]">
-      <div className="relative flex items-center border-b border-slate-200 p-5 pr-14 dark:border-slate-900/40">
+    <aside className="flex h-full w-[240px] flex-shrink-0 flex-col select-none border-r border-slate-200 bg-white font-sans dark:border-[#1a1a1a] dark:bg-[#0a0a0a]">
+      <div className="relative flex items-center border-b border-slate-200 p-5 pr-14 dark:border-[#1a1a1a]">
         <div className="flex min-w-0 flex-1 items-center gap-3">
           <STLRoboticsLogoComponent width={44} height={44} />
           <div className="flex min-w-0 flex-col">
@@ -68,7 +70,7 @@ export function AppSidebar({ onClose }: AppSidebarProps) {
         <button
           type="button"
           onClick={onClose}
-          className="absolute right-4 top-1/2 inline-flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-lg border border-slate-200 text-slate-600 transition hover:border-slate-300 hover:bg-slate-100 hover:text-slate-900 dark:border-slate-900 dark:text-slate-500 dark:hover:border-slate-800 dark:hover:bg-slate-900/60 dark:hover:text-slate-200"
+          className="absolute right-4 top-1/2 inline-flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-lg border border-slate-200 text-slate-600 transition hover:border-slate-300 hover:bg-slate-100 hover:text-slate-900 dark:border-[#1a1a1a] dark:text-slate-500 dark:hover:border-slate-800 dark:hover:bg-[#121212] dark:hover:text-slate-200"
           aria-label="Close navigation panel"
           title="Close navigation"
         >
@@ -83,7 +85,10 @@ export function AppSidebar({ onClose }: AppSidebarProps) {
 
         {visibleMenuItems.map((item) => {
           const Icon = item.icon;
-          const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
+          const isActive =
+            item.href === "/knowledge"
+              ? pathname === "/knowledge"
+              : pathname === item.href || pathname.startsWith(`${item.href}/`);
 
           return (
             <Link
@@ -92,7 +97,7 @@ export function AppSidebar({ onClose }: AppSidebarProps) {
               className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-xs font-semibold tracking-normal transition-all duration-150 ${
                 isActive
                   ? "bg-orange-600/15 text-orange-400 border border-orange-500/20 shadow-sm shadow-orange-500/5"
-                  : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-900/50 hover:text-slate-900 dark:hover:text-slate-200 border border-transparent"
+                  : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-[#121212]/50 hover:text-slate-900 dark:hover:text-slate-200 border border-transparent"
               }`}
             >
               <div className="flex items-center gap-3">
@@ -110,13 +115,13 @@ export function AppSidebar({ onClose }: AppSidebarProps) {
       </nav>
 
       {showAdminLink && (
-        <div className="border-t border-slate-200 px-3 py-4 dark:border-slate-900/40">
+        <div className="border-t border-slate-200 px-3 py-4 dark:border-[#1a1a1a]">
           <Link
             href="/admin"
             className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-semibold tracking-normal transition-all duration-150 ${
               pathname === "/admin" || pathname.startsWith("/admin/")
                 ? "bg-orange-600/15 text-orange-400 border border-orange-500/20 shadow-sm shadow-orange-500/5"
-                : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-900/50 hover:text-slate-900 dark:hover:text-slate-200 border border-transparent"
+                : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-[#121212]/50 hover:text-slate-900 dark:hover:text-slate-200 border border-transparent"
             }`}
           >
             <ShieldCheck

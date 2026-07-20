@@ -3,7 +3,7 @@
 import { CalendarClock, Users } from "lucide-react";
 
 const fieldClassName =
-  "w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-xs font-semibold text-slate-900 outline-none transition placeholder:text-slate-500 focus:border-blue-500/40 focus:ring-1 focus:ring-blue-500/20 disabled:cursor-not-allowed disabled:opacity-60 dark:border-slate-900 dark:bg-slate-950/80 dark:text-slate-200 dark:placeholder:text-slate-600";
+  "w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-xs font-semibold text-slate-900 outline-none transition placeholder:text-slate-500 focus:border-blue-500/40 focus:ring-1 focus:ring-blue-500/20 disabled:cursor-not-allowed disabled:opacity-60 dark:border-[#1a1a1a] dark:bg-[#121212]/80 dark:text-slate-200 dark:placeholder:text-slate-600";
 
 const labelClassName =
   "text-[10px] font-bold uppercase tracking-[0.18em] text-slate-600 dark:text-slate-500";
@@ -24,9 +24,9 @@ export function InviteSettingsPanel({
   onExpiresAtChange,
 }: InviteSettingsPanelProps) {
   return (
-    <div className="rounded-xl border border-slate-200 bg-slate-50 p-5 dark:border-slate-900/70 dark:bg-slate-950/35">
+    <div className="rounded-xl border border-slate-200 bg-slate-50 p-5 dark:border-[#1a1a1a]/70 dark:bg-[#121212]/35">
       <div className="mb-4 flex items-center gap-3">
-        <div className="flex h-9 w-9 items-center justify-center rounded-lg border border-slate-200 bg-white dark:border-slate-800/80 dark:bg-slate-950/60">
+        <div className="flex h-9 w-9 items-center justify-center rounded-lg border border-slate-200 bg-white dark:border-[#1a1a1a] dark:bg-[#121212]/60">
           <CalendarClock className="h-4 w-4 text-slate-600 dark:text-slate-400" />
         </div>
         <div>

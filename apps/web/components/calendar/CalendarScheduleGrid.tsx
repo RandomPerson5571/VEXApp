@@ -11,6 +11,7 @@ import {
   SCHEDULE_HOUR_START,
 } from "@/lib/utils/calendar";
 import type { CalendarDayCell } from "@/lib/utils/calendar";
+import { DayPlanIcon } from "@/components/calendar/DayPlanIcon";
 
 const WEEKDAY_LABELS = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
 
@@ -37,13 +38,13 @@ export function CalendarScheduleGrid({
     mode === "week" ? "grid-cols-[56px_repeat(7,1fr)]" : "grid-cols-[56px_1fr]";
 
   return (
-    <div className="flex-1 min-h-0 bg-[#090e18]/80 border border-slate-900 rounded-2xl overflow-hidden flex flex-col">
+    <div className="flex-1 min-h-0 bg-[#0a0a0a] border border-[#1a1a1a] rounded-2xl overflow-hidden flex flex-col">
       {/* ponytail: sticky header inside scroll so scrollbar doesn't desync week cols */}
       <div className="flex-1 min-h-0 overflow-y-auto dashboard-scroll">
         <div
-          className={`sticky top-0 z-20 grid border-b border-slate-900 bg-slate-950 ${cols}`}
+          className={`sticky top-0 z-20 grid border-b border-[#1a1a1a] bg-slate-950 ${cols}`}
         >
-          <div className="border-r border-slate-900" />
+          <div className="border-r border-[#1a1a1a]" />
           {days.map((cell) => {
             const date = parseDateStr(cell.dateStr);
             const weekday = WEEKDAY_LABELS[date.getDay()];
@@ -57,7 +58,7 @@ export function CalendarScheduleGrid({
                 key={cell.dateStr}
                 type="button"
                 onClick={() => onSelectDate(cell.dateStr)}
-                className={`py-2 px-1 text-center border-r border-slate-900/60 transition cursor-pointer ${
+                className={`py-2 px-1 text-center border-r border-[#1a1a1a]/60 transition cursor-pointer ${
                   dayPlanStyle
                     ? `${dayPlanStyle.cellBg} border-l-[3px] ${dayPlanStyle.accent}`
                     : isSelected
@@ -78,30 +79,19 @@ export function CalendarScheduleGrid({
                   >
                     {cell.day}
                   </div>
-                  {dayPlanStyle && (
-                    <span
-                      className={`h-2 w-2 rounded-full ${dayPlanStyle.dot} shadow-sm flex-shrink-0`}
-                    />
-                  )}
+                  {dayPlan && <DayPlanIcon type={dayPlan.type} className="h-3.5 w-3.5" />}
                 </div>
-                {dayPlanStyle && (
-                  <div
-                    className={`mt-1 mx-auto max-w-full px-1.5 py-0.5 rounded text-[7.5px] font-black uppercase tracking-wide border truncate ${dayPlanStyle.badge}`}
-                  >
-                    {dayPlanStyle.label}
-                  </div>
-                )}
               </button>
             );
           })}
         </div>
 
         <div className={`grid ${cols}`} style={{ minHeight: gridHeight }}>
-          <div className="border-r border-slate-900 bg-slate-950/80">
+          <div className="border-r border-[#1a1a1a] bg-slate-950/80">
             {hours.map((hour) => (
               <div
                 key={hour}
-                className="pr-2 text-right text-[10px] font-bold text-slate-500 border-b border-slate-900/40"
+                className="pr-2 text-right text-[10px] font-bold text-slate-500 border-b border-[#1a1a1a]/40"
                 style={{ height: SCHEDULE_HOUR_HEIGHT }}
               >
                 <span className="relative -top-2">
@@ -122,12 +112,12 @@ export function CalendarScheduleGrid({
               ? dayPlanStyle.cellBg
               : isSelected
                 ? "bg-blue-600/5"
-                : "bg-[#090e18]/40";
+                : "bg-[#0a0a0a]/40";
 
             return (
               <div
                 key={cell.dateStr}
-                className={`relative border-r border-slate-900/60 ${columnBg} ${
+                className={`relative border-r border-[#1a1a1a]/60 ${columnBg} ${
                   dayPlanStyle ? `border-l-[3px] ${dayPlanStyle.accent}` : ""
                 } ${isSelected && !dayPlanStyle ? "ring-1 ring-inset ring-orange-500/40" : ""}`}
                 style={{ height: gridHeight }}
@@ -135,7 +125,7 @@ export function CalendarScheduleGrid({
                 {hours.map((hour) => (
                   <div
                     key={hour}
-                    className="border-b border-slate-900/40"
+                    className="border-b border-[#1a1a1a]/40"
                     style={{ height: SCHEDULE_HOUR_HEIGHT }}
                   />
                 ))}

@@ -33,9 +33,9 @@ export function CalendarSidePanel({
   };
 
   return (
-    <aside className="w-[320px] bg-white dark:bg-[#070b13] flex flex-col h-full border-l border-slate-200 dark:border-slate-900 p-6 select-none font-sans justify-between">
+    <aside className="w-[320px] bg-white dark:bg-[#0a0a0a] flex flex-col h-full border-l border-slate-200 dark:border-[#1a1a1a] p-6 select-none font-sans justify-between">
       <div className="space-y-6 flex-1 overflow-y-auto dashboard-scroll">
-        <div className="border-b border-slate-200 dark:border-slate-900 pb-3">
+        <div className="border-b border-slate-200 dark:border-[#1a1a1a] pb-3">
           <h3 className="text-xs font-black text-slate-600 dark:text-slate-400 uppercase tracking-widest">
             Selected Day Schedule
           </h3>
@@ -100,7 +100,7 @@ export function CalendarSidePanel({
 
         <div className="space-y-4">
           {selectedDayEvents.length === 0 ? (
-            <div className="p-8 text-center rounded-xl border border-slate-200 dark:border-slate-900 bg-slate-50 dark:bg-slate-950/40 text-xs">
+            <div className="p-8 text-center rounded-xl border border-slate-200 dark:border-[#1a1a1a] bg-slate-50 dark:bg-[#121212]/40 text-xs">
               <AlertCircle className="h-5 w-5 text-slate-500 dark:text-slate-600 mx-auto mb-2" />
               <p className="font-semibold text-slate-700 dark:text-slate-400">Empty checklist schedule.</p>
               <p className="text-[10px] text-slate-600 dark:text-slate-600 mt-1">
@@ -135,7 +135,7 @@ export function CalendarSidePanel({
                   )}
 
                   {ev.description && (
-                    <p className="text-[10px] text-slate-600 dark:text-slate-500 leading-normal border-t border-slate-200 dark:border-slate-900/50 pt-2">
+                    <p className="text-[10px] text-slate-600 dark:text-slate-500 leading-normal border-t border-slate-200 dark:border-[#1a1a1a]/50 pt-2">
                       {ev.description}
                     </p>
                   )}
@@ -146,11 +146,11 @@ export function CalendarSidePanel({
         </div>
       </div>
 
-      <div className="pt-6 border-t border-slate-200 dark:border-slate-900">
+      <div className="pt-6 border-t border-slate-200 dark:border-[#1a1a1a]">
         <button
           type="button"
           onClick={onAddEvent}
-          className="w-full py-2.5 rounded-lg border border-slate-200 dark:border-slate-900 text-slate-700 dark:text-slate-300 font-black text-xs hover:border-slate-300 dark:hover:border-slate-800 hover:text-slate-900 dark:hover:text-white transition flex items-center justify-center gap-1.5 bg-white dark:bg-slate-950"
+          className="w-full py-2.5 rounded-lg border border-slate-200 dark:border-[#1a1a1a] text-slate-700 dark:text-slate-300 font-black text-xs hover:border-slate-300 dark:hover:border-slate-800 hover:text-slate-900 dark:hover:text-white transition flex items-center justify-center gap-1.5 bg-white dark:bg-[#121212]"
         >
           <Plus className="h-4.5 w-4.5 text-orange-500" />
           <span>Schedule Event Entry</span>

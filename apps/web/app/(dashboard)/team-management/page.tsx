@@ -21,7 +21,7 @@ function TeamManagementFallback({
 }) {
   return (
     <div className="flex flex-1 items-center justify-center p-8">
-      <div className="w-full max-w-md rounded-2xl border border-slate-900 bg-[#090e18]/80 p-8 text-center shadow-md">
+      <div className="w-full max-w-md rounded-2xl border border-[#1a1a1a] bg-[#0a0a0a] p-8 text-center shadow-md">
         <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full border border-red-500/20 bg-red-500/10">
           <ShieldOff className="h-7 w-7 text-red-400" />
         </div>

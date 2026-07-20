@@ -1,20 +1,20 @@
-import type { CalendarEvent, EventType, UpcomingMatch } from "@/lib/types/team";
-import { getEventStyle, getTodayDateStr } from "@/lib/utils/calendar";
+import type { CalendarEvent, UpcomingMatch } from "@/lib/types/team";
+import {
+  addDaysToDateStr,
+  getEventStyle,
+  getTodayDateStr,
+} from "@/lib/utils/calendar";
 
-const MATCH_EVENT_TYPES = new Set<EventType>([
-  "practice_match",
-  "scrimmage",
-  "championship",
-]);
+const UPCOMING_WINDOW_DAYS = 14;
 
-function formatMatchTime(event: CalendarEvent): string {
+function formatEventTime(event: CalendarEvent): string {
   if (event.matchesCount) {
     return `${event.startTime} • ${event.matchesCount} matches`;
   }
   return event.startTime;
 }
 
-function toUpcomingMatch(event: CalendarEvent): UpcomingMatch {
+function toUpcomingEvent(event: CalendarEvent): UpcomingMatch {
   const date = new Date(`${event.date}T12:00:00`);
 
   return {
@@ -23,17 +23,18 @@ function toUpcomingMatch(event: CalendarEvent): UpcomingMatch {
     day: date.getDate(),
     title: event.title,
     location: event.location ?? "Location TBD",
-    time: formatMatchTime(event),
+    time: formatEventTime(event),
     accentClass: getEventStyle(event.type).bg,
   };
 }
 
+/** All team events from today through the next 2 weeks. */
 export function toUpcomingMatches(events: CalendarEvent[]): UpcomingMatch[] {
   const today = getTodayDateStr();
+  const end = addDaysToDateStr(today, UPCOMING_WINDOW_DAYS);
 
   return events
-    .filter((event) => MATCH_EVENT_TYPES.has(event.type))
-    .filter((event) => event.date >= today)
+    .filter((event) => event.date >= today && event.date <= end)
     .sort((a, b) => {
       const dateCompare = a.date.localeCompare(b.date);
       if (dateCompare !== 0) {
@@ -41,5 +42,5 @@ export function toUpcomingMatches(events: CalendarEvent[]): UpcomingMatch[] {
       }
       return a.startTime.localeCompare(b.startTime);
     })
-    .map(toUpcomingMatch);
+    .map(toUpcomingEvent);
 }

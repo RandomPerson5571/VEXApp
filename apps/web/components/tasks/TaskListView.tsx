@@ -71,8 +71,8 @@ function filterTasks(
 
 function TaskListFallback() {
   return (
-    <div className="flex flex-1 items-center justify-center bg-slate-100 dark:bg-[#03070e] p-8">
-      <div className="w-full max-w-md rounded-2xl border border-slate-300 dark:border-slate-900 bg-white dark:bg-[#090e18]/80 p-8 text-center shadow-md dark:shadow-lg">
+    <div className="flex flex-1 items-center justify-center bg-slate-100 dark:bg-[#000000] p-8">
+      <div className="w-full max-w-md rounded-2xl border border-slate-300 dark:border-[#1a1a1a] bg-white dark:bg-[#0a0a0a] p-8 text-center shadow-md">
         <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full border border-slate-800 bg-slate-900/60">
           <ClipboardList className="h-7 w-7 text-slate-400" />
         </div>
@@ -201,7 +201,7 @@ export function TaskListView() {
   }
 
   return (
-    <div className="relative flex-1 overflow-y-auto bg-slate-50 px-8 py-6 font-sans dashboard-scroll dark:bg-[#03070e]">
+    <div className="relative flex-1 overflow-y-auto bg-slate-50 px-8 py-6 font-sans dashboard-scroll dark:bg-[#000000]">
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(59,130,246,0.06),transparent_55%)]"
@@ -248,16 +248,16 @@ export function TaskListView() {
               {Array.from({ length: 4 }).map((_, index) => (
                 <div
                   key={index}
-                  className="h-20 animate-pulse rounded-xl border border-slate-200 bg-white dark:border-slate-900 dark:bg-slate-950/60"
+                  className="h-20 animate-pulse rounded-xl border border-slate-200 bg-white dark:border-[#1a1a1a] dark:bg-[#121212]/60"
                 />
               ))}
             </div>
-            <div className="h-28 animate-pulse rounded-2xl border border-slate-200 bg-white dark:border-slate-900 dark:bg-slate-950/60" />
+            <div className="h-28 animate-pulse rounded-2xl border border-slate-200 bg-white dark:border-[#1a1a1a] dark:bg-[#121212]/60" />
             <div className="space-y-4">
               {Array.from({ length: 3 }).map((_, index) => (
                 <div
                   key={index}
-                  className="h-40 animate-pulse rounded-2xl border border-slate-200 bg-white dark:border-slate-900 dark:bg-slate-950/60"
+                  className="h-40 animate-pulse rounded-2xl border border-slate-200 bg-white dark:border-[#1a1a1a] dark:bg-[#121212]/60"
                 />
               ))}
             </div>
@@ -295,8 +295,8 @@ export function TaskListView() {
             </div>
 
             {filteredTasks.length === 0 ? (
-              <div className="rounded-2xl border border-slate-200 bg-white p-12 text-center shadow-sm dark:border-slate-900/80 dark:bg-[#090e18]/80 dark:shadow-md">
-                <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full border border-slate-200 bg-slate-100 dark:border-slate-800 dark:bg-slate-900/60">
+              <div className="rounded-2xl border border-slate-200 bg-white p-12 text-center shadow-sm dark:border-[#1a1a1a] dark:bg-[#0a0a0a]">
+                <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full border border-slate-200 bg-slate-100 dark:border-slate-800 dark:bg-[#121212]/60">
                   <ClipboardList className="h-7 w-7 text-slate-500" />
                 </div>
                 <h2 className="text-lg font-black text-slate-900 dark:text-slate-200">No tasks found</h2>

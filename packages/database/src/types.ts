@@ -1,12 +1,13 @@
 export type {
-  Documentation,
   Event,
   Invite,
-  Folder,
   InventoryItem,
   InventoryItemSignOut,
+  KnowledgeEdge,
+  KnowledgeNode,
   NotebookLog,
   Prisma,
+  ScoutNote,
   Task,
   TaskAssignment,
   Team,
@@ -15,12 +16,13 @@ export type {
 } from "../generated/prisma/index.js";
 
 export type {
+  ContentType,
   DayPlanType,
-  DocType,
   EventType,
   TaskPriority,
   TaskStatus,
   TaskType,
+  TopicCategory,
   UserRole,
 } from "../generated/prisma/index.js";
 
@@ -77,30 +79,35 @@ export type TeamInventoryItem = import("../generated/prisma/index.js").Prisma.In
 export type TeamInventorySignOut = TeamInventoryItem["signOuts"][number];
 export type TeamInventoryBorrower = TeamInventorySignOut["user"];
 
-export const folderWithDocsInclude = {
-  docs: {
-    select: { id: true, title: true, type: true, folderId: true, createdAt: true },
-    orderBy: { createdAt: "desc" as const },
-  },
-} satisfies import("../generated/prisma/index.js").Prisma.FolderInclude;
+export const knowledgeNodeInclude = {
+  createdBy: { select: { id: true, firstName: true, lastName: true } },
+} satisfies import("../generated/prisma/index.js").Prisma.KnowledgeNodeInclude;
 
-/** Folder with document summaries — matches the documentation tree query shape. */
-export type FolderWithDocs = import("../generated/prisma/index.js").Prisma.FolderGetPayload<{
-  include: typeof folderWithDocsInclude;
+/** Knowledge node with creator — matches the graph/detail query shape. */
+export type KnowledgeNodeDetail = import("../generated/prisma/index.js").Prisma.KnowledgeNodeGetPayload<{
+  include: typeof knowledgeNodeInclude;
 }>;
 
-export const documentationDetailInclude = {
-  authors: { select: { id: true, firstName: true, lastName: true } },
-  folder: { select: { id: true, name: true } },
-} satisfies import("../generated/prisma/index.js").Prisma.DocumentationInclude;
+export type KnowledgeNodeCreator = KnowledgeNodeDetail["createdBy"];
 
-/** Full documentation record with authors and folder — matches the detail query shape. */
-export type DocumentationDetail = import("../generated/prisma/index.js").Prisma.DocumentationGetPayload<{
-  include: typeof documentationDetailInclude;
+export const knowledgeEdgeInclude = {
+  source: { select: { id: true, title: true, teamId: true } },
+  target: { select: { id: true, title: true, teamId: true } },
+} satisfies import("../generated/prisma/index.js").Prisma.KnowledgeEdgeInclude;
+
+/** Knowledge edge with source/target summaries. */
+export type KnowledgeEdgeDetail = import("../generated/prisma/index.js").Prisma.KnowledgeEdgeGetPayload<{
+  include: typeof knowledgeEdgeInclude;
 }>;
 
-export type FolderDocSummary = FolderWithDocs["docs"][number];
-export type DocumentationAuthor = DocumentationDetail["authors"][number];
+export const scoutNoteInclude = {
+  createdBy: { select: { id: true, firstName: true, lastName: true } },
+} satisfies import("../generated/prisma/index.js").Prisma.ScoutNoteInclude;
+
+/** Scout note with creator. */
+export type ScoutNoteDetail = import("../generated/prisma/index.js").Prisma.ScoutNoteGetPayload<{
+  include: typeof scoutNoteInclude;
+}>;
 
 export const teamDayPlanInclude = {
   creator: { select: { id: true, firstName: true, lastName: true } },

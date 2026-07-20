@@ -46,7 +46,7 @@ describe("calendar day plans UI", () => {
     container.remove();
   });
 
-  it("shows a Build badge on the month cell after setting Build", async () => {
+  it("shows a Build icon on the month cell after setting Build", async () => {
     const onSetDayPlan = vi.fn();
     const onClearDayPlan = vi.fn();
     let selectedDayPlan: TeamDayPlan | undefined;
@@ -100,11 +100,11 @@ describe("calendar day plans UI", () => {
     });
 
     expect(onSetDayPlan).toHaveBeenCalledWith("build");
-    expect(container.textContent).toContain("Build");
+    expect(container.querySelector('[aria-label="Build"]')).not.toBeNull();
     expect(container.textContent).toContain("Driver Practice");
   });
 
-  it("changes the badge to Testing and clears it on clear", async () => {
+  it("changes the icon to Testing and clears it on clear", async () => {
     let selectedDayPlan: TeamDayPlan | undefined = buildPlan("build");
 
     const renderCalendar = () => {
@@ -144,7 +144,7 @@ describe("calendar day plans UI", () => {
     };
 
     renderCalendar();
-    expect(container.textContent).toContain("Build");
+    expect(container.querySelector('[aria-label="Build"]')).not.toBeNull();
 
     const testingButton = Array.from(container.querySelectorAll("button")).find(
       (button) => button.textContent?.trim() === "Testing",
@@ -153,8 +153,8 @@ describe("calendar day plans UI", () => {
       testingButton?.click();
     });
 
-    expect(container.textContent).toContain("Testing");
-    expect(container.textContent).not.toMatch(/Build.*Build/);
+    expect(container.querySelector('[aria-label="Testing"]')).not.toBeNull();
+    expect(container.querySelector('[aria-label="Build"]')).toBeNull();
 
     const clearButton = Array.from(container.querySelectorAll("button")).find(
       (button) => button.textContent?.includes("Clear"),
@@ -170,11 +170,13 @@ describe("calendar day plans UI", () => {
     );
 
     expect(monthCell?.textContent).toContain("Driver Practice");
-    expect(monthCell?.textContent).not.toMatch(/\bBuild\b|\bTesting\b|\bCoding\b/);
+    expect(monthCell?.querySelector('[aria-label="Build"]')).toBeNull();
+    expect(monthCell?.querySelector('[aria-label="Testing"]')).toBeNull();
+    expect(monthCell?.querySelector('[aria-label="Coding"]')).toBeNull();
     expect(container.textContent).not.toContain("Team focus set to");
   });
 
-  it("keeps timed events on the same day when day plan badges change", async () => {
+  it("keeps timed events on the same day when day plan icons change", async () => {
     const eventsByDate = new Map([[SELECTED_DATE, [TIMED_EVENT]]]);
     const plans: TeamDayPlan[] = [buildPlan("build")];
 
@@ -197,18 +199,18 @@ describe("calendar day plans UI", () => {
 
     renderGrid(plans);
     expect(container.textContent).toContain("Driver Practice");
-    expect(container.textContent).toContain("Build");
+    expect(container.querySelector('[aria-label="Build"]')).not.toBeNull();
 
     renderGrid([buildPlan("testing")]);
     expect(container.textContent).toContain("Driver Practice");
-    expect(container.textContent).toContain("Testing");
+    expect(container.querySelector('[aria-label="Testing"]')).not.toBeNull();
 
     renderGrid([]);
     expect(container.textContent).toContain("Driver Practice");
-    expect(container.textContent).not.toContain("Testing");
+    expect(container.querySelector('[aria-label="Testing"]')).toBeNull();
   });
 
-  it("shows day plan badge and keeps events in week schedule view", () => {
+  it("shows day plan icon and keeps events in week schedule view", () => {
     act(() => {
       root.render(
         <CalendarScheduleGrid
@@ -223,7 +225,7 @@ describe("calendar day plans UI", () => {
       );
     });
 
-    expect(container.textContent).toContain("Build");
+    expect(container.querySelector('[aria-label="Build"]')).not.toBeNull();
     expect(container.textContent).toContain("Driver Practice");
   });
 });

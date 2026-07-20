@@ -19,7 +19,7 @@ export function ForgotPasswordForm({
   pending = false,
 }: ForgotPasswordFormProps) {
   return (
-    <div className="w-full max-w-md rounded-2xl bg-[#090e18]/80 border border-slate-900 shadow-2xl p-8 backdrop-blur-md relative">
+    <div className="surface-elevated relative w-full max-w-md rounded-2xl p-8 backdrop-blur-md">
       <div className="flex flex-col items-center gap-2 mb-8 text-center">
         <STLRoboticsLogoComponent width={100} height={100} />
         <h2 className="text-xl font-bold tracking-tight text-white mt-1">
@@ -64,7 +64,7 @@ export function ForgotPasswordForm({
               autoComplete="email"
               required
               placeholder="name@team.com"
-              className="w-full pl-10 pr-4 py-2.5 rounded-lg bg-slate-950 border border-slate-900/60 text-slate-200 text-xs font-semibold placeholder-slate-600 focus:outline-none focus:border-slate-800 focus:ring-1 focus:ring-slate-800 transition"
+              className="w-full pl-10 pr-4 py-2.5 rounded-lg bg-slate-950 border border-[#1a1a1a]/60 text-slate-200 text-xs font-semibold placeholder-slate-600 focus:outline-none focus:border-[#1a1a1a] focus:ring-1 focus:ring-slate-800 transition"
             />
           </div>
         </div>

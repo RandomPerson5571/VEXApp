@@ -129,7 +129,7 @@ export function TaskStatusPicker({
         <CircleDot className="h-3 w-3 shrink-0" />
         <SelectValue />
       </SelectTrigger>
-      <SelectContent className="min-w-[9rem] border-slate-200 bg-white text-slate-800 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-200">
+      <SelectContent className="min-w-[9rem] border-slate-200 bg-white text-slate-800 dark:border-slate-800 dark:bg-[#121212] dark:text-slate-200">
         {TASK_STATUS_OPTIONS.map((option) => {
           const optionConfig = statusConfig[option];
 
@@ -211,7 +211,7 @@ export function TaskPriorityPicker({
       >
         <SelectValue />
       </SelectTrigger>
-      <SelectContent className="min-w-[9rem] border-slate-200 bg-white text-slate-800 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-200">
+      <SelectContent className="min-w-[9rem] border-slate-200 bg-white text-slate-800 dark:border-slate-800 dark:bg-[#121212] dark:text-slate-200">
         {TASK_PRIORITY_OPTIONS.map((option) => {
           const optionConfig = priorityConfig[option];
 

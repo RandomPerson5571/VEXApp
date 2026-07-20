@@ -69,7 +69,7 @@ export default async function Home({
                 Welcome to STL Robotics
               </h1>
               <p className="mt-4 text-lg text-[#3a2800]/80 max-w-xl">
-                Roary keeps match prep, team documents, calendar updates, and member coordination in one place for your VRC season.
+                Roary keeps match prep, knowledge graph, calendar updates, and member coordination in one place for your VRC season.
               </p>
 
               <div className="mt-8 flex flex-wrap items-center gap-3">
@@ -119,7 +119,7 @@ export default async function Home({
 
             <div className="rounded-2xl border border-slate-800 bg-[#0f1720]/60 p-6 hover-lift hover:border-slate-600 hover:bg-[#0f1720]/80">
               <h3 className="font-bold text-lg">Build Resources</h3>
-              <p className="mt-2 text-sm text-slate-400">Centralize documents, schedules, and team resources so the whole team can find what matters fast.</p>
+              <p className="mt-2 text-sm text-slate-400">Centralize knowledge, schedules, and team resources so the whole team can find what matters fast.</p>
             </div>
           </div>
         </div>

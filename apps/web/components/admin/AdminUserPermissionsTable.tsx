@@ -96,7 +96,7 @@ export function AdminUserPermissionsTable({
   }
 
   return (
-    <section className="relative rounded-2xl border border-slate-800/80 bg-[#090e18]/80 p-6 shadow-lg shadow-black/20 backdrop-blur-sm">
+    <section className="relative rounded-2xl border border-[#1a1a1a] bg-[#0a0a0a] p-6 backdrop-blur-sm">
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0 overflow-hidden rounded-2xl"
@@ -111,7 +111,7 @@ export function AdminUserPermissionsTable({
         />
       </div>
 
-      <div className="relative mb-5 flex flex-col gap-4 border-b border-slate-800/80 pb-4 sm:flex-row sm:items-end sm:justify-between">
+      <div className="relative mb-5 flex flex-col gap-4 border-b border-[#1a1a1a] pb-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <p className="text-[10.5px] font-black uppercase tracking-widest text-slate-500">
             Control plane

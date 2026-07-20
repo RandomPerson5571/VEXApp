@@ -46,14 +46,14 @@ export function SignupForm({
 
   return (
     <div className="w-full max-w-md">
-      <div className="w-full max-w-md rounded-2xl bg-white dark:bg-[#090e18]/80 border border-slate-200 dark:border-slate-900 shadow-2xl p-8 backdrop-blur-md relative">
+      <div className="relative w-full max-w-md rounded-2xl border border-slate-200 bg-white p-8 backdrop-blur-md dark:border-[#1a1a1a] dark:bg-[#0a0a0a] dark:bg-gradient-to-b dark:from-white/[0.02] dark:to-transparent">
         <div className="flex flex-col items-center gap-2 mb-8 text-center">
         <STLRoboticsLogoComponent width={100} height={100} />
         <h2 className="text-xl font-bold tracking-tight text-slate-900 dark:text-white mt-1">
           Create your account
         </h2>
         <p className="text-xs font-medium text-slate-600 dark:text-slate-500 max-w-xs leading-relaxed">
-          Join the team portal to manage events, documents, and robotics
+          Join the team portal to manage events, knowledge, and robotics
           updates.
         </p>
       </div>
@@ -73,7 +73,7 @@ export function SignupForm({
       )}
 
       {showResendConfirmation && resendAction ? (
-        <div className="mb-5 space-y-3 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/40 p-4">
+        <div className="mb-5 space-y-3 rounded-lg border border-slate-200 dark:border-[#1a1a1a] bg-slate-50 dark:bg-[#121212]/40 p-4">
           <p className="text-xs font-semibold text-slate-600 dark:text-slate-400">
             Didn&apos;t receive the email?
           </p>
@@ -123,7 +123,7 @@ export function SignupForm({
                     required
                     autoComplete="email"
                     placeholder="name@team.com"
-                    className="w-full pl-10 pr-4 py-2.5 rounded-lg bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-900/60 text-slate-900 dark:text-slate-200 text-xs font-semibold placeholder-slate-500 dark:placeholder-slate-600 focus:outline-none focus:border-orange-500 dark:focus:border-slate-800 focus:ring-1 focus:ring-orange-500 dark:focus:ring-slate-800 transition"
+                    className="w-full pl-10 pr-4 py-2.5 rounded-lg bg-white dark:bg-[#121212] border border-slate-200 dark:border-[#1a1a1a] text-slate-900 dark:text-slate-200 text-xs font-semibold placeholder-slate-500 dark:placeholder-slate-600 focus:outline-none focus:border-orange-500 dark:focus:border-[#1a1a1a] focus:ring-1 focus:ring-orange-500 dark:focus:ring-slate-800 transition"
                   />
                 </div>
               </div>
@@ -132,7 +132,7 @@ export function SignupForm({
             <button
               type="submit"
               disabled={resendPending || Boolean(resendSuccess)}
-              className="w-full py-2.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 disabled:opacity-60 disabled:cursor-not-allowed font-bold text-xs tracking-wide text-slate-700 dark:text-slate-200 transition cursor-pointer"
+              className="w-full py-2.5 rounded-lg border border-slate-200 dark:border-[#1a1a1a] bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 disabled:opacity-60 disabled:cursor-not-allowed font-bold text-xs tracking-wide text-slate-700 dark:text-slate-200 transition cursor-pointer"
             >
               {resendPending ? "Sending..." : "Resend confirmation email"}
             </button>
@@ -163,7 +163,7 @@ export function SignupForm({
               required
               defaultValue={defaultEmail}
               placeholder="name@team.com"
-              className="w-full pl-10 pr-4 py-2.5 rounded-lg bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-900/60 text-slate-900 dark:text-slate-200 text-xs font-semibold placeholder-slate-500 dark:placeholder-slate-600 focus:outline-none focus:border-orange-500 dark:focus:border-slate-800 focus:ring-1 focus:ring-orange-500 dark:focus:ring-slate-800 transition"
+              className="w-full pl-10 pr-4 py-2.5 rounded-lg bg-white dark:bg-[#121212] border border-slate-200 dark:border-[#1a1a1a] text-slate-900 dark:text-slate-200 text-xs font-semibold placeholder-slate-500 dark:placeholder-slate-600 focus:outline-none focus:border-orange-500 dark:focus:border-[#1a1a1a] focus:ring-1 focus:ring-orange-500 dark:focus:ring-slate-800 transition"
             />
           </div>
         </div>
@@ -185,7 +185,7 @@ export function SignupForm({
               type={showPassword ? "text" : "password"}
               required
               placeholder="Create a password"
-              className="w-full pl-10 pr-10 py-2.5 rounded-lg bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-900/60 text-slate-900 dark:text-slate-200 text-xs font-semibold placeholder-slate-500 dark:placeholder-slate-600 focus:outline-none focus:border-orange-500 dark:focus:border-slate-800 focus:ring-1 focus:ring-orange-500 dark:focus:ring-slate-800 transition"
+              className="w-full pl-10 pr-10 py-2.5 rounded-lg bg-white dark:bg-[#121212] border border-slate-200 dark:border-[#1a1a1a] text-slate-900 dark:text-slate-200 text-xs font-semibold placeholder-slate-500 dark:placeholder-slate-600 focus:outline-none focus:border-orange-500 dark:focus:border-[#1a1a1a] focus:ring-1 focus:ring-orange-500 dark:focus:ring-slate-800 transition"
             />
             <button
               type="button"
@@ -219,7 +219,7 @@ export function SignupForm({
               type={showConfirmPassword ? "text" : "password"}
               required
               placeholder="Confirm your password"
-              className="w-full pl-10 pr-10 py-2.5 rounded-lg bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-900/60 text-slate-900 dark:text-slate-200 text-xs font-semibold placeholder-slate-500 dark:placeholder-slate-600 focus:outline-none focus:border-orange-500 dark:focus:border-slate-800 focus:ring-1 focus:ring-orange-500 dark:focus:ring-slate-800 transition"
+              className="w-full pl-10 pr-10 py-2.5 rounded-lg bg-white dark:bg-[#121212] border border-slate-200 dark:border-[#1a1a1a] text-slate-900 dark:text-slate-200 text-xs font-semibold placeholder-slate-500 dark:placeholder-slate-600 focus:outline-none focus:border-orange-500 dark:focus:border-[#1a1a1a] focus:ring-1 focus:ring-orange-500 dark:focus:ring-slate-800 transition"
             />
             <button
               type="button"
@@ -251,10 +251,10 @@ export function SignupForm({
 
       <div className="relative my-6">
         <div className="absolute inset-0 flex items-center" aria-hidden="true">
-          <div className="w-full border-t border-slate-200 dark:border-slate-800" />
+          <div className="w-full border-t border-slate-200 dark:border-[#1a1a1a]" />
         </div>
         <div className="relative flex justify-center">
-          <span className="bg-white dark:bg-[#090e18] px-3 text-[10px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-500">
+          <span className="bg-white dark:bg-[#0a0a0a] px-3 text-[10px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-500">
             or
           </span>
         </div>

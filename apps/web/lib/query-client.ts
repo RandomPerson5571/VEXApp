@@ -35,9 +35,10 @@ export const queryKeys = {
     tasks: (teamId: string, limit = 4) =>
       ["dashboard", "tasks", teamId, limit] as const,
   },
-  docs: {
-    tree: (teamId: string) => ["docs", "tree", teamId] as const,
-    detail: (id: string) => ["docs", "detail", id] as const,
+  knowledge: {
+    nodes: (teamId: string) => ["knowledge", "nodes", teamId] as const,
+    edges: (teamId: string) => ["knowledge", "edges", teamId] as const,
+    scouting: (teamId: string) => ["knowledge", "scouting", teamId] as const,
   },
   notebookLogs: {
     all: ["notebook-logs"] as const,

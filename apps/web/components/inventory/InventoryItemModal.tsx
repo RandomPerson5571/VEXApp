@@ -75,7 +75,7 @@ export function InventoryItemModal({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/40 p-4 backdrop-blur-sm select-none dark:bg-[#000]/70">
       <div
-        className="relative w-full max-w-md overflow-hidden rounded-2xl border border-slate-200 bg-white p-6 font-sans shadow-2xl dark:border-slate-900 dark:bg-[#090e18]"
+        className="relative w-full max-w-md overflow-hidden rounded-2xl border border-slate-200 bg-white p-6 font-sans dark:border-[#1a1a1a] dark:bg-[#0a0a0a] dark:bg-gradient-to-b dark:from-white/[0.02] dark:to-transparent"
         role="dialog"
         aria-modal="true"
         aria-labelledby="inventory-item-modal-title"
@@ -96,7 +96,7 @@ export function InventoryItemModal({
         <div className="relative">
           <h3
             id="inventory-item-modal-title"
-            className="mb-4 flex items-center gap-2 border-b border-slate-200 pb-3 text-md font-bold text-slate-900 dark:border-slate-900 dark:text-slate-100"
+            className="mb-4 flex items-center gap-2 border-b border-slate-200 pb-3 text-md font-bold text-slate-900 dark:border-[#1a1a1a] dark:text-slate-100"
           >
             <div className="flex h-8 w-8 items-center justify-center rounded-lg border border-yellow-500/20 bg-yellow-500/10 shadow-[0_0_16px_rgba(234,179,8,0.12)]">
               <Package className="h-4 w-4 text-yellow-500 dark:text-yellow-400" />
@@ -119,7 +119,7 @@ export function InventoryItemModal({
                 placeholder="e.g. REV HD Hex Motor"
                 value={name}
                 onChange={(e) => onNameChange(e.target.value)}
-                className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-900 transition-[border-color,box-shadow] focus:border-yellow-500 focus:outline-none focus:ring-1 focus:ring-yellow-500/30 dark:border-slate-900 dark:bg-slate-950 dark:text-slate-200 dark:focus:border-yellow-500/40"
+                className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-900 transition-[border-color,box-shadow] focus:border-yellow-500 focus:outline-none focus:ring-1 focus:ring-yellow-500/30 dark:border-[#1a1a1a] dark:bg-[#121212] dark:text-slate-200 dark:focus:border-yellow-500/40"
               />
             </div>
 
@@ -139,7 +139,7 @@ export function InventoryItemModal({
                 placeholder="0"
                 value={totalStock}
                 onChange={(e) => onTotalStockChange(e.target.value)}
-                className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 font-mono text-xs text-slate-900 transition-[border-color,box-shadow] focus:border-yellow-500 focus:outline-none focus:ring-1 focus:ring-yellow-500/30 dark:border-slate-900 dark:bg-slate-950 dark:text-slate-200 dark:focus:border-yellow-500/40"
+                className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 font-mono text-xs text-slate-900 transition-[border-color,box-shadow] focus:border-yellow-500 focus:outline-none focus:ring-1 focus:ring-yellow-500/30 dark:border-[#1a1a1a] dark:bg-[#121212] dark:text-slate-200 dark:focus:border-yellow-500/40"
               />
             </div>
 
@@ -156,7 +156,7 @@ export function InventoryItemModal({
               <div className="flex items-center gap-3">
                 <label
                   htmlFor="inventory-image"
-                  className="flex flex-1 cursor-pointer items-center gap-2 rounded-lg border border-dashed border-slate-300 bg-slate-50 px-3 py-2 text-xs font-semibold text-slate-600 transition hover:border-yellow-500/50 hover:bg-yellow-500/5 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-400 dark:hover:border-yellow-500/30"
+                  className="flex flex-1 cursor-pointer items-center gap-2 rounded-lg border border-dashed border-slate-300 bg-slate-50 px-3 py-2 text-xs font-semibold text-slate-600 transition hover:border-yellow-500/50 hover:bg-yellow-500/5 dark:border-[#1a1a1a] dark:bg-[#121212] dark:text-slate-400 dark:hover:border-yellow-500/30"
                 >
                   <ImagePlus className="h-4 w-4 shrink-0 text-yellow-600 dark:text-yellow-400" />
                   <span className="truncate">
@@ -169,7 +169,7 @@ export function InventoryItemModal({
                     onClick={clearImage}
                     disabled={isSubmitting}
                     aria-label="Remove image"
-                    className="flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-500 transition hover:border-red-500/30 hover:bg-red-500/5 hover:text-red-500 disabled:opacity-50 dark:border-slate-900 dark:bg-slate-950 dark:hover:text-red-400"
+                    className="flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-500 transition hover:border-red-500/30 hover:bg-red-500/5 hover:text-red-500 disabled:opacity-50 dark:border-[#1a1a1a] dark:bg-[#121212] dark:hover:text-red-400"
                   >
                     <X className="h-4 w-4" />
                   </button>
@@ -184,7 +184,7 @@ export function InventoryItemModal({
                 className="sr-only"
               />
               {previewUrl ? (
-                <div className="overflow-hidden rounded-lg border border-slate-200 bg-slate-50 dark:border-slate-900 dark:bg-slate-950">
+                <div className="overflow-hidden rounded-lg border border-slate-200 bg-slate-50 dark:border-[#1a1a1a] dark:bg-[#121212]">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={previewUrl}
@@ -211,7 +211,7 @@ export function InventoryItemModal({
                 value={description}
                 onChange={(e) => onDescriptionChange(e.target.value)}
                 rows={3}
-                className="w-full resize-none rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-900 transition-[border-color,box-shadow] focus:border-yellow-500 focus:outline-none focus:ring-1 focus:ring-yellow-500/30 dark:border-slate-900 dark:bg-slate-950 dark:text-slate-200 dark:focus:border-yellow-500/40"
+                className="w-full resize-none rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-900 transition-[border-color,box-shadow] focus:border-yellow-500 focus:outline-none focus:ring-1 focus:ring-yellow-500/30 dark:border-[#1a1a1a] dark:bg-[#121212] dark:text-slate-200 dark:focus:border-yellow-500/40"
               />
             </div>
 
@@ -219,12 +219,12 @@ export function InventoryItemModal({
               <p className="text-xs font-semibold text-red-500">{error}</p>
             ) : null}
 
-            <div className="flex items-center justify-end gap-3 border-t border-slate-200 pt-3 dark:border-slate-900">
+            <div className="flex items-center justify-end gap-3 border-t border-slate-200 pt-3 dark:border-[#1a1a1a]">
               <button
                 type="button"
                 onClick={onClose}
                 disabled={isSubmitting}
-                className="cursor-pointer rounded-lg bg-slate-100 px-4 py-2 text-xs font-semibold text-slate-700 transition hover:bg-slate-200 hover:text-slate-900 disabled:opacity-50 dark:bg-[#0e1724] dark:text-slate-400 dark:hover:bg-slate-900 dark:hover:text-white"
+                className="cursor-pointer rounded-lg bg-slate-100 px-4 py-2 text-xs font-semibold text-slate-700 transition hover:bg-slate-200 hover:text-slate-900 disabled:opacity-50 dark:bg-[#121212] dark:text-slate-400 dark:hover:bg-[#121212] dark:hover:text-white"
               >
                 Cancel
               </button>

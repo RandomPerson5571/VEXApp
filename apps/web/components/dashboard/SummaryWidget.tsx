@@ -1,6 +1,6 @@
 "use client";
 
-import { AlertTriangle, Award, Calendar, Package, Wrench } from "lucide-react";
+import { AlertCircle, AlertTriangle, Calendar, Package, Wrench } from "lucide-react";
 
 import { useDashboardSummary } from "@/lib/hooks/use-dashboard-summary";
 import { isQueryInitiallyLoading } from "@/lib/hooks/use-query-loading";
@@ -27,44 +27,41 @@ export function SummaryStatsGrid() {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5 mb-7">
       <SummaryStatCard
-        label="Incomplete Tasks"
-        value={stats.incompleteTasks}
-        subtitle={`${stats.completedTasks} completed`}
+        label="Open Tasks"
+        value={Math.max(0, stats.incompleteTasks - stats.overdueTasks)}
+        subtitle="Due soon or unscheduled"
         icon={Wrench}
-        iconTone="orange"
       />
       <SummaryStatCard
         label="Next Event"
         value={stats.nextEvent}
         subtitle={stats.nextEventDate}
         icon={Calendar}
-        iconTone="indigo"
       />
       <SummaryStatCard
-        label="Inventory Items"
+        label="Inventory"
         value={stats.inventoryItems}
         subtitle={
           stats.inventoryWarning ? (
-            <span className="flex items-center gap-1 text-yellow-300">
+            <span className="flex items-center gap-1">
               <AlertTriangle className="h-3 w-3 animate-pulse inline" />
-              Low stock warning activated
+              Low stock warning
             </span>
           ) : (
-            "Stock levels nominal"
+            "Stock looks good"
           )
         }
         icon={Package}
-        iconTone="yellow"
         warning={stats.inventoryWarning}
       />
       <SummaryStatCard
-        label="Team Rank"
-        value={stats.teamRank}
-        delta={stats.teamRankDelta}
-        deltaTone="green"
-        subtitle={stats.teamRankContext}
-        icon={Award}
-        iconTone="green"
+        label="Overdue Tasks"
+        value={stats.overdueTasks}
+        subtitle={
+          stats.overdueTasks > 0 ? "Due date passed" : "Nothing overdue"
+        }
+        icon={AlertCircle}
+        danger={stats.overdueTasks > 0}
       />
     </div>
   );

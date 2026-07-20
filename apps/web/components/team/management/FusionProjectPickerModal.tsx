@@ -115,7 +115,7 @@ export function FusionProjectPickerModal({
             Loading projects…
           </div>
         ) : projects.length === 0 ? (
-          <p className="rounded-lg border border-slate-900 bg-slate-950/60 px-3 py-4 text-center text-[11px] font-semibold text-slate-500">
+          <p className="rounded-lg border border-[#1a1a1a] bg-slate-950/60 px-3 py-4 text-center text-[11px] font-semibold text-slate-500">
             No Fusion projects found for this Autodesk account.
           </p>
         ) : (

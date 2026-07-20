@@ -2,11 +2,13 @@ import { describe, expect, it, vi } from "vitest";
 
 import { queryKeys } from "@/lib/query-client";
 import { dashboardSummaryQueryOptions as clientDashboardSummaryQueryOptions } from "@/lib/queries/dashboard-summary";
-import { documentationDetailQueryOptions as clientDocumentationDetailQueryOptions } from "@/lib/queries/documentation";
 import { teamDayPlansQueryOptions as clientTeamDayPlansQueryOptions } from "@/lib/queries/day-plans";
 import { teamEventsQueryOptions as clientTeamEventsQueryOptions } from "@/lib/queries/events";
-import { teamDocumentationTreeQueryOptions as clientTeamDocumentationTreeQueryOptions } from "@/lib/queries/folders";
 import { teamInventoryQueryOptions as clientTeamInventoryQueryOptions } from "@/lib/queries/inventory";
+import {
+  knowledgeEdgesQueryOptions,
+  knowledgeNodesQueryOptions,
+} from "@/lib/queries/knowledge";
 import {
   dashboardTasksQueryOptions as clientDashboardTasksQueryOptions,
   teamTasksQueryOptions as clientTeamTasksQueryOptions,
@@ -17,14 +19,10 @@ vi.mock("server-only", () => ({}));
 
 const { dashboardSummaryQueryOptions: serverDashboardSummaryQueryOptions } =
   await import("@/lib/queries/dashboard-summary.server");
-const { documentationDetailQueryOptions: serverDocumentationDetailQueryOptions } =
-  await import("@/lib/queries/documentation.server");
 const { teamDayPlansQueryOptions: serverTeamDayPlansQueryOptions } =
   await import("@/lib/queries/day-plans.server");
 const { teamEventsQueryOptions: serverTeamEventsQueryOptions } =
   await import("@/lib/queries/events.server");
-const { teamDocumentationTreeQueryOptions: serverTeamDocumentationTreeQueryOptions } =
-  await import("@/lib/queries/folders.server");
 const { teamInventoryQueryOptions: serverTeamInventoryQueryOptions } =
   await import("@/lib/queries/inventory.server");
 const {
@@ -35,7 +33,6 @@ const { teamMembersQueryOptions: serverTeamMembersQueryOptions } =
   await import("@/lib/queries/team-members.server");
 
 const TEAM_ID = "team-123";
-const DOC_ID = "doc-456";
 
 describe("query options key alignment", () => {
   it("team tasks client and server wrappers share queryKey", () => {
@@ -102,38 +99,12 @@ describe("query options key alignment", () => {
     expect(clientKey).toEqual(queryKeys.teams.members(TEAM_ID));
   });
 
-  it("documentation tree client and server wrappers share queryKey", () => {
-    const clientKey = clientTeamDocumentationTreeQueryOptions(TEAM_ID).queryKey;
-    const serverKey = serverTeamDocumentationTreeQueryOptions(TEAM_ID).queryKey;
-
-    expect(clientKey).toEqual(serverKey);
-    expect(clientKey).toEqual(queryKeys.docs.tree(TEAM_ID));
-  });
-
-  it("documentation detail client and server wrappers share queryKey", () => {
-    const clientKey = clientDocumentationDetailQueryOptions(DOC_ID).queryKey;
-    const serverKey = serverDocumentationDetailQueryOptions(DOC_ID).queryKey;
-
-    expect(clientKey).toEqual(serverKey);
-    expect(clientKey).toEqual(queryKeys.docs.detail(DOC_ID));
-  });
-});
-
-describe("documentation detail server queryFn", () => {
-  it("throws when document is not found", async () => {
-    const { getDocumentationDetail } = await import(
-      "@/lib/queries/documentation.server"
+  it("knowledge nodes and edges queryKeys match shared keys", () => {
+    expect(knowledgeNodesQueryOptions(TEAM_ID).queryKey).toEqual(
+      queryKeys.knowledge.nodes(TEAM_ID),
     );
-
-    vi.spyOn(
-      await import("@/lib/data/documentation.data"),
-      "getDocumentationById",
-    ).mockResolvedValueOnce(null);
-
-    await expect(getDocumentationDetail("missing-doc")).resolves.toBeNull();
-
-    const { queryFn } = serverDocumentationDetailQueryOptions("missing-doc");
-    expect(queryFn).toBeDefined();
-    await expect(queryFn!({} as never)).rejects.toThrow("Document not found.");
+    expect(knowledgeEdgesQueryOptions(TEAM_ID).queryKey).toEqual(
+      queryKeys.knowledge.edges(TEAM_ID),
+    );
   });
 });

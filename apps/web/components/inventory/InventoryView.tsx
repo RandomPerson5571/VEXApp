@@ -38,8 +38,8 @@ function filterInventory(
 
 function InventoryFallback() {
   return (
-    <div className="flex flex-1 items-center justify-center bg-slate-100 dark:bg-[#03070e] p-8">
-      <div className="w-full max-w-md rounded-2xl border border-slate-300 dark:border-slate-900 bg-white dark:bg-[#090e18]/80 p-8 text-center shadow-md dark:shadow-lg">
+    <div className="flex flex-1 items-center justify-center bg-slate-100 dark:bg-[#000000] p-8">
+      <div className="w-full max-w-md rounded-2xl border border-slate-300 dark:border-[#1a1a1a] bg-white dark:bg-[#0a0a0a] p-8 text-center shadow-md">
         <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full border border-slate-800 bg-slate-900/60">
           <Package className="h-7 w-7 text-slate-400" />
         </div>
@@ -130,7 +130,7 @@ export function InventoryView() {
   }
 
   return (
-    <div className="relative flex-1 overflow-y-auto bg-white dark:bg-[#03070e] px-8 py-6 font-sans dashboard-scroll">
+    <div className="relative flex-1 overflow-y-auto bg-white dark:bg-[#000000] px-8 py-6 font-sans dashboard-scroll">
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(234,179,8,0.07),transparent_55%)]"
@@ -186,16 +186,16 @@ export function InventoryView() {
               {Array.from({ length: 5 }).map((_, index) => (
                 <div
                   key={index}
-                  className="h-20 animate-pulse rounded-xl border border-slate-300 dark:border-slate-900 bg-slate-200 dark:bg-slate-950/60"
+                  className="h-20 animate-pulse rounded-xl border border-slate-300 dark:border-[#1a1a1a] bg-slate-200 dark:bg-[#121212]/60"
                 />
               ))}
             </div>
-            <div className="h-28 animate-pulse rounded-2xl border border-slate-300 dark:border-slate-900 bg-slate-200 dark:bg-slate-950/60" />
+            <div className="h-28 animate-pulse rounded-2xl border border-slate-300 dark:border-[#1a1a1a] bg-slate-200 dark:bg-[#121212]/60" />
             <div className="grid gap-4 lg:grid-cols-2">
               {Array.from({ length: 4 }).map((_, index) => (
                 <div
                   key={index}
-                  className="h-48 animate-pulse rounded-2xl border border-slate-900 bg-slate-950/60"
+                  className="h-48 animate-pulse rounded-2xl border border-[#1a1a1a] bg-slate-950/60"
                 />
               ))}
             </div>
@@ -224,8 +224,8 @@ export function InventoryView() {
             </div>
 
             {filteredItems.length === 0 ? (
-              <div className="rounded-2xl border border-slate-300 dark:border-slate-900/80 bg-slate-100 dark:bg-[#090e18]/80 p-12 text-center shadow-md dark:shadow-md">
-                <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full border border-slate-400 dark:border-slate-800 bg-slate-200 dark:bg-slate-900/60">
+              <div className="rounded-2xl border border-slate-300 dark:border-[#1a1a1a] bg-slate-100 dark:bg-[#0a0a0a] p-12 text-center shadow-md">
+                <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full border border-slate-400 dark:border-slate-800 bg-slate-200 dark:bg-[#121212]/60">
                   <Package className="h-7 w-7 text-slate-600 dark:text-slate-500" />
                 </div>
                 <h2 className="text-lg font-black text-slate-900 dark:text-slate-200">No parts found</h2>

@@ -34,7 +34,7 @@ export function PasswordResetForm({ email }: PasswordResetFormProps) {
           <button
             type="submit"
             disabled={pending || Boolean(state && "success" in state)}
-            className="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2 text-xs font-bold text-slate-700 transition hover:border-blue-500/30 hover:bg-blue-500/10 hover:text-blue-600 disabled:cursor-not-allowed disabled:opacity-60 dark:border-slate-800 dark:bg-slate-950/60 dark:text-slate-200 dark:hover:text-blue-200"
+            className="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2 text-xs font-bold text-slate-700 transition hover:border-blue-500/30 hover:bg-blue-500/10 hover:text-blue-600 disabled:cursor-not-allowed disabled:opacity-60 dark:border-slate-800 dark:bg-[#121212]/60 dark:text-slate-200 dark:hover:text-blue-200"
           >
             <KeyRound className="h-4 w-4" />
             {pending ? "Sending..." : "Send Reset Link"}

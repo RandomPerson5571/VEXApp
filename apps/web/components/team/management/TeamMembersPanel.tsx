@@ -21,8 +21,8 @@ export function TeamMembersPanel({
   onDelete,
 }: TeamMembersPanelProps) {
   return (
-    <div className="rounded-2xl border border-slate-900 bg-[#090e18]/80 p-6 shadow-md">
-      <div className="mb-5 flex items-center justify-between border-b border-slate-900 pb-3.5">
+    <div className="rounded-2xl border border-[#1a1a1a] bg-[#0a0a0a] p-6 shadow-md">
+      <div className="mb-5 flex items-center justify-between border-b border-[#1a1a1a] pb-3.5">
         <div>
           <h2 className="text-sm font-black uppercase tracking-wide text-slate-200">
             Team Members
@@ -48,7 +48,7 @@ export function TeamMembersPanel({
 
       <div className="overflow-x-auto">
         <table className="w-full text-left text-xs text-slate-300">
-          <thead className="border-b border-slate-900 bg-[#0c1424] text-[10px] font-bold uppercase tracking-widest text-slate-400">
+          <thead className="border-b border-[#1a1a1a] bg-[#0c1424] text-[10px] font-bold uppercase tracking-widest text-slate-400">
             <tr>
               <th className="px-4 py-3 font-bold">Name</th>
               <th className="px-4 py-3 font-bold">Email</th>

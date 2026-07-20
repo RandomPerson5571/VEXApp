@@ -40,20 +40,6 @@ export interface BuildStatusComponent {
   colorClass: string;
 }
 
-export interface MatchRecord {
-  id: string;
-  matchName: string;
-  alliance: "Red" | "Blue";
-  opponent: string;
-  autonomousScore: number;
-  driverScore: number;
-  highScore: number;
-  autoWin: boolean;
-  driverWin: boolean;
-  notes?: string;
-  scoutedBy: string;
-}
-
 export interface UpcomingMatch {
   id: string;
   monthLabel: string;
@@ -72,9 +58,6 @@ export interface DashboardSummaryStats {
   nextEventDate: string;
   inventoryItems: number;
   inventoryWarning: boolean;
-  teamRank: string;
-  teamRankDelta: string;
-  teamRankContext: string;
 }
 
 export interface DesignNotebookEntry {

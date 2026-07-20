@@ -1,5 +1,5 @@
-import { DocsView } from "@/components/documents/DocsView";
+import { redirect } from "next/navigation";
 
-export default function DocumentsPage() {
-  return <DocsView />;
+export default function DocumentsRedirectPage() {
+  redirect("/knowledge");
 }

@@ -39,6 +39,8 @@
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
+  --color-surface: var(--surface);
+  --color-surface-hover: var(--surface-hover);
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);
@@ -81,6 +83,8 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
+  --surface: oklch(1 0 0);
+  --surface-hover: oklch(0.97 0 0);
 }
 
 html {
@@ -91,38 +95,41 @@ html.dark {
   color-scheme: dark;
 }
 
+/* Industrial Obsidian — dark theme */
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
+  --background: #000000;
+  --foreground: #f4f4f5;
+  --card: #0a0a0a;
+  --card-foreground: #f4f4f5;
+  --popover: #0a0a0a;
+  --popover-foreground: #f4f4f5;
+  --primary: #f4f4f5;
+  --primary-foreground: #000000;
+  --secondary: #121212;
+  --secondary-foreground: #f4f4f5;
+  --muted: #121212;
+  --muted-foreground: #a1a1aa;
+  --accent: #121212;
+  --accent-foreground: #f4f4f5;
   --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
+  --border: #1a1a1a;
+  --input: #1a1a1a;
+  --ring: #a1a1aa;
   --chart-1: oklch(0.87 0 0);
   --chart-2: oklch(0.556 0 0);
   --chart-3: oklch(0.439 0 0);
   --chart-4: oklch(0.371 0 0);
   --chart-5: oklch(0.269 0 0);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  --sidebar: #0a0a0a;
+  --sidebar-foreground: #f4f4f5;
+  --sidebar-primary: #f4f4f5;
+  --sidebar-primary-foreground: #000000;
+  --sidebar-accent: #121212;
+  --sidebar-accent-foreground: #f4f4f5;
+  --sidebar-border: #1a1a1a;
+  --sidebar-ring: #a1a1aa;
+  --surface: #0a0a0a;
+  --surface-hover: #121212;
 }
 
 @layer base {
@@ -144,7 +151,7 @@ html.dark {
 
 .dashboard-scroll {
   scrollbar-width: thin;
-  scrollbar-color: #334155 #0f172a;
+  scrollbar-color: #1a1a1a #000000;
 }
 
 .dashboard-scroll::-webkit-scrollbar {
@@ -153,27 +160,27 @@ html.dark {
 }
 
 .dashboard-scroll::-webkit-scrollbar-track {
-  background: #0f172a;
+  background: #000000;
   border-radius: 9999px;
 }
 
 .dashboard-scroll::-webkit-scrollbar-thumb {
-  background-color: #334155;
+  background-color: #1a1a1a;
   border-radius: 9999px;
-  border: 1px solid #1e293b;
+  border: 1px solid #121212;
 }
 
 .dashboard-scroll::-webkit-scrollbar-thumb:hover {
-  background-color: #475569;
+  background-color: #2a2a2a;
 }
 
 .dashboard-scroll::-webkit-scrollbar-corner {
-  background: #0f172a;
+  background: #000000;
 }
 
 .admin-scroll {
   scrollbar-width: thin;
-  scrollbar-color: #3b4f6b #0a0f1a;
+  scrollbar-color: #1a1a1a #000000;
 }
 
 .admin-scroll::-webkit-scrollbar {
@@ -182,33 +189,33 @@ html.dark {
 }
 
 .admin-scroll::-webkit-scrollbar-track {
-  background: #0a0f1a;
+  background: #000000;
   border-radius: 9999px;
 }
 
 .admin-scroll::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, #3b4f6b 0%, #2a3a52 100%);
+  background: #121212;
   border-radius: 9999px;
-  border: 2px solid #0a0f1a;
+  border: 2px solid #000000;
 }
 
 .admin-scroll::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(180deg, #4a6282 0%, #3b4f6b 100%);
+  background: #1a1a1a;
 }
 
 .admin-scroll::-webkit-scrollbar-corner {
-  background: #0a0f1a;
+  background: #000000;
 }
 
 .auth-bg-grid {
   background-size: 24px 41.5px;
   background-image:
-    linear-gradient(30deg, #1e293b 25%, transparent 25%),
-    linear-gradient(150deg, #1e293b 25%, transparent 25%),
-    linear-gradient(270deg, #1e293b 25%, transparent 25%),
-    linear-gradient(330deg, transparent 75%, #1e293b 75%),
-    linear-gradient(90deg, transparent 75%, #1e293b 75%),
-    linear-gradient(210deg, transparent 75%, #1e293b 75%);
+    linear-gradient(30deg, #1a1a1a 25%, transparent 25%),
+    linear-gradient(150deg, #1a1a1a 25%, transparent 25%),
+    linear-gradient(270deg, #1a1a1a 25%, transparent 25%),
+    linear-gradient(330deg, transparent 75%, #1a1a1a 75%),
+    linear-gradient(90deg, transparent 75%, #1a1a1a 75%),
+    linear-gradient(210deg, transparent 75%, #1a1a1a 75%);
 }
 
 /* Gentle float animation for homepage logo */
@@ -228,13 +235,30 @@ html.dark {
   animation: float 4s ease-in-out infinite;
 }
 
-/* Utility for lifting and highlighting cards on hover */
-.hover-lift {
-  transition: transform 200ms ease, box-shadow 200ms ease, background-color 200ms ease, border-color 200ms ease;
+/* Industrial Obsidian surfaces — border lift, not black shadow (dark only) */
+.dark .surface {
+  background-color: #0a0a0a;
+  border: 1px solid #1a1a1a;
 }
-.hover-lift:hover {
-  transform: translateY(-8px);
-  box-shadow: 0 20px 35px -15px rgba(2,6,23,0.6);
+
+.dark .surface-elevated {
+  background-color: #0a0a0a;
+  background-image: linear-gradient(
+    180deg,
+    rgb(255 255 255 / 0.02) 0%,
+    transparent 100%
+  );
+  border: 1px solid #1a1a1a;
+}
+
+.hover-lift {
+  transition: transform 200ms ease, background-color 200ms ease, border-color 200ms ease;
+}
+.dark .hover-lift:hover {
+  transform: translateY(-4px);
+  background-color: #121212;
+  border-color: #2a2a2a;
+  box-shadow: none;
 }
 
 @keyframes authPageGlow {

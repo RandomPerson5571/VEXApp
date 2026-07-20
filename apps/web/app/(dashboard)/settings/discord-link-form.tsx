@@ -56,7 +56,7 @@ export function DiscordLinkForm({
                 className={`inline-flex items-center rounded-full border px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider ${
                   isConnected
                     ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
-                    : "border-slate-200 bg-white text-slate-500 dark:border-slate-800 dark:bg-slate-900/80"
+                    : "border-slate-200 bg-white text-slate-500 dark:border-slate-800 dark:bg-[#121212]/80"
                 }`}
               >
                 {isConnected ? "Connected" : "Not connected"}
@@ -108,7 +108,7 @@ export function DiscordLinkForm({
   }
 
   return (
-    <article className="group rounded-xl border border-slate-200 bg-slate-50 p-5 transition duration-200 hover:border-indigo-500/20 dark:border-slate-900 dark:bg-slate-950/40">
+    <article className="group rounded-xl border border-slate-200 bg-slate-50 p-5 transition duration-200 hover:border-indigo-500/20 dark:border-[#1a1a1a] dark:bg-[#121212]/40">
       {body}
     </article>
   );

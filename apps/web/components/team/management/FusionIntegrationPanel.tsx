@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState } from "react";
 import { Box, ExternalLink, Link2, Loader2, Unlink } from "lucide-react";
@@ -63,14 +63,14 @@ export function FusionIntegrationPanel({
   }
 
   return (
-    <article className="group relative overflow-hidden rounded-2xl border border-slate-900/80 bg-[#090e18]/80 p-5 shadow-md transition duration-300 hover:border-blue-500/15">
+    <article className="group relative overflow-hidden rounded-2xl border border-[#1a1a1a] bg-[#0a0a0a] p-5 shadow-md transition duration-300 hover:border-blue-500/15">
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0 bg-gradient-to-br from-blue-500/[0.05] via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100"
       />
 
       <div className="relative space-y-4">
-        <div className="flex items-start justify-between gap-3 border-b border-slate-900 pb-3.5">
+        <div className="flex items-start justify-between gap-3 border-b border-[#1a1a1a] pb-3.5">
           <div className="flex items-start gap-3">
             <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-blue-500/20 bg-blue-500/10 transition-transform duration-300 group-hover:scale-105">
               <Image src={Fusion360.src} alt="Fusion 360" width={22} height={22} />
@@ -106,7 +106,7 @@ export function FusionIntegrationPanel({
 
         {isConnected && integration ? (
           <div className="space-y-3">
-            <div className="rounded-xl border border-slate-900 bg-slate-950/60 p-3.5">
+            <div className="rounded-xl border border-[#1a1a1a] bg-slate-950/60 p-3.5">
               <div className="flex items-start justify-between gap-3">
                 <div className="flex min-w-0 items-start gap-2.5">
                   <Box className="mt-0.5 h-4 w-4 shrink-0 text-blue-400/80" />
@@ -135,7 +135,7 @@ export function FusionIntegrationPanel({
               </div>
 
               {integration.hookId ? (
-                <div className="mt-3 border-t border-slate-900 pt-3 text-[9px] font-semibold text-slate-500">
+                <div className="mt-3 border-t border-[#1a1a1a] pt-3 text-[9px] font-semibold text-slate-500">
                   Webhook hook · {integration.hookId.slice(0, 8)}…
                 </div>
               ) : null}
@@ -172,7 +172,7 @@ export function FusionIntegrationPanel({
             ) : null}
           </div>
         ) : (
-          <p className="rounded-lg border border-slate-900 bg-slate-950/60 px-3 py-2.5 text-[10px] font-semibold text-slate-500">
+          <p className="rounded-lg border border-[#1a1a1a] bg-slate-950/60 px-3 py-2.5 text-[10px] font-semibold text-slate-500">
             No Fusion project linked yet.
           </p>
         )}

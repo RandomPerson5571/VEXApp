@@ -22,7 +22,7 @@ export function AdminStatChip({
       className={cn(
         "inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1 text-[11px] font-bold tracking-wide",
         variant === "default" &&
-          "border-slate-800/80 bg-slate-950/50 text-slate-300",
+          "border-[#1a1a1a] bg-slate-950/50 text-slate-300",
         variant === "accent" &&
           "border-blue-500/20 bg-blue-500/10 text-blue-300",
         variant === "success" &&
@@ -54,7 +54,7 @@ export function AdminTabSwitcher<T extends string>({
 }: AdminTabSwitcherProps<T>) {
   return (
     <div
-      className="flex items-center gap-1 self-start rounded-xl border border-slate-800/80 bg-slate-950/60 p-1 shadow-inner"
+      className="flex items-center gap-1 self-start rounded-xl border border-[#1a1a1a] bg-slate-950/60 p-1 shadow-inner"
       role="tablist"
       aria-label="Administration sections"
     >
@@ -128,7 +128,7 @@ export function AdminEmptyState({
 }: AdminEmptyStateProps) {
   return (
     <div className="flex flex-col items-center gap-2.5 px-4 py-10 text-center">
-      <div className="flex size-12 items-center justify-center rounded-2xl border border-slate-800/80 bg-slate-950/50">
+      <div className="flex size-12 items-center justify-center rounded-2xl border border-[#1a1a1a] bg-slate-950/50">
         <Icon className="size-5 text-slate-500" aria-hidden />
       </div>
       <div className="space-y-1">
@@ -150,7 +150,7 @@ export function AdminTableFrame({ children, className }: AdminTableFrameProps) {
   return (
     <div
       className={cn(
-        "admin-scroll overflow-auto rounded-xl border border-slate-800/80 bg-slate-950/30 shadow-sm backdrop-blur-sm",
+        "admin-scroll overflow-auto rounded-xl border border-[#1a1a1a] bg-slate-950/30 shadow-sm backdrop-blur-sm",
         "ring-1 ring-white/[0.02]",
         className,
       )}
@@ -183,7 +183,7 @@ export const adminTableRowClassName = cn(
 );
 
 export const adminInlineInputClassName =
-  "h-9 border-slate-800/80 bg-slate-950/50 transition-[border-color,box-shadow] focus-visible:border-blue-500/40 focus-visible:ring-blue-500/20";
+  "h-9 border-[#1a1a1a] bg-slate-950/50 transition-[border-color,box-shadow] focus-visible:border-blue-500/40 focus-visible:ring-blue-500/20";
 
 export const adminSwitchClassName = cn(
   "shrink-0 border border-slate-600/50 shadow-inner",

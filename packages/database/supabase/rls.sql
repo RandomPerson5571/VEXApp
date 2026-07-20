@@ -1,6 +1,6 @@
 -- Supabase RLS policies for Prisma-managed tables.
 -- Apply manually in the Supabase SQL editor or via `supabase db execute`.
--- Requires user.id to match auth.uid() and implicit join tables _TeamEvents / _AuthoredDocs.
+-- Requires user.id to match auth.uid() and implicit join table _TeamEvents.
 
 CREATE OR REPLACE FUNCTION public.current_user_team_id()
 RETURNS text
@@ -146,65 +146,85 @@ CREATE POLICY "team_events_delete_leader" ON "_TeamEvents"
     AND "B" = public.current_user_team_id()
   );
 
--- Folder (org-wide read for authenticated users until team scoping is added)
-ALTER TABLE "Folder" ENABLE ROW LEVEL SECURITY;
+-- KnowledgeNode (team-scoped)
+ALTER TABLE "KnowledgeNode" ENABLE ROW LEVEL SECURITY;
 
-DROP POLICY IF EXISTS "folder_select_authenticated" ON "Folder";
-CREATE POLICY "folder_select_authenticated" ON "Folder"
+DROP POLICY IF EXISTS "knowledge_node_select_team" ON "KnowledgeNode";
+CREATE POLICY "knowledge_node_select_team" ON "KnowledgeNode"
   FOR SELECT
-  USING (auth.role() = 'authenticated');
+  USING (
+    "teamId" = public.current_user_team_id()
+    OR public.current_user_role() = 'ADMIN'
+  );
 
-DROP POLICY IF EXISTS "folder_write_leader" ON "Folder";
-CREATE POLICY "folder_write_leader" ON "Folder"
-  FOR ALL
-  USING (public.is_team_leader_or_admin())
-  WITH CHECK (public.is_team_leader_or_admin());
-
--- Documentation
-ALTER TABLE "Documentation" ENABLE ROW LEVEL SECURITY;
-
-DROP POLICY IF EXISTS "documentation_select_authenticated" ON "Documentation";
-CREATE POLICY "documentation_select_authenticated" ON "Documentation"
-  FOR SELECT
-  USING (auth.role() = 'authenticated');
-
-DROP POLICY IF EXISTS "documentation_insert_authenticated" ON "Documentation";
-CREATE POLICY "documentation_insert_authenticated" ON "Documentation"
+DROP POLICY IF EXISTS "knowledge_node_insert_team" ON "KnowledgeNode";
+CREATE POLICY "knowledge_node_insert_team" ON "KnowledgeNode"
   FOR INSERT
-  WITH CHECK (auth.role() = 'authenticated');
+  WITH CHECK (
+    "teamId" = public.current_user_team_id()
+    AND "createdById" = auth.uid()::text
+  );
 
-DROP POLICY IF EXISTS "documentation_update_author_or_leader" ON "Documentation";
-CREATE POLICY "documentation_update_author_or_leader" ON "Documentation"
+DROP POLICY IF EXISTS "knowledge_node_update_author_or_leader" ON "KnowledgeNode";
+CREATE POLICY "knowledge_node_update_author_or_leader" ON "KnowledgeNode"
   FOR UPDATE
   USING (
-    public.is_team_leader_or_admin()
-    OR id IN (
-      SELECT "A"
-      FROM "_AuthoredDocs"
-      WHERE "B" IN (
-        SELECT id FROM "User" WHERE "id" = auth.uid()::text
-      )
+    "teamId" = public.current_user_team_id()
+    AND (
+      public.is_team_leader_or_admin()
+      OR "createdById" = auth.uid()::text
     )
   );
 
-DROP POLICY IF EXISTS "documentation_delete_leader" ON "Documentation";
-CREATE POLICY "documentation_delete_leader" ON "Documentation"
+DROP POLICY IF EXISTS "knowledge_node_delete_author_or_leader" ON "KnowledgeNode";
+CREATE POLICY "knowledge_node_delete_author_or_leader" ON "KnowledgeNode"
   FOR DELETE
-  USING (public.is_team_leader_or_admin());
+  USING (
+    "teamId" = public.current_user_team_id()
+    AND (
+      public.is_team_leader_or_admin()
+      OR "createdById" = auth.uid()::text
+    )
+  );
 
--- _AuthoredDocs join table
-ALTER TABLE "_AuthoredDocs" ENABLE ROW LEVEL SECURITY;
+-- KnowledgeEdge (team-scoped via source node)
+ALTER TABLE "KnowledgeEdge" ENABLE ROW LEVEL SECURITY;
 
-DROP POLICY IF EXISTS "authored_docs_select_authenticated" ON "_AuthoredDocs";
-CREATE POLICY "authored_docs_select_authenticated" ON "_AuthoredDocs"
+DROP POLICY IF EXISTS "knowledge_edge_select_team" ON "KnowledgeEdge";
+CREATE POLICY "knowledge_edge_select_team" ON "KnowledgeEdge"
   FOR SELECT
-  USING (auth.role() = 'authenticated');
+  USING (
+    "sourceId" IN (
+      SELECT id FROM "KnowledgeNode"
+      WHERE "teamId" = public.current_user_team_id()
+    )
+    OR public.current_user_role() = 'ADMIN'
+  );
 
-DROP POLICY IF EXISTS "authored_docs_insert_author" ON "_AuthoredDocs";
-CREATE POLICY "authored_docs_insert_author" ON "_AuthoredDocs"
+DROP POLICY IF EXISTS "knowledge_edge_insert_team" ON "KnowledgeEdge";
+CREATE POLICY "knowledge_edge_insert_team" ON "KnowledgeEdge"
   FOR INSERT
   WITH CHECK (
-    "B" IN (SELECT id FROM "User" WHERE "id" = auth.uid()::text)
+    "sourceId" IN (
+      SELECT id FROM "KnowledgeNode"
+      WHERE "teamId" = public.current_user_team_id()
+    )
+    AND "targetId" IN (
+      SELECT id FROM "KnowledgeNode"
+      WHERE "teamId" = public.current_user_team_id()
+    )
+  );
+
+DROP POLICY IF EXISTS "knowledge_edge_delete_leader" ON "KnowledgeEdge";
+CREATE POLICY "knowledge_edge_delete_leader" ON "KnowledgeEdge"
+  FOR DELETE
+  USING (
+    public.is_team_leader_or_admin()
+    OR "sourceId" IN (
+      SELECT id FROM "KnowledgeNode"
+      WHERE "teamId" = public.current_user_team_id()
+        AND "createdById" = auth.uid()::text
+    )
   );
 
 -- NotebookLog

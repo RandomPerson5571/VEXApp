@@ -286,7 +286,7 @@ export function AdminUserManagementTable({
         <AdminTableFrame>
           <Table className="min-w-[56rem]">
             <TableHeader>
-              <TableRow className="border-slate-800/80 hover:bg-transparent">
+              <TableRow className="border-[#1a1a1a] hover:bg-transparent">
                 <TableHead className={cn(adminTableHeadClassName, "w-[14rem]")}>
                   Member
                 </TableHead>

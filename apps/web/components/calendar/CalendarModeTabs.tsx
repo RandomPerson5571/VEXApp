@@ -11,7 +11,7 @@ export function CalendarModeTabs({
   onChange: (mode: CalendarViewMode) => void;
 }) {
   return (
-    <div className="flex items-center gap-1 bg-white dark:bg-slate-950 p-1 border border-slate-200 dark:border-slate-900 rounded-lg self-start sm:self-center">
+    <div className="flex items-center gap-1 bg-white dark:bg-[#121212] p-1 border border-slate-200 dark:border-[#1a1a1a] rounded-lg self-start sm:self-center">
       {VIEW_MODES.map((mode) => (
         <button
           key={mode}

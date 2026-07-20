@@ -2,7 +2,6 @@ import "server-only";
 
 import { prisma } from "@stlvex/database";
 
-import { MOCK_TEAM_RANK } from "@/lib/mock/dashboard-rank";
 import { toCalendarEvent } from "@/lib/mappers/events";
 import type { DashboardSummaryStats } from "@/lib/types/team";
 
@@ -72,11 +71,26 @@ export async function getDashboardSummary(
     completedTasks,
     overdueTasks,
     nextEvent: nextEventCal?.title ?? "No upcoming events",
-    nextEventDate: nextEventCal
-      ? `${nextEventCal.date} at ${nextEventCal.startTime}`
+    nextEventDate: nextEvent
+      ? formatTimeUntil(nextEvent.startDate, now)
       : "—",
     inventoryItems,
     inventoryWarning,
-    ...MOCK_TEAM_RANK,
   };
+}
+
+function formatTimeUntil(start: Date, now: Date): string {
+  const ms = start.getTime() - now.getTime();
+  if (ms <= 0) return "Starting now";
+
+  const hourMs = 1000 * 60 * 60;
+  const dayMs = hourMs * 24;
+  const hours = Math.ceil(ms / hourMs);
+
+  if (hours < 24) {
+    return hours === 1 ? "in 1 hour" : `in ${hours} hours`;
+  }
+
+  const days = Math.ceil(ms / dayMs);
+  return days === 1 ? "in 1 day" : `in ${days} days`;
 }

@@ -201,9 +201,9 @@ export function CalendarView({
   };
 
   return (
-    <div className="flex-1 flex min-h-0 overflow-hidden bg-slate-50 dark:bg-[#03070e] font-sans">
+    <div className="flex-1 flex min-h-0 overflow-hidden bg-slate-50 dark:bg-[#000000] font-sans">
       <div
-        className={`flex-1 px-8 py-6 flex flex-col h-full min-h-0 border-r border-slate-200 dark:border-slate-900/60 ${
+        className={`flex-1 px-8 py-6 flex flex-col h-full min-h-0 border-r border-slate-200 dark:border-[#1a1a1a] ${
           viewType === "month" ? "overflow-y-auto dashboard-scroll" : "overflow-hidden"
         }`}
       >

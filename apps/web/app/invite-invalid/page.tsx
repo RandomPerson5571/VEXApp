@@ -75,7 +75,7 @@ export default async function InviteInvalidPage({
 
   return (
     <div className="flex min-h-screen items-center justify-center p-6">
-      <div className="w-full max-w-md rounded-2xl bg-[#090e18]/80 border border-slate-900 shadow-2xl p-8 text-center space-y-6">
+      <div className="w-full max-w-md rounded-2xl bg-[#0a0a0a] border border-[#1a1a1a] shadow-2xl p-8 text-center space-y-6">
         <div className="space-y-3">
           <h1 className="text-xl font-bold text-white">{copy.title}</h1>
           <p className="text-sm text-slate-400">{copy.description}</p>

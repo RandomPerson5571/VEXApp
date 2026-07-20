@@ -82,9 +82,9 @@ export function ConfirmationDialog({
         aria-modal="true"
         aria-labelledby={titleId}
         aria-describedby={description ? descriptionId : undefined}
-        className="relative w-full max-w-sm rounded-2xl border border-slate-900 bg-[#090e18] p-6 font-sans shadow-2xl"
+        className="surface-elevated relative w-full max-w-sm rounded-2xl p-6 font-sans"
       >
-        <div className="mb-4 flex items-start gap-3 border-b border-slate-900 pb-3">
+        <div className="mb-4 flex items-start gap-3 border-b border-[#1a1a1a] pb-3">
           {icon ? (
             <div className="mt-0.5 shrink-0 text-slate-400">{icon}</div>
           ) : null}
@@ -111,7 +111,7 @@ export function ConfirmationDialog({
             type="button"
             onClick={onClose}
             disabled={pending}
-            className="rounded-lg bg-[#0e1724] px-4 py-2 text-xs font-semibold text-slate-400 transition hover:bg-slate-900 hover:text-white disabled:cursor-not-allowed disabled:opacity-60"
+            className="rounded-lg bg-[#121212] px-4 py-2 text-xs font-semibold text-slate-400 transition hover:bg-[#1a1a1a] hover:text-[#f4f4f5] disabled:cursor-not-allowed disabled:opacity-60"
           >
             {cancelLabel}
           </button>
