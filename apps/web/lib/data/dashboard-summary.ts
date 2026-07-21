@@ -4,6 +4,7 @@ import { prisma } from "@stlvex/database";
 
 import { toCalendarEvent } from "@/lib/mappers/events";
 import type { DashboardSummaryStats } from "@/lib/types/team";
+import { formatTimeUntil } from "@/lib/utils/format-time-until";
 
 function isInventoryDepleted(
   totalStock: number,
@@ -77,20 +78,4 @@ export async function getDashboardSummary(
     inventoryItems,
     inventoryWarning,
   };
-}
-
-function formatTimeUntil(start: Date, now: Date): string {
-  const ms = start.getTime() - now.getTime();
-  if (ms <= 0) return "Starting now";
-
-  const hourMs = 1000 * 60 * 60;
-  const dayMs = hourMs * 24;
-  const hours = Math.ceil(ms / hourMs);
-
-  if (hours < 24) {
-    return hours === 1 ? "in 1 hour" : `in ${hours} hours`;
-  }
-
-  const days = Math.ceil(ms / dayMs);
-  return days === 1 ? "in 1 day" : `in ${days} days`;
 }

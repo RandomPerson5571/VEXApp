@@ -1,7 +1,7 @@
 "use client";
 
 import { Check, Copy, Link2, Loader2, Lock } from "lucide-react";
-import { useEffect, useState, useTransition } from "react";
+import { useState, useTransition } from "react";
 
 import { createInviteLink } from "@/app/(dashboard)/invite/actions";
 import { useTeam, useUser } from "@/components/providers/UserProvider";
@@ -52,11 +52,9 @@ export function InviteCreationView({
   const [copied, setCopied] = useState(false);
   const [isPending, startTransition] = useTransition();
 
-  useEffect(() => {
-    if (!teams.some((team) => team.id === selectedTeamId)) {
-      setSelectedTeamId(teams[0]?.id ?? "");
-    }
-  }, [selectedTeamId, teams]);
+  const effectiveTeamId = teams.some((entry) => entry.id === selectedTeamId)
+    ? selectedTeamId
+    : (teams[0]?.id ?? "");
 
   function resetGeneratedLink() {
     setInviteLink("");
@@ -69,7 +67,7 @@ export function InviteCreationView({
 
     startTransition(async () => {
       const result = await createInviteLink({
-        teamId: selectedTeamId,
+        teamId: effectiveTeamId,
         maxUses,
         expiresAt,
       });
@@ -99,7 +97,7 @@ export function InviteCreationView({
     lockTeamSelection || teams.length <= 1 || isPending || !canCreate;
   const isTeamLocked = lockTeamSelection && !isAdmin;
   const selectedTeam =
-    teams.find((entry) => entry.id === selectedTeamId) ?? teams[0] ?? null;
+    teams.find((entry) => entry.id === effectiveTeamId) ?? teams[0] ?? null;
 
   return (
     <div className="flex flex-1 overflow-y-auto bg-slate-50 dashboard-scroll dark:bg-[#000000]">
@@ -180,7 +178,7 @@ export function InviteCreationView({
               ) : (
                 <select
                   id="invite-team"
-                  value={selectedTeamId}
+                  value={effectiveTeamId}
                   disabled={teamSelectDisabled}
                   onChange={(event) => {
                     setSelectedTeamId(event.target.value);
@@ -254,7 +252,7 @@ export function InviteCreationView({
               type="button"
               onClick={handleCreateLink}
               disabled={
-                !selectedTeamId || teams.length === 0 || isPending || !canCreate
+                !effectiveTeamId || teams.length === 0 || isPending || !canCreate
               }
               className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-xs font-bold uppercase tracking-wide text-white transition hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-60 motion-safe:hover:scale-[1.01] motion-reduce:transition-none"
             >

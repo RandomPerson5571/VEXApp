@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { Clock3, Users } from "lucide-react";
 
 import { DiscordLinkForm } from "@/app/(dashboard)/settings/discord-link-form";
@@ -60,18 +60,28 @@ export function ProfileSettingsView({
   const [draftFirstName, setDraftFirstName] = useState(firstName);
   const [draftLastName, setDraftLastName] = useState(lastName);
   const [draftEmail, setDraftEmail] = useState(email);
+  const [propSnapshot, setPropSnapshot] = useState({
+    firstName,
+    lastName,
+    email,
+  });
   const [isSaving, setIsSaving] = useState(false);
   const [profileMessage, setProfileMessage] = useState<string | null>(null);
   const [profileError, setProfileError] = useState<string | null>(null);
 
-  useEffect(() => {
+  if (
+    propSnapshot.firstName !== firstName ||
+    propSnapshot.lastName !== lastName ||
+    propSnapshot.email !== email
+  ) {
+    setPropSnapshot({ firstName, lastName, email });
     setSavedFirstName(firstName);
     setSavedLastName(lastName);
     setSavedEmail(email);
     setDraftFirstName(firstName);
     setDraftLastName(lastName);
     setDraftEmail(email);
-  }, [email, firstName, lastName]);
+  }
 
   const isDirty = useMemo(
     () =>

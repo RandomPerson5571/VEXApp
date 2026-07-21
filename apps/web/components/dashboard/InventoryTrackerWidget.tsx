@@ -42,8 +42,9 @@ function InventoryRow({ item, index }: { item: TeamInventoryItem; index: number 
   const available = getAvailableStock(item);
 
   return (
-    <div
-      className="group relative overflow-hidden rounded-3xl border border-slate-300 dark:border-[#1a1a1a] bg-slate-100 dark:bg-[#121212]/60 p-3 transition-[transform,opacity,border-color] duration-300 motion-safe:hover:-translate-y-0.5 motion-safe:hover:border-slate-400 dark:motion-safe:hover:border-[#2a2a2a] motion-reduce:transition-none"
+    <Link
+      href="/inventory"
+      className="group relative block overflow-hidden rounded-3xl border border-slate-300 dark:border-[#1a1a1a] bg-slate-100 dark:bg-[#121212]/60 p-3 transition-[transform,opacity,border-color] duration-300 motion-safe:hover:-translate-y-0.5 motion-safe:hover:border-slate-400 dark:motion-safe:hover:border-[#2a2a2a] motion-reduce:transition-none"
       style={{ animationDelay: `${index * 60}ms` }}
     >
       <div className="relative flex items-start justify-between gap-3">
@@ -93,7 +94,7 @@ function InventoryRow({ item, index }: { item: TeamInventoryItem; index: number 
 
         <ChevronRight className="mt-1 h-4 w-4 shrink-0 text-slate-400 transition-colors duration-200 group-hover:text-slate-600 dark:text-slate-700 dark:group-hover:text-slate-500" />
       </div>
-    </div>
+    </Link>
   );
 }
 

@@ -1,7 +1,7 @@
 "use client";
 
 import type { ChangeEvent, FormEvent } from "react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { ImagePlus, Package, Plus, X } from "lucide-react";
 
 export function InventoryItemModal({
@@ -38,21 +38,18 @@ export function InventoryItemModal({
   error?: string;
 }) {
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const previewUrl = useMemo(
+    () => (imageFile ? URL.createObjectURL(imageFile) : null),
+    [imageFile],
+  );
 
   useEffect(() => {
-    if (!imageFile) {
-      setPreviewUrl(null);
-      return;
-    }
-
-    const objectUrl = URL.createObjectURL(imageFile);
-    setPreviewUrl(objectUrl);
-
     return () => {
-      URL.revokeObjectURL(objectUrl);
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl);
+      }
     };
-  }, [imageFile]);
+  }, [previewUrl]);
 
   if (!isOpen) {
     return null;

@@ -42,6 +42,7 @@ export interface BuildStatusComponent {
 
 export interface UpcomingMatch {
   id: string;
+  date: string;
   monthLabel: string;
   day: number;
   title: string;

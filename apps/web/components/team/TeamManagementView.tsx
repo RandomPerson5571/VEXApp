@@ -96,42 +96,48 @@ export function TeamManagementView({
     null,
   );
 
+  const githubErrorParam = searchParams.get("githubError");
+  const fusionErrorParam = searchParams.get("fusionError");
+  const installationIdParam = canManageIntegrations
+    ? parseInstallationId(searchParams.get("githubInstall"))
+    : null;
+  const connectSessionParam = canManageIntegrations
+    ? searchParams.get("fusionConnect")?.trim() || null
+    : null;
+
+  // Latch URL params into state during render (survives router.replace cleanup)
+  if (githubErrorParam && githubBannerError !== githubErrorParam) {
+    setGithubBannerError(githubErrorParam);
+  }
+  if (fusionErrorParam && fusionBannerError !== fusionErrorParam) {
+    setFusionBannerError(fusionErrorParam);
+  }
+  if (
+    installationIdParam &&
+    repoPickerInstallationId !== installationIdParam
+  ) {
+    setRepoPickerInstallationId(installationIdParam);
+  }
+  if (connectSessionParam && fusionConnectSession !== connectSessionParam) {
+    setFusionConnectSession(connectSessionParam);
+  }
+
   useEffect(() => {
-    const githubErrorParam = searchParams.get("githubError");
-    const fusionErrorParam = searchParams.get("fusionError");
-
-    if (githubErrorParam) {
-      setGithubBannerError(githubErrorParam);
-      router.replace("/team-management", { scroll: false });
-      return;
-    }
-
-    if (fusionErrorParam) {
-      setFusionBannerError(fusionErrorParam);
-      router.replace("/team-management", { scroll: false });
-      return;
-    }
-
-    if (!canManageIntegrations) {
-      return;
-    }
-
-    const installationId = parseInstallationId(
-      searchParams.get("githubInstall"),
-    );
-    const connectSession = searchParams.get("fusionConnect")?.trim() || null;
-
-    if (installationId) {
-      setRepoPickerInstallationId(installationId);
-      router.replace("/team-management", { scroll: false });
-      return;
-    }
-
-    if (connectSession) {
-      setFusionConnectSession(connectSession);
+    if (
+      githubErrorParam ||
+      fusionErrorParam ||
+      installationIdParam ||
+      connectSessionParam
+    ) {
       router.replace("/team-management", { scroll: false });
     }
-  }, [canManageIntegrations, router, searchParams]);
+  }, [
+    connectSessionParam,
+    fusionErrorParam,
+    githubErrorParam,
+    installationIdParam,
+    router,
+  ]);
 
   function handleRoleChange(memberId: string, role: UserRole) {
     if (!canManage) return;

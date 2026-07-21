@@ -1,7 +1,6 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
 
 import type { NotificationPreferences } from "@/lib/notifications/preferences";
 
@@ -35,14 +34,9 @@ export function SettingsView({
   initialSection = "profile",
 }: SettingsViewProps) {
   const router = useRouter();
-  const [section, setSection] = useState<SettingsSectionId>(initialSection);
-
-  useEffect(() => {
-    setSection(initialSection);
-  }, [initialSection]);
+  const section = initialSection;
 
   function handleSectionChange(next: SettingsSectionId) {
-    setSection(next);
     // ponytail: drop message/error on tab switch; deep links land via server initialSection
     const href =
       next === "notifications" ? "/settings?section=notifications" : "/settings";

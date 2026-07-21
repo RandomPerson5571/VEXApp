@@ -32,11 +32,6 @@ export function InlineEdit({
   const inputRef = useRef<HTMLInputElement>(null);
   const isSavingRef = useRef(false); // Prevents the double-fire race condition
 
-  // Keep internal value in sync with external prop updates
-  useEffect(() => {
-    setCurrentValue(value);
-  }, [value]);
-
   useEffect(() => {
     if (isEditing && inputRef.current) {
       inputRef.current.focus();
@@ -107,7 +102,10 @@ export function InlineEdit({
     <button
       type="button"
       disabled={disabled}
-      onClick={() => setIsEditing(true)}
+      onClick={() => {
+        setCurrentValue(value);
+        setIsEditing(true);
+      }}
       aria-label={`Edit ${value || placeholder}`}
       className={`w-full text-left bg-transparent border-0 cursor-pointer rounded px-1 transition-colors group/inline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 disabled:cursor-not-allowed ${
         value 

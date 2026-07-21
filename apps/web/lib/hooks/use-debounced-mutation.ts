@@ -21,9 +21,14 @@ export function useDebouncedMutation<TInput>({
   const latestInputRef = useRef<TInput | null>(null);
   const mutateFnRef = useRef(mutateFn);
   const onErrorRef = useRef(onError);
+  const debouncedExecuteRef = useRef<ReturnType<typeof debounce<() => void>> | null>(
+    null,
+  );
 
-  mutateFnRef.current = mutateFn;
-  onErrorRef.current = onError;
+  useEffect(() => {
+    mutateFnRef.current = mutateFn;
+    onErrorRef.current = onError;
+  }, [mutateFn, onError]);
 
   const executeMutate = useCallback(async () => {
     const input = latestInputRef.current;
@@ -43,14 +48,12 @@ export function useDebouncedMutation<TInput>({
     }
   }, []);
 
-  const debouncedExecuteRef = useRef(debounce(executeMutate, delayMs));
-
   useEffect(() => {
-    debouncedExecuteRef.current.cancel();
+    debouncedExecuteRef.current?.cancel();
     debouncedExecuteRef.current = debounce(executeMutate, delayMs);
 
     return () => {
-      debouncedExecuteRef.current.cancel();
+      debouncedExecuteRef.current?.cancel();
     };
   }, [delayMs, executeMutate]);
 
@@ -58,17 +61,17 @@ export function useDebouncedMutation<TInput>({
     (input: TInput) => {
       applyOptimistic(input);
       latestInputRef.current = input;
-      debouncedExecuteRef.current();
+      debouncedExecuteRef.current?.();
     },
     [applyOptimistic],
   );
 
   const flush = useCallback(() => {
-    debouncedExecuteRef.current.flush();
+    debouncedExecuteRef.current?.flush();
   }, []);
 
   const cancel = useCallback(() => {
-    debouncedExecuteRef.current.cancel();
+    debouncedExecuteRef.current?.cancel();
     latestInputRef.current = null;
   }, []);
 

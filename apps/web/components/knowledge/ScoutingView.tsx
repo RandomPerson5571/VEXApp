@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { Binoculars, Plus, Search, Trash2, X } from "lucide-react";
 
 import { ScoutNoteEditor } from "@/components/knowledge/ScoutNoteEditor";
@@ -38,6 +38,10 @@ export function ScoutingView() {
 
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [draftHtml, setDraftHtml] = useState("");
+  const [draftSource, setDraftSource] = useState<{
+    id: string | null;
+    content: string;
+  }>({ id: null, content: "" });
   const [search, setSearch] = useState("");
   const [adding, setAdding] = useState(false);
   const [newNumber, setNewNumber] = useState("");
@@ -54,20 +58,24 @@ export function ScoutingView() {
     );
   }, [notes, search]);
 
+  const activeId =
+    selectedId && notes.some((note) => note.id === selectedId)
+      ? selectedId
+      : (notes[0]?.id ?? null);
+
   const selected = useMemo(
-    () => notes.find((note) => note.id === selectedId) ?? null,
-    [notes, selectedId],
+    () => notes.find((note) => note.id === activeId) ?? null,
+    [notes, activeId],
   );
 
-  useEffect(() => {
-    if (!selectedId && notes[0]) {
-      setSelectedId(notes[0].id);
-    }
-  }, [notes, selectedId]);
-
-  useEffect(() => {
-    setDraftHtml(selected?.content ?? "");
-  }, [selected?.id, selected?.content]);
+  const selectedContent = selected?.content ?? "";
+  if (
+    draftSource.id !== (selected?.id ?? null) ||
+    draftSource.content !== selectedContent
+  ) {
+    setDraftSource({ id: selected?.id ?? null, content: selectedContent });
+    setDraftHtml(selectedContent);
+  }
 
   if (!team) {
     return <ScoutingFallback />;
@@ -207,7 +215,7 @@ export function ScoutingView() {
             </p>
           )}
           {filteredNotes.map((note) => {
-            const active = note.id === selectedId;
+            const active = note.id === activeId;
             return (
               <button
                 key={note.id}

@@ -74,30 +74,22 @@ function needsResolution(rawUrl: string | null | undefined): boolean {
 export function useInventoryImageUrl(rawUrl: string | null | undefined) {
   const [url, setUrl] = useState(() => getCachedImageUrl(rawUrl));
   const [isLoading, setIsLoading] = useState(() => needsResolution(rawUrl));
+  const [trackedRawUrl, setTrackedRawUrl] = useState(rawUrl);
+
+  if (rawUrl !== trackedRawUrl) {
+    setTrackedRawUrl(rawUrl);
+    setUrl(getCachedImageUrl(rawUrl));
+    setIsLoading(needsResolution(rawUrl));
+  }
 
   useEffect(() => {
-    if (!rawUrl) {
-      setUrl(null);
-      setIsLoading(false);
-      return;
-    }
-
-    if (isAbsoluteUrl(rawUrl)) {
-      setUrl(rawUrl);
-      setIsLoading(false);
-      return;
-    }
-
-    if (resolvedCache.has(rawUrl)) {
-      setUrl(resolvedCache.get(rawUrl) ?? null);
-      setIsLoading(false);
+    if (!needsResolution(rawUrl)) {
       return;
     }
 
     let cancelled = false;
-    setIsLoading(true);
 
-    void resolveImageUrl(rawUrl).then((resolved) => {
+    void resolveImageUrl(rawUrl!).then((resolved) => {
       if (cancelled) return;
       setUrl(resolved);
       setIsLoading(false);

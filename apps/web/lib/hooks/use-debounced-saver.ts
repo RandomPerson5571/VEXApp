@@ -14,7 +14,9 @@ export function useDebouncedSaver<TPayload extends object>(
   );
   const saveFnRef = useRef(saveFn);
 
-  saveFnRef.current = saveFn;
+  useEffect(() => {
+    saveFnRef.current = saveFn;
+  }, [saveFn]);
 
   useEffect(() => {
     const debouncers = debouncersRef.current;

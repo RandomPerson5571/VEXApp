@@ -52,9 +52,10 @@ export function UpcomingMatchesList() {
           </p>
         ) : (
           matches.map((match) => (
-            <div
+            <Link
               key={match.id}
-              className="p-3 rounded-3xl border border-slate-300 dark:border-[#1a1a1a] bg-slate-100 dark:bg-[#121212]/60 flex items-center justify-between gap-3 text-xs"
+              href={`/calendar?date=${match.date}`}
+              className="group flex items-center justify-between gap-3 rounded-3xl border border-slate-300 bg-slate-100 p-3 text-xs transition-[transform,border-color] duration-200 hover:-translate-y-0.5 hover:border-slate-400 dark:border-[#1a1a1a] dark:bg-[#121212]/60 dark:hover:border-[#2a2a2a]"
             >
               <div className="flex gap-3">
                 <div className="flex min-w-[45px] flex-col items-center justify-center rounded-lg border border-orange-400/30 bg-orange-500/15 px-2 py-1.5 text-center font-black text-orange-700 dark:text-orange-300">
@@ -73,8 +74,8 @@ export function UpcomingMatchesList() {
                   </span>
                 </div>
               </div>
-              <ChevronRight className="h-4 w-4 text-slate-600 flex-shrink-0" />
-            </div>
+              <ChevronRight className="h-4 w-4 shrink-0 text-slate-600 transition-colors group-hover:text-slate-800 dark:group-hover:text-slate-400" />
+            </Link>
           ))
         )}
       </div>

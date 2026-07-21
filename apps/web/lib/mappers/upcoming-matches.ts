@@ -19,6 +19,7 @@ function toUpcomingEvent(event: CalendarEvent): UpcomingMatch {
 
   return {
     id: event.id,
+    date: event.date,
     monthLabel: date.toLocaleString("en-US", { month: "short" }),
     day: date.getDate(),
     title: event.title,

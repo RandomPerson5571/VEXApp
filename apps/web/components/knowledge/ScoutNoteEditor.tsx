@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
+import { TextSelection } from "@tiptap/pm/state";
 import {
   Bold,
   Heading2,
@@ -29,10 +30,23 @@ export function ScoutNoteEditor({
     content: content || "<p></p>",
     editable,
     immediatelyRender: false,
+    shouldRerenderOnTransaction: true, // ponytail: stored-mark shortcuts need a re-render
     editorProps: {
       attributes: {
         class:
           "scout-note-editor min-h-[280px] px-4 py-3 text-sm leading-relaxed text-slate-800 outline-none dark:text-slate-200 [&_h2]:mb-2 [&_h2]:mt-3 [&_h2]:text-base [&_h2]:font-bold [&_ol]:my-2 [&_ol]:list-decimal [&_ol]:pl-5 [&_p]:my-1.5 [&_ul]:my-2 [&_ul]:list-disc [&_ul]:pl-5 [&_strong]:font-bold [&_em]:italic",
+      },
+      // ponytail: TipTap Mod-a uses AllSelection; after delete it sticks and kills mark shortcuts
+      handleKeyDown: (view, event) => {
+        if (!(event.ctrlKey || event.metaKey) || event.key.toLowerCase() !== "a") {
+          return false;
+        }
+        const { doc } = view.state;
+        const to = Math.max(1, doc.content.size - 1);
+        view.dispatch(
+          view.state.tr.setSelection(TextSelection.create(doc, 1, to)),
+        );
+        return true;
       },
     },
     onUpdate: ({ editor: current }) => {
@@ -136,6 +150,7 @@ function ToolbarButton({
       type="button"
       title={label}
       aria-label={label}
+      onMouseDown={(event) => event.preventDefault()}
       onClick={onClick}
       className={`inline-flex h-7 w-7 items-center justify-center rounded-md border text-slate-600 transition dark:text-slate-300 ${
         active
