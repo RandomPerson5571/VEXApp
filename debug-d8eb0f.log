@@ -1,0 +1,3 @@
+{"sessionId":"d8eb0f","runId":"post-fix","hypothesisId":"H-C","location":"current-user.ts:getCurrentUserState","message":"about to call connection()","data":{},"timestamp":1784594615389}
+{"sessionId":"d8eb0f","runId":"post-fix","hypothesisId":"H-C","location":"current-user.ts:getCurrentUserState","message":"about to call connection()","data":{},"timestamp":1784594621071}
+{"sessionId":"d8eb0f","runId":"post-fix","hypothesisId":"H-D","location":"enforce-api-rate-limit.ts:entry","message":"enforceApiRateLimit called","data":{"hasRequest":true,"requestType":"object","bucket":"team","userIdPresent":true},"timestamp":1784594621504}
