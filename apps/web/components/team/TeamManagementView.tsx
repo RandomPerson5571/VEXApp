@@ -328,12 +328,12 @@ export function TeamManagementView({
   }
 
   return (
-    <div className="min-h-0 flex-1 overflow-y-auto bg-[#000000] px-8 py-6 font-sans scrollbar-thin scrollbar-thumb-slate-900 scrollbar-track-transparent">
+    <div className="min-h-0 flex-1 overflow-y-auto bg-slate-100 px-8 py-6 font-sans scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-transparent dark:bg-[#000000] dark:scrollbar-thumb-slate-900">
       <div className="mb-6">
-        <h1 className="text-2xl font-black tracking-tight text-slate-100">
+        <h1 className="text-2xl font-black tracking-tight text-slate-950 dark:text-slate-100">
           Team Management
         </h1>
-        <p className="mt-1 text-xs font-semibold text-slate-400">
+        <p className="mt-1 text-xs font-semibold text-slate-600 dark:text-slate-400">
           {canManage
             ? `Manage roles and invites for ${teamLabel}.`
             : `View roster for ${teamLabel}.`}
@@ -341,13 +341,13 @@ export function TeamManagementView({
       </div>
 
       {githubBannerError ? (
-        <div className="mb-4 rounded-xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-[11px] font-semibold text-red-400">
+        <div className="mb-4 rounded-xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-[11px] font-semibold text-red-600 dark:text-red-400">
           {githubBannerError}
         </div>
       ) : null}
 
       {fusionBannerError ? (
-        <div className="mb-4 rounded-xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-[11px] font-semibold text-red-400">
+        <div className="mb-4 rounded-xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-[11px] font-semibold text-red-600 dark:text-red-400">
           {fusionBannerError}
         </div>
       ) : null}

@@ -50,7 +50,7 @@ export function LandingNav() {
             </Link>
             <Link
               href="/dashboard"
-              className="rounded-md bg-[#ffa800] px-3 py-1.5 text-sm font-medium text-[#1a1200] transition-colors hover:bg-[#ffb52e]"
+              className="landing-orange-glass-button rounded-md px-3 py-1.5 text-sm font-medium"
             >
               Open Dashboard
             </Link>

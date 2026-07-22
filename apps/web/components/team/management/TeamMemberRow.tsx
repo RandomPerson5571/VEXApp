@@ -19,12 +19,14 @@ export function TeamMemberRow({
   onDelete,
 }: TeamMemberRowProps) {
   return (
-    <tr className="transition hover:bg-slate-900/20">
-      <td className="px-4 py-4 font-black text-slate-100">{member.name}</td>
-      <td className="px-4 py-4 text-[11px] font-semibold text-slate-400">
+    <tr className="transition hover:bg-slate-100 dark:hover:bg-slate-900/20">
+      <td className="px-4 py-4 font-black text-slate-950 dark:text-slate-100">
+        {member.name}
+      </td>
+      <td className="px-4 py-4 text-[11px] font-semibold text-slate-600 dark:text-slate-400">
         {member.email}
       </td>
-      <td className="px-4 py-4 font-bold text-slate-300">
+      <td className="px-4 py-4 font-bold text-slate-700 dark:text-slate-300">
         {canManage ? (
           <RoleSelect
             variant="inline"
@@ -39,7 +41,7 @@ export function TeamMemberRow({
         <MemberStatusBadge status={member.status} />
       </td>
       {canManage ? (
-        <td className="space-x-1.5 px-4 py-4 text-right font-semibold text-slate-400">
+        <td className="space-x-1.5 px-4 py-4 text-right font-semibold text-slate-500 dark:text-slate-400">
           <button
             type="button"
             onClick={() => onEdit(member)}
