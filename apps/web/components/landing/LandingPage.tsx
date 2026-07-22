@@ -26,6 +26,7 @@ export function LandingPage() {
             ".landing-hero-headline",
             ".landing-hero-sub",
             ".landing-hero-cta",
+            ".landing-hero-video",
             ".landing-hero-mock",
             ".landing-section",
           ],
@@ -51,6 +52,11 @@ export function LandingPage() {
             ".landing-hero-cta",
             { opacity: 0, y: 16, duration: 0.5 },
             "-=0.35",
+          )
+          .from(
+            ".landing-hero-video",
+            { opacity: 0, scale: 0.96, duration: 0.65 },
+            "-=0.45",
           )
           .from(
             ".landing-hero-mock",
