@@ -29,7 +29,7 @@ export function LandingHero() {
         </div>
 
         <h1 className="landing-hero-headline mt-6 max-w-3xl text-[clamp(2.25rem,6vw,4.25rem)] font-semibold leading-[1.05] tracking-tight text-zinc-50">
-          The team hub for competition season
+          The team dashboard for competition season
         </h1>
 
         <p className="landing-hero-sub mt-5 max-w-xl text-base leading-relaxed text-zinc-400 sm:text-lg">
