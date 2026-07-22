@@ -36,7 +36,7 @@ export function LandingFooter() {
       </div>
 
       <div className="border-t border-[#1a1a1a] py-6 text-center text-xs text-zinc-600">
-        STL Robotics - 2026-2027 Season - Roary
+        © 2026 STL Robotics
       </div>
     </footer>
   );
