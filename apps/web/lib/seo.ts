@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 const LOCAL_FALLBACK = "http://localhost:3000";
 
 export const SITE_NAME = "STL Robotics";
+export const PAGE_TITLE = "STL Robotics App";
 
 export const SITE_DESCRIPTION =
   "Team hub for STL Robotics. Manage matches, build logs, inventory, calendar, knowledge, and members for the 2026-2027 VRC season.";
@@ -41,8 +42,8 @@ export const PRIVATE_LAYOUT_METADATA: Metadata = { robots: NO_INDEX_ROBOTS };
 export const ROOT_LAYOUT_METADATA: Metadata = {
   metadataBase: new URL(getSiteUrl()),
   title: {
-    default: SITE_NAME,
-    template: `%s | ${SITE_NAME}`,
+    default: PAGE_TITLE,
+    template: PAGE_TITLE,
   },
   description: SITE_DESCRIPTION,
   keywords: [...SITE_KEYWORDS],
@@ -52,13 +53,13 @@ export const ROOT_LAYOUT_METADATA: Metadata = {
     type: "website",
     locale: "en_US",
     siteName: SITE_NAME,
-    title: SITE_NAME,
+    title: PAGE_TITLE,
     description: SITE_DESCRIPTION,
     images: [OG_IMAGE],
   },
   twitter: {
     card: "summary_large_image",
-    title: SITE_NAME,
+    title: PAGE_TITLE,
     description: SITE_DESCRIPTION,
     images: [OG_IMAGE.url],
   },
@@ -70,23 +71,23 @@ export const ROOT_LAYOUT_METADATA: Metadata = {
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: SITE_NAME,
+    title: PAGE_TITLE,
   },
-  applicationName: SITE_NAME,
+  applicationName: PAGE_TITLE,
 };
 
-export function createPageMetadata({
-  title,
-  description = SITE_DESCRIPTION,
-  path = "/",
-  index = true,
-}: {
+export function createPageMetadata(options: {
   title?: string;
   description?: string;
   path?: string;
   index?: boolean;
 } = {}): Metadata {
-  const resolvedTitle = title ?? SITE_NAME;
+  const {
+    description = SITE_DESCRIPTION,
+    path = "/",
+    index = true,
+  } = options;
+  const resolvedTitle = PAGE_TITLE;
   const canonical = path === "/" ? getSiteUrl() : `${getSiteUrl()}${path}`;
 
   return {

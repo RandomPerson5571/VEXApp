@@ -34,7 +34,7 @@ export function LandingHero() {
             </div>
 
             <h1 className="landing-hero-headline mt-6 max-w-3xl text-[clamp(2.25rem,6vw,4.25rem)] font-semibold leading-[1.05] tracking-tight text-zinc-50">
-              The team hub for competition season
+              The team dashboard for the 2026-27 season
             </h1>
 
             <p className="landing-hero-sub mt-5 max-w-xl text-base leading-relaxed text-zinc-400 sm:text-lg">
@@ -43,7 +43,7 @@ export function LandingHero() {
             </p>
 
             <div className="landing-hero-cta mt-8 flex flex-wrap items-center gap-3">
-              <Link
+              <Link 
                 href="/login"
                 className="landing-orange-glass-button inline-flex items-center rounded-md px-5 py-2.5 text-sm font-semibold"
               >
@@ -73,7 +73,7 @@ export function LandingHero() {
               aria-label="STL Robotics team hub preview video"
             />
             <p className="mt-3 text-center text-xs text-zinc-600">
-              © 2026 STL Robotics
+              © 2026 Alex Li and 2053X PXR0
             </p>
           </div>
         </div>
