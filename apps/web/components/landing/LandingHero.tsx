@@ -40,12 +40,12 @@ export function LandingHero() {
             <p className="landing-hero-sub mt-5 max-w-xl text-base leading-relaxed text-zinc-400 sm:text-lg">
               Roary keeps match prep, knowledge, calendar, and member
               coordination in one place for the 2026-2027 VRC season.
-    
+            </p>
 
             <div className="landing-hero-cta mt-8 flex flex-wrap items-center gap-3">
               <Link
                 href="/login"
-                className="inline-flex items-center rounded-md bg-[#ffa800] px-5 py-2.5 text-sm font-semibold text-[#1a1200] transition-colors hover:bg-[#ffb52e]"
+                className="landing-orange-glass-button inline-flex items-center rounded-md px-5 py-2.5 text-sm font-semibold"
               >
                 Log in
               </Link>

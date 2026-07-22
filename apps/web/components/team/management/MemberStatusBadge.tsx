@@ -11,8 +11,8 @@ export function MemberStatusBadge({ status }: MemberStatusBadgeProps) {
     <span
       className={`rounded border px-2 py-0.5 text-[10px] font-bold ${
         isActive
-          ? "border-green-500/20 bg-green-500/10 text-green-400"
-          : "border-red-500/20 bg-red-500/10 text-red-500"
+          ? "border-green-500/20 bg-green-500/10 text-green-700 dark:text-green-400"
+          : "border-red-500/20 bg-red-500/10 text-red-600 dark:text-red-500"
       }`}
     >
       {status}

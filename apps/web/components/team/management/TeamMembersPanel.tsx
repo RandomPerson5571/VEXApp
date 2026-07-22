@@ -21,13 +21,13 @@ export function TeamMembersPanel({
   onDelete,
 }: TeamMembersPanelProps) {
   return (
-    <div className="rounded-2xl border border-[#1a1a1a] bg-[#0a0a0a] p-6 shadow-md">
-      <div className="mb-5 flex items-center justify-between border-b border-[#1a1a1a] pb-3.5">
+    <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-md dark:border-[#1a1a1a] dark:bg-[#0a0a0a]">
+      <div className="mb-5 flex items-center justify-between border-b border-slate-200 pb-3.5 dark:border-[#1a1a1a]">
         <div>
-          <h2 className="text-sm font-black uppercase tracking-wide text-slate-200">
+          <h2 className="text-sm font-black uppercase tracking-wide text-slate-900 dark:text-slate-200">
             Team Members
           </h2>
-          <p className="mt-0.5 text-[11px] font-semibold text-slate-500">
+          <p className="mt-0.5 text-[11px] font-semibold text-slate-600 dark:text-slate-500">
             {canManage
               ? "Manage roles and invites for your team"
               : "View members assigned to your team"}
@@ -47,8 +47,8 @@ export function TeamMembersPanel({
       </div>
 
       <div className="overflow-x-auto">
-        <table className="w-full text-left text-xs text-slate-300">
-          <thead className="border-b border-[#1a1a1a] bg-[#0c1424] text-[10px] font-bold uppercase tracking-widest text-slate-400">
+        <table className="w-full text-left text-xs text-slate-700 dark:text-slate-300">
+          <thead className="border-b border-slate-200 bg-slate-100 text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:border-[#1a1a1a] dark:bg-[#0c1424] dark:text-slate-400">
             <tr>
               <th className="px-4 py-3 font-bold">Name</th>
               <th className="px-4 py-3 font-bold">Email</th>
@@ -59,7 +59,7 @@ export function TeamMembersPanel({
               ) : null}
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-900/40">
+          <tbody className="divide-y divide-slate-200 dark:divide-slate-900/40">
             {members.length === 0 ? (
               <tr>
                 <td
