@@ -113,7 +113,7 @@ export function GitHubRepoPickerModal({
             Loading repositories…
           </div>
         ) : repositories.length === 0 ? (
-          <p className="rounded-lg border border-[#1a1a1a] bg-slate-950/60 px-3 py-4 text-center text-[11px] font-semibold text-slate-500">
+          <p className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-4 text-center text-[11px] font-semibold text-slate-600 dark:border-[#1a1a1a] dark:bg-slate-950/60 dark:text-slate-500">
             No repositories found for this GitHub App installation.
           </p>
         ) : (
@@ -137,7 +137,7 @@ export function GitHubRepoPickerModal({
         )}
 
         {error ? (
-          <p className="rounded-lg border border-red-500/20 bg-red-500/10 px-3 py-2 text-[10px] font-semibold text-red-400">
+          <p className="rounded-lg border border-red-500/20 bg-red-500/10 px-3 py-2 text-[10px] font-semibold text-red-600 dark:text-red-400">
             {error}
           </p>
         ) : null}

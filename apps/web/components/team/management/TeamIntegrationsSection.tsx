@@ -25,12 +25,12 @@ export function TeamIntegrationsSection({
   onFusionActiveChange,
 }: TeamIntegrationsSectionProps) {
   return (
-    <section className="rounded-2xl border border-[#1a1a1a] bg-[#0a0a0a] p-6 shadow-md">
-      <div className="mb-5 border-b border-[#1a1a1a] pb-3.5">
-        <h2 className="text-sm font-black uppercase tracking-wide text-slate-200">
+    <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-md dark:border-[#1a1a1a] dark:bg-[#0a0a0a]">
+      <div className="mb-5 border-b border-slate-200 pb-3.5 dark:border-[#1a1a1a]">
+        <h2 className="text-sm font-black uppercase tracking-wide text-slate-900 dark:text-slate-200">
           Workspace Integrations
         </h2>
-        <p className="mt-0.5 text-[11px] font-semibold text-slate-500">
+        <p className="mt-0.5 text-[11px] font-semibold text-slate-600 dark:text-slate-500">
           Link external repositories and CAD projects to your team workspace.
         </p>
       </div>
