@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 
+import { canManageTeamRoster } from "@/lib/auth/auth-guards";
+import { verifyCurrentUserPermissions } from "@/lib/auth/auth-guards-server";
 import { getCurrentUser } from "@/lib/auth/current-user";
 import { enforceApiRateLimit } from "@/lib/security/enforce-api-rate-limit";
 import { fromUiEventType } from "@/lib/mappers/events";
@@ -26,6 +28,7 @@ type CreateEventRequestBody = {
   type?: UiEventType;
   location?: string;
   description?: string;
+  forAllTeams?: boolean;
 };
 
 export async function GET() {
@@ -103,6 +106,18 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Invalid event type." }, { status: 400 });
   }
 
+  const forAllTeams = body.forAllTeams === true;
+
+  if (forAllTeams) {
+    const permissions = await verifyCurrentUserPermissions(teamId);
+    if (!canManageTeamRoster(permissions)) {
+      return NextResponse.json(
+        { error: "Only admins and team leaders can create events for all teams." },
+        { status: 403 },
+      );
+    }
+  }
+
   const startDate = combineDateAndTime(date, startTime);
   const endDate = combineDateAndTime(date, endTime);
 
@@ -122,6 +137,7 @@ export async function POST(request: Request) {
       startDate,
       endDate,
       teamId,
+      forAllTeams,
     });
 
     return NextResponse.json(event, { status: 201 });

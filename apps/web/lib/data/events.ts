@@ -11,6 +11,7 @@ export type CreateEventInput = {
   startDate: Date;
   endDate: Date;
   teamId: string;
+  forAllTeams?: boolean;
 };
 
 export async function listEventsForTeam(teamId: string): Promise<Event[]> {
@@ -29,6 +30,17 @@ export async function createEventForTeam(input: CreateEventInput): Promise<Event
     throw new Error("End time must be after start time.");
   }
 
+  // ponytail: connect every team when forAllTeams; no Event.isGlobal flag
+  const teamConnect = input.forAllTeams
+    ? (await prisma.team.findMany({ select: { id: true } })).map((team) => ({
+        id: team.id,
+      }))
+    : [{ id: input.teamId }];
+
+  if (teamConnect.length === 0) {
+    throw new Error("No teams found.");
+  }
+
   return prisma.event.create({
     data: {
       name: input.name.trim(),
@@ -38,7 +50,7 @@ export async function createEventForTeam(input: CreateEventInput): Promise<Event
       startDate: input.startDate,
       endDate: input.endDate,
       teams: {
-        connect: { id: input.teamId },
+        connect: teamConnect,
       },
     },
   });

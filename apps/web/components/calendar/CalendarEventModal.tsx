@@ -21,6 +21,8 @@ export function CalendarEventModal({
   type,
   location,
   description,
+  forAllTeams = false,
+  canMakeGlobal = false,
   onTitleChange,
   onDateChange,
   onStartTimeChange,
@@ -28,6 +30,7 @@ export function CalendarEventModal({
   onTypeChange,
   onLocationChange,
   onDescriptionChange,
+  onForAllTeamsChange,
   onClose,
   onSubmit,
   isSubmitting = false,
@@ -41,6 +44,8 @@ export function CalendarEventModal({
   type: EventType;
   location: string;
   description: string;
+  forAllTeams?: boolean;
+  canMakeGlobal?: boolean;
   onTitleChange: (value: string) => void;
   onDateChange: (value: string) => void;
   onStartTimeChange: (value: string) => void;
@@ -48,6 +53,7 @@ export function CalendarEventModal({
   onTypeChange: (value: EventType) => void;
   onLocationChange: (value: string) => void;
   onDescriptionChange: (value: string) => void;
+  onForAllTeamsChange?: (value: boolean) => void;
   onClose: () => void;
   onSubmit: (event: FormEvent<HTMLFormElement>) => void;
   isSubmitting?: boolean;
@@ -194,6 +200,27 @@ export function CalendarEventModal({
               className="w-full px-3 py-2 text-xs font-semibold bg-white dark:bg-[#121212] border border-slate-200 dark:border-[#1a1a1a] rounded-lg text-slate-900 dark:text-slate-200 focus:outline-none focus:border-orange-500 dark:focus:border-[#1a1a1a]"
             />
           </div>
+
+          {canMakeGlobal ? (
+            <label
+              htmlFor="event-for-all-teams"
+              className="flex items-start gap-2.5 cursor-pointer select-none"
+            >
+              <input
+                id="event-for-all-teams"
+                type="checkbox"
+                checked={forAllTeams}
+                onChange={(e) => onForAllTeamsChange?.(e.target.checked)}
+                className="mt-0.5 h-3.5 w-3.5 rounded border-slate-300 text-orange-600 focus:ring-orange-500 dark:border-[#333] dark:bg-[#121212]"
+              />
+              <span className="text-xs font-semibold text-slate-700 dark:text-slate-300">
+                Visible to all teams
+                <span className="block text-[10px] font-medium text-slate-500 dark:text-slate-500 mt-0.5">
+                  Adds this event to every team calendar
+                </span>
+              </span>
+            </label>
+          ) : null}
 
           {error ? (
             <p className="text-xs font-semibold text-red-500">{error}</p>

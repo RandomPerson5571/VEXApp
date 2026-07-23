@@ -9,6 +9,7 @@ export type CreateEventPayload = {
   type: EventType;
   location: string;
   description?: string;
+  forAllTeams?: boolean;
 };
 
 export async function fetchTeamEventsFromApi(): Promise<CalendarEvent[]> {

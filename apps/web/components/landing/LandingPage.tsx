@@ -90,11 +90,7 @@ export function LandingPage() {
   );
 
   return (
-    <div
-      ref={rootRef}
-      className="landing-root relative min-h-screen bg-black text-zinc-100"
-      style={{ fontFamily: "var(--font-geist-sans), ui-sans-serif, system-ui" }}
-    >
+    <div ref={rootRef} className="landing-root relative min-h-screen bg-black text-zinc-100">
       <div className="landing-noise pointer-events-none fixed inset-0 z-[1]" />
       <div className="relative z-[2]">
         <LandingNav />

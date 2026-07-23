@@ -2,6 +2,8 @@
 
 import { useEffect, useMemo, useState } from "react";
 import type { CalendarEvent, DayPlanType, EventType } from "@/lib/types/team";
+import { canManageTeamRoster } from "@/lib/auth/auth-guards";
+import { useUserPermissions } from "@/lib/auth/use-user-permissions";
 import { useTeam } from "@/components/providers/UserProvider";
 import { isQueryInitiallyLoading } from "@/lib/hooks/use-query-loading";
 import { useTeamEventMutations } from "@/lib/hooks/use-team-event-mutations";
@@ -38,6 +40,8 @@ export function CalendarView({
   onActivityLog,
 }: CalendarViewProps) {
   const team = useTeam();
+  const permissions = useUserPermissions(team?.id);
+  const canMakeGlobal = canManageTeamRoster(permissions);
   const eventsQuery = useTeamEvents();
   const { data: events = [] } = eventsQuery;
   const { createMutation: createEventMutation } = useTeamEventMutations({
@@ -46,6 +50,7 @@ export function CalendarView({
       setIsModalOpen(false);
       setTitle("");
       setDescription("");
+      setForAllTeams(false);
     },
   });
   const dayPlansQuery = useTeamDayPlans();
@@ -70,6 +75,7 @@ export function CalendarView({
   const [type, setType] = useState<EventType>("build");
   const [location, setLocation] = useState(DEFAULT_LOCATION);
   const [description, setDescription] = useState("");
+  const [forAllTeams, setForAllTeams] = useState(false);
 
   useEffect(() => {
     return () => {
@@ -187,6 +193,7 @@ export function CalendarView({
         type,
         location,
         description: description.trim() || undefined,
+        forAllTeams: canMakeGlobal && forAllTeams ? true : undefined,
       },
       {
         onSuccess: () => {
@@ -273,6 +280,8 @@ export function CalendarView({
         type={type}
         location={location}
         description={description}
+        forAllTeams={forAllTeams}
+        canMakeGlobal={canMakeGlobal}
         onTitleChange={setTitle}
         onDateChange={setEventDate}
         onStartTimeChange={setStartTime}
@@ -280,9 +289,11 @@ export function CalendarView({
         onTypeChange={setType}
         onLocationChange={setLocation}
         onDescriptionChange={setDescription}
+        onForAllTeamsChange={setForAllTeams}
         onClose={() => {
           if (!createEventMutation.isPending) {
             createEventMutation.reset();
+            setForAllTeams(false);
             setIsModalOpen(false);
           }
         }}

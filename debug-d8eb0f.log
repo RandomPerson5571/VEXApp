@@ -21,3 +21,15 @@
 {"sessionId":"d8eb0f","runId":"post-fix","hypothesisId":"H-C","location":"current-user.ts:getCurrentUserState","message":"about to call connection()","data":{},"timestamp":1784678161349}
 {"sessionId":"d8eb0f","runId":"post-fix","hypothesisId":"H-C","location":"current-user.ts:getCurrentUserState","message":"about to call connection()","data":{},"timestamp":1784680964672}
 {"sessionId":"d8eb0f","runId":"post-fix","hypothesisId":"H-C","location":"current-user.ts:getCurrentUserState","message":"about to call connection()","data":{},"timestamp":1784681405710}
+{"sessionId":"d8eb0f","runId":"post-fix","hypothesisId":"H-C","location":"current-user.ts:getCurrentUserState","message":"about to call connection()","data":{},"timestamp":1784778333635}
+{"sessionId":"d8eb0f","runId":"post-fix","hypothesisId":"H-C","location":"current-user.ts:getCurrentUserState","message":"about to call connection()","data":{},"timestamp":1784778429873}
+{"sessionId":"d8eb0f","runId":"post-fix","hypothesisId":"H-D","location":"enforce-api-rate-limit.ts:entry","message":"enforceApiRateLimit called","data":{"hasRequest":true,"requestType":"object","bucket":"team","userIdPresent":true},"timestamp":1784778431024}
+{"sessionId":"d8eb0f","runId":"post-fix","hypothesisId":"H-C","location":"current-user.ts:getCurrentUserState","message":"about to call connection()","data":{},"timestamp":1784778515442}
+{"sessionId":"d8eb0f","runId":"post-fix","hypothesisId":"H-C","location":"current-user.ts:getCurrentUserState","message":"about to call connection()","data":{},"timestamp":1784778515883}
+{"sessionId":"d8eb0f","runId":"post-fix","hypothesisId":"H-C","location":"current-user.ts:getCurrentUserState","message":"about to call connection()","data":{},"timestamp":1784778520159}
+{"sessionId":"d8eb0f","runId":"post-fix","hypothesisId":"H-C","location":"current-user.ts:getCurrentUserState","message":"about to call connection()","data":{},"timestamp":1784778527142}
+{"sessionId":"d8eb0f","runId":"post-fix","hypothesisId":"H-C","location":"current-user.ts:getCurrentUserState","message":"about to call connection()","data":{},"timestamp":1784778592148}
+{"sessionId":"d8eb0f","runId":"post-fix","hypothesisId":"H-C","location":"current-user.ts:getCurrentUserState","message":"about to call connection()","data":{},"timestamp":1784778593223}
+{"sessionId":"d8eb0f","runId":"post-fix","hypothesisId":"H-D","location":"enforce-api-rate-limit.ts:entry","message":"enforceApiRateLimit called","data":{"hasRequest":true,"requestType":"object","bucket":"team","userIdPresent":true},"timestamp":1784778593519}
+{"sessionId":"d8eb0f","runId":"post-fix","hypothesisId":"H-C","location":"current-user.ts:getCurrentUserState","message":"about to call connection()","data":{},"timestamp":1784778594920}
+{"sessionId":"d8eb0f","runId":"post-fix","hypothesisId":"H-C","location":"current-user.ts:getCurrentUserState","message":"about to call connection()","data":{},"timestamp":1784778595016}
