@@ -22,6 +22,10 @@ export async function fetchTeamEventsFromApi(): Promise<CalendarEvent[]> {
   return response.json() as Promise<CalendarEvent[]>;
 }
 
+export type UpdateEventPayload = CreateEventPayload & {
+  eventId: string;
+};
+
 export async function createTeamEventFromApi(
   payload: CreateEventPayload,
 ): Promise<CalendarEvent> {
@@ -40,6 +44,37 @@ export async function createTeamEventFromApi(
   }
 
   return body as CalendarEvent;
+}
+
+export async function updateTeamEventFromApi(
+  payload: UpdateEventPayload,
+): Promise<CalendarEvent> {
+  const { eventId, ...body } = payload;
+  const response = await fetch(`/api/events/${eventId}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+
+  const result = (await response.json()) as CalendarEvent | { error?: string };
+
+  if (!response.ok) {
+    throw new Error(
+      "error" in result && result.error ? result.error : "Failed to update event.",
+    );
+  }
+
+  return result as CalendarEvent;
+}
+
+export async function deleteTeamEventFromApi(eventId: string): Promise<void> {
+  const response = await fetch(`/api/events/${eventId}`, { method: "DELETE" });
+
+  if (response.status === 204) return;
+
+  const body = (await response.json()) as { error?: string };
+
+  throw new Error(body.error ?? "Failed to delete event.");
 }
 
 export function teamEventsQueryOptions(teamId: string) {

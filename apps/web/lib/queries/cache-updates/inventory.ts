@@ -30,3 +30,14 @@ export function replaceTeamInventoryItem(
     },
   );
 }
+
+export function removeTeamInventoryItem(
+  queryClient: QueryClient,
+  teamId: string,
+  itemId: string,
+): void {
+  queryClient.setQueryData<TeamInventoryItem[]>(
+    queryKeys.inventory.forTeam(teamId),
+    (old) => (old ? old.filter((item) => item.id !== itemId) : old),
+  );
+}

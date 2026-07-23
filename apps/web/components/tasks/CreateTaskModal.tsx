@@ -122,7 +122,7 @@ function TaskDueDateField({ value, onChange }: TaskDueDateFieldProps) {
         <div
           role="dialog"
           aria-label="Choose due date"
-          className="absolute bottom-[calc(100%+0.375rem)] left-0 right-0 z-20 rounded-xl border border-[#1a1a1a] bg-[#0a0a0a] p-3 "
+          className="absolute top-[calc(100%+0.375rem)] left-0 right-0 z-20 rounded-xl border border-[#1a1a1a] bg-[#0a0a0a] p-3"
         >
           <div className="mb-3 flex items-center justify-between">
             <span className="text-xs font-black text-slate-200">
@@ -278,14 +278,14 @@ export function CreateTaskModal({
         aria-modal="true"
         aria-labelledby={titleId}
         aria-describedby={descriptionId}
-        className="surface-elevated relative w-full max-w-lg overflow-visible rounded-2xl font-sans motion-safe:animate-in motion-safe:fade-in-0 motion-safe:zoom-in-95 motion-safe:duration-200 motion-reduce:animate-none"
+        className="surface-elevated relative flex max-h-[calc(100dvh-2rem)] w-full max-w-lg flex-col overflow-hidden rounded-2xl font-sans motion-safe:animate-in motion-safe:fade-in-0 motion-safe:zoom-in-95 motion-safe:duration-200 motion-reduce:animate-none"
       >
         <div
           aria-hidden
           className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(59,130,246,0.08),transparent_60%)]"
         />
 
-        <div className="relative border-b border-[#1a1a1a] px-6 py-5">
+        <div className="relative shrink-0 border-b border-[#1a1a1a] px-6 py-5">
           <button
             type="button"
             onClick={onClose}
@@ -315,7 +315,7 @@ export function CreateTaskModal({
           </div>
         </div>
 
-        <form onSubmit={onSubmit} className="relative space-y-5 px-6 py-5">
+        <form onSubmit={onSubmit} className="relative min-h-0 flex-1 space-y-5 overflow-y-auto px-6 py-5">
           <div className="space-y-1.5">
             <label htmlFor="task-title" className={labelClassName}>
               Title

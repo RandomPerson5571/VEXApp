@@ -13,3 +13,30 @@ export function prependTeamEvent(
     (old) => (old ? [...old, newEvent] : [newEvent]),
   );
 }
+
+export function replaceTeamEvent(
+  queryClient: QueryClient,
+  teamId: string,
+  updatedEvent: CalendarEvent,
+): void {
+  queryClient.setQueryData<CalendarEvent[]>(
+    queryKeys.events.forTeam(teamId),
+    (old) => {
+      if (!old) return [updatedEvent];
+      return old.map((event) =>
+        event.id === updatedEvent.id ? updatedEvent : event,
+      );
+    },
+  );
+}
+
+export function removeTeamEvent(
+  queryClient: QueryClient,
+  teamId: string,
+  eventId: string,
+): void {
+  queryClient.setQueryData<CalendarEvent[]>(
+    queryKeys.events.forTeam(teamId),
+    (old) => (old ? old.filter((event) => event.id !== eventId) : old),
+  );
+}

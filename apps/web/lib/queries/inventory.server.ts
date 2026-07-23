@@ -2,12 +2,15 @@ import "server-only";
 
 import {
   createInventoryItem,
+  deleteInventoryItem,
   listInventoryForTeam,
   returnInventorySignOut,
   signOutInventoryItem,
+  updateInventoryItem,
   type CreateInventoryItemInput,
   type ReturnInventorySignOutInput,
   type SignOutInventoryItemInput,
+  type UpdateInventoryItemInput,
 } from "@/lib/data/inventory";
 import { createTeamInventoryQueryOptions } from "@/lib/queries/shared/inventory";
 import type { TeamInventoryItem } from "@stlvex/database/types";
@@ -22,6 +25,16 @@ export async function createTeamInventoryItem(
   input: CreateInventoryItemInput,
 ): Promise<TeamInventoryItem> {
   return createInventoryItem(input);
+}
+
+export async function updateTeamInventoryItem(
+  input: UpdateInventoryItemInput,
+): Promise<TeamInventoryItem> {
+  return updateInventoryItem(input);
+}
+
+export async function deleteTeamInventoryItem(itemId: string): Promise<void> {
+  await deleteInventoryItem(itemId);
 }
 
 export async function signOutTeamInventoryItem(

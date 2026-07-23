@@ -94,7 +94,9 @@ function InventoryActionDialog({
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm"
       role="presentation"
+      onClick={(event) => event.stopPropagation()}
       onMouseDown={(event) => {
+        event.stopPropagation();
         if (event.target === event.currentTarget) {
           onClose();
         }
@@ -313,10 +315,12 @@ export function InventoryCard({
   item,
   teamId,
   index,
+  onEdit,
 }: {
   item: TeamInventoryItem;
   teamId: string;
   index: number;
+  onEdit?: () => void;
 }) {
   const status = getStockStatus(item);
   const fill = getStockFill(item);
@@ -391,8 +395,23 @@ export function InventoryCard({
 
   return (
     <article
-      className="group relative overflow-hidden rounded-2xl border border-slate-300 dark:border-[#1a1a1a] bg-slate-100 dark:bg-[#0a0a0a] p-5 shadow-md backdrop-blur-sm transition-[transform,border-color] duration-300 motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-2 motion-safe:fill-mode-backwards motion-safe:hover:-translate-y-1 motion-safe:hover:border-slate-400 dark:motion-safe:hover:border-slate-800 motion-reduce:animate-none motion-reduce:transition-none"
+      className={`group relative overflow-hidden rounded-2xl border border-slate-300 dark:border-[#1a1a1a] bg-slate-100 dark:bg-[#0a0a0a] p-5 shadow-md backdrop-blur-sm transition-[transform,border-color] duration-300 motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-2 motion-safe:fill-mode-backwards motion-safe:hover:-translate-y-1 motion-safe:hover:border-slate-400 dark:motion-safe:hover:border-slate-800 motion-reduce:animate-none motion-reduce:transition-none ${
+        onEdit ? "cursor-pointer" : ""
+      }`}
       style={staggerStyle}
+      onClick={onEdit}
+      onKeyDown={
+        onEdit
+          ? (e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                onEdit();
+              }
+            }
+          : undefined
+      }
+      role={onEdit ? "button" : undefined}
+      tabIndex={onEdit ? 0 : undefined}
     >
       <div
         aria-hidden
@@ -466,7 +485,8 @@ export function InventoryCard({
         <div className="grid gap-2 sm:grid-cols-2">
           <button
             type="button"
-            onClick={() => {
+            onClick={(e) => {
+              e.stopPropagation();
               setActionError(undefined);
               setIsCheckoutOpen(true);
             }}
@@ -478,7 +498,8 @@ export function InventoryCard({
           </button>
           <button
             type="button"
-            onClick={() => {
+            onClick={(e) => {
+              e.stopPropagation();
               setActionError(undefined);
               setIsCheckinOpen(true);
             }}

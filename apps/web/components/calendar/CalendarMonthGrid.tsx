@@ -14,6 +14,7 @@ export function CalendarMonthGrid({
   selectedDate,
   todayStr,
   onSelectDate,
+  onEventClick,
 }: {
   calendarDays: CalendarDayCell[];
   eventsByDate: Map<string, CalendarEvent[]>;
@@ -21,6 +22,7 @@ export function CalendarMonthGrid({
   selectedDate: string;
   todayStr: string;
   onSelectDate: (date: string) => void;
+  onEventClick: (event: CalendarEvent) => void;
 }) {
   return (
     <div className="flex-1 bg-white dark:bg-[#0a0a0a] border border-slate-200 dark:border-[#1a1a1a] rounded-2xl overflow-hidden flex flex-col min-h-[450px]">
@@ -79,13 +81,26 @@ export function CalendarMonthGrid({
                 {dayEvents.map((ev) => {
                   const style = getEventStyle(ev.type);
                   return (
-                    <div
+                    <span
                       key={ev.id}
-                      className={`px-1.5 py-0.5 rounded text-[8.5px] font-bold border truncate flex items-center gap-1 uppercase ${style.bg}`}
+                      role="button"
+                      tabIndex={0}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onEventClick(ev);
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          onEventClick(ev);
+                        }
+                      }}
+                      className={`px-1.5 py-0.5 rounded text-[8.5px] font-bold border truncate flex items-center gap-1 uppercase cursor-pointer hover:brightness-95 ${style.bg}`}
                     >
                       <span className={`h-1 w-1 rounded-full ${style.dot} flex-shrink-0`} />
                       <span className="truncate">{ev.title}</span>
-                    </div>
+                    </span>
                   );
                 })}
               </div>

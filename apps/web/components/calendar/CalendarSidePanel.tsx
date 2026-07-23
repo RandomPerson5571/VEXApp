@@ -14,6 +14,7 @@ export function CalendarSidePanel({
   onSetDayPlan,
   onClearDayPlan,
   onAddEvent,
+  onEventClick,
 }: {
   selectedDate: string;
   selectedDayPlan?: TeamDayPlan;
@@ -22,6 +23,7 @@ export function CalendarSidePanel({
   onSetDayPlan: (type: DayPlanType) => void;
   onClearDayPlan: () => void;
   onAddEvent: () => void;
+  onEventClick: (event: CalendarEvent) => void;
 }) {
   const handleDayPlanClick = (type: DayPlanType) => {
     if (selectedDayPlan?.type === type) {
@@ -111,9 +113,11 @@ export function CalendarSidePanel({
             selectedDayEvents.map((ev) => {
               const style = getEventStyle(ev.type);
               return (
-                <div
+                <button
                   key={ev.id}
-                  className={`p-4 rounded-xl border flex flex-col gap-2.5 shadow-md ${style.bg}`}
+                  type="button"
+                  onClick={() => onEventClick(ev)}
+                  className={`p-4 rounded-xl border flex flex-col gap-2.5 shadow-md text-left cursor-pointer transition hover:brightness-[0.97] dark:hover:brightness-110 ${style.bg}`}
                 >
                   <div className="flex items-center justify-between">
                     <span className="text-[9px] uppercase tracking-widest font-black leading-none">
@@ -139,7 +143,7 @@ export function CalendarSidePanel({
                       {ev.description}
                     </p>
                   )}
-                </div>
+                </button>
               );
             })
           )}

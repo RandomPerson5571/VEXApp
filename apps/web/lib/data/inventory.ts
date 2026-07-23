@@ -54,6 +54,21 @@ export type CreateInventoryItemInput = {
   imageUrl?: string | null;
 };
 
+async function findInventoryItemOrThrow(
+  inventoryItemId: string,
+): Promise<TeamInventoryItem> {
+  const item = await prisma.inventoryItem.findUnique({
+    where: { id: inventoryItemId },
+    include: teamInventoryItemInclude,
+  });
+
+  if (!item) {
+    throw new Error("Inventory item not found.");
+  }
+
+  return item;
+}
+
 export async function createInventoryItem(
   input: CreateInventoryItemInput,
 ): Promise<TeamInventoryItem> {
@@ -81,27 +96,58 @@ export async function createInventoryItem(
   });
 }
 
+export type UpdateInventoryItemInput = {
+  itemId: string;
+  name: string;
+  description?: string | null;
+  totalStock: number;
+  checkoutLimit?: number | null;
+  imageUrl?: string | null;
+};
+
+export async function updateInventoryItem(
+  input: UpdateInventoryItemInput,
+): Promise<TeamInventoryItem> {
+  if (input.totalStock < 0) {
+    throw new Error("Stock quantity cannot be negative.");
+  }
+
+  if (
+    input.checkoutLimit !== null &&
+    input.checkoutLimit !== undefined &&
+    input.checkoutLimit < 1
+  ) {
+    throw new Error("Checkout limit must be at least 1.");
+  }
+
+  await findInventoryItemOrThrow(input.itemId);
+
+  return prisma.inventoryItem.update({
+    where: { id: input.itemId },
+    data: {
+      name: input.name.trim(),
+      description: input.description?.trim() || null,
+      totalStock: input.totalStock,
+      checkoutLimit: input.checkoutLimit ?? null,
+      ...(input.imageUrl !== undefined
+        ? { imageUrl: input.imageUrl?.trim() || null }
+        : {}),
+    },
+    include: teamInventoryItemInclude,
+  });
+}
+
+export async function deleteInventoryItem(itemId: string): Promise<void> {
+  await findInventoryItemOrThrow(itemId);
+  await prisma.inventoryItem.delete({ where: { id: itemId } });
+}
+
 export type SignOutInventoryItemInput = {
   inventoryItemId: string;
   teamId: string;
   userId: string;
   quantity: number;
 };
-
-async function findInventoryItemOrThrow(
-  inventoryItemId: string,
-): Promise<TeamInventoryItem> {
-  const item = await prisma.inventoryItem.findUnique({
-    where: { id: inventoryItemId },
-    include: teamInventoryItemInclude,
-  });
-
-  if (!item) {
-    throw new Error("Inventory item not found.");
-  }
-
-  return item;
-}
 
 export async function signOutInventoryItem(
   input: SignOutInventoryItemInput,

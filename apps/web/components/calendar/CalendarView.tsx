@@ -30,6 +30,18 @@ import type { CalendarViewMode } from "./calendarTypes";
 
 const DEFAULT_LOCATION = "Iron Reign Workshop";
 
+function resetEventFormDefaults() {
+  return {
+    title: "",
+    startTime: "4:30 PM",
+    endTime: "6:30 PM",
+    type: "build" as EventType,
+    location: DEFAULT_LOCATION,
+    description: "",
+    forAllTeams: false,
+  };
+}
+
 export interface CalendarViewProps {
   initialSelectedDate?: string;
   onActivityLog?: (text: string, subtext: string, type: "schedule") => void;
@@ -44,14 +56,26 @@ export function CalendarView({
   const canMakeGlobal = canManageTeamRoster(permissions);
   const eventsQuery = useTeamEvents();
   const { data: events = [] } = eventsQuery;
-  const { createMutation: createEventMutation } = useTeamEventMutations({
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setEditingEventId(null);
+    setForAllTeams(false);
+  };
+
+  const {
+    createMutation: createEventMutation,
+    updateMutation: updateEventMutation,
+    deleteMutation: deleteEventMutation,
+  } = useTeamEventMutations({
     teamId: team?.id,
     onCreateSuccess: () => {
-      setIsModalOpen(false);
+      closeModal();
       setTitle("");
       setDescription("");
-      setForAllTeams(false);
     },
+    onUpdateSuccess: closeModal,
+    onDeleteSuccess: closeModal,
   });
   const dayPlansQuery = useTeamDayPlans();
   const { data: dayPlans = [] } = dayPlansQuery;
@@ -67,6 +91,7 @@ export function CalendarView({
   });
   const [selectedDate, setSelectedDate] = useState(initialSelectedDate);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingEventId, setEditingEventId] = useState<string | null>(null);
 
   const [title, setTitle] = useState("");
   const [eventDate, setEventDate] = useState(initialSelectedDate);
@@ -85,6 +110,11 @@ export function CalendarView({
   }, [flushDayPlans, cancelDayPlans]);
 
   const todayStr = getTodayDateStr();
+  const isEditMode = editingEventId !== null;
+  const isModalBusy =
+    createEventMutation.isPending ||
+    updateEventMutation.isPending ||
+    deleteEventMutation.isPending;
 
   const calendarDays = useMemo(
     () => getDaysInMonth(currentMonth.getFullYear(), currentMonth.getMonth()),
@@ -128,6 +158,7 @@ export function CalendarView({
   }, [dayPlans]);
 
   const selectedDayEvents = eventsByDate.get(selectedDate) ?? [];
+
   const selectedDayPlan = dayPlansByDate.get(selectedDate);
 
   const shiftMonth = (delta: number) => {
@@ -176,13 +207,63 @@ export function CalendarView({
   };
 
   const openAddEventModal = () => {
+    const defaults = resetEventFormDefaults();
+    setEditingEventId(null);
     setEventDate(selectedDate);
+    setTitle(defaults.title);
+    setStartTime(defaults.startTime);
+    setEndTime(defaults.endTime);
+    setType(defaults.type);
+    setLocation(defaults.location);
+    setDescription(defaults.description);
+    setForAllTeams(defaults.forAllTeams);
+    createEventMutation.reset();
+    updateEventMutation.reset();
+    deleteEventMutation.reset();
     setIsModalOpen(true);
   };
 
-  const handleAddEvent = (e: React.FormEvent<HTMLFormElement>) => {
+  const openEditEventModal = (event: CalendarEvent) => {
+    setEditingEventId(event.id);
+    setTitle(event.title);
+    setEventDate(event.date);
+    setStartTime(event.startTime);
+    setEndTime(event.endTime);
+    setType(event.type);
+    setLocation(event.location || DEFAULT_LOCATION);
+    setDescription(event.description ?? "");
+    setForAllTeams(false);
+    createEventMutation.reset();
+    updateEventMutation.reset();
+    deleteEventMutation.reset();
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    if (isModalBusy) return;
+    createEventMutation.reset();
+    updateEventMutation.reset();
+    deleteEventMutation.reset();
+    closeModal();
+  };
+
+  const handleSubmitEvent = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!title.trim() || !team?.id || createEventMutation.isPending) return;
+    if (!title.trim() || !team?.id || isModalBusy) return;
+
+    if (isEditMode && editingEventId) {
+      updateEventMutation.mutate({
+        eventId: editingEventId,
+        title: title.trim(),
+        date: eventDate,
+        startTime,
+        endTime,
+        type,
+        location,
+        description: description.trim() || undefined,
+      });
+      return;
+    }
 
     createEventMutation.mutate(
       {
@@ -206,6 +287,31 @@ export function CalendarView({
       },
     );
   };
+
+  const handleDeleteEvent = () => {
+    if (!editingEventId || isModalBusy) return;
+    if (!window.confirm("Delete this event?")) return;
+    deleteEventMutation.mutate(editingEventId);
+  };
+
+  const modalError = (() => {
+    const mutation = isEditMode
+      ? updateEventMutation.isError
+        ? updateEventMutation
+        : deleteEventMutation.isError
+          ? deleteEventMutation
+          : null
+      : createEventMutation.isError
+        ? createEventMutation
+        : null;
+
+    if (!mutation) return undefined;
+    return mutation.error instanceof Error
+      ? mutation.error.message
+      : isEditMode
+        ? "Failed to save event."
+        : "Failed to create event.";
+  })();
 
   return (
     <div className="flex-1 flex min-h-0 overflow-hidden bg-slate-50 dark:bg-[#000000] font-sans">
@@ -236,6 +342,7 @@ export function CalendarView({
               selectedDate={selectedDate}
               todayStr={todayStr}
               onSelectDate={handleSelectDate}
+              onEventClick={openEditEventModal}
             />
           ) : viewType === "week" ? (
             <CalendarScheduleGrid
@@ -246,6 +353,7 @@ export function CalendarView({
               selectedDate={selectedDate}
               todayStr={todayStr}
               onSelectDate={handleSelectDate}
+              onEventClick={openEditEventModal}
             />
           ) : (
             <CalendarScheduleGrid
@@ -256,6 +364,7 @@ export function CalendarView({
               selectedDate={selectedDate}
               todayStr={todayStr}
               onSelectDate={handleSelectDate}
+              onEventClick={openEditEventModal}
             />
           )}
         </div>
@@ -269,10 +378,12 @@ export function CalendarView({
         onSetDayPlan={(type: DayPlanType) => setDayPlan(selectedDate, type)}
         onClearDayPlan={() => clearDayPlan(selectedDate)}
         onAddEvent={openAddEventModal}
+        onEventClick={openEditEventModal}
       />
 
       <CalendarEventModal
         isOpen={isModalOpen}
+        mode={isEditMode ? "edit" : "create"}
         title={title}
         eventDate={eventDate}
         startTime={startTime}
@@ -290,22 +401,14 @@ export function CalendarView({
         onLocationChange={setLocation}
         onDescriptionChange={setDescription}
         onForAllTeamsChange={setForAllTeams}
-        onClose={() => {
-          if (!createEventMutation.isPending) {
-            createEventMutation.reset();
-            setForAllTeams(false);
-            setIsModalOpen(false);
-          }
-        }}
-        onSubmit={handleAddEvent}
-        isSubmitting={createEventMutation.isPending}
-        error={
-          createEventMutation.isError
-            ? createEventMutation.error instanceof Error
-              ? createEventMutation.error.message
-              : "Failed to create event."
-            : undefined
+        onClose={handleCloseModal}
+        onSubmit={handleSubmitEvent}
+        onDelete={isEditMode ? handleDeleteEvent : undefined}
+        isSubmitting={
+          createEventMutation.isPending || updateEventMutation.isPending
         }
+        isDeleting={deleteEventMutation.isPending}
+        error={modalError}
       />
     </div>
   );
