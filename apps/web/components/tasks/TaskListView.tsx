@@ -115,6 +115,7 @@ export function TaskListView() {
   const { createMutation: createTaskMutation, updateMutation: updateTaskMutation, updateTaskStatus, isStatusUpdating } =
     useTeamTaskMutations({
       teamId,
+      creator,
       onCreateSuccess: () => {
         setIsCreateModalOpen(false);
         setCreateForm(emptyCreateTaskFormValues);
@@ -324,23 +325,26 @@ export function TaskListView() {
                     task={task}
                     defaultExpanded={index === 0}
                     onOpen={() => openEditModal(task)}
-                    onUpdateTitle={async (title) => {
-                      await updateTaskMutation.mutateAsync({ taskId: task.id, title });
+                    onUpdateTitle={(title) => {
+                      updateTaskMutation.mutate({ taskId: task.id, title });
+                      return Promise.resolve();
                     }}
-                    onUpdateDescription={async (description) => {
-                      await updateTaskMutation.mutateAsync({
+                    onUpdateDescription={(description) => {
+                      updateTaskMutation.mutate({
                         taskId: task.id,
                         description,
                       });
+                      return Promise.resolve();
                     }}
                     onUpdateStatus={async (status) => {
                       updateTaskStatus(task.id, status);
                     }}
-                    onUpdatePriority={async (priority) => {
-                      await updateTaskMutation.mutateAsync({
+                    onUpdatePriority={(priority) => {
+                      updateTaskMutation.mutate({
                         taskId: task.id,
                         priority,
                       });
+                      return Promise.resolve();
                     }}
                     isStatusUpdating={isStatusUpdating(task.id)}
                     isPriorityUpdating={

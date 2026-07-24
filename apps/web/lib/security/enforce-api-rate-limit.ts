@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-import { appendFileSync } from "node:fs";
 
 import { getRequestClientIp } from "@/lib/security/client-ip";
 import { consumeRateLimit } from "@/lib/security/rate-limit";
@@ -35,16 +34,6 @@ export async function enforceApiRateLimit(
   userId: string,
   bucket: ApiMutationRateLimitBucket,
 ): Promise<NextResponse | null> {
-  // #region agent log
-  try {
-    appendFileSync(
-      "c:/Users/griff/OneDrive/Documents/coding-workspace/VexRobotics/VEXApp/debug-d8eb0f.log",
-      `${JSON.stringify({ sessionId: "d8eb0f", runId: "post-fix", hypothesisId: "H-D", location: "enforce-api-rate-limit.ts:entry", message: "enforceApiRateLimit called", data: { hasRequest: request != null, requestType: typeof request, bucket, userIdPresent: !!userId }, timestamp: Date.now() })}\n`,
-    );
-  } catch {
-    /* ignore */
-  }
-  // #endregion
   const config = API_MUTATION_RATE_LIMITS[bucket];
 
   const userResult = await consumeRateLimit(
