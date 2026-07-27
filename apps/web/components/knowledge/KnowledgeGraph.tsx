@@ -5,9 +5,11 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Network } from "lucide-react";
 
 import {
+  formatEnumLabel,
   linkEndpointId,
   neighborIdsFor,
   TOPIC_COLORS,
+  TOPIC_OPTIONS,
   toGraphData,
   type GraphNode,
 } from "@/components/knowledge/knowledge-view-utils";
@@ -117,6 +119,21 @@ export function KnowledgeGraph({
 
   return (
     <div ref={containerRef} className="relative h-full min-h-[420px] w-full">
+      {!isLoading && !isError && nodes.length > 0 ? (
+        <ul className="pointer-events-none absolute bottom-3 left-3 z-10 flex flex-wrap gap-x-3 gap-y-1 rounded-lg border border-slate-200/80 bg-white/85 px-2.5 py-1.5 text-[11px] text-slate-600 shadow-sm backdrop-blur-sm dark:border-slate-800/80 dark:bg-[#0a0a0a]/85 dark:text-slate-400">
+          {TOPIC_OPTIONS.map((topic) => (
+            <li key={topic} className="flex items-center gap-1.5">
+              <span
+                className="h-2 w-2 shrink-0 rounded-full"
+                style={{ backgroundColor: TOPIC_COLORS[topic] }}
+                aria-hidden
+              />
+              {formatEnumLabel(topic)}
+            </li>
+          ))}
+        </ul>
+      ) : null}
+
       {isLoading ? (
         <div className="absolute inset-0 z-10 flex items-center justify-center text-sm text-slate-500">
           Loading graph…
