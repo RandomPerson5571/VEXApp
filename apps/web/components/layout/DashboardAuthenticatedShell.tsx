@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 
 import { DashboardChrome } from "@/components/layout/DashboardChrome";
+import { QueryProvider } from "@/components/providers/QueryProvider";
 import { UserProvider } from "@/components/providers/UserProvider";
 import { getCurrentUserState, type CurrentUser } from "@/lib/auth/current-user";
 
@@ -33,7 +34,9 @@ export async function DashboardAuthenticatedShell({
 
   return (
     <UserProvider value={userState.user}>
-      <DashboardChrome>{children}</DashboardChrome>
+      <QueryProvider>
+        <DashboardChrome>{children}</DashboardChrome>
+      </QueryProvider>
     </UserProvider>
   );
 }

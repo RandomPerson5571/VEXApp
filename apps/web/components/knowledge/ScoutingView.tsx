@@ -125,8 +125,14 @@ export function ScoutingView() {
   const team = useTeam();
   const isAdmin = isGlobalAdmin(user);
   const { teamId, notes, isLoading, isError } = useTeamScouting();
-  const { createNote, updateNote, deleteNote, reorderNotes } =
-    useScoutingMutations(teamId);
+  const {
+    createNote,
+    updateNote,
+    deleteNote,
+    scheduleReorder,
+    scheduleCrossOff,
+    isReorderPending,
+  } = useScoutingMutations(teamId);
 
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [saveNoteId, setSaveNoteId] = useState<string | null>(null);
@@ -268,36 +274,16 @@ export function ScoutingView() {
   const handleReorder = (orderedNoteIds: string[], dnpNoteIds: string[]) => {
     if (!isAdmin) return;
     setFormError(null);
-    reorderNotes.mutate(
-      { orderedNoteIds, dnpNoteIds },
-      {
-        onError: (error) => {
-          setFormError(
-            error instanceof Error ? error.message : "Failed to reorder picklist.",
-          );
-        },
-      },
-    );
+    scheduleReorder({ orderedNoteIds, dnpNoteIds });
   };
 
   const handleToggleCrossOff = (noteId: string, crossedOff: boolean) => {
     if (!isAdmin) return;
     setFormError(null);
-    updateNote.mutate(
-      { noteId, payload: { crossedOff } },
-      {
-        onError: (error) => {
-          setFormError(
-            error instanceof Error
-              ? error.message
-              : "Failed to update cross-off.",
-          );
-        },
-      },
-    );
+    scheduleCrossOff(noteId, crossedOff);
   };
 
-  const applyPicklistMembership = async (
+  const applyPicklistMembership = (
     noteId: string,
     membership: "ranked" | "dnp" | "none",
   ) => {
@@ -321,32 +307,25 @@ export function ScoutingView() {
     } else if (membership === "dnp") {
       nextDnp = [...nextDnp, noteId];
     }
-    try {
-      await reorderNotes.mutateAsync({
-        orderedNoteIds: nextRanked,
-        dnpNoteIds: nextDnp,
-      });
-      setDraft((prev) => {
-        if (!prev) return prev;
-        if (membership === "ranked") {
-          return {
-            ...prev,
-            doNotPick: false,
-            pickRank: nextRanked.indexOf(noteId) + 1,
-          };
-        }
-        if (membership === "dnp") {
-          return { ...prev, doNotPick: true, pickRank: null };
-        }
-        return { ...prev, doNotPick: false, pickRank: null };
-      });
-    } catch (error) {
-      setFormError(
-        error instanceof Error
-          ? error.message
-          : "Failed to update picklist membership.",
-      );
-    }
+
+    scheduleReorder({
+      orderedNoteIds: nextRanked,
+      dnpNoteIds: nextDnp,
+    });
+    setDraft((prev) => {
+      if (!prev) return prev;
+      if (membership === "ranked") {
+        return {
+          ...prev,
+          doNotPick: false,
+          pickRank: nextRanked.indexOf(noteId) + 1,
+        };
+      }
+      if (membership === "dnp") {
+        return { ...prev, doNotPick: true, pickRank: null };
+      }
+      return { ...prev, doNotPick: false, pickRank: null };
+    });
   };
 
   const saveLabel =
@@ -631,12 +610,9 @@ export function ScoutingView() {
                         {!(draft.pickRank != null && !draft.doNotPick) && (
                           <button
                             type="button"
-                            disabled={reorderNotes.isPending}
+                            disabled={isReorderPending}
                             onClick={() =>
-                              void applyPicklistMembership(
-                                selected.id,
-                                "ranked",
-                              )
+                              applyPicklistMembership(selected.id, "ranked")
                             }
                             className="inline-flex h-7 items-center gap-1 rounded-md px-2 text-[11px] font-semibold text-orange-600 transition hover:bg-orange-500/10 disabled:opacity-50 dark:text-orange-400"
                           >
@@ -647,9 +623,9 @@ export function ScoutingView() {
                         {!draft.doNotPick && (
                           <button
                             type="button"
-                            disabled={reorderNotes.isPending}
+                            disabled={isReorderPending}
                             onClick={() =>
-                              void applyPicklistMembership(selected.id, "dnp")
+                              applyPicklistMembership(selected.id, "dnp")
                             }
                             className="inline-flex h-7 items-center gap-1 rounded-md px-2 text-[11px] font-semibold text-slate-600 transition hover:bg-slate-200/70 disabled:opacity-50 dark:text-slate-300 dark:hover:bg-[#1a1a1a]"
                           >
@@ -660,9 +636,9 @@ export function ScoutingView() {
                         {(draft.pickRank != null || draft.doNotPick) && (
                           <button
                             type="button"
-                            disabled={reorderNotes.isPending}
+                            disabled={isReorderPending}
                             onClick={() =>
-                              void applyPicklistMembership(selected.id, "none")
+                              applyPicklistMembership(selected.id, "none")
                             }
                             className="inline-flex h-7 items-center gap-1 rounded-md px-2 text-[11px] font-semibold text-slate-500 transition hover:bg-slate-200/70 disabled:opacity-50 dark:text-slate-400 dark:hover:bg-[#1a1a1a]"
                           >
