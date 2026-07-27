@@ -6,10 +6,12 @@ import { canManageTeamRoster } from "@/lib/auth/auth-guards";
 import { useUserPermissions } from "@/lib/auth/use-user-permissions";
 import { useTeam } from "@/components/providers/UserProvider";
 import { isQueryInitiallyLoading } from "@/lib/hooks/use-query-loading";
+import { useMergedCalendarSources } from "@/lib/hooks/use-merged-calendar-sources";
 import { useTeamEventMutations } from "@/lib/hooks/use-team-event-mutations";
 import { useTeamDayPlanMutations } from "@/lib/hooks/use-team-day-plan-mutations";
 import { useTeamDayPlans } from "@/lib/hooks/use-team-day-plans";
-import { useTeamEvents } from "@/lib/hooks/use-team-events";
+import { isRobotEventsId } from "@/lib/mappers/upcoming-matches";
+import { CalendarSourcesBanner } from "@/components/calendar/CalendarSourcesBanner";
 import {
   addDaysToDateStr,
   formatMonthYear,
@@ -20,6 +22,7 @@ import {
   getTodayDateStr,
   parseDateStr,
 } from "@/lib/utils/calendar";
+import { ConfirmationDialog } from "@/components/ui/ConfirmationDialog";
 import { CalendarEventModal } from "./CalendarEventModal";
 import { CalendarHeader } from "./CalendarHeader";
 import { CalendarMonthGrid } from "./CalendarMonthGrid";
@@ -54,8 +57,12 @@ export function CalendarView({
   const team = useTeam();
   const permissions = useUserPermissions(team?.id);
   const canMakeGlobal = canManageTeamRoster(permissions);
-  const eventsQuery = useTeamEvents();
-  const { data: events = [] } = eventsQuery;
+  const {
+    calendarEvents: events,
+    status: sourcesStatus,
+    warning: sourcesWarning,
+    isInitialLoading: sourcesLoading,
+  } = useMergedCalendarSources();
 
   const closeModal = () => {
     setIsModalOpen(false);
@@ -80,8 +87,7 @@ export function CalendarView({
   const dayPlansQuery = useTeamDayPlans();
   const { data: dayPlans = [] } = dayPlansQuery;
   const isInitialLoading =
-    isQueryInitiallyLoading(eventsQuery) ||
-    isQueryInitiallyLoading(dayPlansQuery);
+    sourcesLoading || isQueryInitiallyLoading(dayPlansQuery);
   const { setDayPlan, clearDayPlan, isPending: isDayPlanPending, flush: flushDayPlans, cancel: cancelDayPlans } =
     useTeamDayPlanMutations();
   const [viewType, setViewType] = useState<CalendarViewMode>("month");
@@ -92,6 +98,7 @@ export function CalendarView({
   const [selectedDate, setSelectedDate] = useState(initialSelectedDate);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingEventId, setEditingEventId] = useState<string | null>(null);
+  const [isMobileDayOpen, setIsMobileDayOpen] = useState(false);
 
   const [title, setTitle] = useState("");
   const [eventDate, setEventDate] = useState(initialSelectedDate);
@@ -100,7 +107,9 @@ export function CalendarView({
   const [type, setType] = useState<EventType>("build");
   const [location, setLocation] = useState(DEFAULT_LOCATION);
   const [description, setDescription] = useState("");
+  const [createdBy, setCreatedBy] = useState<string | undefined>();
   const [forAllTeams, setForAllTeams] = useState(false);
+  const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
 
   useEffect(() => {
     return () => {
@@ -204,6 +213,13 @@ export function CalendarView({
     setSelectedDate(date);
     const [year, month] = date.split("-").map(Number);
     setCurrentMonth(new Date(year, month - 1, 1));
+    // ponytail: desktop keeps side panel; phone opens day sheet
+    if (
+      typeof window !== "undefined" &&
+      !window.matchMedia("(min-width: 1024px)").matches
+    ) {
+      setIsMobileDayOpen(true);
+    }
   };
 
   const openAddEventModal = () => {
@@ -216,6 +232,7 @@ export function CalendarView({
     setType(defaults.type);
     setLocation(defaults.location);
     setDescription(defaults.description);
+    setCreatedBy(undefined);
     setForAllTeams(defaults.forAllTeams);
     createEventMutation.reset();
     updateEventMutation.reset();
@@ -224,6 +241,14 @@ export function CalendarView({
   };
 
   const openEditEventModal = (event: CalendarEvent) => {
+    // ponytail: RobotEvents rows are read-only — open external page
+    if (isRobotEventsId(event.id)) {
+      if (event.href) {
+        window.open(event.href, "_blank", "noopener,noreferrer");
+      }
+      return;
+    }
+
     setEditingEventId(event.id);
     setTitle(event.title);
     setEventDate(event.date);
@@ -232,6 +257,7 @@ export function CalendarView({
     setType(event.type);
     setLocation(event.location || DEFAULT_LOCATION);
     setDescription(event.description ?? "");
+    setCreatedBy(event.createdBy);
     setForAllTeams(false);
     createEventMutation.reset();
     updateEventMutation.reset();
@@ -290,8 +316,7 @@ export function CalendarView({
 
   const handleDeleteEvent = () => {
     if (!editingEventId || isModalBusy) return;
-    if (!window.confirm("Delete this event?")) return;
-    deleteEventMutation.mutate(editingEventId);
+    setIsDeleteConfirmOpen(true);
   };
 
   const modalError = (() => {
@@ -314,9 +339,9 @@ export function CalendarView({
   })();
 
   return (
-    <div className="flex-1 flex min-h-0 overflow-hidden bg-slate-50 dark:bg-[#000000] font-sans">
+    <div className="relative flex min-h-0 flex-1 overflow-hidden bg-slate-50 font-sans dark:bg-[#000000]">
       <div
-        className={`flex-1 px-8 py-6 flex flex-col h-full min-h-0 border-r border-slate-200 dark:border-[#1a1a1a] ${
+        className={`flex h-full min-h-0 flex-1 flex-col border-r border-slate-200 px-4 py-6 sm:px-8 dark:border-[#1a1a1a] ${
           viewType === "month" ? "overflow-y-auto dashboard-scroll" : "overflow-hidden"
         }`}
       >
@@ -329,57 +354,108 @@ export function CalendarView({
           onAddEvent={openAddEventModal}
         />
 
-        <div
-          className={`${viewType !== "month" ? "flex-1 min-h-0 flex flex-col" : ""} ${
-            isInitialLoading ? "animate-pulse opacity-70" : ""
-          }`}
-        >
-          {viewType === "month" ? (
-            <CalendarMonthGrid
-              calendarDays={calendarDays}
-              eventsByDate={eventsByDate}
-              dayPlansByDate={dayPlansByDate}
-              selectedDate={selectedDate}
-              todayStr={todayStr}
-              onSelectDate={handleSelectDate}
-              onEventClick={openEditEventModal}
+        {!isInitialLoading && sourcesStatus !== "both-unavailable" ? (
+          <CalendarSourcesBanner
+            status={sourcesStatus}
+            warning={sourcesWarning}
+            className="mb-3"
+          />
+        ) : null}
+
+        {sourcesStatus === "both-unavailable" && !isInitialLoading ? (
+          <div className="flex flex-1 items-center justify-center py-16">
+            <CalendarSourcesBanner
+              status={sourcesStatus}
+              warning={sourcesWarning}
+              className="max-w-md"
             />
-          ) : viewType === "week" ? (
-            <CalendarScheduleGrid
-              mode="week"
-              days={weekDays}
-              eventsByDate={eventsByDate}
-              dayPlansByDate={dayPlansByDate}
-              selectedDate={selectedDate}
-              todayStr={todayStr}
-              onSelectDate={handleSelectDate}
-              onEventClick={openEditEventModal}
-            />
-          ) : (
-            <CalendarScheduleGrid
-              mode="day"
-              days={dayCell}
-              eventsByDate={eventsByDate}
-              dayPlansByDate={dayPlansByDate}
-              selectedDate={selectedDate}
-              todayStr={todayStr}
-              onSelectDate={handleSelectDate}
-              onEventClick={openEditEventModal}
-            />
-          )}
-        </div>
+          </div>
+        ) : (
+          <div
+            className={`${viewType !== "month" ? "flex min-h-0 flex-1 flex-col" : ""} ${
+              isInitialLoading ? "animate-pulse opacity-70" : ""
+            }`}
+          >
+            {viewType === "month" ? (
+              <CalendarMonthGrid
+                calendarDays={calendarDays}
+                eventsByDate={eventsByDate}
+                dayPlansByDate={dayPlansByDate}
+                selectedDate={selectedDate}
+                todayStr={todayStr}
+                onSelectDate={handleSelectDate}
+                onEventClick={openEditEventModal}
+              />
+            ) : viewType === "week" ? (
+              <CalendarScheduleGrid
+                mode="week"
+                days={weekDays}
+                eventsByDate={eventsByDate}
+                dayPlansByDate={dayPlansByDate}
+                selectedDate={selectedDate}
+                todayStr={todayStr}
+                onSelectDate={handleSelectDate}
+                onEventClick={openEditEventModal}
+              />
+            ) : (
+              <CalendarScheduleGrid
+                mode="day"
+                days={dayCell}
+                eventsByDate={eventsByDate}
+                dayPlansByDate={dayPlansByDate}
+                selectedDate={selectedDate}
+                todayStr={todayStr}
+                onSelectDate={handleSelectDate}
+                onEventClick={openEditEventModal}
+              />
+            )}
+          </div>
+        )}
       </div>
 
-      <CalendarSidePanel
-        selectedDate={selectedDate}
-        selectedDayPlan={selectedDayPlan}
-        selectedDayEvents={selectedDayEvents}
-        isDayPlanPending={isDayPlanPending}
-        onSetDayPlan={(type: DayPlanType) => setDayPlan(selectedDate, type)}
-        onClearDayPlan={() => clearDayPlan(selectedDate)}
-        onAddEvent={openAddEventModal}
-        onEventClick={openEditEventModal}
-      />
+      <div className="hidden h-full shrink-0 lg:flex">
+        <CalendarSidePanel
+          selectedDate={selectedDate}
+          selectedDayPlan={selectedDayPlan}
+          selectedDayEvents={selectedDayEvents}
+          isDayPlanPending={isDayPlanPending}
+          onSetDayPlan={(type: DayPlanType) => setDayPlan(selectedDate, type)}
+          onClearDayPlan={() => clearDayPlan(selectedDate)}
+          onAddEvent={openAddEventModal}
+          onEventClick={openEditEventModal}
+        />
+      </div>
+
+      {isMobileDayOpen ? (
+        <>
+          <button
+            type="button"
+            aria-label="Close day schedule overlay"
+            className="fixed inset-0 z-40 bg-slate-950/40 backdrop-blur-[1px] lg:hidden"
+            onClick={() => setIsMobileDayOpen(false)}
+          />
+          <div className="fixed inset-x-0 bottom-0 z-50 max-h-[75dvh] overflow-hidden rounded-t-2xl border border-slate-200 shadow-2xl lg:hidden dark:border-[#1a1a1a]">
+            <CalendarSidePanel
+              selectedDate={selectedDate}
+              selectedDayPlan={selectedDayPlan}
+              selectedDayEvents={selectedDayEvents}
+              isDayPlanPending={isDayPlanPending}
+              onSetDayPlan={(type: DayPlanType) => setDayPlan(selectedDate, type)}
+              onClearDayPlan={() => clearDayPlan(selectedDate)}
+              onAddEvent={() => {
+                setIsMobileDayOpen(false);
+                openAddEventModal();
+              }}
+              onEventClick={(event) => {
+                setIsMobileDayOpen(false);
+                openEditEventModal(event);
+              }}
+              onClose={() => setIsMobileDayOpen(false)}
+              className="max-h-[75dvh] border-l-0"
+            />
+          </div>
+        </>
+      ) : null}
 
       <CalendarEventModal
         isOpen={isModalOpen}
@@ -391,8 +467,10 @@ export function CalendarView({
         type={type}
         location={location}
         description={description}
+        createdBy={createdBy}
         forAllTeams={forAllTeams}
         canMakeGlobal={canMakeGlobal}
+        lockDate={!isEditMode}
         onTitleChange={setTitle}
         onDateChange={setEventDate}
         onStartTimeChange={setStartTime}
@@ -409,6 +487,23 @@ export function CalendarView({
         }
         isDeleting={deleteEventMutation.isPending}
         error={modalError}
+      />
+
+      <ConfirmationDialog
+        isOpen={isDeleteConfirmOpen}
+        title="Delete this event?"
+        description="This removes the event from the team calendar."
+        confirmLabel="Delete"
+        variant="danger"
+        pending={deleteEventMutation.isPending}
+        pendingLabel="Deleting..."
+        onClose={() => setIsDeleteConfirmOpen(false)}
+        onConfirm={() => {
+          if (!editingEventId) return;
+          deleteEventMutation.mutate(editingEventId, {
+            onSettled: () => setIsDeleteConfirmOpen(false),
+          });
+        }}
       />
     </div>
   );

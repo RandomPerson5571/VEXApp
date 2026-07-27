@@ -8,6 +8,16 @@ export type AdminTeamRow = {
   discordRoleId: string | null;
 };
 
+export type AdminInviteRow = {
+  id: string;
+  teamId: string;
+  team: AdminTeamOption;
+  maxUses: number;
+  usesCount: number;
+  expiresAt: string;
+  createdAt: string;
+};
+
 export type AdminTeamOption = Pick<AdminTeamRow, "id" | "name" | "number">;
 
 export type AdminUserRow = {

@@ -162,10 +162,12 @@ function IntegrationHeader({
 
 type NotificationsSettingsViewProps = {
   initialSettings: NotificationPreferences;
+  githubConnected?: boolean;
 };
 
 export function NotificationsSettingsView({
   initialSettings,
+  githubConnected = false,
 }: NotificationsSettingsViewProps) {
   const [saved, setSaved] = useState<NotificationPreferences>(initialSettings);
   const [draft, setDraft] = useState<NotificationPreferences>(initialSettings);
@@ -219,7 +221,13 @@ export function NotificationsSettingsView({
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(draft),
+        body: JSON.stringify({
+          ...draft,
+          // Collapse GitHub until the team integration is connected.
+          githubNotifsEnabled: githubConnected
+            ? draft.githubNotifsEnabled
+            : false,
+        }),
       });
 
       const payload = (await response.json()) as NotificationSettingsResponse;
@@ -319,15 +327,24 @@ export function NotificationsSettingsView({
                 id="github-notifs-enabled"
                 label="Enable GitHub notifications"
                 description="Receive alerts when selected events occur in linked repositories."
-                checked={githubNotifsEnabled}
+                checked={githubNotifsEnabled && githubConnected}
                 onCheckedChange={(checked) =>
                   updateDraft("githubNotifsEnabled", checked)
                 }
-                disabled={!enableDiscordPushNotifs}
+                disabled={!enableDiscordPushNotifs || !githubConnected}
               />
             </div>
 
-            {githubNotifsEnabled && enableDiscordPushNotifs ? (
+            {!githubConnected ? (
+              <p className="mt-3 text-xs text-slate-600 dark:text-slate-500">
+                Connect GitHub under Team Management to choose which repository
+                events notify you.
+              </p>
+            ) : null}
+
+            {githubConnected &&
+            githubNotifsEnabled &&
+            enableDiscordPushNotifs ? (
               <div className="mt-4 rounded-xl border border-slate-200 bg-white/80 p-4 backdrop-blur-sm dark:border-slate-800 dark:bg-[#121212]/50">
                 <p className="mb-3 text-[10px] font-black uppercase tracking-widest text-slate-500">
                   Events
@@ -413,9 +430,11 @@ export function NotificationsSettingsView({
               disabled={
                 !isDirty ||
                 isSaving ||
-                (githubNotifsEnabled && githubEvents.length === 0)
+                (githubConnected &&
+                  githubNotifsEnabled &&
+                  githubEvents.length === 0)
               }
-              className="cursor-pointer rounded-lg bg-blue-600 px-5 py-2 text-xs font-bold tracking-wide text-white transition hover:bg-blue-500 disabled:cursor-not-allowed disabled:bg-blue-600/40 disabled:text-blue-200/70"
+              className="cursor-pointer rounded-lg bg-orange-600 px-5 py-2 text-xs font-bold tracking-wide text-white transition hover:bg-orange-500 disabled:cursor-not-allowed disabled:bg-orange-600/40 disabled:text-orange-200/70"
             >
               {isSaving ? "Saving..." : "Save Changes"}
             </button>

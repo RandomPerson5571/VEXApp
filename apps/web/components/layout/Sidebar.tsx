@@ -38,9 +38,11 @@ const menuItems: SidebarItem[] = [
 
 type AppSidebarProps = {
   onClose?: () => void;
+  /** Close after nav — mobile overlay only; desktop keeps the panel open */
+  onNavigate?: () => void;
 };
 
-export function AppSidebar({ onClose }: AppSidebarProps) {
+export function AppSidebar({ onClose, onNavigate }: AppSidebarProps) {
   const pathname = usePathname();
   const user = useOptionalUser();
   const showAdminLink = user !== null && isGlobalAdmin(user);
@@ -94,6 +96,7 @@ export function AppSidebar({ onClose }: AppSidebarProps) {
             <Link
               key={item.href}
               href={item.href}
+              onClick={onNavigate}
               className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-xs font-semibold tracking-normal transition-all duration-150 ${
                 isActive
                   ? "bg-orange-600/15 text-orange-400 border border-orange-500/20 shadow-sm shadow-orange-500/5"
@@ -118,6 +121,7 @@ export function AppSidebar({ onClose }: AppSidebarProps) {
         <div className="border-t border-slate-200 px-3 py-4 dark:border-[#1a1a1a]">
           <Link
             href="/admin"
+            onClick={onNavigate}
             className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-semibold tracking-normal transition-all duration-150 ${
               pathname === "/admin" || pathname.startsWith("/admin/")
                 ? "bg-orange-600/15 text-orange-400 border border-orange-500/20 shadow-sm shadow-orange-500/5"

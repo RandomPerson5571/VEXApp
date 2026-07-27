@@ -138,6 +138,7 @@ export async function POST(request: Request) {
       endDate,
       teamId,
       forAllTeams,
+      createdById: currentUser.profile.id,
     });
 
     return NextResponse.json(event, { status: 201 });

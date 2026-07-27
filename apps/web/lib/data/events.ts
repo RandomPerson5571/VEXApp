@@ -1,7 +1,20 @@
 import "server-only";
 
 import { prisma } from "@stlvex/database";
-import type { Event, EventType } from "@stlvex/database/types";
+import type { Event, EventType, Prisma } from "@stlvex/database/types";
+
+const eventCreatorSelect = {
+  creator: {
+    select: {
+      firstName: true,
+      lastName: true,
+    },
+  },
+} satisfies Prisma.EventInclude;
+
+export type EventWithCreator = Prisma.EventGetPayload<{
+  include: typeof eventCreatorSelect;
+}>;
 
 export type CreateEventInput = {
   name: string;
@@ -12,20 +25,26 @@ export type CreateEventInput = {
   endDate: Date;
   teamId: string;
   forAllTeams?: boolean;
+  createdById?: string | null;
 };
 
-export async function listEventsForTeam(teamId: string): Promise<Event[]> {
+export async function listEventsForTeam(
+  teamId: string,
+): Promise<EventWithCreator[]> {
   return prisma.event.findMany({
     where: {
       teams: {
         some: { id: teamId },
       },
     },
+    include: eventCreatorSelect,
     orderBy: { startDate: "asc" },
   });
 }
 
-export async function createEventForTeam(input: CreateEventInput): Promise<Event> {
+export async function createEventForTeam(
+  input: CreateEventInput,
+): Promise<EventWithCreator> {
   if (input.endDate <= input.startDate) {
     throw new Error("End time must be after start time.");
   }
@@ -49,10 +68,12 @@ export async function createEventForTeam(input: CreateEventInput): Promise<Event
       type: input.type,
       startDate: input.startDate,
       endDate: input.endDate,
+      createdById: input.createdById ?? null,
       teams: {
         connect: teamConnect,
       },
     },
+    include: eventCreatorSelect,
   });
 }
 
@@ -87,7 +108,7 @@ async function findTeamEventOrThrow(
 
 export async function updateEventForTeam(
   input: UpdateEventInput,
-): Promise<Event> {
+): Promise<EventWithCreator> {
   if (input.endDate <= input.startDate) {
     throw new Error("End time must be after start time.");
   }
@@ -104,6 +125,7 @@ export async function updateEventForTeam(
       startDate: input.startDate,
       endDate: input.endDate,
     },
+    include: eventCreatorSelect,
   });
 }
 

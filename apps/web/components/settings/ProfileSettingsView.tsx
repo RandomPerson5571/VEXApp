@@ -2,8 +2,6 @@
 
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
-import { Clock3, Users } from "lucide-react";
-
 import { DiscordLinkForm } from "@/app/(dashboard)/settings/discord-link-form";
 import { PasswordResetForm } from "@/app/(dashboard)/settings/password-reset-form";
 import { DeleteAccountButton } from "@/components/auth/DeleteAccountButton";
@@ -16,8 +14,6 @@ type ProfileSettingsViewProps = {
   lastName: string;
   email: string;
   linkedDiscordId: string | null;
-  teamName: string | null;
-  teamNumber: string | null;
   message?: string | null;
   error?: string | null;
 };
@@ -48,8 +44,6 @@ export function ProfileSettingsView({
   lastName,
   email,
   linkedDiscordId,
-  teamName,
-  teamNumber,
   message,
   error,
 }: ProfileSettingsViewProps) {
@@ -97,11 +91,6 @@ export function ProfileSettingsView({
       savedLastName,
     ],
   );
-
-  const teamLabel =
-    teamName && teamNumber
-      ? `${teamName} (${teamNumber})`
-      : teamName ?? "No team assigned";
 
   const resetDraft = () => {
     setDraftFirstName(savedFirstName);
@@ -276,37 +265,6 @@ export function ProfileSettingsView({
         description="Manage sign-in credentials and authentication methods."
       >
         <PasswordResetForm email={email} />
-      </SettingsSection>
-
-      <SettingsSection
-        title="Team Change Request"
-        description="Request a transfer to a different team. Requires admin approval."
-      >
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div className="flex items-start gap-3">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-slate-100 border border-slate-200 text-slate-500 dark:bg-[#121212] dark:border-[#1a1a1a]">
-              <Users className="h-4.5 w-4.5" />
-            </div>
-            <div className="space-y-1">
-              <p className="text-sm font-bold text-slate-900 dark:text-slate-200">Current team</p>
-              <p className="text-xs text-slate-600 dark:text-slate-400">{teamLabel}</p>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-3 shrink-0">
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-amber-500/20 bg-amber-500/10 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-amber-600 dark:text-amber-400">
-              <Clock3 className="h-3 w-3" />
-              Coming soon
-            </span>
-            <button
-              type="button"
-              disabled
-              className="rounded-lg border border-slate-200 px-4 py-2 text-xs font-bold text-slate-500 cursor-not-allowed dark:border-[#1a1a1a] dark:text-slate-600"
-            >
-              Request Transfer
-            </button>
-          </div>
-        </div>
       </SettingsSection>
 
       <SettingsSection

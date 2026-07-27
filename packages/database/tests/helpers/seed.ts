@@ -281,7 +281,6 @@ export async function deleteTestTeam(teamId: string) {
     where: { task: { teamId } },
   });
   await prisma.task.deleteMany({ where: { teamId } });
-  await prisma.notebookLog.deleteMany({ where: { teamId } });
   await prisma.inventoryItemSignOut.deleteMany({ where: { teamId } });
 
   const users = await prisma.user.findMany({

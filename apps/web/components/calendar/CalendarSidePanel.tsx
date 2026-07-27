@@ -1,6 +1,6 @@
 "use client";
 
-import { AlertCircle, Clock, MapPin, Plus, X } from "lucide-react";
+import { AlertCircle, Clock, MapPin, Plus, UserRound, X } from "lucide-react";
 import type { CalendarEvent, DayPlanType, TeamDayPlan } from "@/lib/types/team";
 import { formatSelectedDayLabel, getDayPlanStyle, getEventStyle } from "@/lib/utils/calendar";
 
@@ -15,6 +15,8 @@ export function CalendarSidePanel({
   onClearDayPlan,
   onAddEvent,
   onEventClick,
+  onClose,
+  className = "",
 }: {
   selectedDate: string;
   selectedDayPlan?: TeamDayPlan;
@@ -24,6 +26,8 @@ export function CalendarSidePanel({
   onClearDayPlan: () => void;
   onAddEvent: () => void;
   onEventClick: (event: CalendarEvent) => void;
+  onClose?: () => void;
+  className?: string;
 }) {
   const handleDayPlanClick = (type: DayPlanType) => {
     if (selectedDayPlan?.type === type) {
@@ -35,15 +39,31 @@ export function CalendarSidePanel({
   };
 
   return (
-    <aside className="w-[320px] bg-white dark:bg-[#0a0a0a] flex flex-col h-full border-l border-slate-200 dark:border-[#1a1a1a] p-6 select-none font-sans justify-between">
+    <aside
+      className={`flex h-full w-full flex-col justify-between border-l border-slate-200 bg-white p-6 font-sans select-none dark:border-[#1a1a1a] dark:bg-[#0a0a0a] lg:w-[320px] ${className}`}
+    >
       <div className="space-y-6 flex-1 overflow-y-auto dashboard-scroll">
-        <div className="border-b border-slate-200 dark:border-[#1a1a1a] pb-3">
-          <h3 className="text-xs font-black text-slate-600 dark:text-slate-400 uppercase tracking-widest">
-            Selected Day Schedule
-          </h3>
-          <p className="text-xs font-bold text-slate-900 dark:text-slate-100 leading-tight mt-2.5 font-sans pr-1 break-words">
-            {formatSelectedDayLabel(selectedDate)}
-          </p>
+        <div className="border-b border-slate-200 pb-3 dark:border-[#1a1a1a]">
+          <div className="flex items-start justify-between gap-2">
+            <div className="min-w-0">
+              <h3 className="text-xs font-black uppercase tracking-widest text-slate-600 dark:text-slate-400">
+                Selected Day Schedule
+              </h3>
+              <p className="mt-2.5 break-words pr-1 font-sans text-xs font-bold leading-tight text-slate-900 dark:text-slate-100">
+                {formatSelectedDayLabel(selectedDate)}
+              </p>
+            </div>
+            {onClose ? (
+              <button
+                type="button"
+                onClick={onClose}
+                className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-slate-200 text-slate-500 transition hover:border-slate-300 hover:text-slate-900 lg:hidden dark:border-[#1a1a1a] dark:hover:text-slate-200"
+                aria-label="Close day schedule"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            ) : null}
+          </div>
         </div>
 
         <div className="space-y-3">
@@ -135,6 +155,13 @@ export function CalendarSidePanel({
                     <div className="flex items-center gap-1.5 text-[10.5px] text-slate-600 dark:text-slate-400 font-semibold mt-1">
                       <MapPin className="h-3 w-3 text-slate-500 dark:text-slate-600" />
                       <span className="truncate">{ev.location}</span>
+                    </div>
+                  )}
+
+                  {ev.createdBy && (
+                    <div className="flex items-center gap-1.5 text-[10.5px] text-slate-600 dark:text-slate-400 font-semibold">
+                      <UserRound className="h-3 w-3 text-slate-500 dark:text-slate-600" />
+                      <span className="truncate">{ev.createdBy}</span>
                     </div>
                   )}
 

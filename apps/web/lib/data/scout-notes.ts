@@ -9,6 +9,13 @@ const scoutNoteSelect = {
   targetTeamNumber: true,
   targetTeamName: true,
   content: true,
+  driveRating: true,
+  autonReliability: true,
+  mechanisms: true,
+  formNotes: true,
+  pickRank: true,
+  doNotPick: true,
+  crossedOff: true,
   createdById: true,
   createdAt: true,
   updatedAt: true,
@@ -24,6 +31,13 @@ export type CreateScoutNoteInput = {
   targetTeamNumber: string;
   targetTeamName?: string | null;
   content?: string;
+  driveRating?: number | null;
+  autonReliability?: number | null;
+  mechanisms?: string | null;
+  formNotes?: string | null;
+  pickRank?: number | null;
+  doNotPick?: boolean;
+  crossedOff?: boolean;
   createdById: string;
 };
 
@@ -33,7 +47,38 @@ export type UpdateScoutNoteInput = {
   targetTeamNumber?: string;
   targetTeamName?: string | null;
   content?: string;
+  driveRating?: number | null;
+  autonReliability?: number | null;
+  mechanisms?: string | null;
+  formNotes?: string | null;
+  pickRank?: number | null;
+  doNotPick?: boolean;
+  crossedOff?: boolean;
 };
+
+export type ReorderScoutNotesInput = {
+  teamId: string;
+  orderedNoteIds: string[];
+  dnpNoteIds?: string[];
+};
+
+function normalizeRating(value: number | null | undefined, label: string) {
+  if (value === undefined) return undefined;
+  if (value === null) return null;
+  if (!Number.isInteger(value) || value < 1 || value > 5) {
+    throw new Error(`${label} must be an integer from 1 to 5.`);
+  }
+  return value;
+}
+
+function normalizePickRank(value: number | null | undefined) {
+  if (value === undefined) return undefined;
+  if (value === null) return null;
+  if (!Number.isInteger(value) || value < 1) {
+    throw new Error("Pick rank must be a positive integer.");
+  }
+  return value;
+}
 
 export async function listScoutNotes(teamId: string): Promise<ScoutNoteRecord[]> {
   return prisma.scoutNote.findMany({
@@ -67,6 +112,14 @@ export async function createScoutNote(
         targetTeamNumber,
         targetTeamName: input.targetTeamName?.trim() || null,
         content: input.content ?? "",
+        driveRating: normalizeRating(input.driveRating, "Drive rating") ?? null,
+        autonReliability:
+          normalizeRating(input.autonReliability, "Auton reliability") ?? null,
+        mechanisms: input.mechanisms?.trim() || null,
+        formNotes: input.formNotes?.trim() || null,
+        pickRank: normalizePickRank(input.pickRank) ?? null,
+        doNotPick: input.doNotPick ?? false,
+        crossedOff: input.crossedOff ?? false,
         createdById: input.createdById,
       },
       select: scoutNoteSelect,
@@ -107,6 +160,33 @@ export async function updateScoutNote(
   if (input.content !== undefined) {
     data.content = input.content;
   }
+  if (input.driveRating !== undefined) {
+    data.driveRating = normalizeRating(input.driveRating, "Drive rating");
+  }
+  if (input.autonReliability !== undefined) {
+    data.autonReliability = normalizeRating(
+      input.autonReliability,
+      "Auton reliability",
+    );
+  }
+  if (input.mechanisms !== undefined) {
+    data.mechanisms = input.mechanisms?.trim() || null;
+  }
+  if (input.formNotes !== undefined) {
+    data.formNotes = input.formNotes?.trim() || null;
+  }
+  if (input.pickRank !== undefined) {
+    data.pickRank = normalizePickRank(input.pickRank);
+  }
+  if (input.doNotPick !== undefined) {
+    data.doNotPick = input.doNotPick;
+    if (input.doNotPick) {
+      data.pickRank = null;
+    }
+  }
+  if (input.crossedOff !== undefined) {
+    data.crossedOff = input.crossedOff;
+  }
 
   try {
     return await prisma.scoutNote.update({
@@ -123,6 +203,64 @@ export async function updateScoutNote(
     }
     throw error;
   }
+}
+
+export async function reorderScoutNotes(
+  input: ReorderScoutNotesInput,
+): Promise<ScoutNoteRecord[]> {
+  const orderedNoteIds = input.orderedNoteIds;
+  const dnpNoteIds = input.dnpNoteIds ?? [];
+
+  const orderedSet = new Set(orderedNoteIds);
+  const dnpSet = new Set(dnpNoteIds);
+  for (const id of dnpNoteIds) {
+    if (orderedSet.has(id)) {
+      throw new Error("A note cannot be both ranked and DNP.");
+    }
+  }
+  if (orderedSet.size !== orderedNoteIds.length) {
+    throw new Error("Duplicate note ids in ranked list.");
+  }
+  if (dnpSet.size !== dnpNoteIds.length) {
+    throw new Error("Duplicate note ids in DNP list.");
+  }
+
+  const allIds = [...orderedNoteIds, ...dnpNoteIds];
+  if (allIds.length > 0) {
+    const notes = await prisma.scoutNote.findMany({
+      where: { id: { in: allIds }, teamId: input.teamId },
+      select: { id: true },
+    });
+    if (notes.length !== allIds.length) {
+      throw new Error("One or more scout notes were not found.");
+    }
+  }
+
+  // Payload is the full picklist: clear anything previously ranked/DNP but omitted.
+  await prisma.$transaction([
+    prisma.scoutNote.updateMany({
+      where: {
+        teamId: input.teamId,
+        OR: [{ pickRank: { not: null } }, { doNotPick: true }],
+        ...(allIds.length > 0 ? { id: { notIn: allIds } } : {}),
+      },
+      data: { pickRank: null, doNotPick: false },
+    }),
+    ...orderedNoteIds.map((id, index) =>
+      prisma.scoutNote.update({
+        where: { id },
+        data: { pickRank: index + 1, doNotPick: false },
+      }),
+    ),
+    ...dnpNoteIds.map((id) =>
+      prisma.scoutNote.update({
+        where: { id },
+        data: { pickRank: null, doNotPick: true },
+      }),
+    ),
+  ]);
+
+  return listScoutNotes(input.teamId);
 }
 
 export async function deleteScoutNote(

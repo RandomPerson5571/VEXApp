@@ -1,12 +1,9 @@
-import { Plus } from "lucide-react";
-
 import type { TeamMember } from "./team-management-types";
 import { TeamMemberRow } from "./TeamMemberRow";
 
 type TeamMembersPanelProps = {
   members: TeamMember[];
   canManage: boolean;
-  onInvite: () => void;
   onRoleChange: (memberId: string, role: TeamMember["role"]) => void;
   onEdit: (member: TeamMember) => void;
   onDelete: (memberId: string) => void;
@@ -15,35 +12,21 @@ type TeamMembersPanelProps = {
 export function TeamMembersPanel({
   members,
   canManage,
-  onInvite,
   onRoleChange,
   onEdit,
   onDelete,
 }: TeamMembersPanelProps) {
   return (
     <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-md dark:border-[#1a1a1a] dark:bg-[#0a0a0a]">
-      <div className="mb-5 flex items-center justify-between border-b border-slate-200 pb-3.5 dark:border-[#1a1a1a]">
-        <div>
-          <h2 className="text-sm font-black uppercase tracking-wide text-slate-900 dark:text-slate-200">
-            Team Members
-          </h2>
-          <p className="mt-0.5 text-[11px] font-semibold text-slate-600 dark:text-slate-500">
-            {canManage
-              ? "Manage roles and invites for your team"
-              : "View members assigned to your team"}
-          </p>
-        </div>
-
-        {canManage ? (
-          <button
-            type="button"
-            onClick={onInvite}
-            className="flex cursor-pointer items-center gap-1.5 rounded-lg bg-orange-600 px-3 py-1.5 text-xs font-bold text-white shadow-lg shadow-orange-500/10 transition hover:bg-orange-500"
-          >
-            <Plus className="h-4 w-4" />
-            <span>Invite Member</span>
-          </button>
-        ) : null}
+      <div className="mb-5 border-b border-slate-200 pb-3.5 dark:border-[#1a1a1a]">
+        <h2 className="text-sm font-black uppercase tracking-wide text-slate-900 dark:text-slate-200">
+          Team Members
+        </h2>
+        <p className="mt-0.5 text-[11px] font-semibold text-slate-600 dark:text-slate-500">
+          {canManage
+            ? "Manage roles for your team"
+            : "View members assigned to your team"}
+        </p>
       </div>
 
       <div className="overflow-x-auto">

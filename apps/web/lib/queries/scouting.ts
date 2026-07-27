@@ -7,6 +7,13 @@ export type ScoutNoteRecord = {
   targetTeamNumber: string;
   targetTeamName: string | null;
   content: string;
+  driveRating: number | null;
+  autonReliability: number | null;
+  mechanisms: string | null;
+  formNotes: string | null;
+  pickRank: number | null;
+  doNotPick: boolean;
+  crossedOff: boolean;
   createdById: string;
   createdAt: string | Date;
   updatedAt: string | Date;
@@ -17,12 +24,31 @@ export type CreateScoutNotePayload = {
   targetTeamNumber: string;
   targetTeamName?: string | null;
   content?: string;
+  driveRating?: number | null;
+  autonReliability?: number | null;
+  mechanisms?: string | null;
+  formNotes?: string | null;
+  pickRank?: number | null;
+  doNotPick?: boolean;
+  crossedOff?: boolean;
 };
 
 export type UpdateScoutNotePayload = {
   targetTeamNumber?: string;
   targetTeamName?: string | null;
   content?: string;
+  driveRating?: number | null;
+  autonReliability?: number | null;
+  mechanisms?: string | null;
+  formNotes?: string | null;
+  pickRank?: number | null;
+  doNotPick?: boolean;
+  crossedOff?: boolean;
+};
+
+export type ReorderScoutNotesPayload = {
+  orderedNoteIds: string[];
+  dnpNoteIds?: string[];
 };
 
 async function readError(response: Response, fallback: string): Promise<string> {
@@ -79,6 +105,21 @@ export async function deleteScoutNoteFromApi(noteId: string): Promise<void> {
   if (!response.ok) {
     throw new Error(await readError(response, "Failed to delete scout note."));
   }
+}
+
+export async function reorderScoutNotesFromApi(
+  payload: ReorderScoutNotesPayload,
+): Promise<ScoutNoteRecord[]> {
+  const response = await fetch("/api/knowledge/scouting/reorder", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+  throwIfRateLimited(response);
+  if (!response.ok) {
+    throw new Error(await readError(response, "Failed to reorder picklist."));
+  }
+  return response.json() as Promise<ScoutNoteRecord[]>;
 }
 
 export function scoutNotesQueryOptions(teamId: string) {

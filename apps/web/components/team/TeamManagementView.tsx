@@ -7,7 +7,6 @@ import type { UserRole } from "@stlvex/database/types";
 import { EditMemberModal } from "./management/EditMemberModal";
 import { FusionProjectPickerModal } from "./management/FusionProjectPickerModal";
 import { GitHubRepoPickerModal } from "./management/GitHubRepoPickerModal";
-import { InviteMemberModal } from "./management/InviteMemberModal";
 import { TeamIntegrationsSection } from "./management/TeamIntegrationsSection";
 import { TeamMembersPanel } from "./management/TeamMembersPanel";
 import {
@@ -66,13 +65,8 @@ export function TeamManagementView({
   const searchParams = useSearchParams();
 
   const [members, setMembers] = useState<TeamMember[]>(initialMembers);
-  const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editingMember, setEditingMember] = useState<TeamMember | null>(null);
-
-  const [newName, setNewName] = useState("");
-  const [newEmail, setNewEmail] = useState("");
-  const [newRole, setNewRole] = useState<UserRole>("TEAM_MEMBER");
 
   const [editName, setEditName] = useState("");
   const [editEmail, setEditEmail] = useState("");
@@ -147,25 +141,6 @@ export function TeamManagementView({
         member.id === memberId ? { ...member, role } : member,
       ),
     );
-  }
-
-  function handleInviteSubmit(event: React.FormEvent) {
-    event.preventDefault();
-    if (!canManage || !newName || !newEmail) return;
-
-    const newMember: TeamMember = {
-      id: `m-${Date.now()}`,
-      name: newName,
-      email: newEmail,
-      role: newRole,
-      status: "Active",
-    };
-
-    setMembers((prev) => [...prev, newMember]);
-    setIsInviteModalOpen(false);
-    setNewName("");
-    setNewEmail("");
-    setNewRole("TEAM_MEMBER");
   }
 
   function handleDeleteMember(id: string) {
@@ -335,7 +310,7 @@ export function TeamManagementView({
         </h1>
         <p className="mt-1 text-xs font-semibold text-slate-600 dark:text-slate-400">
           {canManage
-            ? `Manage roles and invites for ${teamLabel}.`
+            ? `Manage roles for ${teamLabel}.`
             : `View roster for ${teamLabel}.`}
         </p>
       </div>
@@ -355,7 +330,6 @@ export function TeamManagementView({
       <TeamMembersPanel
         members={members}
         canManage={canManage}
-        onInvite={() => setIsInviteModalOpen(true)}
         onRoleChange={handleRoleChange}
         onEdit={handleStartEdit}
         onDelete={handleDeleteMember}
@@ -372,19 +346,6 @@ export function TeamManagementView({
           onFusionActiveChange={handleFusionActiveChange}
         />
       </div>
-
-      {canManage && isInviteModalOpen ? (
-        <InviteMemberModal
-          name={newName}
-          email={newEmail}
-          role={newRole}
-          onNameChange={setNewName}
-          onEmailChange={setNewEmail}
-          onRoleChange={setNewRole}
-          onClose={() => setIsInviteModalOpen(false)}
-          onSubmit={handleInviteSubmit}
-        />
-      ) : null}
 
       {canManage && isEditModalOpen && editingMember ? (
         <EditMemberModal

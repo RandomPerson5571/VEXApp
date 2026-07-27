@@ -9,6 +9,13 @@ type CreateScoutNoteBody = {
   targetTeamNumber?: string;
   targetTeamName?: string | null;
   content?: string;
+  driveRating?: number | null;
+  autonReliability?: number | null;
+  mechanisms?: string | null;
+  formNotes?: string | null;
+  pickRank?: number | null;
+  doNotPick?: boolean;
+  crossedOff?: boolean;
 };
 
 export async function GET() {
@@ -79,6 +86,13 @@ export async function POST(request: Request) {
       targetTeamNumber,
       targetTeamName: body.targetTeamName,
       content: body.content,
+      driveRating: body.driveRating,
+      autonReliability: body.autonReliability,
+      mechanisms: body.mechanisms,
+      formNotes: body.formNotes,
+      pickRank: body.pickRank,
+      doNotPick: body.doNotPick,
+      crossedOff: body.crossedOff,
       createdById: currentUser.profile.id,
     });
     return NextResponse.json(note, { status: 201 });

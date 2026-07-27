@@ -11,6 +11,7 @@ import {
   InventoryStats,
 } from "@/components/inventory/InventoryComponents";
 import { InventoryItemModal } from "@/components/inventory/InventoryItemModal";
+import { ConfirmationDialog } from "@/components/ui/ConfirmationDialog";
 import { isGlobalAdmin } from "@/lib/auth/auth-guards";
 import { isQueryInitiallyLoading } from "@/lib/hooks/use-query-loading";
 import { useTeamInventoryMutations } from "@/lib/hooks/use-team-inventory-mutations";
@@ -97,6 +98,7 @@ export function InventoryView() {
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [existingImageUrl, setExistingImageUrl] = useState<string | null>(null);
   const [formError, setFormError] = useState<string | undefined>();
+  const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
 
   const isEditMode = editingItemId !== null;
   const isModalBusy =
@@ -190,20 +192,25 @@ export function InventoryView() {
     }
   };
 
-  const handleDeleteItem = async () => {
+  const handleDeleteItem = () => {
     if (!editingItemId || isModalBusy) return;
-    if (!window.confirm("Delete this inventory part?")) return;
+    setIsDeleteConfirmOpen(true);
+  };
 
+  const confirmDeleteItem = async () => {
+    if (!editingItemId) return;
     setFormError(undefined);
 
     try {
       await deleteMutation.mutateAsync(editingItemId);
+      setIsDeleteConfirmOpen(false);
     } catch (error) {
       setFormError(
         error instanceof Error
           ? error.message
           : "Failed to delete inventory item.",
       );
+      setIsDeleteConfirmOpen(false);
     }
   };
 
@@ -393,6 +400,20 @@ export function InventoryView() {
           error={formError}
         />
       ) : null}
+
+      <ConfirmationDialog
+        isOpen={isDeleteConfirmOpen}
+        title="Delete this inventory part?"
+        description="This permanently removes the part from team inventory."
+        confirmLabel="Delete"
+        variant="danger"
+        pending={deleteMutation.isPending}
+        pendingLabel="Deleting..."
+        onClose={() => setIsDeleteConfirmOpen(false)}
+        onConfirm={() => {
+          void confirmDeleteItem();
+        }}
+      />
     </div>
   );
 }

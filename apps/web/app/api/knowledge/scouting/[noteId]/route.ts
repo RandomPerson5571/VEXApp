@@ -13,6 +13,13 @@ type UpdateScoutNoteBody = {
   targetTeamNumber?: string;
   targetTeamName?: string | null;
   content?: string;
+  driveRating?: number | null;
+  autonReliability?: number | null;
+  mechanisms?: string | null;
+  formNotes?: string | null;
+  pickRank?: number | null;
+  doNotPick?: boolean;
+  crossedOff?: boolean;
 };
 
 type RouteContext = {
@@ -94,6 +101,13 @@ export async function PATCH(request: Request, context: RouteContext) {
       targetTeamNumber: body.targetTeamNumber,
       targetTeamName: body.targetTeamName,
       content: body.content,
+      driveRating: body.driveRating,
+      autonReliability: body.autonReliability,
+      mechanisms: body.mechanisms,
+      formNotes: body.formNotes,
+      pickRank: body.pickRank,
+      doNotPick: body.doNotPick,
+      crossedOff: body.crossedOff,
     });
     return NextResponse.json(note);
   } catch (error) {

@@ -12,7 +12,6 @@ type DeleteTeamPayload = {
 async function deleteTeams(teamIds: string[]): Promise<void> {
   await prisma.$transaction([
     prisma.invite.deleteMany({ where: { teamId: { in: teamIds } } }),
-    prisma.notebookLog.deleteMany({ where: { teamId: { in: teamIds } } }),
     prisma.inventoryItemSignOut.deleteMany({ where: { teamId: { in: teamIds } } }),
     prisma.user.updateMany({
       where: { teamId: { in: teamIds } },

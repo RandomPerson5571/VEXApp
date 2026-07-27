@@ -4,6 +4,8 @@ import type { ChangeEvent, FormEvent } from "react";
 import { useEffect, useMemo, useRef } from "react";
 import { ImagePlus, Package, Plus, X } from "lucide-react";
 
+import { useInventoryImageUrl } from "@/lib/hooks/use-inventory-image-url";
+
 export function InventoryItemModal({
   isOpen,
   mode = "create",
@@ -50,7 +52,10 @@ export function InventoryItemModal({
     () => (imageFile ? URL.createObjectURL(imageFile) : null),
     [imageFile],
   );
-  const displayPreview = previewUrl ?? existingImageUrl ?? null;
+  // ponytail: DB stores storage path; list cards already sign via this hook
+  const { url: resolvedExistingUrl, isLoading: isResolvingExisting } =
+    useInventoryImageUrl(imageFile ? null : existingImageUrl);
+  const displayPreview = previewUrl ?? resolvedExistingUrl ?? null;
 
   useEffect(() => {
     return () => {
@@ -234,6 +239,8 @@ export function InventoryItemModal({
                     className="h-28 w-full object-contain"
                   />
                 </div>
+              ) : isResolvingExisting ? (
+                <div className="h-28 animate-pulse rounded-lg border border-slate-200 bg-slate-50 dark:border-[#1a1a1a] dark:bg-[#121212]" />
               ) : null}
             </div>
 

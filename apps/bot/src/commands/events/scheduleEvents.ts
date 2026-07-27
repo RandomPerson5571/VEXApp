@@ -244,6 +244,7 @@ const scheduleEventsCommand: SlashCommand = {
         type: eventType,
         startDate,
         endDate,
+        createdById: dbUser.id,
         teams: {
           connect: targetTeams.teamIds.map((id) => ({ id })),
         },

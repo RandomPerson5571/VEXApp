@@ -13,11 +13,10 @@ type SettingsViewProps = {
   lastName: string;
   email: string;
   linkedDiscordId: string | null;
-  teamName: string | null;
-  teamNumber: string | null;
   message?: string | null;
   error?: string | null;
   initialNotificationSettings: NotificationPreferences;
+  githubConnected?: boolean;
   initialSection?: SettingsSectionId;
 };
 
@@ -26,11 +25,10 @@ export function SettingsView({
   lastName,
   email,
   linkedDiscordId,
-  teamName,
-  teamNumber,
   message,
   error,
   initialNotificationSettings,
+  githubConnected = false,
   initialSection = "profile",
 }: SettingsViewProps) {
   const router = useRouter();
@@ -54,8 +52,6 @@ export function SettingsView({
               lastName={lastName}
               email={email}
               linkedDiscordId={linkedDiscordId}
-              teamName={teamName}
-              teamNumber={teamNumber}
               message={message}
               error={error}
             />
@@ -63,6 +59,7 @@ export function SettingsView({
           <div className={section === "notifications" ? undefined : "hidden"}>
             <NotificationsSettingsView
               initialSettings={initialNotificationSettings}
+              githubConnected={githubConnected}
             />
           </div>
         </div>

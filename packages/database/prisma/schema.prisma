@@ -58,7 +58,6 @@ model User {
   teamId             String?
   team               Team?              @relation(fields: [teamId], references: [id])
   discordAccount     DiscordAccount?
-  notebookLogs       NotebookLog[]
   inventorySignOuts InventoryItemSignOut[]
   createdAt          DateTime           @default(now())
   updatedAt          DateTime           @updatedAt
@@ -66,8 +65,10 @@ model User {
   createdTasks           Task[]           @relation("TaskCreator")
   taskAssignments        TaskAssignment[]
   createdDayPlans        TeamDayPlan[]
+  createdEvents          Event[]
   createdKnowledgeNodes  KnowledgeNode[]
   createdScoutNotes      ScoutNote[]
+  attendanceCheckIns     AttendanceCheckIn[]
 
   notificationSettings NotificationSettings?
 }
@@ -107,7 +108,6 @@ model Team {
   annoucementsChannelId String?
   members         User[]
   events          Event[]         @relation("TeamEvents")
-  notebookLogs    NotebookLog[]
   inventorySignOuts InventoryItemSignOut[]
   tasks           Task[]
   invites         Invite[]
@@ -116,6 +116,7 @@ model Team {
   dayPlans          TeamDayPlan[]
   knowledgeNodes    KnowledgeNode[]
   scoutNotes        ScoutNote[]
+  attendanceCheckIns AttendanceCheckIn[]
   createdAt         DateTime        @default(now())
   updatedAt         DateTime        @updatedAt
 }
@@ -172,7 +173,30 @@ model Event {
   startDate   DateTime
   endDate     DateTime
   teams       Team[]    @relation("TeamEvents") // Implicit many-to-many join table
+  createdById String?
+  creator     User?     @relation(fields: [createdById], references: [id], onDelete: SetNull)
   createdAt   DateTime  @default(now())
+  attendanceCheckIns AttendanceCheckIn[]
+
+  @@index([createdById])
+}
+
+/// One check-in per team member per calendar day (UTC date).
+model AttendanceCheckIn {
+  id          String   @id @default(cuid())
+  teamId      String   @map("team_id")
+  team        Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  userId      String   @map("user_id")
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  eventId     String?  @map("event_id")
+  event       Event?   @relation(fields: [eventId], references: [id], onDelete: SetNull)
+  date        DateTime @db.Date
+  checkedInAt DateTime @default(now()) @map("checked_in_at")
+
+  @@unique([teamId, userId, date])
+  @@index([teamId, date])
+  @@index([eventId])
+  @@map("attendance_check_ins")
 }
 
 model TeamDayPlan {
@@ -233,7 +257,22 @@ model ScoutNote {
   team             Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
   targetTeamNumber String
   targetTeamName   String?
+  /// Freeform TipTap HTML — extra notes beyond structured fields.
   content          String   @default("")
+  /// Pit/match form: drive quality 1–5
+  driveRating      Int?
+  /// Pit/match form: autonomous reliability 1–5
+  autonReliability Int?
+  /// Pit/match form: mechanisms summary
+  mechanisms       String?
+  /// Short structured notes (plain text)
+  formNotes        String?
+  /// Alliance picklist rank (1 = top pick); null = unranked / DNP
+  pickRank         Int?
+  /// Do-not-pick list (incompatible / broken / avoid)
+  doNotPick        Boolean  @default(false)
+  /// Struck during alliance selection (picked by someone else)
+  crossedOff       Boolean  @default(false)
   createdById      String
   createdBy        User     @relation(fields: [createdById], references: [id], onDelete: Cascade)
   createdAt        DateTime @default(now())
@@ -241,16 +280,8 @@ model ScoutNote {
 
   @@unique([teamId, targetTeamNumber])
   @@index([teamId])
-}
-
-model NotebookLog {
-  id          String   @id @default(uuid())
-  description String
-  teamId      String
-  team        Team     @relation(fields: [teamId], references: [id])
-  userId      String
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  createdAt   DateTime @default(now())
+  @@index([teamId, pickRank])
+  @@index([teamId, doNotPick])
 }
 
 model Invite {

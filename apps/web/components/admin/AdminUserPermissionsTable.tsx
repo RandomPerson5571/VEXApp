@@ -1,8 +1,9 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Building2, Users } from "lucide-react";
+import { Building2, Mail, Users } from "lucide-react";
 
+import { AdminInviteManagementTable } from "./AdminInviteManagementTable";
 import { AdminTeamManagementTable } from "./AdminTeamManagementTable";
 import { AdminUserManagementTable } from "./AdminUserManagementTable";
 import {
@@ -13,11 +14,13 @@ import {
   sortTeams,
   sortUsersByTeam,
   toTeamOption,
+  type AdminInviteRow,
   type AdminTeamRow,
   type AdminUserRow,
 } from "./admin-types";
 
 export type {
+  AdminInviteRow,
   AdminTeamOption,
   AdminTeamRow,
   AdminUserRow,
@@ -26,32 +29,37 @@ export type {
 type AdminUserPermissionsTableProps = {
   users: AdminUserRow[];
   teams: AdminTeamRow[];
+  invites: AdminInviteRow[];
   currentUserId: string;
 };
 
-type AdminTab = "users" | "teams";
+type AdminTab = "users" | "teams" | "invites";
 
 const ADMIN_TABS = [
   { id: "users" as const, label: "Users", icon: Users },
   { id: "teams" as const, label: "Teams", icon: Building2 },
+  { id: "invites" as const, label: "Invites", icon: Mail },
 ];
+
+const TAB_DESCRIPTIONS: Record<AdminTab, string> = {
+  users: "Edit user profiles, team assignments, and platform administrator access.",
+  teams: "Create teams, manage identity settings, and remove teams when needed.",
+  invites: "Track invite link usage and revoke codes that should no longer work.",
+};
 
 export function AdminUserPermissionsTable({
   users: initialUsers,
   teams: initialTeams,
+  invites: initialInvites,
   currentUserId,
 }: AdminUserPermissionsTableProps) {
   const [activeTab, setActiveTab] = useState<AdminTab>("users");
   const [users, setUsers] = useState(initialUsers);
   const [teams, setTeams] = useState(() => sortTeams(initialTeams));
+  const [invites, setInvites] = useState(initialInvites);
   const [error, setError] = useState<string | null>(null);
 
   const teamOptions = useMemo(() => teams.map(toTeamOption), [teams]);
-
-  const tabDescription =
-    activeTab === "users"
-      ? "Edit user profiles, team assignments, and platform administrator access."
-      : "Create teams, manage identity settings, and remove teams when needed.";
 
   function handleTabChange(tab: AdminTab) {
     setError(null);
@@ -74,6 +82,14 @@ export function AdminUserPermissionsTable({
         ),
       ),
     );
+
+    setInvites((current) =>
+      current.map((invite) =>
+        invite.teamId === updatedTeam.id
+          ? { ...invite, team: option }
+          : invite,
+      ),
+    );
   }
 
   function handleTeamCreated(team: AdminTeamRow) {
@@ -93,6 +109,14 @@ export function AdminUserPermissionsTable({
         ),
       ),
     );
+    setInvites((current) =>
+      current.filter((invite) => !deleted.has(invite.teamId)),
+    );
+  }
+
+  function handleInvitesDeleted(inviteIds: string[]) {
+    const deleted = new Set(inviteIds);
+    setInvites((current) => current.filter((invite) => !deleted.has(invite.id)));
   }
 
   return (
@@ -120,7 +144,7 @@ export function AdminUserPermissionsTable({
             Platform administration
           </h2>
           <p className="mt-1 max-w-xl text-xs font-medium leading-relaxed text-slate-500">
-            {tabDescription}
+            {TAB_DESCRIPTIONS[activeTab]}
           </p>
         </div>
 
@@ -147,12 +171,18 @@ export function AdminUserPermissionsTable({
             onUsersChange={setUsers}
             onError={setError}
           />
-        ) : (
+        ) : activeTab === "teams" ? (
           <AdminTeamManagementTable
             teams={teams}
             onTeamCreated={handleTeamCreated}
             onTeamUpdated={handleTeamUpdated}
             onTeamsDeleted={handleTeamsDeleted}
+            onError={setError}
+          />
+        ) : (
+          <AdminInviteManagementTable
+            invites={invites}
+            onInvitesDeleted={handleInvitesDeleted}
             onError={setError}
           />
         )}

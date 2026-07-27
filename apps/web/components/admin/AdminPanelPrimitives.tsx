@@ -161,12 +161,12 @@ export function AdminTableFrame({ children, className }: AdminTableFrameProps) {
 }
 
 export const adminSelectContentClassName = cn(
-  "z-[200] min-w-[var(--radix-select-trigger-width)] border-slate-700/80 bg-[#0c1220] text-slate-100 shadow-xl shadow-black/50",
+  "z-[200] min-w-[var(--radix-select-trigger-width)] overflow-hidden rounded-xl border-slate-700/70 bg-[#0c1220]/95 text-slate-100 shadow-xl shadow-black/50 backdrop-blur-xl",
   "admin-scroll",
 );
 
 export const adminSelectItemClassName = cn(
-  "cursor-pointer rounded-md py-2 pl-2 pr-2 text-slate-200",
+  "cursor-pointer rounded-lg py-2 pl-2.5 pr-2 text-slate-200 transition-colors duration-100",
   "[&>span:first-child]:hidden",
   "focus:bg-slate-800 focus:text-slate-100",
   "data-[highlighted]:bg-slate-800 data-[highlighted]:text-slate-100",

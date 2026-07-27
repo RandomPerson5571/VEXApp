@@ -95,19 +95,3 @@ export function isOverdue(
   if (!date || status === "Done") return false;
   return date.getTime() < Date.now();
 }
-
-export function getSubtaskProgress(subTasks: TaskListSubTask[]): {
-  completed: number;
-  total: number;
-  percent: number;
-} {
-  const total = subTasks.length;
-  if (total === 0) return { completed: 0, total: 0, percent: 0 };
-
-  const completed = subTasks.filter((task) => task.status === "Done").length;
-  return {
-    completed,
-    total,
-    percent: Math.round((completed / total) * 100),
-  };
-}

@@ -129,7 +129,7 @@ export function TaskStatusPicker({
         <CircleDot className="h-3 w-3 shrink-0" />
         <SelectValue />
       </SelectTrigger>
-      <SelectContent className="min-w-[9rem] border-slate-200 bg-white text-slate-800 dark:border-slate-800 dark:bg-[#121212] dark:text-slate-200">
+      <SelectContent className="min-w-[9rem] border-slate-200/90 bg-white/95 text-slate-800 shadow-lg shadow-slate-900/10 dark:border-slate-800 dark:bg-[#121212]/95 dark:text-slate-200 dark:shadow-black/40">
         {TASK_STATUS_OPTIONS.map((option) => {
           const optionConfig = statusConfig[option];
 
@@ -137,7 +137,7 @@ export function TaskStatusPicker({
             <SelectItem
               key={option}
               value={option}
-              className="pr-2 text-xs font-semibold focus:bg-slate-100 focus:text-slate-950 dark:focus:bg-slate-800 dark:focus:text-slate-100 [&>span:first-child]:hidden"
+              className="pr-2 text-xs font-semibold focus:bg-slate-100 focus:text-slate-950 data-[highlighted]:bg-slate-100 data-[highlighted]:text-slate-950 dark:focus:bg-slate-800 dark:focus:text-slate-100 dark:data-[highlighted]:bg-slate-800 dark:data-[highlighted]:text-slate-100 [&>span:first-child]:hidden"
             >
               <span className="inline-flex items-center gap-2">
                 <span
@@ -211,7 +211,7 @@ export function TaskPriorityPicker({
       >
         <SelectValue />
       </SelectTrigger>
-      <SelectContent className="min-w-[9rem] border-slate-200 bg-white text-slate-800 dark:border-slate-800 dark:bg-[#121212] dark:text-slate-200">
+      <SelectContent className="min-w-[9rem] border-slate-200/90 bg-white/95 text-slate-800 shadow-lg shadow-slate-900/10 dark:border-slate-800 dark:bg-[#121212]/95 dark:text-slate-200 dark:shadow-black/40">
         {TASK_PRIORITY_OPTIONS.map((option) => {
           const optionConfig = priorityConfig[option];
 
@@ -219,13 +219,9 @@ export function TaskPriorityPicker({
             <SelectItem
               key={option}
               value={option}
-              className="pr-2 text-xs font-semibold focus:bg-slate-100 focus:text-slate-950 dark:focus:bg-slate-800 dark:focus:text-slate-100 [&>span:first-child]:hidden"
+              className="pr-2 text-xs font-semibold focus:bg-slate-100 focus:text-slate-950 data-[highlighted]:bg-slate-100 data-[highlighted]:text-slate-950 dark:focus:bg-slate-800 dark:focus:text-slate-100 dark:data-[highlighted]:bg-slate-800 dark:data-[highlighted]:text-slate-100 [&>span:first-child]:hidden"
             >
-              <span
-                className={`inline-flex items-center rounded-md border px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide ${optionConfig.className}`}
-              >
-                {optionConfig.label}
-              </span>
+              {optionConfig.label}
             </SelectItem>
           );
         })}

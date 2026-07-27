@@ -1,14 +1,10 @@
 /** Routes that require an authenticated Supabase session. */
 export const PROTECTED_ROUTE_PREFIXES = [
   "/dashboard",
-  "/documents",
   "/knowledge",
   "/calendar",
-  "/matches",
-  "/build-logs",
   "/inventory",
   "/invite",
-  "/members",
   "/settings",
   "/task-list",
   "/team-management",

@@ -6,7 +6,7 @@ export const SITE_NAME = "STL Robotics";
 export const PAGE_TITLE = "STL Robotics App";
 
 export const SITE_DESCRIPTION =
-  "Team hub for STL Robotics. Manage matches, build logs, inventory, calendar, knowledge, and members for the 2026-2027 VRC season.";
+  "Team hub for STL Robotics. Manage inventory, calendar, tasks, knowledge, scouting, and members for the 2026-2027 VRC season.";
 
 export const SITE_KEYWORDS = [
   "VEX Robotics",

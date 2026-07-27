@@ -1,1 +1,0 @@
-export type SkillType = "driver" | "programming";
