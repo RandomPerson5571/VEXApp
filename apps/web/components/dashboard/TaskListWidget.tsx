@@ -132,6 +132,7 @@ export function TaskListWidget({ maxItems = 4 }: TaskListWidgetProps) {
 
   return (
     <div className="relative flex h-full min-h-0 flex-col overflow-hidden rounded-[32px] border border-slate-200 dark:border-[#1a1a1a] bg-white dark:bg-[#0a0a0a] p-6 shadow-[0_24px_80px_rgba(0,0,0,0.08)]">
+      <div aria-hidden className="pointer-events-none absolute inset-0 bg-gradient-to-br from-orange-50/40 via-transparent to-transparent opacity-60 dark:from-orange-500/10 dark:to-transparent" />
       <div className="relative flex min-h-0 flex-1 flex-col">
         <div className="flex items-start justify-between border-b border-slate-300 dark:border-[#1a1a1a] pb-3 mb-4">
           <div>

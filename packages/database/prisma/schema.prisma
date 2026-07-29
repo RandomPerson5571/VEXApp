@@ -381,6 +381,7 @@ model TaskAssignment {
 model InventoryItem {
   id          String   @id @default(cuid())
   imageUrl    String?
+  color       String?
   name        String
   description String?
   totalStock  Int      // Total units the organization owns

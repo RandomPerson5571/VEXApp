@@ -26,7 +26,15 @@ export function SummaryStatCard({
           : "border-slate-300 bg-slate-100 dark:border-[#1a1a1a] dark:bg-[#0a0a0a]"
       }`}
     >
-      <div className="flex items-start justify-between gap-4">
+      <div
+        className="pointer-events-none absolute inset-0 opacity-100"
+        style={{
+          backgroundImage: danger
+            ? "radial-gradient(circle at top left, rgba(248,113,113,0.12), transparent 35%)"
+            : "radial-gradient(circle at top left, rgba(249,115,22,0.12), transparent 35%)",
+        }}
+      />
+      <div className="relative flex items-start justify-between gap-4">
         <div className="space-y-3">
           <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.3em] text-slate-600 dark:text-slate-400">
             <span

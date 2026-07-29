@@ -23,6 +23,7 @@ import {
   matchesInventorySearch,
   summarizeInventory,
 } from "@/lib/inventory/inventory-utils";
+import { INVENTORY_COLOR_PRESETS } from "@/lib/inventory/item-colors";
 
 function filterInventory(
   items: ReturnType<typeof useTeamInventory>["data"],
@@ -68,6 +69,7 @@ export function InventoryView() {
     setDescription("");
     setTotalStock("");
     setCheckoutLimit("");
+    setColor(INVENTORY_COLOR_PRESETS[0].value);
     setImageFile(null);
     setExistingImageUrl(null);
     setFormError(undefined);
@@ -95,6 +97,7 @@ export function InventoryView() {
   const [description, setDescription] = useState("");
   const [totalStock, setTotalStock] = useState("");
   const [checkoutLimit, setCheckoutLimit] = useState("");
+  const [color, setColor] = useState<string>(INVENTORY_COLOR_PRESETS[0].value);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [existingImageUrl, setExistingImageUrl] = useState<string | null>(null);
   const [formError, setFormError] = useState<string | undefined>();
@@ -125,6 +128,7 @@ export function InventoryView() {
         ? ""
         : String(item.checkoutLimit),
     );
+    setColor(item.color ?? INVENTORY_COLOR_PRESETS[0].value);
     setImageFile(null);
     setExistingImageUrl(item.imageUrl);
     setFormError(undefined);
@@ -169,6 +173,7 @@ export function InventoryView() {
           description: description.trim() || undefined,
           totalStock: stock,
           checkoutLimit: limit,
+          color,
           ...(imageUrl !== undefined ? { imageUrl } : {}),
         });
         return;
@@ -180,6 +185,7 @@ export function InventoryView() {
         totalStock: stock,
         checkoutLimit: limit,
         imageUrl,
+        color,
       });
     } catch (error) {
       setFormError(
@@ -384,12 +390,14 @@ export function InventoryView() {
           description={description}
           totalStock={totalStock}
           checkoutLimit={checkoutLimit}
+          color={color}
           imageFile={imageFile}
           existingImageUrl={existingImageUrl}
           onNameChange={setName}
           onDescriptionChange={setDescription}
           onTotalStockChange={setTotalStock}
           onCheckoutLimitChange={setCheckoutLimit}
+          onColorChange={setColor}
           onImageFileChange={setImageFile}
           onClose={handleCloseModal}
           onSubmit={handleSubmitItem}

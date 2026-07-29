@@ -11,7 +11,7 @@ export function DashboardView() {
   useWarmTeamTasksCache();
 
   return (
-    <div className="min-h-0 flex-1 overflow-y-auto bg-slate-50 px-6 py-6 font-sans text-slate-900 dashboard-scroll dark:bg-[#000000] dark:text-slate-100">
+    <div className="min-h-0 flex-1 overflow-y-auto bg-gradient-to-b from-slate-50 via-slate-50 to-white px-6 py-6 font-sans text-slate-900 dashboard-scroll dark:bg-gradient-to-b dark:from-[#000000] dark:via-[#050505] dark:to-[#090909] dark:text-slate-100">
       <div className="mx-auto w-full max-w-[1600px] space-y-6">
         <header className="space-y-1">
           <h1 className="text-2xl font-black tracking-tight text-slate-900 dark:text-white">

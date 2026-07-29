@@ -14,6 +14,7 @@ type UpdateInventoryItemRequestBody = {
   totalStock?: number;
   checkoutLimit?: number | null;
   imageUrl?: string | null;
+  color?: string | null;
 };
 
 type RouteContext = {
@@ -89,6 +90,7 @@ export async function PATCH(request: Request, context: RouteContext) {
       totalStock,
       checkoutLimit,
       ...(body.imageUrl !== undefined ? { imageUrl: body.imageUrl } : {}),
+      ...(body.color !== undefined ? { color: body.color } : {}),
     });
 
     return NextResponse.json(item);

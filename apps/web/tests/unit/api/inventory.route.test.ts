@@ -47,6 +47,7 @@ function buildCreatedItem(overrides: Record<string, unknown> = {}) {
     description: "Green cartridge",
     totalStock: 4,
     imageUrl: null,
+    color: null,
     createdAt: new Date("2026-07-01"),
     updatedAt: new Date("2026-07-01"),
     signOuts: [],
@@ -140,6 +141,7 @@ describe("api/inventory POST", () => {
           name: "  REV HD Hex Motor  ",
           description: "Green cartridge",
           totalStock: 4,
+          color: "#3f6fa9",
         }),
       }),
     );
@@ -151,6 +153,7 @@ describe("api/inventory POST", () => {
       description: "Green cartridge",
       totalStock: 4,
       imageUrl: null,
+      color: null,
       signOuts: [],
     });
     expect(createTeamInventoryItemMock).toHaveBeenCalledWith({
@@ -159,6 +162,7 @@ describe("api/inventory POST", () => {
       totalStock: 4,
       checkoutLimit: null,
       imageUrl: null,
+      color: "#3f6fa9",
     });
   });
 
