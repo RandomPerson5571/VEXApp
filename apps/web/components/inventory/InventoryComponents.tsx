@@ -94,7 +94,7 @@ function InventoryActionDialog({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm motion-safe:animate-in motion-safe:fade-in motion-safe:duration-200 motion-reduce:animate-none"
       role="presentation"
       onClick={(event) => event.stopPropagation()}
       onMouseDown={(event) => {
@@ -108,7 +108,7 @@ function InventoryActionDialog({
         role="dialog"
         aria-modal="true"
         aria-labelledby="inventory-action-dialog-title"
-        className="w-full max-w-md rounded-2xl border border-slate-300 bg-white p-5 font-sans shadow-2xl dark:border-slate-900 dark:bg-[#090e18]"
+        className="w-full max-w-md rounded-2xl border border-slate-300 bg-white p-5 font-sans shadow-2xl motion-safe:animate-in motion-safe:fade-in motion-safe:zoom-in-95 motion-safe:slide-in-from-bottom-2 motion-safe:duration-300 motion-safe:ease-out motion-reduce:animate-none dark:border-slate-900 dark:bg-[#090e18]"
       >
         <div className="mb-4 flex items-start justify-between gap-3 border-b border-slate-200 pb-3 dark:border-slate-900">
           <div className="min-w-0">
@@ -127,7 +127,7 @@ function InventoryActionDialog({
           <button
             type="button"
             onClick={onClose}
-            className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-slate-200 text-slate-600 transition hover:bg-slate-100 hover:text-slate-900 dark:border-slate-800 dark:text-slate-500 dark:hover:bg-slate-900 dark:hover:text-slate-100"
+            className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-slate-200 text-slate-600 transition-[background-color,color,transform] duration-200 ease-out hover:bg-slate-100 hover:text-slate-900 motion-safe:active:scale-95 motion-reduce:transition-none dark:border-slate-800 dark:text-slate-500 dark:hover:bg-slate-900 dark:hover:text-slate-100"
             aria-label="Close"
           >
             <X className="h-4 w-4" />
@@ -206,7 +206,9 @@ export function InventoryStats({
         label="Alerts"
         value={summary.alerts}
         icon={AlertTriangle}
-        tone={summary.depleted > 0 ? "red" : summary.alerts > 0 ? "yellow" : "green"}
+        tone={
+          summary.depleted > 0 ? "red" : summary.alerts > 0 ? "yellow" : "green"
+        }
         pulse={summary.depleted > 0}
       />
     </div>
@@ -227,11 +229,14 @@ function StatCard({
   pulse?: boolean;
 }) {
   const toneClasses = {
-    slate: "border-slate-300 dark:border-[#1a1a1a] bg-slate-200 dark:bg-[#121212]/50 text-slate-700 dark:text-slate-300",
+    slate:
+      "border-slate-300 dark:border-[#1a1a1a] bg-slate-200 dark:bg-[#121212]/50 text-slate-700 dark:text-slate-300",
     blue: "border-blue-300 dark:border-blue-500/20 bg-blue-100 dark:bg-blue-500/5 text-blue-700 dark:text-blue-300",
-    yellow: "border-yellow-300 dark:border-yellow-500/20 bg-yellow-100 dark:bg-yellow-500/5 text-yellow-700 dark:text-yellow-300",
+    yellow:
+      "border-yellow-300 dark:border-yellow-500/20 bg-yellow-100 dark:bg-yellow-500/5 text-yellow-700 dark:text-yellow-300",
     red: "border-red-300 dark:border-red-500/20 bg-red-100 dark:bg-red-500/5 text-red-700 dark:text-red-300",
-    green: "border-emerald-300 dark:border-emerald-500/20 bg-emerald-100 dark:bg-emerald-500/5 text-emerald-700 dark:text-emerald-300",
+    green:
+      "border-emerald-300 dark:border-emerald-500/20 bg-emerald-100 dark:bg-emerald-500/5 text-emerald-700 dark:text-emerald-300",
   };
 
   const iconClasses = {
@@ -244,7 +249,7 @@ function StatCard({
 
   return (
     <div
-      className={`rounded-xl border px-4 py-3 backdrop-blur-sm transition-[transform,box-shadow] duration-300 motion-safe:hover:-translate-y-0.5 motion-reduce:transition-none ${toneClasses[tone]} ${pulse ? "motion-safe:animate-pulse" : ""}`}
+      className={`rounded-xl border px-4 py-3 backdrop-blur-sm transition-[transform,box-shadow,border-color] duration-500 ease-out motion-safe:hover:-translate-y-0.5 motion-safe:hover:shadow-lg motion-reduce:transition-none ${toneClasses[tone]} ${pulse ? "motion-safe:animate-pulse" : ""}`}
     >
       <div className="mb-2 flex items-center gap-2">
         <Icon className={`h-3.5 w-3.5 ${iconClasses[tone]}`} />
@@ -298,7 +303,7 @@ export function InventoryFilters({
               key={filter.id}
               type="button"
               onClick={() => onAvailabilityChange(filter.id)}
-              className={`rounded-lg border px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider transition-[transform,background-color,border-color,color] duration-200 motion-safe:active:scale-95 motion-reduce:transition-none ${
+              className={`rounded-lg border px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider transition-[transform,background-color,border-color,color,box-shadow] duration-300 ease-out motion-safe:active:scale-95 motion-reduce:transition-none ${
                 active
                   ? "border-yellow-500/30 bg-yellow-500/15 text-yellow-600 dark:text-yellow-300"
                   : "border-slate-300 dark:border-[#1a1a1a] bg-slate-200 dark:bg-[#121212]/60 text-slate-700 dark:text-slate-500 hover:border-slate-400 dark:hover:border-slate-800 hover:text-slate-900 dark:hover:text-slate-300"
@@ -362,6 +367,7 @@ export function InventoryCard({
   const staggerStyle = {
     animationDelay: `${index * 70}ms`,
     "--inventory-item-color": item.color ?? INVENTORY_COLOR_PRESETS[0].value,
+    viewTransitionName: `inventory-item-${item.id}`,
   } as CSSProperties;
 
   const handleSignOut = async () => {
@@ -400,7 +406,9 @@ export function InventoryCard({
       }
     } catch (error) {
       setActionError(
-        error instanceof Error ? error.message : "Failed to return inventory item.",
+        error instanceof Error
+          ? error.message
+          : "Failed to return inventory item.",
       );
     }
   };
@@ -419,7 +427,7 @@ export function InventoryCard({
 
   return (
     <article
-      className={`group relative overflow-hidden rounded-2xl border border-slate-300 dark:border-[#1a1a1a] bg-slate-100 dark:bg-[#0a0a0a] p-5 shadow-md backdrop-blur-sm transition-[transform,border-color] duration-300 motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-2 motion-safe:fill-mode-backwards motion-safe:hover:-translate-y-1 motion-safe:hover:border-slate-400 dark:motion-safe:hover:border-slate-800 motion-reduce:animate-none motion-reduce:transition-none ${
+      className={`inventory-card-motion group relative overflow-hidden rounded-2xl border border-slate-300 dark:border-[#1a1a1a] bg-slate-100 dark:bg-[#0a0a0a] p-5 shadow-md backdrop-blur-sm transition-[transform,border-color,box-shadow] duration-500 ease-out transform-gpu will-change-transform motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-3 motion-safe:fill-mode-backwards motion-safe:hover:-translate-y-0.5 motion-safe:hover:border-slate-400 motion-safe:hover:shadow-xl dark:motion-safe:hover:border-slate-800 motion-reduce:animate-none motion-reduce:transition-none ${
         onEdit ? "cursor-pointer" : ""
       }`}
       style={staggerStyle}
@@ -439,12 +447,12 @@ export function InventoryCard({
     >
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-y-0 left-0 w-1.5"
+        className="pointer-events-none absolute inset-y-0 left-0 w-1.5 transition-[width,opacity] duration-500 ease-out group-hover:w-2 motion-reduce:transition-none"
         style={{ backgroundColor: "var(--inventory-item-color)" }}
       />
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100 motion-reduce:transition-none"
+        className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 ease-out group-hover:opacity-100 motion-reduce:transition-none"
         style={{
           background:
             "linear-gradient(135deg, color-mix(in srgb, var(--inventory-item-color) 12%, transparent), transparent 48%)",
@@ -455,7 +463,9 @@ export function InventoryCard({
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0 space-y-2">
             <div className="flex flex-wrap items-center gap-2">
-              <h2 className="text-sm font-black text-slate-900 dark:text-slate-100">{item.name}</h2>
+              <h2 className="text-sm font-black text-slate-900 dark:text-slate-100">
+                {item.name}
+              </h2>
               <span
                 className={`rounded border px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider ${statusBadgeClass[status]}`}
               >
@@ -493,7 +503,10 @@ export function InventoryCard({
               <span className={`font-mono ${statusLabelClass[status]}`}>
                 {available}
               </span>
-              <span className="text-slate-600 dark:text-slate-600"> / {item.totalStock} total</span>
+              <span className="text-slate-600 dark:text-slate-600">
+                {" "}
+                / {item.totalStock} total
+              </span>
             </span>
             {teamCheckedOut > 0 ? (
               <span className="inline-flex items-center gap-1 text-yellow-600 dark:text-yellow-400">
@@ -509,7 +522,7 @@ export function InventoryCard({
           ) : null}
           <div className="h-2 w-full overflow-hidden rounded-full border border-slate-300 dark:border-slate-900/80 bg-slate-200 dark:bg-slate-950">
             <div
-              className={`h-full rounded-full transition-[width] duration-500 ease-out motion-reduce:transition-none ${statusBarClass[status]}`}
+              className={`h-full rounded-full transition-[width,background-color,box-shadow] duration-700 ease-out motion-reduce:transition-none ${statusBarClass[status]}`}
               style={{ width: `${fill}%` }}
             />
           </div>
@@ -547,7 +560,7 @@ export function InventoryCard({
               setIsCheckoutOpen(true);
             }}
             disabled={available <= 0}
-            className="inline-flex h-10 items-center justify-center gap-1.5 rounded-lg bg-yellow-600 px-3 text-[10px] font-bold uppercase tracking-wider text-white shadow-lg shadow-yellow-500/15 transition hover:bg-yellow-500 disabled:cursor-not-allowed disabled:opacity-50 motion-safe:active:scale-95 motion-reduce:transition-none"
+            className="inline-flex h-10 items-center justify-center gap-1.5 rounded-lg bg-yellow-600 px-3 text-[10px] font-bold uppercase tracking-wider text-white shadow-lg shadow-yellow-500/15 transition-[transform,background-color,box-shadow,opacity] duration-300 ease-out hover:bg-yellow-500 hover:shadow-yellow-500/25 disabled:cursor-not-allowed disabled:opacity-50 motion-safe:active:scale-95 motion-reduce:transition-none"
           >
             <PackagePlus className="h-3.5 w-3.5" />
             Check out
@@ -560,7 +573,7 @@ export function InventoryCard({
               setIsCheckinOpen(true);
             }}
             disabled={!isAdmin || teamSignOuts.length === 0}
-            className="inline-flex h-10 items-center justify-center gap-1.5 rounded-lg border border-emerald-500/25 bg-emerald-500/10 px-3 text-[10px] font-bold uppercase tracking-wider text-emerald-600 transition hover:bg-emerald-500/15 disabled:cursor-not-allowed disabled:opacity-50 dark:text-emerald-400"
+            className="inline-flex h-10 items-center justify-center gap-1.5 rounded-lg border border-emerald-500/25 bg-emerald-500/10 px-3 text-[10px] font-bold uppercase tracking-wider text-emerald-600 transition-[transform,background-color,border-color,opacity] duration-300 ease-out hover:bg-emerald-500/15 disabled:cursor-not-allowed disabled:opacity-50 motion-safe:active:scale-95 motion-reduce:transition-none dark:text-emerald-400"
             title={isAdmin ? undefined : "Only admins can check in parts."}
           >
             <RotateCcw className="h-3.5 w-3.5" />
@@ -577,7 +590,7 @@ export function InventoryCard({
               {teamSignOuts.map((signOut) => (
                 <li
                   key={signOut.id}
-                  className="flex items-center justify-between gap-3 text-[11px]"
+                  className="flex items-center justify-between gap-3 text-[11px] motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-left-1 motion-safe:duration-300 motion-reduce:animate-none"
                 >
                   <div className="flex min-w-0 items-center gap-2">
                     <div
@@ -643,7 +656,7 @@ export function InventoryCard({
               type="button"
               onClick={() => setIsCheckoutOpen(false)}
               disabled={isSigningOut}
-              className="rounded-lg border border-slate-300 px-4 py-2 text-xs font-bold text-slate-700 transition hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-800 dark:text-slate-300 dark:hover:bg-slate-900"
+              className="rounded-lg border border-slate-300 px-4 py-2 text-xs font-bold text-slate-700 transition-[transform,background-color,opacity] duration-300 ease-out hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-50 motion-safe:active:scale-95 motion-reduce:transition-none dark:border-slate-800 dark:text-slate-300 dark:hover:bg-slate-900"
             >
               Cancel
             </button>
@@ -651,7 +664,7 @@ export function InventoryCard({
               type="button"
               onClick={handleSignOut}
               disabled={!canSignOut}
-              className="inline-flex items-center gap-1.5 rounded-lg bg-yellow-600 px-4 py-2 text-xs font-bold text-white shadow-lg shadow-yellow-500/15 transition hover:bg-yellow-500 disabled:cursor-not-allowed disabled:opacity-50"
+              className="inline-flex items-center gap-1.5 rounded-lg bg-yellow-600 px-4 py-2 text-xs font-bold text-white shadow-lg shadow-yellow-500/15 transition-[transform,background-color,box-shadow,opacity] duration-300 ease-out hover:bg-yellow-500 hover:shadow-yellow-500/25 disabled:cursor-not-allowed disabled:opacity-50 motion-safe:active:scale-95 motion-reduce:transition-none"
             >
               <PackagePlus className="h-4 w-4" />
               {isSigningOut ? "Checking out..." : "Check out"}
@@ -676,7 +689,7 @@ export function InventoryCard({
               {teamSignOuts.map((signOut) => (
                 <li
                   key={signOut.id}
-                  className="flex items-center justify-between gap-3 rounded-xl border border-slate-300 bg-slate-50 p-3 text-xs dark:border-slate-900 dark:bg-slate-950/50"
+                  className="flex items-center justify-between gap-3 rounded-xl border border-slate-300 bg-slate-50 p-3 text-xs motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-1 motion-safe:duration-300 motion-reduce:animate-none dark:border-slate-900 dark:bg-slate-950/50"
                 >
                   <div className="min-w-0">
                     <p className="truncate font-black text-slate-900 dark:text-slate-100">
@@ -690,8 +703,10 @@ export function InventoryCard({
                     type="button"
                     onClick={() => handleReturn(signOut.id)}
                     disabled={!isAdmin || isReturning}
-                    className="inline-flex h-9 shrink-0 items-center justify-center gap-1 rounded-lg border border-emerald-500/25 bg-emerald-500/10 px-3 text-[10px] font-bold uppercase tracking-wider text-emerald-600 transition hover:bg-emerald-500/15 disabled:cursor-not-allowed disabled:opacity-50 dark:text-emerald-400"
-                    title={isAdmin ? undefined : "Only admins can check in parts."}
+                    className="inline-flex h-9 shrink-0 items-center justify-center gap-1 rounded-lg border border-emerald-500/25 bg-emerald-500/10 px-3 text-[10px] font-bold uppercase tracking-wider text-emerald-600 transition-[transform,background-color,opacity] duration-300 ease-out hover:bg-emerald-500/15 disabled:cursor-not-allowed disabled:opacity-50 motion-safe:active:scale-95 motion-reduce:transition-none dark:text-emerald-400"
+                    title={
+                      isAdmin ? undefined : "Only admins can check in parts."
+                    }
                   >
                     <RotateCcw className="h-3.5 w-3.5" />
                     {isReturning ? "Checking in..." : "Check in"}
