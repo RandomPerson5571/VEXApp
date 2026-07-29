@@ -1,11 +1,12 @@
 "use client";
 
-import { Bell, User } from "lucide-react";
+import { Bell, MonitorCog, User } from "lucide-react";
 
-export type SettingsSectionId = "profile" | "notifications";
+export type SettingsSectionId = "profile" | "interface" | "notifications";
 
 const settingsItems = [
   { id: "profile" as const, label: "Profile", icon: User },
+  { id: "interface" as const, label: "Interface", icon: MonitorCog },
   { id: "notifications" as const, label: "Notifications", icon: Bell },
 ] as const;
 

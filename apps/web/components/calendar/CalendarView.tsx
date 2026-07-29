@@ -31,15 +31,15 @@ import { CalendarScheduleGrid } from "./CalendarScheduleGrid";
 import { CalendarSidePanel } from "./CalendarSidePanel";
 import type { CalendarViewMode } from "./calendarTypes";
 
-const DEFAULT_LOCATION = "Iron Reign Workshop";
+const DEFAULT_LOCATION = "STL CHS";
 
 function resetEventFormDefaults() {
   return {
     title: "",
-    startTime: "4:30 PM",
-    endTime: "6:30 PM",
+    startTime: "2:30 PM",
+    endTime: "4:00 PM",
     type: "build" as EventType,
-    location: DEFAULT_LOCATION,
+    location: "STL CHS",
     description: "",
     forAllTeams: false,
   };
