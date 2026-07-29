@@ -74,11 +74,10 @@ export async function handleTelemetrySecurity(
   try {
     const team = await prisma.team.findUnique({
       where: { id: payload.teamId },
-      select: { purchasingManagerRoleId: true, discordRoleId: true },
+      select: { discordRoleId: true },
     });
 
-    const roleId = team?.purchasingManagerRoleId ?? team?.discordRoleId;
-    const mention = roleId ? `<@&${roleId}>` : "";
+    const mention = team?.discordRoleId ? `<@&${team.discordRoleId}>` : "";
 
     const embed = new EmbedBuilder()
       .setTitle("Security")

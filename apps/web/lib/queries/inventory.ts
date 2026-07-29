@@ -9,6 +9,7 @@ export type CreateInventoryItemPayload = {
   totalStock: number;
   checkoutLimit?: number;
   imageUrl?: string;
+  color?: string | null;
 };
 
 export type SignOutInventoryItemPayload = {

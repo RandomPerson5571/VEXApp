@@ -267,7 +267,7 @@ Most routes: session check → permission → `lib/data/*` → JSON. Rate limiti
 
 Prisma models used by web (full schema in `packages/database`):
 
-`User`, `NotificationSettings`, `DiscordAccount`, `Team`, `Invite`, `Task` / `TaskAssignment`, `InventoryItem` / `InventoryItemSignOut`, `Event`, `TeamDayPlan`, `KnowledgeNode` / `KnowledgeEdge`, `ScoutNote`, `TeamGitHubIntegration`, `TeamFusionIntegration`, plus Discord guild settings / attendance (bot-leaning).
+`User`, `NotificationSettings`, `DiscordAccount`, `Team`, `Invite`, `Task` / `TaskAssignment`, `InventoryItem` / `InventoryItemSignOut`, `Event`, `TeamDayPlan`, `KnowledgeNode` / `KnowledgeEdge`, `ScoutNote`, `TeamGitHubIntegration`, `TeamFusionIntegration`, plus Discord guild settings (bot-leaning).
 
 ---
 

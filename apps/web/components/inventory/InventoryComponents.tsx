@@ -31,6 +31,7 @@ import {
   summarizeInventory,
   type StockStatus,
 } from "@/lib/inventory/inventory-utils";
+import { INVENTORY_COLOR_PRESETS } from "@/lib/inventory/item-colors";
 
 const AVAILABILITY_FILTERS: { id: AvailabilityFilter; label: string }[] = [
   { id: "all", label: "All" },
@@ -315,11 +316,13 @@ export function InventoryFilters({
 export function InventoryCard({
   item,
   teamId,
+  isAdmin,
   index,
   onEdit,
 }: {
   item: TeamInventoryItem;
   teamId: string;
+  isAdmin: boolean;
   index: number;
   onEdit?: () => void;
 }) {
@@ -358,7 +361,8 @@ export function InventoryCard({
 
   const staggerStyle = {
     animationDelay: `${index * 70}ms`,
-  } satisfies CSSProperties;
+    "--inventory-item-color": item.color ?? INVENTORY_COLOR_PRESETS[0].value,
+  } as CSSProperties;
 
   const handleSignOut = async () => {
     if (!canSignOut) return;
@@ -382,7 +386,7 @@ export function InventoryCard({
   };
 
   const handleReturn = async (signOutId: string) => {
-    if (isReturning) return;
+    if (!isAdmin || isReturning) return;
 
     setActionError(undefined);
 
@@ -435,7 +439,16 @@ export function InventoryCard({
     >
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 bg-gradient-to-br from-yellow-500/[0.04] via-transparent to-blue-500/[0.03] opacity-0 transition-opacity duration-300 group-hover:opacity-100 motion-reduce:transition-none"
+        className="pointer-events-none absolute inset-y-0 left-0 w-1.5"
+        style={{ backgroundColor: "var(--inventory-item-color)" }}
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100 motion-reduce:transition-none"
+        style={{
+          background:
+            "linear-gradient(135deg, color-mix(in srgb, var(--inventory-item-color) 12%, transparent), transparent 48%)",
+        }}
       />
 
       <div className="relative space-y-4">
@@ -546,8 +559,9 @@ export function InventoryCard({
               setActionError(undefined);
               setIsCheckinOpen(true);
             }}
-            disabled={teamSignOuts.length === 0}
+            disabled={!isAdmin || teamSignOuts.length === 0}
             className="inline-flex h-10 items-center justify-center gap-1.5 rounded-lg border border-emerald-500/25 bg-emerald-500/10 px-3 text-[10px] font-bold uppercase tracking-wider text-emerald-600 transition hover:bg-emerald-500/15 disabled:cursor-not-allowed disabled:opacity-50 dark:text-emerald-400"
+            title={isAdmin ? undefined : "Only admins can check in parts."}
           >
             <RotateCcw className="h-3.5 w-3.5" />
             Check in
@@ -675,8 +689,9 @@ export function InventoryCard({
                   <button
                     type="button"
                     onClick={() => handleReturn(signOut.id)}
-                    disabled={isReturning}
+                    disabled={!isAdmin || isReturning}
                     className="inline-flex h-9 shrink-0 items-center justify-center gap-1 rounded-lg border border-emerald-500/25 bg-emerald-500/10 px-3 text-[10px] font-bold uppercase tracking-wider text-emerald-600 transition hover:bg-emerald-500/15 disabled:cursor-not-allowed disabled:opacity-50 dark:text-emerald-400"
+                    title={isAdmin ? undefined : "Only admins can check in parts."}
                   >
                     <RotateCcw className="h-3.5 w-3.5" />
                     {isReturning ? "Checking in..." : "Check in"}

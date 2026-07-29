@@ -30,7 +30,6 @@ export async function handleInventoryLowStock(
       where: { id: payload.teamId },
       select: {
         annoucementsChannelId: true,
-        purchasingManagerRoleId: true,
         number: true,
       },
     });
@@ -47,10 +46,6 @@ export async function handleInventoryLowStock(
       console.warn(`[inventory.low_stock] channel not sendable`);
       return;
     }
-
-    const mention = team.purchasingManagerRoleId
-      ? `<@&${team.purchasingManagerRoleId}> `
-      : "";
 
     const embed = new EmbedBuilder()
       .setTitle("Low stock")
@@ -69,7 +64,7 @@ export async function handleInventoryLowStock(
     );
 
     await channel.send({
-      content: `${mention}Low stock alert`.trim(),
+      content: "Low stock alert",
       embeds: [embed],
       components: [row],
     });

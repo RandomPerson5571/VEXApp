@@ -534,16 +534,19 @@ export function AdminUserManagementTable({
 
                       <TableCell className="text-right">
                         <Tooltip>
+                          {/* span: TooltipTrigger asChild must not own Switch data-state */}
                           <TooltipTrigger asChild>
-                            <Switch
-                              checked={user.isAdmin}
-                              disabled={isPending}
-                              onCheckedChange={(checked: boolean) =>
-                                handleToggle(user.id, checked)
-                              }
-                              className={adminSwitchClassName}
-                              aria-label={`${user.isAdmin ? "Revoke" : "Grant"} platform admin access for ${fullName}`}
-                            />
+                            <span className="inline-flex">
+                              <Switch
+                                checked={user.isAdmin}
+                                disabled={isPending}
+                                onCheckedChange={(checked: boolean) => {
+                                  void handleToggle(user.id, checked);
+                                }}
+                                className={adminSwitchClassName}
+                                aria-label={`${user.isAdmin ? "Revoke" : "Grant"} platform admin access for ${fullName}`}
+                              />
+                            </span>
                           </TooltipTrigger>
                           <TooltipContent side="left" className="text-xs font-semibold">
                             {user.isAdmin

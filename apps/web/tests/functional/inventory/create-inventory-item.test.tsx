@@ -6,6 +6,7 @@ import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { InventoryItemModal } from "@/components/inventory/InventoryItemModal";
+import { INVENTORY_COLOR_PRESETS } from "@/lib/inventory/item-colors";
 import type { CreateInventoryItemPayload } from "@/lib/queries/inventory";
 
 function CreateInventoryHarness({
@@ -15,6 +16,7 @@ function CreateInventoryHarness({
   initialDescription = "",
   initialTotalStock = "",
   initialCheckoutLimit = "",
+  initialColor = INVENTORY_COLOR_PRESETS[0].value,
   initialImageFile = null,
 }: {
   onCreate: (payload: CreateInventoryItemPayload) => void;
@@ -23,12 +25,14 @@ function CreateInventoryHarness({
   initialDescription?: string;
   initialTotalStock?: string;
   initialCheckoutLimit?: string;
+  initialColor?: string;
   initialImageFile?: File | null;
 }) {
   const [name, setName] = useState(initialName);
   const [description, setDescription] = useState(initialDescription);
   const [totalStock, setTotalStock] = useState(initialTotalStock);
   const [checkoutLimit, setCheckoutLimit] = useState(initialCheckoutLimit);
+  const [color, setColor] = useState(initialColor);
   const [imageFile, setImageFile] = useState<File | null>(initialImageFile);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState(initialError);
@@ -52,6 +56,7 @@ function CreateInventoryHarness({
       description: description.trim() || undefined,
       totalStock: stock,
       checkoutLimit: limit,
+      color,
     });
     setIsSubmitting(false);
     setError(undefined);
@@ -64,11 +69,13 @@ function CreateInventoryHarness({
       description={description}
       totalStock={totalStock}
       checkoutLimit={checkoutLimit}
+      color={color}
       imageFile={imageFile}
       onNameChange={setName}
       onDescriptionChange={setDescription}
       onTotalStockChange={setTotalStock}
       onCheckoutLimitChange={setCheckoutLimit}
+      onColorChange={setColor}
       onImageFileChange={setImageFile}
       onClose={() => undefined}
       onSubmit={handleSubmit}
@@ -123,7 +130,43 @@ describe("inventory item creation UI", () => {
       description: "Green cartridge",
       totalStock: 4,
       checkoutLimit: 2,
+      color: INVENTORY_COLOR_PRESETS[0].value,
     });
+  });
+
+  it("lets admins choose a muted color preset", async () => {
+    const onCreate = vi.fn();
+
+    await act(async () => {
+      root.render(
+        <CreateInventoryHarness
+          onCreate={onCreate}
+          initialName="Motor"
+          initialTotalStock="2"
+        />,
+      );
+    });
+
+    const purpleButton = Array.from(container.querySelectorAll("button")).find(
+      (button) => button.textContent?.includes("Purple"),
+    );
+    const submitButton = Array.from(container.querySelectorAll("button")).find(
+      (button) => button.textContent?.includes("Add Part"),
+    );
+
+    await act(async () => {
+      purpleButton?.click();
+    });
+
+    await act(async () => {
+      submitButton?.click();
+    });
+
+    expect(onCreate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        color: "#7c5aa6",
+      }),
+    );
   });
 
   it("updates image file state when an image is selected", async () => {

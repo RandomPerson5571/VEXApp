@@ -80,7 +80,6 @@ model User {
   createdEvents          Event[]
   createdKnowledgeNodes  KnowledgeNode[]
   createdScoutNotes      ScoutNote[]
-  attendanceCheckIns     AttendanceCheckIn[]
   moderationEventsAsTarget ModerationEvent[] @relation("ModerationTarget")
   moderationEventsAsActor  ModerationEvent[] @relation("ModerationActor")
 
@@ -138,7 +137,6 @@ model Team {
   /// Actionable ops channel (typo preserved for existing rows)
   annoucementsChannelId String?
   adminLogsChannelId    String?
-  purchasingManagerRoleId String?
   digestHourLocal       Int             @default(17)
   digestTimezone        String          @default("America/New_York")
   members         User[]
@@ -151,7 +149,6 @@ model Team {
   dayPlans          TeamDayPlan[]
   knowledgeNodes    KnowledgeNode[]
   scoutNotes        ScoutNote[]
-  attendanceCheckIns AttendanceCheckIn[]
   digestBuffer      TeamDigestBuffer?
   createdAt         DateTime        @default(now())
   updatedAt         DateTime        @updatedAt
@@ -223,27 +220,8 @@ model Event {
   createdById String?
   creator     User?     @relation(fields: [createdById], references: [id], onDelete: SetNull)
   createdAt   DateTime  @default(now())
-  attendanceCheckIns AttendanceCheckIn[]
 
   @@index([createdById])
-}
-
-/// One check-in per team member per calendar day (UTC date).
-model AttendanceCheckIn {
-  id          String   @id @default(cuid())
-  teamId      String   @map("team_id")
-  team        Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
-  userId      String   @map("user_id")
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  eventId     String?  @map("event_id")
-  event       Event?   @relation(fields: [eventId], references: [id], onDelete: SetNull)
-  date        DateTime @db.Date
-  checkedInAt DateTime @default(now()) @map("checked_in_at")
-
-  @@unique([teamId, userId, date])
-  @@index([teamId, date])
-  @@index([eventId])
-  @@map("attendance_check_ins")
 }
 
 model TeamDayPlan {
@@ -428,6 +406,7 @@ model TaskAssignment {
 model InventoryItem {
   id          String   @id @default(cuid())
   imageUrl    String?
+  color       String?
   name        String
   description String?
   totalStock  Int      // Total units the organization owns

@@ -13,6 +13,13 @@ export async function PATCH(request: Request, context: RouteContext) {
   if (!gated.ok) return gated.response;
   const currentUser = gated.user;
 
+  if (!currentUser.profile.isAdmin) {
+    return NextResponse.json(
+      { error: "Only admins can check in inventory." },
+      { status: 403 },
+    );
+  }
+
   const teamId = currentUser.profile.teamId;
 
   if (!teamId) {
