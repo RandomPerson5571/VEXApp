@@ -9,7 +9,12 @@ export type TeamMember = {
   name: string;
   email: string;
   role: UserRole;
+  isAdmin: boolean;
+  teamId: string | null;
   status: MemberStatus;
+  suppressedUntil: string | null;
+  bannedAt: string | null;
+  moderationReason: string | null;
 };
 
 export const TEAM_ROSTER_USER_ROLES: UserRole[] = [
@@ -28,6 +33,11 @@ type RosterUser = {
   lastName: string;
   email: string;
   role: UserRole;
+  isAdmin: boolean;
+  teamId: string | null;
+  suppressedUntil: Date | string | null;
+  bannedAt: Date | string | null;
+  moderationReason?: string | null;
 };
 
 export function toTeamMember(user: RosterUser): TeamMember {
@@ -36,7 +46,20 @@ export function toTeamMember(user: RosterUser): TeamMember {
     name: `${user.firstName} ${user.lastName}`,
     email: user.email,
     role: user.role,
+    isAdmin: user.isAdmin,
+    teamId: user.teamId,
     status: "Active",
+    suppressedUntil: user.suppressedUntil
+      ? typeof user.suppressedUntil === "string"
+        ? user.suppressedUntil
+        : user.suppressedUntil.toISOString()
+      : null,
+    bannedAt: user.bannedAt
+      ? typeof user.bannedAt === "string"
+        ? user.bannedAt
+        : user.bannedAt.toISOString()
+      : null,
+    moderationReason: user.moderationReason ?? null,
   };
 }
 

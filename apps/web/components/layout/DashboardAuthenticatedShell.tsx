@@ -22,6 +22,10 @@ export async function DashboardAuthenticatedShell({
     redirect("/login");
   }
 
+  if (userState.status === "banned") {
+    redirect("/login?error=banned");
+  }
+
   if (userState.status === "needs_verification") {
     redirect(`/login?error=${encodeURIComponent(userState.error)}`);
   }

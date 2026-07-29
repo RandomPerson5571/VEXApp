@@ -115,6 +115,15 @@ export default async function TeamManagementPage() {
         lastName: true,
         email: true,
         role: true,
+        isAdmin: true,
+        teamId: true,
+        suppressedUntil: true,
+        bannedAt: true,
+        moderationEventsAsTarget: {
+          orderBy: { createdAt: "desc" },
+          take: 1,
+          select: { reason: true },
+        },
       },
       orderBy: [{ lastName: "asc" }, { firstName: "asc" }],
     }),
@@ -132,10 +141,17 @@ export default async function TeamManagementPage() {
   const canManage = canManageTeamRoster(permissions);
   const canManageIntegrations = canManageTeamIntegrations(permissions);
 
+  const members = rosterUsers.map((user) =>
+    toTeamMember({
+      ...user,
+      moderationReason: user.moderationEventsAsTarget[0]?.reason ?? null,
+    }),
+  );
+
   return (
     <div className="flex min-h-0 flex-1 flex-col">
       <TeamManagementView
-        initialMembers={rosterUsers.map(toTeamMember)}
+        initialMembers={members}
         initialGithubIntegration={team.githubIntegration}
         initialFusionIntegration={team.fusionIntegration}
         teamLabel={`${team.name} (${team.number})`}

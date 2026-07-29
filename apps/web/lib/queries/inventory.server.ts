@@ -12,7 +12,12 @@ import {
   type SignOutInventoryItemInput,
   type UpdateInventoryItemInput,
 } from "@/lib/data/inventory";
+import {
+  markInventoryOrderPlaced,
+  syncInventoryStockAlerts,
+} from "@/lib/data/inventory-alerts";
 import { createTeamInventoryQueryOptions } from "@/lib/queries/shared/inventory";
+import { dispatchTelemetry } from "@/lib/telemetry/dispatch";
 import type { TeamInventoryItem } from "@stlvex/database/types";
 
 export async function getTeamInventory(
@@ -28,9 +33,13 @@ export async function createTeamInventoryItem(
 }
 
 export async function updateTeamInventoryItem(
-  input: UpdateInventoryItemInput,
+  input: UpdateInventoryItemInput & { teamId?: string },
 ): Promise<TeamInventoryItem> {
-  return updateInventoryItem(input);
+  const item = await updateInventoryItem(input);
+  if (input.teamId) {
+    return syncInventoryStockAlerts(item.id, input.teamId);
+  }
+  return item;
 }
 
 export async function deleteTeamInventoryItem(itemId: string): Promise<void> {
@@ -40,13 +49,22 @@ export async function deleteTeamInventoryItem(itemId: string): Promise<void> {
 export async function signOutTeamInventoryItem(
   input: SignOutInventoryItemInput,
 ): Promise<TeamInventoryItem> {
-  return signOutInventoryItem(input);
+  await signOutInventoryItem(input);
+  return syncInventoryStockAlerts(input.inventoryItemId, input.teamId);
 }
 
 export async function returnTeamInventorySignOut(
   input: ReturnInventorySignOutInput,
 ): Promise<TeamInventoryItem> {
-  return returnInventorySignOut(input);
+  await returnInventorySignOut(input);
+  dispatchTelemetry({ teamId: input.teamId, event: "partsReturned" });
+  return syncInventoryStockAlerts(input.inventoryItemId, input.teamId);
+}
+
+export async function orderPlacedTeamInventoryItem(
+  itemId: string,
+): Promise<TeamInventoryItem> {
+  return markInventoryOrderPlaced(itemId);
 }
 
 export function teamInventoryQueryOptions(teamId: string) {

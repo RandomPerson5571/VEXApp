@@ -96,7 +96,7 @@ export async function updateTaskForTeam(
 ): Promise<TaskListTask> {
   const existing = await prisma.task.findFirst({
     where: { id: input.taskId, teamId: input.teamId },
-    select: { id: true },
+    select: { id: true, status: true },
   });
 
   if (!existing) {
@@ -167,9 +167,19 @@ export async function updateTaskForTeam(
     throw new Error("No changes to save.");
   }
 
-  return prisma.task.update({
+  const updated = await prisma.task.update({
     where: { id: input.taskId },
     data,
     include: taskListTaskInclude,
   });
+
+  if (
+    input.status === "Done" &&
+    existing.status !== "Done"
+  ) {
+    const { dispatchTelemetry } = await import("@/lib/telemetry/dispatch");
+    dispatchTelemetry({ teamId: input.teamId, event: "tasksCompleted" });
+  }
+
+  return updated;
 }

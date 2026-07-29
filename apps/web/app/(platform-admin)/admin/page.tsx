@@ -1,6 +1,7 @@
 import { prisma } from "@stlvex/database";
 
 import { AdminUserPermissionsTable } from "@/components/admin/AdminUserPermissionsTable";
+import type { AdminUserRow } from "@/components/admin/admin-types";
 import { getCurrentUser } from "@/lib/auth/current-user";
 
 export default async function AdminPage() {
@@ -10,7 +11,7 @@ export default async function AdminPage() {
     return null;
   }
 
-  const [users, teams, invites] = await Promise.all([
+  const [rawUsers, teams, invites] = await Promise.all([
     prisma.user.findMany({
       select: {
         id: true,
@@ -20,12 +21,19 @@ export default async function AdminPage() {
         role: true,
         isAdmin: true,
         teamId: true,
+        suppressedUntil: true,
+        bannedAt: true,
         team: {
           select: {
             id: true,
             name: true,
             number: true,
           },
+        },
+        moderationEventsAsTarget: {
+          orderBy: { createdAt: "desc" },
+          take: 1,
+          select: { reason: true },
         },
       },
     }),
@@ -58,6 +66,20 @@ export default async function AdminPage() {
       orderBy: { createdAt: "desc" },
     }),
   ]);
+
+  const users: AdminUserRow[] = rawUsers.map((user) => ({
+    id: user.id,
+    firstName: user.firstName,
+    lastName: user.lastName,
+    email: user.email,
+    role: user.role,
+    isAdmin: user.isAdmin,
+    teamId: user.teamId,
+    team: user.team,
+    suppressedUntil: user.suppressedUntil?.toISOString() ?? null,
+    bannedAt: user.bannedAt?.toISOString() ?? null,
+    moderationReason: user.moderationEventsAsTarget[0]?.reason ?? null,
+  }));
 
   return (
     <div className="admin-scroll flex-1 overflow-y-auto overflow-x-hidden px-8 py-6">

@@ -33,6 +33,14 @@ export async function authorizeTeamMember(
     return null;
   }
 
+  if (dbUser.bannedAt) {
+    await interaction.reply({
+      content: "❌ Your account has been banned.",
+      ephemeral: true,
+    });
+    return null;
+  }
+
   if (!dbUser.teamId || !dbUser.team) {
     await interaction.reply({
       content: "⚠️ Your account is missing a team assignment in the database.",

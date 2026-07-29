@@ -88,6 +88,7 @@ export async function PATCH(request: Request, context: RouteContext) {
       description: body.description ?? null,
       totalStock,
       checkoutLimit,
+      teamId: currentUser.profile.teamId ?? undefined,
       ...(body.imageUrl !== undefined ? { imageUrl: body.imageUrl } : {}),
     });
 

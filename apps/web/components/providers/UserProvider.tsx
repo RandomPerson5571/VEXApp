@@ -10,6 +10,7 @@ export type UserContextValue = {
   profile: User;
   team: Team | null;
   discordAvatarUrl: string | null;
+  moderationReason: string | null;
 };
 
 const UserContext = createContext<UserContextValue | null>(null);

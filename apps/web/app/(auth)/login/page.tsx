@@ -16,22 +16,28 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
   if (user) {
     const profile = await lookupUserProfile(user.id);
 
-    if (profile.status === "found") {
+    if (profile.status === "banned") {
+      const { createClient } = await import("@/lib/supabase/server");
+      const supabase = await createClient();
+      await supabase.auth.signOut();
+    } else if (profile.status === "found") {
       const identity = await verifySessionIdentity(user);
 
       if (identity.ok) {
         redirect("/dashboard");
       }
-    }
-
-    if (profile.status === "missing") {
+    } else if (profile.status === "missing") {
       redirect("/onboarding");
+    } else {
+      dbUnavailable = true;
     }
-
-    dbUnavailable = true;
   }
 
   const resolvedSearchParams = searchParams ? await searchParams : undefined;
+  const bannedError =
+    resolvedSearchParams?.error === "banned"
+      ? "Your account has been banned. Contact a platform administrator."
+      : resolvedSearchParams?.error;
   const message = dbUnavailable
     ? "Unable to reach the database. Check your connection settings and try again."
     : resolvedSearchParams?.message;
@@ -39,8 +45,8 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
   return (
     <LoginClient
       searchParams={
-        resolvedSearchParams || message
-          ? { ...resolvedSearchParams, message }
+        resolvedSearchParams || message || bannedError
+          ? { ...resolvedSearchParams, message, error: bannedError }
           : undefined
       }
     />

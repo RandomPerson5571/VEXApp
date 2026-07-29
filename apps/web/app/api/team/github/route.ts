@@ -98,6 +98,13 @@ export async function DELETE(request: Request) {
     );
   }
 
+  const { dispatchTelemetry } = await import("@/lib/telemetry/dispatch");
+  dispatchTelemetry({
+    teamId: access.teamId,
+    event: "githubUnlinked",
+    message: "GitHub integration was disconnected.",
+  });
+
   return NextResponse.json({
     message: "GitHub integration disconnected.",
   });

@@ -134,7 +134,10 @@ export function useScoutingMutations(teamId: string) {
       }
     },
     onSuccess: (notes) => {
-      replaceScoutNotesCache(queryClient, teamId, notes);
+      // Offline outbox returns []; keep optimistic cache until flush.
+      if (notes.length > 0) {
+        replaceScoutNotesCache(queryClient, teamId, notes);
+      }
     },
   });
 
@@ -162,7 +165,10 @@ export function useScoutingMutations(teamId: string) {
     applyOptimistic: applyReorderOptimistic,
     mutateFn: async (payload) => {
       const notes = await reorderScoutNotesFromApi(payload);
-      replaceScoutNotesCache(queryClient, teamId, notes);
+      // Offline outbox returns []; keep optimistic cache until flush.
+      if (notes.length > 0) {
+        replaceScoutNotesCache(queryClient, teamId, notes);
+      }
       reorderRollbackRef.current = undefined;
     },
     onError: () => {

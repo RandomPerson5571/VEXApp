@@ -2,6 +2,7 @@ import { prisma } from "@stlvex/database";
 
 export type ProfileLookupResult =
   | { status: "found" }
+  | { status: "banned" }
   | { status: "missing" }
   | { status: "unavailable" };
 
@@ -11,10 +12,18 @@ export async function lookupUserProfile(
   try {
     const profile = await prisma.user.findUnique({
       where: { id: userId },
-      select: { id: true },
+      select: { id: true, bannedAt: true },
     });
 
-    return profile ? { status: "found" } : { status: "missing" };
+    if (!profile) {
+      return { status: "missing" };
+    }
+
+    if (profile.bannedAt) {
+      return { status: "banned" };
+    }
+
+    return { status: "found" };
   } catch (error) {
     console.error("[auth] profile lookup failed:", error);
     return { status: "unavailable" };

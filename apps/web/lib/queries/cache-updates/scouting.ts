@@ -10,7 +10,27 @@ export function mergeScoutNoteInList(
   notes: ScoutNoteRecord[],
   updated: ScoutNoteRecord,
 ): ScoutNoteRecord[] {
-  return notes.map((note) => (note.id === updated.id ? updated : note));
+  // Merge so offline-queued stubs (partial fields) don't wipe cache.
+  return notes.map((note) =>
+    note.id === updated.id ? { ...note, ...updated } : note,
+  );
+}
+
+/** Replace a temp offline-create id with the server note after outbox flush. */
+export function remapScoutNoteTempId(
+  queryClient: QueryClient,
+  tempNoteId: string,
+  serverNote: ScoutNoteRecord,
+): void {
+  queryClient.setQueriesData<ScoutNoteRecord[]>(
+    { queryKey: ["knowledge", "scouting"] },
+    (old) => {
+      if (!old) return old;
+      return old.map((note) =>
+        note.id === tempNoteId ? { ...note, ...serverNote } : note,
+      );
+    },
+  );
 }
 
 export function applyScoutNotePatch(

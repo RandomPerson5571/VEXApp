@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { canManageTeamRoster } from "@/lib/auth/auth-guards";
 import { verifyCurrentUserPermissions } from "@/lib/auth/auth-guards-server";
 import { getCurrentUser } from "@/lib/auth/current-user";
+import { rejectIfSuppressed } from "@/lib/auth/reject-if-suppressed";
 import { enforceApiRateLimit } from "@/lib/security/enforce-api-rate-limit";
 import { fromUiEventType } from "@/lib/mappers/events";
 import {
@@ -47,11 +48,9 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
-  const currentUser = await getCurrentUser();
-
-  if (!currentUser) {
-    return NextResponse.json({ error: "Not authenticated." }, { status: 401 });
-  }
+  const gated = await rejectIfSuppressed();
+  if (!gated.ok) return gated.response;
+  const currentUser = gated.user;
 
   const teamId = currentUser.profile.teamId;
 
@@ -139,6 +138,13 @@ export async function POST(request: Request) {
       teamId,
       forAllTeams,
       createdById: currentUser.profile.id,
+    });
+
+    const { dispatchTelemetry } = await import("@/lib/telemetry/dispatch");
+    dispatchTelemetry({
+      teamId,
+      event: "calendarEventCreated",
+      message: `New calendar event: **${title}**`,
     });
 
     return NextResponse.json(event, { status: 201 });

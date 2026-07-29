@@ -148,6 +148,15 @@ export async function signInWithCredentials(
     return { error: identityCheck.error };
   }
 
+  const banCheck = await prisma.user.findUnique({
+    where: { id: user.id },
+    select: { bannedAt: true },
+  });
+  if (banCheck?.bannedAt) {
+    await supabase.auth.signOut();
+    return { error: "Your account has been banned." };
+  }
+
   if (await shouldOnboard(user.id)) {
     const invite = await getValidInviteFromCookies(user.id);
 

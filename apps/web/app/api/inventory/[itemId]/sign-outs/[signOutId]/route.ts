@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-import { getCurrentUser } from "@/lib/auth/current-user";
+import { rejectIfSuppressed } from "@/lib/auth/reject-if-suppressed";
 import { returnTeamInventorySignOut } from "@/lib/queries/inventory.server";
 import { enforceApiRateLimit } from "@/lib/security/enforce-api-rate-limit";
 
@@ -9,11 +9,9 @@ type RouteContext = {
 };
 
 export async function PATCH(request: Request, context: RouteContext) {
-  const currentUser = await getCurrentUser();
-
-  if (!currentUser) {
-    return NextResponse.json({ error: "Not authenticated." }, { status: 401 });
-  }
+  const gated = await rejectIfSuppressed();
+  if (!gated.ok) return gated.response;
+  const currentUser = gated.user;
 
   const teamId = currentUser.profile.teamId;
 

@@ -7,6 +7,15 @@ type TeamMembersPanelProps = {
   onRoleChange: (memberId: string, role: TeamMember["role"]) => void;
   onEdit: (member: TeamMember) => void;
   onDelete: (memberId: string) => void;
+  onModerationComplete: (
+    memberId: string,
+    result: {
+      action: string;
+      suppressedUntil?: string | null;
+      bannedAt?: string | null;
+      removedFromTeam?: boolean;
+    },
+  ) => void;
 };
 
 export function TeamMembersPanel({
@@ -15,6 +24,7 @@ export function TeamMembersPanel({
   onRoleChange,
   onEdit,
   onDelete,
+  onModerationComplete,
 }: TeamMembersPanelProps) {
   return (
     <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-md dark:border-[#1a1a1a] dark:bg-[#0a0a0a]">
@@ -24,7 +34,7 @@ export function TeamMembersPanel({
         </h2>
         <p className="mt-0.5 text-[11px] font-semibold text-slate-600 dark:text-slate-500">
           {canManage
-            ? "Manage roles for your team"
+            ? "Manage roles and moderation for your team"
             : "View members assigned to your team"}
         </p>
       </div>
@@ -61,6 +71,7 @@ export function TeamMembersPanel({
                   onRoleChange={onRoleChange}
                   onEdit={onEdit}
                   onDelete={onDelete}
+                  onModerationComplete={onModerationComplete}
                 />
               ))
             )}

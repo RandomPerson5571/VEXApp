@@ -4,6 +4,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { useState } from "react";
 
+import { ScoutingOutboxSync } from "@/components/providers/ScoutingOutboxSync";
 import { createQueryClient } from "@/lib/query-client";
 
 export function QueryProvider({ children }: { children: React.ReactNode }) {
@@ -11,6 +12,7 @@ export function QueryProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <QueryClientProvider client={queryClient}>
+      <ScoutingOutboxSync />
       {children}
       {process.env.NODE_ENV === "development" ? (
         <ReactQueryDevtools initialIsOpen={false} buttonPosition="bottom-left" />

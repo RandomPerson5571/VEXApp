@@ -149,6 +149,48 @@ export function TeamManagementView({
     setMembers((prev) => prev.filter((member) => member.id !== id));
   }
 
+  async function handleModerationComplete(
+    memberId: string,
+    result: {
+      action: string;
+      suppressedUntil?: string | null;
+      bannedAt?: string | null;
+      removedFromTeam?: boolean;
+    },
+  ) {
+    if (result.removedFromTeam) {
+      setMembers((prev) => prev.filter((m) => m.id !== memberId));
+      return;
+    }
+
+    setMembers((prev) =>
+      prev.map((m) => {
+        if (m.id !== memberId) return m;
+        if (result.action === "suppress") {
+          return {
+            ...m,
+            suppressedUntil: result.suppressedUntil ?? m.suppressedUntil,
+          };
+        }
+        if (result.action === "unsuppress") {
+          return { ...m, suppressedUntil: null, moderationReason: null };
+        }
+        if (result.action === "ban") {
+          return {
+            ...m,
+            bannedAt: result.bannedAt ?? new Date().toISOString(),
+            teamId: null,
+            suppressedUntil: null,
+          };
+        }
+        if (result.action === "unban") {
+          return { ...m, bannedAt: null };
+        }
+        return m;
+      }),
+    );
+  }
+
   function handleStartEdit(member: TeamMember) {
     if (!canManage) return;
 
@@ -333,6 +375,7 @@ export function TeamManagementView({
         onRoleChange={handleRoleChange}
         onEdit={handleStartEdit}
         onDelete={handleDeleteMember}
+        onModerationComplete={handleModerationComplete}
       />
 
       <div className="mt-6">

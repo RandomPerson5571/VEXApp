@@ -82,5 +82,12 @@ export async function POST(req: Request) {
   const origin = req.headers.get("origin") || `${req.url?.startsWith("https://") ? "https" : "http"}://${req.headers.get("host")}`;
   const link = `${origin?.replace(/\/$/, "")}/join/${invite.id}`;
 
+  const { dispatchTelemetry } = await import("@/lib/telemetry/dispatch");
+  dispatchTelemetry({
+    teamId: team.id,
+    event: "inviteGenerated",
+    message: `Invite link generated (max ${parsedMaxUses} uses).`,
+  });
+
   return NextResponse.json({ inviteId: invite.id, link });
 }

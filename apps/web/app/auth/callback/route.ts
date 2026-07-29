@@ -159,6 +159,11 @@ export async function GET(request: Request) {
     );
   }
 
+  if (profile.status === "banned") {
+    await supabase.auth.signOut();
+    return NextResponse.redirect(`${origin}/login?error=banned`);
+  }
+
   if (profile.status === "missing") {
     const { invite, refreshCookie } = await resolveInviteForAuthUser(user);
 

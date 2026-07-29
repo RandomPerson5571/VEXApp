@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 
 import { AppHeader } from "@/components/layout/AppHeader";
 import { AppSidebar } from "@/components/layout/Sidebar";
+import { SuppressionBanner } from "@/components/layout/SuppressionBanner";
 
 type DashboardChromeProps = {
   children: React.ReactNode;
@@ -62,6 +63,7 @@ export function DashboardChrome({ children }: DashboardChromeProps) {
           isNavigationOpen={isNavigationOpen}
           onToggleNavigation={() => setIsNavigationOpen((open) => !open)}
         />
+        <SuppressionBanner />
         <main className="relative flex min-h-0 flex-1 flex-col overflow-hidden">
           {children}
         </main>

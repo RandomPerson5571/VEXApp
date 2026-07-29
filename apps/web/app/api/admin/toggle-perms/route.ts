@@ -84,5 +84,17 @@ export async function POST(request: Request) {
     data: { isAdmin },
   });
 
+  if (isAdmin) {
+    const teamId = currentUser.profile.teamId;
+    if (teamId) {
+      const { dispatchTelemetry } = await import("@/lib/telemetry/dispatch");
+      dispatchTelemetry({
+        teamId,
+        event: "adminRoleGranted",
+        message: `Platform admin granted to user \`${userId}\`.`,
+      });
+    }
+  }
+
   return NextResponse.json({ userId, isAdmin });
 }

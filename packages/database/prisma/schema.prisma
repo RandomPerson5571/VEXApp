@@ -45,6 +45,14 @@ enum VerificationMethod {
   UNVERIFIED
 }
 
+enum ModerationAction {
+  SUPPRESS
+  UNSUPPRESS
+  KICK
+  BAN
+  UNBAN
+}
+
 model User {
   id           String          @id // Must match Supabase Auth UUID 1:1
   firstName    String
@@ -59,6 +67,10 @@ model User {
   team               Team?              @relation(fields: [teamId], references: [id])
   discordAccount     DiscordAccount?
   inventorySignOuts InventoryItemSignOut[]
+  /// Time-boxed read-only; null or past = not suppressed
+  suppressedUntil    DateTime?
+  /// Platform ban; null = not banned. Reason/actor live on ModerationEvent only.
+  bannedAt           DateTime?
   createdAt          DateTime           @default(now())
   updatedAt          DateTime           @updatedAt
 
@@ -69,8 +81,26 @@ model User {
   createdKnowledgeNodes  KnowledgeNode[]
   createdScoutNotes      ScoutNote[]
   attendanceCheckIns     AttendanceCheckIn[]
+  moderationEventsAsTarget ModerationEvent[] @relation("ModerationTarget")
+  moderationEventsAsActor  ModerationEvent[] @relation("ModerationActor")
 
   notificationSettings NotificationSettings?
+}
+
+model ModerationEvent {
+  id           String           @id @default(cuid())
+  targetUserId String
+  targetUser   User             @relation("ModerationTarget", fields: [targetUserId], references: [id], onDelete: Cascade)
+  actorId      String
+  actor        User             @relation("ModerationActor", fields: [actorId], references: [id], onDelete: Cascade)
+  action       ModerationAction
+  reason       String
+  until        DateTime?
+  createdAt    DateTime         @default(now())
+
+  @@index([targetUserId])
+  @@index([actorId])
+  @@index([createdAt])
 }
 
 model NotificationSettings {
@@ -105,7 +135,12 @@ model Team {
   number          String          @unique // e.g., "82855T"
   discordServerId String?         @unique
   discordRoleId   String?         @unique
+  /// Actionable ops channel (typo preserved for existing rows)
   annoucementsChannelId String?
+  adminLogsChannelId    String?
+  purchasingManagerRoleId String?
+  digestHourLocal       Int             @default(17)
+  digestTimezone        String          @default("America/New_York")
   members         User[]
   events          Event[]         @relation("TeamEvents")
   inventorySignOuts InventoryItemSignOut[]
@@ -117,8 +152,20 @@ model Team {
   knowledgeNodes    KnowledgeNode[]
   scoutNotes        ScoutNote[]
   attendanceCheckIns AttendanceCheckIn[]
+  digestBuffer      TeamDigestBuffer?
   createdAt         DateTime        @default(now())
   updatedAt         DateTime        @updatedAt
+}
+
+/// Routine telemetry counters awaiting the daily digest flush.
+model TeamDigestBuffer {
+  teamId    String   @id
+  team      Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  /// e.g. { "tasksCompleted": 14, "partsReturned": 5, "scoutNotesSaved": 2 }
+  counters  Json     @default("{}")
+  updatedAt DateTime @updatedAt
+  /// Last digest flush day key (yyyy-mm-dd in team timezone) to avoid double-send
+  lastFlushedDateKey String?
 }
 
 model DiscordGuildSettings {
@@ -385,6 +432,11 @@ model InventoryItem {
   description String?
   totalStock  Int      // Total units the organization owns
   checkoutLimit Int?    // Optional max units a user can check out in one sign-out
+  /// Absolute available qty that triggers low-stock; null = 25% heuristic
+  lowStockThreshold Int?
+  /// Set on first low-stock alert fire — mutes further alerts until restocked
+  restockPending    Boolean   @default(false)
+  orderPlacedAt     DateTime?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 

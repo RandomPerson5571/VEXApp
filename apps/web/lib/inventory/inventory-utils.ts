@@ -27,7 +27,11 @@ export function getAvailableStock(item: TeamInventoryItem): number {
 export function getStockStatus(item: TeamInventoryItem): StockStatus {
   const available = getAvailableStock(item);
   if (available <= 0) return "depleted";
-  if (available <= Math.max(1, Math.floor(item.totalStock * 0.25))) return "low";
+  const threshold =
+    item.lowStockThreshold != null && item.lowStockThreshold >= 0
+      ? item.lowStockThreshold
+      : Math.max(1, Math.floor(item.totalStock * 0.25));
+  if (available <= threshold) return "low";
   return "nominal";
 }
 

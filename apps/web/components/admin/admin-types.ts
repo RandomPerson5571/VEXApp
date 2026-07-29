@@ -29,6 +29,9 @@ export type AdminUserRow = {
   isAdmin: boolean;
   teamId: string | null;
   team: AdminTeamOption | null;
+  suppressedUntil: string | null;
+  bannedAt: string | null;
+  moderationReason: string | null;
 };
 
 export const ADMIN_FIELD_CLASS_NAME =

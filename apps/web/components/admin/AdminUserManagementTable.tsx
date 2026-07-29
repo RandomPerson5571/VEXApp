@@ -50,7 +50,9 @@ import {
   adminTableHeadClassName,
   adminTableRowClassName,
 } from "./AdminPanelPrimitives";
+import { MemberModerationMenu } from "@/components/moderation/MemberModerationMenu";
 import { getInitials } from "@/components/tasks/task-list-utils";
+import { isUserBanned, isUserSuppressed } from "@/lib/auth/moderation";
 import { ADMIN_INLINE_SAVE_DELAY_MS } from "@/lib/constants/request-timing";
 import { RateLimitError } from "@/lib/errors/rate-limit-error";
 import { useDebouncedSaver } from "@/lib/hooks/use-debounced-saver";
@@ -306,12 +308,15 @@ export function AdminUserManagementTable({
                 <TableHead className={cn(adminTableHeadClassName, "w-[8rem] text-right")}>
                   Admin
                 </TableHead>
+                <TableHead className={cn(adminTableHeadClassName, "w-[12rem] text-right")}>
+                  Moderate
+                </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {users.length === 0 ? (
                 <TableRow className="hover:bg-transparent">
-                  <TableCell colSpan={7}>
+                  <TableCell colSpan={8}>
                     <AdminEmptyState
                       icon={Users}
                       title="No users in the platform"
@@ -321,7 +326,7 @@ export function AdminUserManagementTable({
                 </TableRow>
               ) : filteredUsers.length === 0 ? (
                 <TableRow className="hover:bg-transparent">
-                  <TableCell colSpan={7}>
+                  <TableCell colSpan={8}>
                     <AdminEmptyState
                       icon={UserRound}
                       title="No users match your search"
@@ -334,6 +339,10 @@ export function AdminUserManagementTable({
                   const isSelf = user.id === currentUserId;
                   const isPending = pendingUserId === user.id;
                   const fullName = `${user.firstName} ${user.lastName}`;
+                  const banned = isUserBanned({ bannedAt: user.bannedAt });
+                  const suppressed = isUserSuppressed({
+                    suppressedUntil: user.suppressedUntil,
+                  });
 
                   return (
                     <TableRow
@@ -365,7 +374,21 @@ export function AdminUserManagementTable({
                                   Admin
                                 </span>
                               ) : null}
+                              {banned ? (
+                                <span className="inline-flex h-5 items-center rounded-md border border-red-500/30 bg-red-500/10 px-1.5 text-[10px] font-bold text-red-400">
+                                  Banned
+                                </span>
+                              ) : suppressed ? (
+                                <span className="inline-flex h-5 items-center rounded-md border border-amber-500/30 bg-amber-500/10 px-1.5 text-[10px] font-bold text-amber-300">
+                                  Read-only
+                                </span>
+                              ) : null}
                             </div>
+                            {user.moderationReason ? (
+                              <p className="mt-1 truncate text-[10px] font-semibold text-slate-500">
+                                {user.moderationReason}
+                              </p>
+                            ) : null}
                           </div>
                         </div>
                       </TableCell>
@@ -528,6 +551,55 @@ export function AdminUserManagementTable({
                               : "Grant platform administrator access"}
                           </TooltipContent>
                         </Tooltip>
+                      </TableCell>
+
+                      <TableCell className="text-right">
+                        <MemberModerationMenu
+                          subject={{
+                            id: user.id,
+                            name: fullName,
+                            role: user.role,
+                            isAdmin: user.isAdmin,
+                            teamId: user.teamId,
+                            suppressedUntil: user.suppressedUntil,
+                            bannedAt: user.bannedAt,
+                          }}
+                          onComplete={(result) => {
+                            onUsersChange(
+                              users.map((row) => {
+                                if (row.id !== user.id) return row;
+                                if (result.removedFromTeam || result.action === "ban") {
+                                  return {
+                                    ...row,
+                                    teamId: null,
+                                    team: null,
+                                    bannedAt:
+                                      result.bannedAt ??
+                                      new Date().toISOString(),
+                                    suppressedUntil: null,
+                                  };
+                                }
+                                if (result.action === "unban") {
+                                  return { ...row, bannedAt: null };
+                                }
+                                if (result.action === "suppress") {
+                                  return {
+                                    ...row,
+                                    suppressedUntil:
+                                      result.suppressedUntil ?? row.suppressedUntil,
+                                  };
+                                }
+                                if (result.action === "unsuppress") {
+                                  return { ...row, suppressedUntil: null };
+                                }
+                                if (result.action === "kick") {
+                                  return { ...row, teamId: null, team: null };
+                                }
+                                return row;
+                              }),
+                            );
+                          }}
+                        />
                       </TableCell>
                     </TableRow>
                   );

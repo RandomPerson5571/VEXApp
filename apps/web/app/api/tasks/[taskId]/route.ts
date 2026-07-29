@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-import { getCurrentUser } from "@/lib/auth/current-user";
+import { rejectIfSuppressed } from "@/lib/auth/reject-if-suppressed";
 import { enforceApiRateLimit } from "@/lib/security/enforce-api-rate-limit";
 import { updateTeamTask } from "@/lib/queries/tasks.server";
 import type { TaskPriority, TaskStatus, TaskType } from "@stlvex/database/types";
@@ -30,11 +30,9 @@ function parseDueDate(dueDate: string | null | undefined): Date | null | undefin
 }
 
 export async function PATCH(request: Request, context: RouteContext) {
-  const currentUser = await getCurrentUser();
-
-  if (!currentUser) {
-    return NextResponse.json({ error: "Not authenticated." }, { status: 401 });
-  }
+  const gated = await rejectIfSuppressed();
+  if (!gated.ok) return gated.response;
+  const currentUser = gated.user;
 
   const teamId = currentUser.profile.teamId;
 

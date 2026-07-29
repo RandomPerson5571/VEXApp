@@ -103,6 +103,7 @@ export type UpdateInventoryItemInput = {
   totalStock: number;
   checkoutLimit?: number | null;
   imageUrl?: string | null;
+  lowStockThreshold?: number | null;
 };
 
 export async function updateInventoryItem(
@@ -129,6 +130,9 @@ export async function updateInventoryItem(
       description: input.description?.trim() || null,
       totalStock: input.totalStock,
       checkoutLimit: input.checkoutLimit ?? null,
+      ...(input.lowStockThreshold !== undefined
+        ? { lowStockThreshold: input.lowStockThreshold }
+        : {}),
       ...(input.imageUrl !== undefined
         ? { imageUrl: input.imageUrl?.trim() || null }
         : {}),

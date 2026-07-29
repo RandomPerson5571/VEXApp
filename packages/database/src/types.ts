@@ -5,12 +5,14 @@ export type {
   InventoryItemSignOut,
   KnowledgeEdge,
   KnowledgeNode,
+  ModerationEvent,
   Prisma,
   ScoutNote,
   Task,
   TaskAssignment,
   Team,
   TeamDayPlan,
+  TeamDigestBuffer,
   User,
 } from "../generated/prisma/index.js";
 
@@ -18,6 +20,7 @@ export type {
   ContentType,
   DayPlanType,
   EventType,
+  ModerationAction,
   TaskPriority,
   TaskStatus,
   TaskType,

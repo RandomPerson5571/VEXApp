@@ -39,4 +39,29 @@ describe("POST /api/webhooks integration", () => {
 
     expect(response.status).toBe(401);
   });
+
+  it("accepts telemetry.actionable events", async () => {
+    const { createTestWebhookApp: createApp } = await import(
+      "../../helpers/webhook-app.js"
+    );
+    const app = createApp();
+
+    const response = await request(app)
+      .post("/api/webhooks")
+      .set("x-webhook-secret", "vitest-webhook-secret")
+      .send({
+        type: "telemetry.actionable",
+        payload: {
+          teamId: "team-1",
+          event: "inviteGenerated",
+          message: "Invite created",
+        },
+      });
+
+    expect(response.status).toBe(202);
+    expect(response.body).toMatchObject({
+      accepted: true,
+      type: "telemetry.actionable",
+    });
+  });
 });
