@@ -218,18 +218,18 @@ export function getDayPlanStyle(type: DayPlanType): DayPlanStyle {
       };
     case "testing":
       return {
-        bg: "bg-amber-50 dark:bg-amber-600/10 border-amber-500/20 text-amber-700 dark:text-amber-400",
-        accent: "border-l-amber-500",
-        dot: "bg-amber-500",
-        icon: "text-amber-600 dark:text-amber-400",
-        badge: "bg-amber-500/15 dark:bg-amber-500/25 text-amber-800 dark:text-amber-200 border-amber-400/40",
+        bg: "bg-[color:var(--site-accent)]/10 dark:bg-[color:var(--site-accent)]/10 border-[color:var(--site-accent)]/20 text-[color:var(--site-accent)] dark:text-[color:var(--site-accent)]",
+        accent: "border-l-[color:var(--site-accent)]",
+        dot: "bg-[color:var(--site-accent)]",
+        icon: "text-[color:var(--site-accent)] dark:text-[color:var(--site-accent)]",
+        badge: "bg-[color:var(--site-accent)]/15 dark:bg-[color:var(--site-accent)]/25 text-[color:var(--site-accent)] dark:text-[color:var(--site-accent)] border-[color:var(--site-accent)]/40",
         label: "Testing",
-        cellBg: "bg-amber-100/90 dark:bg-amber-500/20",
-        cellBgMuted: "bg-amber-50/70 dark:bg-amber-500/10 opacity-60",
+        cellBg: "bg-[color:var(--site-accent)]/90 dark:bg-[color:var(--site-accent)]/20",
+        cellBgMuted: "bg-[color:var(--site-accent)]/70 dark:bg-[color:var(--site-accent)]/10 opacity-60",
         button:
-          "bg-amber-50 dark:bg-amber-500/15 border-amber-300 dark:border-amber-500/50 text-amber-700 dark:text-amber-300 hover:bg-amber-100 dark:hover:bg-amber-500/25 hover:border-amber-400 dark:hover:border-amber-400/70",
+          "bg-[color:var(--site-accent)]/10 dark:bg-[color:var(--site-accent)]/15 border-[color:var(--site-accent)]/30 dark:border-[color:var(--site-accent)]/50 text-[color:var(--site-accent)] dark:text-[color:var(--site-accent)] hover:bg-[color:var(--site-accent)]/100 dark:hover:bg-[color:var(--site-accent)]/25 hover:border-[color:var(--site-accent)]/40 dark:hover:border-[color:var(--site-accent)]/70",
         buttonActive:
-          "bg-amber-500 dark:bg-amber-500 border-amber-600 dark:border-amber-400 text-white shadow-lg shadow-amber-500/30 scale-[1.02]",
+          "bg-[color:var(--site-accent)] dark:bg-[color:var(--site-accent)] border-[color:var(--site-accent)]/60 dark:border-[color:var(--site-accent)]/40 text-white shadow-lg shadow-[color:var(--site-accent)]/30 scale-[1.02]",
       };
     case "build":
     default:
@@ -254,13 +254,13 @@ export function getEventStyle(type: EventType): EventStyle {
   switch (type) {
     case "championship":
       return {
-        bg: "bg-amber-50 dark:bg-amber-600/10 border-amber-500/20 text-amber-700 dark:text-amber-400",
-        dot: "bg-amber-400",
+        bg: "bg-[color:var(--site-accent)]/10 dark:bg-[color:var(--site-accent)]/10 border-[color:var(--site-accent)]/20 text-[color:var(--site-accent)] dark:text-[color:var(--site-accent)]",
+        dot: "bg-[color:var(--site-accent)]",
       };
     case "scrimmage":
       return {
-        bg: "bg-yellow-50 dark:bg-yellow-500/10 border-yellow-500/20 text-yellow-700 dark:text-yellow-400",
-        dot: "bg-yellow-400",
+        bg: "bg-[color:var(--site-accent)]/10 dark:bg-[color:var(--site-accent)]/10 border-[color:var(--site-accent)]/20 text-[color:var(--site-accent)] dark:text-[color:var(--site-accent)]",
+        dot: "bg-[color:var(--site-accent)]",
       };
     case "practice_match":
       return {

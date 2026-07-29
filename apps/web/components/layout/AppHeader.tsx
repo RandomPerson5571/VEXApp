@@ -113,7 +113,7 @@ export function AppHeader({
                   onClick={() => setShowUserDropdown(false)}
                 >
                   <User className="h-4.5 w-4.5 text-slate-600 dark:text-slate-500" />
-                  Settings
+                  User Settings
                 </Link>
                 <Link
                   href="/invite"

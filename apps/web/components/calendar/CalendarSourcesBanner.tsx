@@ -37,7 +37,7 @@ export function CalendarSourcesBanner({
   return (
     <p
       role="status"
-      className={`text-[10px] font-medium text-amber-700 dark:text-amber-400/90 ${className}`}
+      className={`text-[10px] font-medium text-[color:var(--site-accent)] dark:text-[color:var(--site-accent)]/90 ${className}`}
     >
       {warning}
     </p>
