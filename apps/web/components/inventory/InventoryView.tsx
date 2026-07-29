@@ -355,6 +355,7 @@ export function InventoryView() {
                     key={item.id}
                     item={item}
                     teamId={teamId}
+                    isAdmin={isAdmin}
                     index={index}
                     onEdit={isAdmin ? () => openEditModal(item) : undefined}
                   />

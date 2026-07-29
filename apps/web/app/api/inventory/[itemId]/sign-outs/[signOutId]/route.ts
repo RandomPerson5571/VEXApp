@@ -15,6 +15,13 @@ export async function PATCH(request: Request, context: RouteContext) {
     return NextResponse.json({ error: "Not authenticated." }, { status: 401 });
   }
 
+  if (!currentUser.profile.isAdmin) {
+    return NextResponse.json(
+      { error: "Only admins can check in inventory." },
+      { status: 403 },
+    );
+  }
+
   const teamId = currentUser.profile.teamId;
 
   if (!teamId) {

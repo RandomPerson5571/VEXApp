@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useMemo, useState } from "react";
+import { DayPlanIcon } from "@/components/calendar/DayPlanIcon";
 import type { CalendarEvent, DayPlanType, TeamDayPlan } from "@/lib/types/team";
 import { CalendarSourcesBanner } from "@/components/calendar/CalendarSourcesBanner";
 import { isQueryInitiallyLoading } from "@/lib/hooks/use-query-loading";
