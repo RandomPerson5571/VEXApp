@@ -28,9 +28,9 @@ const SECTIONS = [
     fragment: (
       <div className="space-y-2 text-sm">
         {[
-          ["Alex Chen", "Lead"],
-          ["Jordan Lee", "Builder"],
-          ["Sam Rivera", "Scout"],
+          ["Luca Klecina", "Lead"],
+          ["Evan Ding", "Builder"],
+          ["Fiona Liang", "Coder"],
         ].map(([name, role]) => (
           <div
             key={name}

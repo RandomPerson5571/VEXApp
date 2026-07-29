@@ -312,10 +312,12 @@ export function InventoryFilters({
 export function InventoryCard({
   item,
   teamId,
+  isAdmin,
   index,
 }: {
   item: TeamInventoryItem;
   teamId: string;
+  isAdmin: boolean;
   index: number;
 }) {
   const status = getStockStatus(item);
@@ -370,7 +372,7 @@ export function InventoryCard({
   };
 
   const handleReturn = async (signOutId: string) => {
-    if (isReturning) return;
+    if (!isAdmin || isReturning) return;
 
     setActionError(undefined);
 
@@ -482,8 +484,9 @@ export function InventoryCard({
               setActionError(undefined);
               setIsCheckinOpen(true);
             }}
-            disabled={teamSignOuts.length === 0}
+            disabled={!isAdmin || teamSignOuts.length === 0}
             className="inline-flex h-10 items-center justify-center gap-1.5 rounded-lg border border-emerald-500/25 bg-emerald-500/10 px-3 text-[10px] font-bold uppercase tracking-wider text-emerald-600 transition hover:bg-emerald-500/15 disabled:cursor-not-allowed disabled:opacity-50 dark:text-emerald-400"
+            title={isAdmin ? undefined : "Only admins can check in parts."}
           >
             <RotateCcw className="h-3.5 w-3.5" />
             Check in
@@ -611,8 +614,9 @@ export function InventoryCard({
                   <button
                     type="button"
                     onClick={() => handleReturn(signOut.id)}
-                    disabled={isReturning}
+                    disabled={!isAdmin || isReturning}
                     className="inline-flex h-9 shrink-0 items-center justify-center gap-1 rounded-lg border border-emerald-500/25 bg-emerald-500/10 px-3 text-[10px] font-bold uppercase tracking-wider text-emerald-600 transition hover:bg-emerald-500/15 disabled:cursor-not-allowed disabled:opacity-50 dark:text-emerald-400"
+                    title={isAdmin ? undefined : "Only admins can check in parts."}
                   >
                     <RotateCcw className="h-3.5 w-3.5" />
                     {isReturning ? "Checking in..." : "Check in"}

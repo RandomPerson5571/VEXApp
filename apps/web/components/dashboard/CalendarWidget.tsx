@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useMemo, useState } from "react";
+import { DayPlanIcon } from "@/components/calendar/DayPlanIcon";
 import type { CalendarEvent, DayPlanType, TeamDayPlan } from "@/lib/types/team";
 import { isQueryInitiallyLoading } from "@/lib/hooks/use-query-loading";
 import { useTeamDayPlans } from "@/lib/hooks/use-team-day-plans";
@@ -90,7 +91,7 @@ export function TeamCalendarWidget() {
               key={type}
               className={`inline-flex items-center gap-1.5 rounded-md border px-2 py-1 text-[10px] font-black uppercase tracking-wide ${style.badge}`}
             >
-              <span className={`h-2.5 w-2.5 rounded-full ${style.dot}`} />
+              <DayPlanIcon type={type} className="h-3 w-3" />
               {style.label}
             </span>
           );
@@ -167,6 +168,11 @@ export function TeamCalendarWidget() {
                       : "hover:bg-slate-200/50 dark:hover:bg-white/5"
                   }`}
                 >
+                  {dayPlan ? (
+                    <span className="absolute right-1 top-1">
+                      <DayPlanIcon type={dayPlan.type} className="h-3 w-3" />
+                    </span>
+                  ) : null}
                   <span className="leading-none">{cell.day}</span>
                   {dayEvents.length > 0 && (
                     <div className="flex gap-0.5 justify-center absolute bottom-1">

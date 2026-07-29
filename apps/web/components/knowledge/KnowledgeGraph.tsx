@@ -2,9 +2,18 @@
 
 import dynamic from "next/dynamic";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Network } from "lucide-react";
+import {
+  Box,
+  Circle,
+  Code2,
+  Network,
+  Wrench,
+  type LucideIcon,
+} from "lucide-react";
+import type { TopicCategory } from "@stlvex/database/types";
 
 import {
+  formatEnumLabel,
   linkEndpointId,
   neighborIdsFor,
   TOPIC_COLORS,
@@ -16,6 +25,20 @@ import type { KnowledgeEdgeRecord, KnowledgeNodeRecord } from "@/lib/queries/kno
 const ForceGraph2D = dynamic(() => import("react-force-graph-2d"), {
   ssr: false,
 });
+
+const TOPIC_ICONS: Record<TopicCategory, LucideIcon> = {
+  PROGRAMMING: Code2,
+  CAD: Box,
+  HARDWARE: Wrench,
+  GENERAL: Circle,
+};
+
+const TOPIC_GLYPHS: Record<TopicCategory, string> = {
+  PROGRAMMING: "</>",
+  CAD: "3D",
+  HARDWARE: "HW",
+  GENERAL: "i",
+};
 
 type GraphApi = {
   centerAt: (x: number, y: number, ms?: number) => void;
@@ -144,6 +167,29 @@ export function KnowledgeGraph({
       ) : null}
 
       {showGraph ? (
+        <div className="pointer-events-none absolute left-3 top-3 z-10 flex flex-wrap gap-1.5 rounded-lg border border-slate-200/80 bg-white/90 p-2 shadow-sm backdrop-blur dark:border-slate-800/80 dark:bg-[#0a0a0a]/85">
+          {Object.keys(TOPIC_COLORS).map((topic) => {
+            const category = topic as TopicCategory;
+            const Icon = TOPIC_ICONS[category];
+            return (
+              <span
+                key={category}
+                className="inline-flex items-center gap-1.5 rounded-md border border-slate-200 bg-slate-50 px-2 py-1 text-[10px] font-black uppercase tracking-wide text-slate-700 dark:border-slate-800 dark:bg-[#121212] dark:text-slate-200"
+              >
+                <span
+                  className="inline-flex h-4 w-4 items-center justify-center rounded-full text-white"
+                  style={{ backgroundColor: TOPIC_COLORS[category] }}
+                >
+                  <Icon className="h-2.5 w-2.5" aria-hidden />
+                </span>
+                {formatEnumLabel(category)}
+              </span>
+            );
+          })}
+        </div>
+      ) : null}
+
+      {showGraph ? (
         <ForceGraph2D
           ref={graphRef as never}
           width={size.width}
@@ -163,6 +209,48 @@ export function KnowledgeGraph({
             hasFittedRef.current = true;
             fitGraph(400);
           }}
+          onRenderFramePre={(ctx, globalScale) => {
+            const programmingNodes = graphData.nodes.filter(
+              (entry) =>
+                entry.topicCategory === "PROGRAMMING" &&
+                "x" in entry &&
+                "y" in entry &&
+                typeof (entry as GraphNode & { x?: unknown }).x === "number" &&
+                typeof (entry as GraphNode & { y?: unknown }).y === "number",
+            ) as (GraphNode & { x: number; y: number })[];
+
+            if (programmingNodes.length === 0) return;
+
+            const xs = programmingNodes.map((entry) => entry.x);
+            const ys = programmingNodes.map((entry) => entry.y);
+            const padding = 34 / globalScale;
+            const minX = Math.min(...xs) - padding;
+            const maxX = Math.max(...xs) + padding;
+            const minY = Math.min(...ys) - padding;
+            const maxY = Math.max(...ys) + padding;
+            const width = maxX - minX;
+            const height = maxY - minY;
+            const radius = Math.min(24 / globalScale, width / 3, height / 3);
+
+            ctx.save();
+            ctx.globalAlpha = 0.16;
+            ctx.fillStyle = TOPIC_COLORS.PROGRAMMING;
+            ctx.strokeStyle = TOPIC_COLORS.PROGRAMMING;
+            ctx.lineWidth = 2 / globalScale;
+            ctx.setLineDash([8 / globalScale, 6 / globalScale]);
+            ctx.beginPath();
+            ctx.roundRect(minX, minY, width, height, radius);
+            ctx.fill();
+            ctx.globalAlpha = 0.85;
+            ctx.stroke();
+            ctx.setLineDash([]);
+            ctx.font = `${10 / globalScale}px Sans-Serif`;
+            ctx.textAlign = "left";
+            ctx.textBaseline = "bottom";
+            ctx.fillStyle = TOPIC_COLORS.PROGRAMMING;
+            ctx.fillText("Programming Zone", minX, minY - 5 / globalScale);
+            ctx.restore();
+          }}
           onNodeClick={(node) => onSelectNode(String((node as GraphNode).id))}
           onBackgroundClick={onClearSelection}
           nodeCanvasObject={(node, ctx, globalScale) => {
@@ -176,11 +264,17 @@ export function KnowledgeGraph({
             const isNeighbor =
               !selectedId || neighborIds.has(n.id) || highlightSet.has(n.id);
 
+            const radius = isSelected || isLinkSource ? 8 : 6;
+
             ctx.beginPath();
-            ctx.arc(x, y, isSelected || isLinkSource ? 7 : 5, 0, 2 * Math.PI, false);
+            ctx.arc(x, y, radius, 0, 2 * Math.PI, false);
             ctx.fillStyle = TOPIC_COLORS[n.topicCategory];
             ctx.globalAlpha = isNeighbor ? 1 : 0.18;
             ctx.fill();
+
+            ctx.strokeStyle = "rgba(15,23,42,0.8)";
+            ctx.lineWidth = 1.5 / globalScale;
+            ctx.stroke();
 
             if (isSelected || isHit || isLinkSource) {
               ctx.strokeStyle = isHit
@@ -191,6 +285,13 @@ export function KnowledgeGraph({
               ctx.lineWidth = 2 / globalScale;
               ctx.stroke();
             }
+
+            ctx.font = `${6.5 / globalScale}px Sans-Serif`;
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.fillStyle = n.topicCategory === "GENERAL" ? "#0f172a" : "#ffffff";
+            ctx.globalAlpha = isNeighbor ? 0.95 : 0.22;
+            ctx.fillText(TOPIC_GLYPHS[n.topicCategory], x, y + 0.5 / globalScale);
 
             ctx.font = `${fontSize}px Sans-Serif`;
             ctx.textAlign = "center";
