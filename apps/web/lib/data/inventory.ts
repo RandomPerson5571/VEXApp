@@ -5,6 +5,7 @@ import {
   teamInventoryItemInclude,
   type TeamInventoryItem,
 } from "@stlvex/database/types";
+import { normalizeInventoryColor } from "@/lib/inventory/item-colors";
 
 export async function countInventoryItems(): Promise<number> {
   return prisma.inventoryItem.count();
@@ -52,6 +53,7 @@ export type CreateInventoryItemInput = {
   totalStock: number;
   checkoutLimit?: number | null;
   imageUrl?: string | null;
+  color?: string | null;
 };
 
 async function findInventoryItemOrThrow(
@@ -91,6 +93,7 @@ export async function createInventoryItem(
       totalStock: input.totalStock,
       checkoutLimit: input.checkoutLimit ?? null,
       imageUrl: input.imageUrl?.trim() || null,
+      color: normalizeInventoryColor(input.color),
     },
     include: teamInventoryItemInclude,
   });
@@ -103,6 +106,7 @@ export type UpdateInventoryItemInput = {
   totalStock: number;
   checkoutLimit?: number | null;
   imageUrl?: string | null;
+  color?: string | null;
 };
 
 export async function updateInventoryItem(
@@ -131,6 +135,9 @@ export async function updateInventoryItem(
       checkoutLimit: input.checkoutLimit ?? null,
       ...(input.imageUrl !== undefined
         ? { imageUrl: input.imageUrl?.trim() || null }
+        : {}),
+      ...(input.color !== undefined
+        ? { color: normalizeInventoryColor(input.color) }
         : {}),
     },
     include: teamInventoryItemInclude,

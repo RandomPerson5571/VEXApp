@@ -30,6 +30,7 @@ import {
   summarizeInventory,
   type StockStatus,
 } from "@/lib/inventory/inventory-utils";
+import { INVENTORY_COLOR_PRESETS } from "@/lib/inventory/item-colors";
 
 const AVAILABILITY_FILTERS: { id: AvailabilityFilter; label: string }[] = [
   { id: "all", label: "All" },
@@ -352,7 +353,8 @@ export function InventoryCard({
 
   const staggerStyle = {
     animationDelay: `${index * 70}ms`,
-  } satisfies CSSProperties;
+    "--inventory-item-color": item.color ?? INVENTORY_COLOR_PRESETS[0].value,
+  } as CSSProperties;
 
   const handleSignOut = async () => {
     if (!canSignOut) return;
@@ -417,7 +419,16 @@ export function InventoryCard({
     >
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 bg-gradient-to-br from-yellow-500/[0.04] via-transparent to-blue-500/[0.03] opacity-0 transition-opacity duration-300 group-hover:opacity-100 motion-reduce:transition-none"
+        className="pointer-events-none absolute inset-y-0 left-0 w-1.5"
+        style={{ backgroundColor: "var(--inventory-item-color)" }}
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100 motion-reduce:transition-none"
+        style={{
+          background:
+            "linear-gradient(135deg, color-mix(in srgb, var(--inventory-item-color) 12%, transparent), transparent 48%)",
+        }}
       />
 
       <div className="relative space-y-4">

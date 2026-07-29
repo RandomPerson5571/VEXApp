@@ -17,8 +17,9 @@ export function UpcomingMatchesList() {
   } = useMergedCalendarSources();
 
   return (
-    <div className="space-y-4 rounded-[32px] border border-slate-200 bg-white p-5 shadow-[0_24px_80px_rgba(0,0,0,0.08)] dark:border-[#1a1a1a] dark:bg-[#0a0a0a]">
-      <div className="flex items-start justify-between border-b border-slate-300 pb-2.5 dark:border-[#1a1a1a]">
+    <div className="relative space-y-4 rounded-[32px] border border-slate-200 bg-white p-5 shadow-[0_24px_80px_rgba(0,0,0,0.08)] dark:border-[#1a1a1a] dark:bg-[#0a0a0a]">
+      <div aria-hidden className="pointer-events-none absolute inset-0 bg-gradient-to-br from-orange-50/30 via-transparent to-transparent opacity-60 dark:from-orange-500/10 dark:to-transparent" />
+      <div className="space-y-3">
         <div>
           <span className="text-xs font-black uppercase tracking-wider text-slate-900 dark:text-slate-100">
             Upcoming Matches

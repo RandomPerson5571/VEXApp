@@ -129,6 +129,7 @@ export function InventoryTrackerWidget() {
             "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")",
         }}
       />
+      <div aria-hidden className="pointer-events-none absolute inset-0 bg-gradient-to-br from-orange-50/30 via-transparent to-transparent opacity-60 dark:from-orange-500/10 dark:to-transparent" />
 
       <div className="relative mb-4 flex items-start justify-between gap-3 border-b border-slate-300 dark:border-[#1a1a1a] pb-3">
         <div>

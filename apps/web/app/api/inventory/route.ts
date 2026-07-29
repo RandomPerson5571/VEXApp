@@ -14,6 +14,7 @@ type CreateInventoryItemRequestBody = {
   totalStock?: number;
   checkoutLimit?: number | null;
   imageUrl?: string;
+  color?: string | null;
 };
 
 export async function GET() {
@@ -93,6 +94,7 @@ export async function POST(request: Request) {
       totalStock,
       checkoutLimit,
       imageUrl: body.imageUrl ?? null,
+      color: body.color ?? null,
     });
 
     return NextResponse.json(item, { status: 201 });
