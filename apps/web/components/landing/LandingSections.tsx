@@ -1,23 +1,29 @@
 const SECTIONS = [
   {
     num: "01",
-    title: "Match readiness",
-    body: "Track upcoming matches, scouting notes, and the details your drive team needs before queueing.",
+    title: "Inventory checkout",
+    body: "Sign parts in and out so the shop knows what is on the robot and what is still on the shelf.",
     fragment: (
       <div className="space-y-2 text-sm">
-        {["Alliance notes locked", "Auton path reviewed", "Battery check"].map(
-          (row, i) => (
-            <div
-              key={row}
-              className="flex items-center justify-between rounded-md border border-[#1a1a1a] bg-black/40 px-3 py-2"
+        {[
+          ["V5 Brain", "Out"],
+          ["36T gear set", "In"],
+          ["Omni wheels (4)", "Out"],
+        ].map(([item, status]) => (
+          <div
+            key={item}
+            className="flex items-center justify-between rounded-md border border-[#1a1a1a] bg-black/40 px-3 py-2"
+          >
+            <span className="text-zinc-300">{item}</span>
+            <span
+              className={
+                status === "Out" ? "text-[#ffa800]" : "text-zinc-500"
+              }
             >
-              <span className="text-zinc-300">{row}</span>
-              <span className={i === 0 ? "text-[#ffa800]" : "text-zinc-600"}>
-                {i === 0 ? "Ready" : "Queued"}
-              </span>
-            </div>
-          ),
-        )}
+              {status}
+            </span>
+          </div>
+        ))}
       </div>
     ),
   },

@@ -5,7 +5,6 @@ export type {
   InventoryItemSignOut,
   KnowledgeEdge,
   KnowledgeNode,
-  NotebookLog,
   Prisma,
   ScoutNote,
   Task,

@@ -26,7 +26,6 @@ import {
 import {
   type CreateTaskFormValues,
   type EditTaskFormValues,
-  formatPersonName,
   getTaskAssignees,
   taskToEditFormValues,
 } from "./task-list-utils";
@@ -46,7 +45,6 @@ function matchesSearch(task: TaskListTask, query: string): boolean {
     task.creator?.firstName ?? "",
     task.creator?.lastName ?? "",
     ...assignees.flatMap((a) => [a.firstName, a.lastName]),
-    ...task.subTasks.map((s) => s.title),
   ]
     .join(" ")
     .toLowerCase();
@@ -115,6 +113,7 @@ export function TaskListView() {
   const { createMutation: createTaskMutation, updateMutation: updateTaskMutation, updateTaskStatus, isStatusUpdating } =
     useTeamTaskMutations({
       teamId,
+      creator,
       onCreateSuccess: () => {
         setIsCreateModalOpen(false);
         setCreateForm(emptyCreateTaskFormValues);
@@ -184,13 +183,9 @@ export function TaskListView() {
 
     if (!editingTaskId || !editForm) return;
 
+    // ponytail: modal is assignees/due only; title/status/priority stay on the card
     updateTaskMutation.mutate({
       taskId: editingTaskId,
-      title: editForm.title,
-      description: editForm.description,
-      status: editForm.status,
-      type: editForm.type,
-      priority: editForm.priority,
       dueDate: editForm.dueDate || null,
       assigneeIds: editForm.assigneeIds,
     });
@@ -201,7 +196,7 @@ export function TaskListView() {
   }
 
   return (
-    <div className="relative flex-1 overflow-y-auto bg-slate-50 px-8 py-6 font-sans dashboard-scroll dark:bg-[#000000]">
+    <div className="relative flex-1 overflow-y-auto bg-slate-50 px-4 py-6 font-sans dashboard-scroll sm:px-8 dark:bg-[#000000]">
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(59,130,246,0.06),transparent_55%)]"
@@ -212,11 +207,11 @@ export function TaskListView() {
           <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
             <div>
               <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-blue-500/20 bg-blue-600/10 shadow-[0_0_20px_rgba(59,130,246,0.1)]">
-                  <ClipboardList className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-orange-500/20 bg-orange-600/10 shadow-[0_0_20px_rgba(234,88,12,0.1)]">
+                  <ClipboardList className="h-5 w-5 text-orange-600 dark:text-orange-400" />
                 </div>
                 <div>
-                  <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-blue-600/80 dark:text-blue-400/80">
+                  <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-orange-600/80 dark:text-orange-400/80">
                     Team workspace
                   </p>
                   <h1 className="text-[clamp(1.5rem,3.5vw,2rem)] font-black leading-none tracking-tight text-slate-950 dark:text-slate-100">
@@ -225,8 +220,9 @@ export function TaskListView() {
                 </div>
               </div>
               <p className="mt-3 max-w-2xl text-sm font-medium leading-relaxed text-slate-600 dark:text-slate-400">
-                Track build, software, and CAD work for {label}. Any team member
-                can create tasks — expand a card to view subtasks and progress.
+                Track build, software, and CAD work for {label}. Edit title,
+                status, and priority on the card; use Due &amp; assignees for the
+                rest.
               </p>
             </div>
 
@@ -234,7 +230,7 @@ export function TaskListView() {
               type="button"
               onClick={openCreateModal}
               disabled={isInitialLoading}
-              className="inline-flex shrink-0 items-center gap-1.5 self-start rounded-lg bg-blue-600 px-4 py-2.5 text-xs font-bold text-white shadow-lg shadow-blue-900/25 transition hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-50 motion-safe:hover:scale-[1.02] motion-reduce:transition-none"
+              className="inline-flex shrink-0 items-center gap-1.5 self-start rounded-lg bg-orange-600 px-4 py-2.5 text-xs font-bold text-white shadow-lg shadow-orange-900/25 transition hover:bg-orange-500 disabled:cursor-not-allowed disabled:opacity-50 motion-safe:hover:scale-[1.02] motion-reduce:transition-none"
             >
               <Plus className="h-4 w-4" />
               New task
@@ -309,7 +305,7 @@ export function TaskListView() {
                   <button
                     type="button"
                     onClick={openCreateModal}
-                    className="mt-5 inline-flex items-center gap-1.5 rounded-lg bg-blue-600 px-4 py-2 text-xs font-bold text-white shadow-lg shadow-blue-900/20 transition hover:bg-blue-500"
+                    className="mt-5 inline-flex items-center gap-1.5 rounded-lg bg-orange-600 px-4 py-2 text-xs font-bold text-white shadow-lg shadow-orange-900/20 transition hover:bg-orange-500"
                   >
                     <Plus className="h-4 w-4" />
                     Create task
@@ -318,29 +314,31 @@ export function TaskListView() {
               </div>
             ) : (
               <div className="space-y-4 pb-6">
-                {filteredTasks.map((task, index) => (
+                {filteredTasks.map((task) => (
                   <TaskCard
                     key={task.id}
                     task={task}
-                    defaultExpanded={index === 0}
-                    onOpen={() => openEditModal(task)}
-                    onUpdateTitle={async (title) => {
-                      await updateTaskMutation.mutateAsync({ taskId: task.id, title });
+                    onEditAssignees={() => openEditModal(task)}
+                    onUpdateTitle={(title) => {
+                      updateTaskMutation.mutate({ taskId: task.id, title });
+                      return Promise.resolve();
                     }}
-                    onUpdateDescription={async (description) => {
-                      await updateTaskMutation.mutateAsync({
+                    onUpdateDescription={(description) => {
+                      updateTaskMutation.mutate({
                         taskId: task.id,
                         description,
                       });
+                      return Promise.resolve();
                     }}
                     onUpdateStatus={async (status) => {
                       updateTaskStatus(task.id, status);
                     }}
-                    onUpdatePriority={async (priority) => {
-                      await updateTaskMutation.mutateAsync({
+                    onUpdatePriority={(priority) => {
+                      updateTaskMutation.mutate({
                         taskId: task.id,
                         priority,
                       });
+                      return Promise.resolve();
                     }}
                     isStatusUpdating={isStatusUpdating(task.id)}
                     isPriorityUpdating={
@@ -395,10 +393,6 @@ export function TaskListView() {
                 : "Failed to update task."
               : null
           }
-          taskMeta={{
-            creatorName: formatPersonName(editingTask.creator),
-            subTasks: editingTask.subTasks,
-          }}
         />
       ) : null}
     </div>

@@ -157,6 +157,7 @@ describe("api/inventory POST", () => {
       name: "REV HD Hex Motor",
       description: "Green cartridge",
       totalStock: 4,
+      checkoutLimit: null,
       imageUrl: null,
     });
   });

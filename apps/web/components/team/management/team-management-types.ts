@@ -45,7 +45,7 @@ export function formatTeamMemberRole(role: UserRole): string {
 }
 
 export const TEAM_FIELD_CLASS_NAME =
-  "w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-900 focus:border-slate-300 focus:outline-none dark:border-[#1a1a1a] dark:bg-slate-950 dark:text-slate-200 dark:focus:border-slate-800";
+  "w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-900 shadow-sm focus:outline-none dark:border-[#1a1a1a] dark:bg-slate-950 dark:text-slate-200";
 
 export const TEAM_INLINE_SELECT_CLASS_NAME =
-  "rounded-lg border border-slate-200 bg-white px-2 py-1 text-[11.5px] font-semibold text-slate-900 focus:outline-none dark:border-[#1a1a1a] dark:bg-slate-950 dark:text-slate-200";
+  "rounded-lg border border-slate-200 bg-white px-2 py-1 text-[11.5px] font-semibold text-slate-900 shadow-sm focus:outline-none dark:border-[#1a1a1a] dark:bg-slate-950 dark:text-slate-200";

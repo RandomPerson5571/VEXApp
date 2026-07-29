@@ -15,6 +15,7 @@ import {
 import type {
   CreateNodePayload,
   KnowledgeSearchHit,
+  UpdateNodePayload,
 } from "@/lib/queries/knowledge";
 
 function KnowledgeFallback() {
@@ -40,7 +41,7 @@ export function KnowledgeView() {
   const team = useTeam();
   const isAdmin = isGlobalAdmin(user);
   const { teamId, nodes, edges, isLoading, isError } = useTeamKnowledge();
-  const { createNode, createEdge, deleteNode, deleteEdge, search } =
+  const { createNode, updateNode, createEdge, deleteNode, deleteEdge, search } =
     useKnowledgeMutations(teamId);
 
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -114,6 +115,18 @@ export function KnowledgeView() {
     }
   };
 
+  const handleUpdateNode = async (nodeId: string, payload: UpdateNodePayload) => {
+    setFormError(null);
+    try {
+      await updateNode.mutateAsync({ nodeId, payload });
+    } catch (error) {
+      setFormError(
+        error instanceof Error ? error.message : "Failed to update node.",
+      );
+      throw error;
+    }
+  };
+
   const handleSearch = async () => {
     setFormError(null);
     try {
@@ -167,6 +180,7 @@ export function KnowledgeView() {
         isAdmin={isAdmin}
         isSearching={search.isPending}
         isCreatingNode={createNode.isPending}
+        isUpdatingNode={updateNode.isPending}
         isCreatingEdge={createEdge.isPending}
         onSearchQueryChange={setSearchQuery}
         onSearch={handleSearch}
@@ -181,6 +195,7 @@ export function KnowledgeView() {
         onDeleteNode={handleDeleteNode}
         onDeleteEdge={(edgeId) => deleteEdge.mutate(edgeId)}
         onCreateNode={handleCreateNode}
+        onUpdateNode={handleUpdateNode}
       />
     </div>
   );

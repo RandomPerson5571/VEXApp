@@ -34,7 +34,7 @@ export type GraphLink = {
   relationshipType: string;
 };
 
-export type SidebarMode = "browse" | "create";
+export type SidebarMode = "browse" | "create" | "edit";
 
 export function formatEnumLabel(value: string): string {
   return value
@@ -103,7 +103,7 @@ export function toGraphData(
 }
 
 export const inputClassName =
-  "w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm dark:border-slate-800 dark:bg-[#121212] dark:text-slate-100";
+  "w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm shadow-sm outline-none transition dark:border-slate-800 dark:bg-[#121212] dark:text-slate-100";
 
 export const panelClassName =
   "rounded-xl border border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-[#0a0a0a]";

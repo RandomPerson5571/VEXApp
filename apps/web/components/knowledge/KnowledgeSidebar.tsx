@@ -1,13 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import {
-  GitBranch,
-  Plus,
-  Search,
-  Trash2,
-  X,
-} from "lucide-react";
+import { GitBranch, Pencil, Plus, Search, Trash2, X } from "lucide-react";
 
 import {
   CONTENT_OPTIONS,
@@ -24,6 +18,7 @@ import type {
   KnowledgeEdgeRecord,
   KnowledgeNodeRecord,
   KnowledgeSearchHit,
+  UpdateNodePayload,
 } from "@/lib/queries/knowledge";
 import type { ContentType, TopicCategory } from "@stlvex/database/types";
 
@@ -57,10 +52,89 @@ function NodePreview({ node }: { node: KnowledgeNodeRecord }) {
       href={node.contentUrl}
       target="_blank"
       rel="noreferrer"
-      className="mt-3 block truncate text-sm text-sky-600 underline dark:text-sky-400"
+      className="mt-3 block truncate text-sm text-orange-600 underline dark:text-orange-400"
     >
       {node.contentUrl}
     </a>
+  );
+}
+
+function NodeFormFields({
+  title,
+  topicCategory,
+  contentType,
+  content,
+  contentUrl,
+  onTitleChange,
+  onTopicChange,
+  onContentTypeChange,
+  onContentChange,
+  onContentUrlChange,
+}: {
+  title: string;
+  topicCategory: TopicCategory;
+  contentType: ContentType;
+  content: string;
+  contentUrl: string;
+  onTitleChange: (value: string) => void;
+  onTopicChange: (value: TopicCategory) => void;
+  onContentTypeChange: (value: ContentType) => void;
+  onContentChange: (value: string) => void;
+  onContentUrlChange: (value: string) => void;
+}) {
+  return (
+    <div className="space-y-2">
+      <input
+        value={title}
+        onChange={(event) => onTitleChange(event.target.value)}
+        placeholder="Title"
+        className={inputClassName}
+      />
+      <div className="grid grid-cols-2 gap-2">
+        <select
+          value={topicCategory}
+          onChange={(event) =>
+            onTopicChange(event.target.value as TopicCategory)
+          }
+          className={inputClassName}
+        >
+          {TOPIC_OPTIONS.map((option) => (
+            <option key={option} value={option}>
+              {formatEnumLabel(option)}
+            </option>
+          ))}
+        </select>
+        <select
+          value={contentType}
+          onChange={(event) =>
+            onContentTypeChange(event.target.value as ContentType)
+          }
+          className={inputClassName}
+        >
+          {CONTENT_OPTIONS.map((option) => (
+            <option key={option} value={option}>
+              {formatEnumLabel(option)}
+            </option>
+          ))}
+        </select>
+      </div>
+      {contentType === "MARKDOWN" ? (
+        <textarea
+          value={content}
+          onChange={(event) => onContentChange(event.target.value)}
+          placeholder="Markdown content"
+          rows={4}
+          className={inputClassName}
+        />
+      ) : (
+        <input
+          value={contentUrl}
+          onChange={(event) => onContentUrlChange(event.target.value)}
+          placeholder="Content URL"
+          className={inputClassName}
+        />
+      )}
+    </div>
   );
 }
 
@@ -75,6 +149,7 @@ type KnowledgeSidebarProps = {
   isAdmin: boolean;
   isSearching: boolean;
   isCreatingNode: boolean;
+  isUpdatingNode: boolean;
   isCreatingEdge: boolean;
   onSearchQueryChange: (value: string) => void;
   onSearch: () => void;
@@ -86,6 +161,7 @@ type KnowledgeSidebarProps = {
   onDeleteNode: (nodeId: string) => void;
   onDeleteEdge: (edgeId: string) => void;
   onCreateNode: (payload: CreateNodePayload) => Promise<void>;
+  onUpdateNode: (nodeId: string, payload: UpdateNodePayload) => Promise<void>;
 };
 
 export function KnowledgeSidebar({
@@ -99,6 +175,7 @@ export function KnowledgeSidebar({
   isAdmin,
   isSearching,
   isCreatingNode,
+  isUpdatingNode,
   isCreatingEdge,
   onSearchQueryChange,
   onSearch,
@@ -110,6 +187,7 @@ export function KnowledgeSidebar({
   onDeleteNode,
   onDeleteEdge,
   onCreateNode,
+  onUpdateNode,
 }: KnowledgeSidebarProps) {
   const [mode, setMode] = useState<SidebarMode>("browse");
   const [deleteTarget, setDeleteTarget] = useState<{
@@ -127,12 +205,21 @@ export function KnowledgeSidebar({
 
   const linkSource = nodes.find((node) => node.id === linkSourceId) ?? null;
 
-  const resetCreateForm = () => {
+  const resetForm = () => {
     setTitle("");
     setContent("");
     setContentUrl("");
     setTopicCategory("GENERAL");
     setContentType("MARKDOWN");
+  };
+
+  const startEdit = (node: KnowledgeNodeRecord) => {
+    setTitle(node.title);
+    setTopicCategory(node.topicCategory);
+    setContentType(node.contentType);
+    setContent(node.content ?? "");
+    setContentUrl(node.contentUrl ?? "");
+    setMode("edit");
   };
 
   const handleCreateNode = async () => {
@@ -143,9 +230,36 @@ export function KnowledgeSidebar({
       content: contentType === "MARKDOWN" ? content : null,
       contentUrl: contentType === "MARKDOWN" ? null : contentUrl.trim() || null,
     });
-    resetCreateForm();
+    resetForm();
     setMode("browse");
   };
+
+  const handleUpdateNode = async () => {
+    if (!selectedNode) return;
+    await onUpdateNode(selectedNode.id, {
+      title,
+      topicCategory,
+      contentType,
+      content: contentType === "MARKDOWN" ? content : null,
+      contentUrl: contentType === "MARKDOWN" ? null : contentUrl.trim() || null,
+    });
+    setMode("browse");
+  };
+
+  const formFields = (
+    <NodeFormFields
+      title={title}
+      topicCategory={topicCategory}
+      contentType={contentType}
+      content={content}
+      contentUrl={contentUrl}
+      onTitleChange={setTitle}
+      onTopicChange={setTopicCategory}
+      onContentTypeChange={setContentType}
+      onContentChange={setContent}
+      onContentUrlChange={setContentUrl}
+    />
+  );
 
   return (
     <aside className="flex w-full flex-col gap-3 overflow-y-auto p-4 lg:w-[340px]">
@@ -162,7 +276,7 @@ export function KnowledgeSidebar({
           <button
             type="button"
             onClick={() => setMode("create")}
-            className="inline-flex items-center gap-1 rounded-lg bg-slate-900 px-2.5 py-1.5 text-xs font-semibold text-white dark:bg-sky-600"
+            className="inline-flex items-center gap-1 rounded-lg bg-orange-600 px-2.5 py-1.5 text-xs font-semibold text-white hover:bg-orange-500"
           >
             <Plus className="h-3.5 w-3.5" />
             Add
@@ -213,7 +327,9 @@ export function KnowledgeSidebar({
               type="button"
               onClick={() => onSelectNode(hit.id)}
               className={`flex w-full items-center justify-between rounded-lg px-2 py-1.5 text-left text-sm hover:bg-slate-50 dark:hover:bg-[#121212] ${
-                selectedNode?.id === hit.id ? "bg-sky-500/10 text-sky-600 dark:text-sky-400" : ""
+                selectedNode?.id === hit.id
+                  ? "bg-orange-500/10 text-orange-600 dark:text-orange-400"
+                  : ""
               }`}
             >
               <span className="truncate font-medium">{hit.title}</span>
@@ -226,10 +342,10 @@ export function KnowledgeSidebar({
       ) : null}
 
       {isAdmin && linkSource ? (
-        <section className={`${panelClassName} border-sky-500/30 bg-sky-500/5`}>
+        <section className={`${panelClassName} border-orange-500/30 bg-orange-500/5`}>
           <div className="flex items-start justify-between gap-2">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-wide text-sky-600 dark:text-sky-400">
+              <p className="text-xs font-semibold uppercase tracking-wide text-orange-600 dark:text-orange-400">
                 Create edge
               </p>
               <p className="mt-1 text-sm font-bold text-slate-900 dark:text-slate-100">
@@ -262,7 +378,7 @@ export function KnowledgeSidebar({
             <button
               type="button"
               onClick={() => {
-                resetCreateForm();
+                resetForm();
                 setMode("browse");
               }}
               className="rounded-lg p-1 text-slate-500 hover:bg-slate-100 dark:hover:bg-[#121212]"
@@ -271,70 +387,46 @@ export function KnowledgeSidebar({
               <X className="h-4 w-4" />
             </button>
           </div>
-          <div className="space-y-2">
-            <input
-              value={title}
-              onChange={(event) => setTitle(event.target.value)}
-              placeholder="Title"
-              className={inputClassName}
-            />
-            <div className="grid grid-cols-2 gap-2">
-              <select
-                value={topicCategory}
-                onChange={(event) =>
-                  setTopicCategory(event.target.value as TopicCategory)
-                }
-                className={inputClassName}
-              >
-                {TOPIC_OPTIONS.map((option) => (
-                  <option key={option} value={option}>
-                    {formatEnumLabel(option)}
-                  </option>
-                ))}
-              </select>
-              <select
-                value={contentType}
-                onChange={(event) =>
-                  setContentType(event.target.value as ContentType)
-                }
-                className={inputClassName}
-              >
-                {CONTENT_OPTIONS.map((option) => (
-                  <option key={option} value={option}>
-                    {formatEnumLabel(option)}
-                  </option>
-                ))}
-              </select>
-            </div>
-            {contentType === "MARKDOWN" ? (
-              <textarea
-                value={content}
-                onChange={(event) => setContent(event.target.value)}
-                placeholder="Markdown content"
-                rows={4}
-                className={inputClassName}
-              />
-            ) : (
-              <input
-                value={contentUrl}
-                onChange={(event) => setContentUrl(event.target.value)}
-                placeholder="Content URL"
-                className={inputClassName}
-              />
-            )}
-            <button
-              type="button"
-              onClick={handleCreateNode}
-              disabled={isCreatingNode || !title.trim()}
-              className="w-full rounded-lg bg-slate-900 px-3 py-2 text-sm font-semibold text-white disabled:opacity-50 dark:bg-sky-600"
-            >
-              Create node
-            </button>
-          </div>
+          {formFields}
+          <button
+            type="button"
+            onClick={handleCreateNode}
+            disabled={isCreatingNode || !title.trim()}
+            className="mt-2 w-full rounded-lg bg-orange-600 px-3 py-2 text-sm font-semibold text-white hover:bg-orange-500 disabled:opacity-50"
+          >
+            Create node
+          </button>
         </section>
       ) : null}
 
-      {selectedNode ? (
+      {isAdmin && mode === "edit" && selectedNode ? (
+        <section className={panelClassName}>
+          <div className="mb-3 flex items-center justify-between">
+            <h2 className="text-sm font-bold text-slate-900 dark:text-slate-100">
+              Edit node
+            </h2>
+            <button
+              type="button"
+              onClick={() => setMode("browse")}
+              className="rounded-lg p-1 text-slate-500 hover:bg-slate-100 dark:hover:bg-[#121212]"
+              aria-label="Close edit form"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+          {formFields}
+          <button
+            type="button"
+            onClick={handleUpdateNode}
+            disabled={isUpdatingNode || !title.trim()}
+            className="mt-2 w-full rounded-lg bg-orange-600 px-3 py-2 text-sm font-semibold text-white hover:bg-orange-500 disabled:opacity-50"
+          >
+            {isUpdatingNode ? "Saving…" : "Save changes"}
+          </button>
+        </section>
+      ) : null}
+
+      {selectedNode && mode !== "edit" ? (
         <section className={panelClassName}>
           <div className="flex items-start justify-between gap-2">
             <div className="min-w-0">
@@ -347,6 +439,16 @@ export function KnowledgeSidebar({
               </p>
             </div>
             <div className="flex shrink-0 items-center gap-1">
+              {isAdmin ? (
+                <button
+                  type="button"
+                  onClick={() => startEdit(selectedNode)}
+                  className="rounded-lg p-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-[#121212]"
+                  aria-label="Edit node"
+                >
+                  <Pencil className="h-4 w-4" />
+                </button>
+              ) : null}
               <button
                 type="button"
                 onClick={onClearSelection}
@@ -414,7 +516,7 @@ export function KnowledgeSidebar({
             </div>
           ) : null}
         </section>
-      ) : mode === "browse" && !linkSourceId ? (
+      ) : mode === "browse" && !linkSourceId && !selectedNode ? (
         <div className="rounded-xl border border-dashed border-slate-300 px-4 py-8 text-center dark:border-slate-800">
           <p className="text-sm text-slate-500">
             Select a node on the graph, or click empty space to show all nodes.

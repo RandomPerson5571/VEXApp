@@ -1,21 +1,18 @@
 "use client";
 
-import { useMemo, useState } from "react";
 import {
   AlertCircle,
   Calendar,
   CheckCircle2,
-  ChevronDown,
-  Circle,
   Clock,
   ListTodo,
   Search,
   User,
+  Users,
 } from "lucide-react";
 
 import type {
   TaskListAssignee,
-  TaskListSubTask,
   TaskListTask,
   TaskPriority,
   TaskStatus,
@@ -24,14 +21,12 @@ import { InlineEdit } from "@/components/InlineEdit";
 import {
   TaskPriorityPicker,
   TaskStatusPicker,
-  TaskStatusDot,
   TaskTypeBadge,
 } from "./TaskBadges";
 import {
   formatDueDate,
   formatPersonName,
   getInitials,
-  getSubtaskProgress,
   getTaskAssignees,
   isOverdue,
 } from "./task-list-utils";
@@ -66,67 +61,9 @@ function AssigneeStack({ assignees }: { assignees: TaskListAssignee[] }) {
   );
 }
 
-function SubtaskRow({ task }: { task: TaskListSubTask }) {
-  const dueLabel = formatDueDate(task.dueDate);
-  const overdue = isOverdue(task.dueDate, task.status);
-  const assignees = getTaskAssignees(task);
-
-  return (
-    <div className="group/sub flex items-start gap-3 rounded-lg border border-transparent px-3 py-2.5 transition hover:border-slate-200 hover:bg-slate-100 dark:hover:border-[#1a1a1a] dark:hover:bg-slate-950/40">
-      <div className="mt-1.5 flex h-4 w-4 shrink-0 items-center justify-center">
-        {task.status === "Done" ? (
-          <CheckCircle2 className="h-4 w-4 text-emerald-500" />
-        ) : task.status === "InProgress" ? (
-          <Clock className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-        ) : (
-          <Circle className="h-4 w-4 text-slate-600" />
-        )}
-      </div>
-
-      <div className="min-w-0 flex-1">
-        <div className="flex flex-wrap items-center gap-2">
-          <p
-            className={`text-sm font-semibold ${
-              task.status === "Done" ? "text-slate-500 line-through" : "text-slate-900 dark:text-slate-200"
-            }`}
-          >
-            {task.title}
-          </p>
-          <TaskTypeBadge type={task.type} />
-        </div>
-
-        {task.description ? (
-          <p className="mt-1 line-clamp-2 text-xs text-slate-500">{task.description}</p>
-        ) : null}
-
-        <div className="mt-2 flex flex-wrap items-center gap-3 text-[10px] font-semibold text-slate-500">
-          <AssigneeStack assignees={assignees} />
-          {dueLabel ? (
-            <span
-              className={`inline-flex items-center gap-1 ${
-                overdue ? "text-red-600 dark:text-red-400" : "text-slate-500"
-              }`}
-            >
-              {overdue ? (
-                <AlertCircle className="h-3 w-3" />
-              ) : (
-                <Calendar className="h-3 w-3" />
-              )}
-              {dueLabel}
-            </span>
-          ) : null}
-        </div>
-      </div>
-
-      <TaskStatusDot status={task.status} />
-    </div>
-  );
-}
-
 type TaskCardProps = {
   task: TaskListTask;
-  defaultExpanded?: boolean;
-  onOpen?: () => void;
+  onEditAssignees?: () => void;
   onUpdateTitle: (title: string) => Promise<void>;
   onUpdateDescription: (description: string) => Promise<void>;
   onUpdateStatus: (status: TaskStatus) => Promise<void>;
@@ -137,8 +74,7 @@ type TaskCardProps = {
 
 export function TaskCard({
   task,
-  defaultExpanded = false,
-  onOpen,
+  onEditAssignees,
   onUpdateTitle,
   onUpdateDescription,
   onUpdateStatus,
@@ -146,161 +82,89 @@ export function TaskCard({
   isStatusUpdating = false,
   isPriorityUpdating = false,
 }: TaskCardProps) {
-  const [expanded, setExpanded] = useState(defaultExpanded);
   const dueLabel = formatDueDate(task.dueDate);
   const overdue = isOverdue(task.dueDate, task.status);
   const assignees = getTaskAssignees(task);
-  const progress = useMemo(() => getSubtaskProgress(task.subTasks), [task.subTasks]);
-  const hasSubtasks = task.subTasks.length > 0;
 
   return (
-    <article
-      className={`overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:border-slate-300 dark:border-[#1a1a1a] dark:bg-[#0a0a0a] dark:hover:border-slate-800 ${
-        onOpen ? "cursor-pointer" : ""
-      }`}
-      onClick={onOpen}
-      onKeyDown={
-        onOpen
-          ? (event) => {
-              if (event.key === "Enter" || event.key === " ") {
-                event.preventDefault();
-                onOpen();
-              }
-            }
-          : undefined
-      }
-      role={onOpen ? "button" : undefined}
-      tabIndex={onOpen ? 0 : undefined}
-      aria-label={onOpen ? `Open task: ${task.title}` : undefined}
-    >
-      <div className="p-5">
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-          <div className="min-w-0 flex-1">
-            <div
-              className="flex flex-wrap items-center gap-2"
-              onClick={(event) => event.stopPropagation()}
-            >
-              <TaskTypeBadge type={task.type} />
-              <TaskPriorityPicker
-                priority={task.priority}
-                onPriorityChange={onUpdatePriority}
-                disabled={isPriorityUpdating}
-              />
-              <TaskStatusPicker
-                status={task.status}
-                onStatusChange={onUpdateStatus}
-                disabled={isStatusUpdating}
-              />
-            </div>
-
-            <h3 className="mt-3 text-lg font-black tracking-tight text-slate-950 dark:text-slate-100">
-              <span onClick={(event) => event.stopPropagation()}>
-                <InlineEdit
-                  value={task.title}
-                  placeholder="Task title"
-                  onSave={onUpdateTitle}
-                  className="text-lg font-black tracking-tight"
-                />
-              </span>
-            </h3>
-
-            <div
-              className="mt-2 max-w-3xl"
-              onClick={(event) => event.stopPropagation()}
-            >
-              <InlineEdit
-                value={task.description ?? ""}
-                placeholder="Add a description..."
-                allowEmpty
-                onSave={onUpdateDescription}
-                className="text-sm leading-relaxed text-slate-600 dark:text-slate-400"
-              />
-            </div>
-
-            <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 text-xs">
-              <div className="flex items-center gap-2">
-                <User className="h-3.5 w-3.5 text-slate-500" />
-                <span className="font-semibold text-slate-500">Created by</span>
-                <span className="font-bold text-slate-800 dark:text-slate-300">
-                  {formatPersonName(task.creator)}
-                </span>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <span className="font-semibold text-slate-500">Assigned</span>
-                <AssigneeStack assignees={assignees} />
-              </div>
-
-              {dueLabel ? (
-                <div
-                  className={`flex items-center gap-1.5 font-bold ${
-                    overdue ? "text-red-600 dark:text-red-400" : "text-slate-600 dark:text-slate-400"
-                  }`}
-                >
-                  {overdue ? (
-                    <AlertCircle className="h-3.5 w-3.5" />
-                  ) : (
-                    <Calendar className="h-3.5 w-3.5" />
-                  )}
-                  Due {dueLabel}
-                </div>
-              ) : null}
-            </div>
-          </div>
-
-          {hasSubtasks ? (
-            <div className="w-full shrink-0 lg:w-44">
-              <div className="rounded-xl border border-slate-200 bg-slate-50 p-3 dark:border-[#1a1a1a] dark:bg-[#121212]/50">
-                <div className="flex items-center justify-between text-[10px] font-bold uppercase tracking-wide text-slate-500">
-                  <span>Subtasks</span>
-                  <span className="font-mono text-slate-600 dark:text-slate-400">
-                    {progress.completed}/{progress.total}
-                  </span>
-                </div>
-                <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-slate-200 dark:bg-slate-900">
-                  <div
-                    className="h-full rounded-full bg-gradient-to-r from-blue-600 to-indigo-500 transition-all duration-500"
-                    style={{ width: `${progress.percent}%` }}
-                  />
-                </div>
-                <p className="mt-1.5 text-right text-[10px] font-bold text-blue-600 dark:text-blue-400">
-                  {progress.percent}% complete
-                </p>
-              </div>
-            </div>
-          ) : null}
-        </div>
-
-        {hasSubtasks ? (
-          <button
-            type="button"
-            onClick={(event) => {
-              event.stopPropagation();
-              setExpanded((open) => !open);
-            }}
-            className="mt-4 inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 px-3 py-1.5 text-[11px] font-bold text-slate-600 transition hover:border-slate-300 hover:text-slate-900 dark:border-[#1a1a1a] dark:bg-[#121212]/50 dark:text-slate-400 dark:hover:border-slate-800 dark:hover:text-slate-200"
-            aria-expanded={expanded}
-          >
-            <ChevronDown
-              className={`h-4 w-4 transition-transform duration-200 ${
-                expanded ? "rotate-180" : ""
-              }`}
+    <article className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:border-slate-300 dark:border-[#1a1a1a] dark:bg-[#0a0a0a] dark:hover:border-slate-800">
+      <div className="p-4 sm:p-5">
+        <div className="min-w-0">
+          <div className="flex flex-wrap items-center gap-2">
+            <TaskTypeBadge type={task.type} />
+            <TaskPriorityPicker
+              priority={task.priority}
+              onPriorityChange={onUpdatePriority}
+              disabled={isPriorityUpdating}
             />
-            {expanded ? "Hide" : "Show"} {task.subTasks.length} subtask
-            {task.subTasks.length === 1 ? "" : "s"}
-          </button>
-        ) : null}
-      </div>
+            <TaskStatusPicker
+              status={task.status}
+              onStatusChange={onUpdateStatus}
+              disabled={isStatusUpdating}
+            />
+          </div>
 
-      {hasSubtasks && expanded ? (
-        <div className="border-t border-slate-200 bg-slate-50/70 px-2 py-2 dark:border-[#1a1a1a] dark:bg-[#121212]/30">
-          <div className="space-y-0.5">
-            {task.subTasks.map((subtask) => (
-              <SubtaskRow key={subtask.id} task={subtask} />
-            ))}
+          <h3 className="mt-3 text-lg font-black tracking-tight text-slate-950 dark:text-slate-100">
+            <InlineEdit
+              value={task.title}
+              placeholder="Task title"
+              onSave={onUpdateTitle}
+              className="text-lg font-black tracking-tight"
+            />
+          </h3>
+
+          <div className="mt-2 max-w-3xl">
+            <InlineEdit
+              value={task.description ?? ""}
+              placeholder="Add a description..."
+              allowEmpty
+              onSave={onUpdateDescription}
+              className="text-sm leading-relaxed text-slate-600 dark:text-slate-400"
+            />
+          </div>
+
+          <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 text-xs">
+            <div className="flex items-center gap-2">
+              <User className="h-3.5 w-3.5 text-slate-500" />
+              <span className="font-semibold text-slate-500">Created by</span>
+              <span className="font-bold text-slate-800 dark:text-slate-300">
+                {formatPersonName(task.creator)}
+              </span>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <span className="font-semibold text-slate-500">Assigned</span>
+              <AssigneeStack assignees={assignees} />
+            </div>
+
+            {dueLabel ? (
+              <div
+                className={`flex items-center gap-1.5 font-bold ${
+                  overdue ? "text-red-600 dark:text-red-400" : "text-slate-600 dark:text-slate-400"
+                }`}
+              >
+                {overdue ? (
+                  <AlertCircle className="h-3.5 w-3.5" />
+                ) : (
+                  <Calendar className="h-3.5 w-3.5" />
+                )}
+                Due {dueLabel}
+              </div>
+            ) : null}
+
+            {onEditAssignees ? (
+              <button
+                type="button"
+                onClick={onEditAssignees}
+                className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-1 text-[11px] font-bold text-slate-600 transition hover:border-slate-300 hover:text-slate-900 dark:border-[#1a1a1a] dark:bg-[#121212]/50 dark:text-slate-400 dark:hover:text-slate-200"
+              >
+                <Users className="h-3.5 w-3.5" />
+                Due &amp; assignees
+              </button>
+            ) : null}
           </div>
         </div>
-      ) : null}
+      </div>
     </article>
   );
 }
@@ -320,8 +184,8 @@ export function TaskListStats({ tasks }: TaskListStatsProps) {
       label: "Total tasks",
       value: total,
       icon: ListTodo,
-      accent: "text-blue-600 dark:text-blue-400",
-      bg: "bg-blue-500/10 border-blue-500/20",
+      accent: "text-orange-600 dark:text-orange-400",
+      bg: "bg-orange-500/10 border-orange-500/20",
     },
     {
       label: "In progress",
@@ -389,7 +253,7 @@ type TaskFiltersProps = {
 };
 
 const selectClassName =
-  "rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 outline-none transition focus:border-blue-500/40 focus:ring-1 focus:ring-blue-500/20 dark:border-[#1a1a1a] dark:bg-[#121212]/60 dark:text-slate-300";
+  "rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 shadow-sm outline-none transition hover:border-slate-300 dark:border-[#1a1a1a] dark:bg-[#121212]/60 dark:text-slate-300 dark:hover:border-slate-700";
 
 export function TaskFilters({
   search,

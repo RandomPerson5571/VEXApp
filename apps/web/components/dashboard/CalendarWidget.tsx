@@ -5,9 +5,10 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useMemo, useState } from "react";
 import { DayPlanIcon } from "@/components/calendar/DayPlanIcon";
 import type { CalendarEvent, DayPlanType, TeamDayPlan } from "@/lib/types/team";
+import { CalendarSourcesBanner } from "@/components/calendar/CalendarSourcesBanner";
 import { isQueryInitiallyLoading } from "@/lib/hooks/use-query-loading";
+import { useMergedCalendarSources } from "@/lib/hooks/use-merged-calendar-sources";
 import { useTeamDayPlans } from "@/lib/hooks/use-team-day-plans";
-import { useTeamEvents } from "@/lib/hooks/use-team-events";
 import {
   formatMonthYear,
   getDayPlanStyle,
@@ -22,13 +23,16 @@ const DAY_PLAN_TYPES: DayPlanType[] = ["build", "coding", "testing"];
 const EVENT_DOT_CLASS = "bg-orange-400";
 
 export function TeamCalendarWidget() {
-  const eventsQuery = useTeamEvents();
+  const {
+    calendarEvents: events,
+    status,
+    warning,
+    isInitialLoading: sourcesLoading,
+  } = useMergedCalendarSources();
   const dayPlansQuery = useTeamDayPlans();
-  const { data: events = [] } = eventsQuery;
   const { data: dayPlans = [] } = dayPlansQuery;
   const isInitialLoading =
-    isQueryInitiallyLoading(eventsQuery) ||
-    isQueryInitiallyLoading(dayPlansQuery);
+    sourcesLoading || isQueryInitiallyLoading(dayPlansQuery);
   const today = getTodayDateStr();
   const [currentMonth, setCurrentMonth] = useState(() => {
     const now = new Date();
@@ -83,111 +87,118 @@ export function TeamCalendarWidget() {
         </Link>
       </div>
 
-      <div className="flex flex-wrap items-center gap-2 mb-3">
-        {DAY_PLAN_TYPES.map((type) => {
-          const style = getDayPlanStyle(type);
-          return (
-            <span
-              key={type}
-              className={`inline-flex items-center gap-1.5 rounded-md border px-2 py-1 text-[10px] font-black uppercase tracking-wide ${style.badge}`}
-            >
-              <DayPlanIcon type={type} className="h-3 w-3" />
-              {style.label}
-            </span>
-          );
-        })}
-      </div>
+      {!isInitialLoading ? (
+        <CalendarSourcesBanner
+          status={status}
+          warning={warning}
+          className="mb-3"
+        />
+      ) : null}
 
-      <div className="flex items-center justify-between mb-2">
-        <span className="text-xs font-black text-slate-900 dark:text-slate-100">
-          {formatMonthYear(currentMonth)}
-        </span>
-        <div className="flex items-center gap-1">
-          <button
-            type="button"
-            onClick={() => shiftMonth(-1)}
-            className="p-1 rounded bg-slate-200 dark:bg-[#121212]/80 border border-slate-300 dark:border-[#1a1a1a] text-slate-700 dark:text-slate-200 hover:bg-slate-300 dark:hover:bg-[#121212]"
-            aria-label="Previous month"
-          >
-            <ChevronLeft className="h-3 w-3" />
-          </button>
-          <button
-            type="button"
-            onClick={() => shiftMonth(1)}
-            className="p-1 rounded bg-slate-200 dark:bg-[#121212]/80 border border-slate-300 dark:border-[#1a1a1a] text-slate-700 dark:text-slate-200 hover:bg-slate-300 dark:hover:bg-[#121212]"
-            aria-label="Next month"
-          >
-            <ChevronRight className="h-3 w-3" />
-          </button>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-7 gap-1 text-center text-[10px] font-bold pb-2 border-b border-slate-300 dark:border-[#1a1a1a] text-slate-600 dark:text-slate-500">
-        {WEEKDAY_LABELS.map((day, i) => (
-          <span key={`${day}-${i}`}>{day}</span>
-        ))}
-      </div>
-
-      <div className="grid grid-cols-7 gap-1.5 pt-2 text-center">
-        {isInitialLoading
-          ? daysGrid.map((cell) => (
-              <div
-                key={cell.dateStr}
-                className="h-11 animate-pulse rounded-xl bg-slate-100 dark:bg-[#121212]/60"
-              />
-            ))
-          : daysGrid.map((cell) => {
-              const dayEvents = eventsByDate.get(cell.dateStr) ?? [];
-              const dayPlan = dayPlansByDate.get(cell.dateStr);
-              const dayPlanStyle = dayPlan
-                ? getDayPlanStyle(dayPlan.type)
-                : null;
-              const isSelectedDay = cell.dateStr === today;
-
-              const planBg = dayPlanStyle
-                ? cell.isCurrentMonth
-                  ? dayPlanStyle.cellBg
-                  : dayPlanStyle.cellBgMuted
-                : "";
-
+      {status === "both-unavailable" && !isInitialLoading ? null : (
+        <>
+          <div className="mb-3 flex flex-wrap items-center gap-2">
+            {DAY_PLAN_TYPES.map((type) => {
+              const style = getDayPlanStyle(type);
               return (
-                <Link
-                  key={cell.dateStr}
-                  href={`/calendar?date=${cell.dateStr}`}
-                  className={`min-h-11 rounded-xl flex flex-col items-center justify-center gap-0.5 p-1 relative text-[10px] font-bold transition border ${
-                    cell.isCurrentMonth
-                      ? "text-slate-900 dark:text-slate-100"
-                      : "text-slate-500 dark:text-slate-500"
-                  } ${planBg} ${
-                    dayPlanStyle
-                      ? `border-l-[3px] ${dayPlanStyle.accent}`
-                      : "border-transparent"
-                  } ${
-                    isSelectedDay
-                      ? "ring-2 ring-inset ring-orange-500/50 text-orange-600 dark:text-orange-300"
-                      : "hover:bg-slate-200/50 dark:hover:bg-white/5"
-                  }`}
+                <span
+                  key={type}
+                  className={`inline-flex items-center gap-1.5 rounded-md border px-2 py-1 text-[10px] font-black uppercase tracking-wide ${style.badge}`}
                 >
-                  {dayPlan ? (
-                    <span className="absolute right-1 top-1">
-                      <DayPlanIcon type={dayPlan.type} className="h-3 w-3" />
-                    </span>
-                  ) : null}
-                  <span className="leading-none">{cell.day}</span>
-                  {dayEvents.length > 0 && (
-                    <div className="flex gap-0.5 justify-center absolute bottom-1">
-                      {dayEvents.slice(0, 3).map((ev) => (
-                        <span
-                          key={ev.id}
-                          className={`h-1.5 w-1.5 rounded-full ${EVENT_DOT_CLASS}`}
-                        />
-                      ))}
-                    </div>
-                  )}
-                </Link>
+                  <span className={`h-2.5 w-2.5 rounded-full ${style.dot}`} />
+                  {style.label}
+                </span>
               );
             })}
-      </div>
+          </div>
+
+          <div className="mb-2 flex items-center justify-between">
+            <span className="text-xs font-black text-slate-900 dark:text-slate-100">
+              {formatMonthYear(currentMonth)}
+            </span>
+            <div className="flex items-center gap-1">
+              <button
+                type="button"
+                onClick={() => shiftMonth(-1)}
+                className="rounded border border-slate-300 bg-slate-200 p-1 text-slate-700 hover:bg-slate-300 dark:border-[#1a1a1a] dark:bg-[#121212]/80 dark:text-slate-200 dark:hover:bg-[#121212]"
+                aria-label="Previous month"
+              >
+                <ChevronLeft className="h-3 w-3" />
+              </button>
+              <button
+                type="button"
+                onClick={() => shiftMonth(1)}
+                className="rounded border border-slate-300 bg-slate-200 p-1 text-slate-700 hover:bg-slate-300 dark:border-[#1a1a1a] dark:bg-[#121212]/80 dark:text-slate-200 dark:hover:bg-[#121212]"
+                aria-label="Next month"
+              >
+                <ChevronRight className="h-3 w-3" />
+              </button>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-7 gap-1 border-b border-slate-300 pb-2 text-center text-[10px] font-bold text-slate-600 dark:border-[#1a1a1a] dark:text-slate-500">
+            {WEEKDAY_LABELS.map((day, i) => (
+              <span key={`${day}-${i}`}>{day}</span>
+            ))}
+          </div>
+
+          <div className="grid grid-cols-7 gap-1.5 pt-2 text-center">
+            {isInitialLoading
+              ? daysGrid.map((cell) => (
+                  <div
+                    key={cell.dateStr}
+                    className="h-11 animate-pulse rounded-xl bg-slate-100 dark:bg-[#121212]/60"
+                  />
+                ))
+              : daysGrid.map((cell) => {
+                  const dayEvents = eventsByDate.get(cell.dateStr) ?? [];
+                  const dayPlan = dayPlansByDate.get(cell.dateStr);
+                  const dayPlanStyle = dayPlan
+                    ? getDayPlanStyle(dayPlan.type)
+                    : null;
+                  const isSelectedDay = cell.dateStr === today;
+
+                  const planBg = dayPlanStyle
+                    ? cell.isCurrentMonth
+                      ? dayPlanStyle.cellBg
+                      : dayPlanStyle.cellBgMuted
+                    : "";
+
+                  return (
+                    <Link
+                      key={cell.dateStr}
+                      href={`/calendar?date=${cell.dateStr}`}
+                      className={`relative flex min-h-11 flex-col items-center justify-center gap-0.5 rounded-xl border p-1 text-[10px] font-bold transition ${
+                        cell.isCurrentMonth
+                          ? "text-slate-900 dark:text-slate-100"
+                          : "text-slate-500 dark:text-slate-500"
+                      } ${planBg} ${
+                        dayPlanStyle
+                          ? `border-l-[3px] ${dayPlanStyle.accent}`
+                          : "border-transparent"
+                      } ${
+                        isSelectedDay
+                          ? "text-orange-600 ring-2 ring-inset ring-orange-500/50 dark:text-orange-300"
+                          : "hover:bg-slate-200/50 dark:hover:bg-white/5"
+                      }`}
+                    >
+                      <span className="leading-none">{cell.day}</span>
+                      {dayEvents.length > 0 && (
+                        <div className="absolute bottom-1 flex justify-center gap-0.5">
+                          {dayEvents.slice(0, 3).map((ev) => (
+                            <span
+                              key={ev.id}
+                              className={`h-1.5 w-1.5 rounded-full ${EVENT_DOT_CLASS}`}
+                            />
+                          ))}
+                        </div>
+                      )}
+                    </Link>
+                  );
+                })}
+          </div>
+        </>
+      )}
     </div>
   );
 }

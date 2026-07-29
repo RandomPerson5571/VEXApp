@@ -11,10 +11,12 @@ import {
   knowledgeEdgesQueryOptions,
   knowledgeNodesQueryOptions,
   searchKnowledgeFromApi,
+  updateKnowledgeNodeFromApi,
   type CreateEdgePayload,
   type CreateNodePayload,
   type KnowledgeEdgeRecord,
   type KnowledgeNodeRecord,
+  type UpdateNodePayload,
 } from "@/lib/queries/knowledge";
 import { queryKeys } from "@/lib/query-client";
 
@@ -51,6 +53,17 @@ export function useKnowledgeMutations(teamId: string) {
     onSuccess: invalidate,
   });
 
+  const updateNode = useMutation({
+    mutationFn: ({
+      nodeId,
+      payload,
+    }: {
+      nodeId: string;
+      payload: UpdateNodePayload;
+    }) => updateKnowledgeNodeFromApi(nodeId, payload),
+    onSuccess: invalidate,
+  });
+
   const createEdge = useMutation({
     mutationFn: (payload: CreateEdgePayload) => createKnowledgeEdgeFromApi(payload),
     onSuccess: invalidate,
@@ -84,5 +97,5 @@ export function useKnowledgeMutations(teamId: string) {
     mutationFn: (query: string) => searchKnowledgeFromApi(query),
   });
 
-  return { createNode, createEdge, deleteNode, deleteEdge, search };
+  return { createNode, updateNode, createEdge, deleteNode, deleteEdge, search };
 }

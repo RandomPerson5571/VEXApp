@@ -13,6 +13,7 @@ import {
 import { invalidateTaskDashboard } from "@/lib/queries/cache-updates/invalidate";
 import {
   createTeamTaskFromApi,
+  type CreateTaskPayload,
   updateTeamTaskFromApi,
 } from "@/lib/queries/tasks";
 import type { TaskListTask, TaskStatus } from "@stlvex/database/types";
@@ -20,12 +21,48 @@ import { debounce } from "@/lib/utils/debounce";
 
 type UseTeamTaskMutationsOptions = {
   teamId: string | undefined;
+  creator?: { id: string; firstName: string; lastName: string };
   onCreateSuccess?: () => void;
   onUpdateSuccess?: () => void;
 };
 
+function buildOptimisticCreatedTask(
+  teamId: string,
+  payload: CreateTaskPayload,
+  creator: { id: string; firstName: string; lastName: string } | undefined,
+): TaskListTask {
+  const now = new Date();
+  // ponytail: temp row for instant list paint; replaced on success
+  return {
+    id: `temp-${crypto.randomUUID()}`,
+    title: payload.title.trim(),
+    description: payload.description?.trim() || null,
+    type: payload.type,
+    status: "NotStarted",
+    priority: payload.priority,
+    dueDate: payload.dueDate
+      ? new Date(`${payload.dueDate.trim()}T17:00:00.000Z`)
+      : null,
+    teamId,
+    createdBy: creator?.id ?? null,
+    parentTaskId: null,
+    createdAt: now,
+    updatedAt: now,
+    creator: creator
+      ? {
+          id: creator.id,
+          firstName: creator.firstName,
+          lastName: creator.lastName,
+        }
+      : null,
+    assignments: [],
+    subTasks: [],
+  };
+}
+
 export function useTeamTaskMutations({
   teamId,
+  creator,
   onCreateSuccess,
   onUpdateSuccess,
 }: UseTeamTaskMutationsOptions) {
@@ -38,11 +75,51 @@ export function useTeamTaskMutations({
 
   const createMutation = useMutation({
     mutationFn: createTeamTaskFromApi,
-    onSuccess: (newTask) => {
-      if (teamId) {
-        prependTeamTask(queryClient, teamId, newTask);
-      }
+    onMutate: async (variables) => {
+      if (!teamId) return {};
+
+      await queryClient.cancelQueries({
+        queryKey: queryKeys.tasks.forTeam(teamId),
+      });
+
+      const previous = queryClient.getQueryData<TaskListTask[]>(
+        queryKeys.tasks.forTeam(teamId),
+      );
+
+      const optimisticTask = buildOptimisticCreatedTask(
+        teamId,
+        variables,
+        creator,
+      );
+      prependTeamTask(queryClient, teamId, optimisticTask);
       onCreateSuccess?.();
+
+      return { previous, tempId: optimisticTask.id };
+    },
+    onSuccess: (newTask, _variables, context) => {
+      if (!teamId) return;
+
+      if (context?.tempId) {
+        queryClient.setQueryData<TaskListTask[]>(
+          queryKeys.tasks.forTeam(teamId),
+          (old) => {
+            if (!old) return [newTask];
+            const withoutTemp = old.filter((task) => task.id !== context.tempId);
+            return [newTask, ...withoutTemp.filter((task) => task.id !== newTask.id)];
+          },
+        );
+        return;
+      }
+
+      prependTeamTask(queryClient, teamId, newTask);
+    },
+    onError: (_error, _variables, context) => {
+      if (teamId && context?.previous) {
+        queryClient.setQueryData(
+          queryKeys.tasks.forTeam(teamId),
+          context.previous,
+        );
+      }
     },
     onSettled: () => {
       if (teamId) {

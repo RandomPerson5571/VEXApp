@@ -40,10 +40,14 @@ export const queryKeys = {
     edges: (teamId: string) => ["knowledge", "edges", teamId] as const,
     scouting: (teamId: string) => ["knowledge", "scouting", teamId] as const,
   },
-  notebookLogs: {
-    all: ["notebook-logs"] as const,
-  },
   invites: {
     all: ["invites"] as const,
+  },
+  robotevents: {
+    upcoming: (teamId: string) => ["robotevents", "upcoming", teamId] as const,
+    picklistEvents: (teamId: string) =>
+      ["robotevents", "picklist-events", teamId] as const,
+    eventAnalytics: (eventId: string) =>
+      ["robotevents", "event-analytics", eventId] as const,
   },
 } as const;

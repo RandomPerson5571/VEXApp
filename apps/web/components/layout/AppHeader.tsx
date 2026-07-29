@@ -124,7 +124,7 @@ export function AppHeader({
                   Invite
                 </Link>
                 <Link
-                  href="/members"
+                  href="/team-management"
                   className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-[#121212] text-slate-900 dark:text-slate-300 font-semibold"
                   onClick={() => setShowUserDropdown(false)}
                 >

@@ -23,21 +23,9 @@ export interface CalendarEvent {
   location?: string;
   matchesCount?: number;
   description?: string;
-}
-
-export interface Activity {
-  id: string;
-  text: string;
-  subtext?: string;
-  time: string;
-  type: "scout" | "doc" | "inventory" | "build" | "schedule";
-}
-
-export interface BuildStatusComponent {
-  id: string;
-  name: string;
-  percentage: number;
-  colorClass: string;
+  createdBy?: string;
+  /** External events.vex.com URL when sourced from RobotEvents. */
+  href?: string;
 }
 
 export interface UpcomingMatch {
@@ -49,6 +37,8 @@ export interface UpcomingMatch {
   location: string;
   time: string;
   accentClass: string;
+  /** External events.vex.com URL when sourced from RobotEvents. */
+  href?: string;
 }
 
 export interface DashboardSummaryStats {
@@ -59,18 +49,4 @@ export interface DashboardSummaryStats {
   nextEventDate: string;
   inventoryItems: number;
   inventoryWarning: boolean;
-}
-
-export interface DesignNotebookEntry {
-  id: string;
-  title: string;
-  week: string;
-  category: string;
-  introduction: string;
-  designConstraints: string[];
-  conceptSketchesDescription: string;
-  prototypesText: string;
-  testingResults: string;
-  conclusion: string;
-  nextSteps: string;
 }

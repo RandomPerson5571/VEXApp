@@ -75,6 +75,7 @@ describe("calendar day plans UI", () => {
                 renderCalendar();
               }}
               onAddEvent={() => undefined}
+              onEventClick={() => undefined}
             />
             <CalendarMonthGrid
               calendarDays={[CALENDAR_CELL]}
@@ -83,6 +84,7 @@ describe("calendar day plans UI", () => {
               selectedDate={SELECTED_DATE}
               todayStr="2026-07-01"
               onSelectDate={() => undefined}
+              onEventClick={() => undefined}
             />
           </>,
         );
@@ -129,6 +131,7 @@ describe("calendar day plans UI", () => {
                 renderCalendar();
               }}
               onAddEvent={() => undefined}
+              onEventClick={() => undefined}
             />
             <CalendarMonthGrid
               calendarDays={[CALENDAR_CELL]}
@@ -137,6 +140,7 @@ describe("calendar day plans UI", () => {
               selectedDate={SELECTED_DATE}
               todayStr="2026-07-01"
               onSelectDate={() => undefined}
+              onEventClick={() => undefined}
             />
           </>,
         );
@@ -192,6 +196,7 @@ describe("calendar day plans UI", () => {
             selectedDate={SELECTED_DATE}
             todayStr="2026-07-01"
             onSelectDate={() => undefined}
+            onEventClick={() => undefined}
           />,
         );
       });
@@ -221,6 +226,7 @@ describe("calendar day plans UI", () => {
           selectedDate={SELECTED_DATE}
           todayStr="2026-07-01"
           onSelectDate={() => undefined}
+          onEventClick={() => undefined}
         />,
       );
     });

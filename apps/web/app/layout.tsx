@@ -3,7 +3,6 @@ import type { Metadata, Viewport } from "next";
 import Script from "next/script";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { QueryProvider } from "@/components/providers/QueryProvider";
 import { ServiceWorkerRegistration } from "@/components/providers/ServiceWorkerRegistration";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { ROOT_LAYOUT_METADATA } from "@/lib/seo";
@@ -36,13 +35,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={cn(
-        "h-full dark",
-        "antialiased",
-        geistSans.variable,
-        geistMono.variable,
-        "font-sans",
-      )}
+      className={cn("h-full dark", "antialiased", geistSans.variable, geistMono.variable, "font-sans")}
       suppressHydrationWarning
     >
       <head>
@@ -61,9 +54,7 @@ export default function RootLayout({
       </head>
       <body className="flex min-h-full flex-col">
         <ServiceWorkerRegistration />
-        <ThemeProvider>
-          <QueryProvider>{children}</QueryProvider>
-        </ThemeProvider>
+        <ThemeProvider>{children}</ThemeProvider>
       </body>
     </html>
   );

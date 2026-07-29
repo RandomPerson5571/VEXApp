@@ -35,6 +35,14 @@ export type CreateNodePayload = {
   content?: string | null;
 };
 
+export type UpdateNodePayload = {
+  title?: string;
+  topicCategory?: TopicCategory;
+  contentType?: ContentType;
+  contentUrl?: string | null;
+  content?: string | null;
+};
+
 export type CreateEdgePayload = {
   sourceId: string;
   targetId: string;
@@ -100,6 +108,22 @@ export async function createKnowledgeEdgeFromApi(
     throw new Error(await readError(response, "Failed to create edge."));
   }
   return response.json() as Promise<KnowledgeEdgeRecord>;
+}
+
+export async function updateKnowledgeNodeFromApi(
+  nodeId: string,
+  payload: UpdateNodePayload,
+): Promise<KnowledgeNodeRecord> {
+  const response = await fetch(`/api/knowledge/nodes/${nodeId}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+  throwIfRateLimited(response);
+  if (!response.ok) {
+    throw new Error(await readError(response, "Failed to update node."));
+  }
+  return response.json() as Promise<KnowledgeNodeRecord>;
 }
 
 export async function deleteKnowledgeNodeFromApi(nodeId: string): Promise<void> {

@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { AlertTriangle, Package, Plus } from "lucide-react";
+import type { TeamInventoryItem } from "@stlvex/database/types";
 
 import { useTeam, useUser } from "@/components/providers/UserProvider";
 import {
@@ -10,6 +11,7 @@ import {
   InventoryStats,
 } from "@/components/inventory/InventoryComponents";
 import { InventoryItemModal } from "@/components/inventory/InventoryItemModal";
+import { ConfirmationDialog } from "@/components/ui/ConfirmationDialog";
 import { isGlobalAdmin } from "@/lib/auth/auth-guards";
 import { isQueryInitiallyLoading } from "@/lib/hooks/use-query-loading";
 import { useTeamInventoryMutations } from "@/lib/hooks/use-team-inventory-mutations";
@@ -60,32 +62,87 @@ export function InventoryView() {
   const inventoryQuery = useTeamInventory();
   const { data: items = [], isError } = inventoryQuery;
   const isInitialLoading = isQueryInitiallyLoading(inventoryQuery);
-  const { createMutation } = useTeamInventoryMutations({
-    teamId: team?.id,
-    onCreateSuccess: () => {
-      setIsModalOpen(false);
-      setName("");
-      setDescription("");
-      setTotalStock("");
-      setCheckoutLimit("");
-      setImageFile(null);
-      setCreateError(undefined);
-    },
-  });
+
+  const resetForm = () => {
+    setName("");
+    setDescription("");
+    setTotalStock("");
+    setCheckoutLimit("");
+    setImageFile(null);
+    setExistingImageUrl(null);
+    setFormError(undefined);
+    setEditingItemId(null);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    resetForm();
+  };
+
+  const { createMutation, updateMutation, deleteMutation } =
+    useTeamInventoryMutations({
+      teamId: team?.id,
+      onCreateSuccess: closeModal,
+      onUpdateSuccess: closeModal,
+      onDeleteSuccess: closeModal,
+    });
   const [search, setSearch] = useState("");
   const [availabilityFilter, setAvailabilityFilter] =
     useState<AvailabilityFilter>("all");
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingItemId, setEditingItemId] = useState<string | null>(null);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [totalStock, setTotalStock] = useState("");
   const [checkoutLimit, setCheckoutLimit] = useState("");
   const [imageFile, setImageFile] = useState<File | null>(null);
-  const [createError, setCreateError] = useState<string | undefined>();
+  const [existingImageUrl, setExistingImageUrl] = useState<string | null>(null);
+  const [formError, setFormError] = useState<string | undefined>();
+  const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
 
-  const openCreateModal = () => setIsModalOpen(true);
+  const isEditMode = editingItemId !== null;
+  const isModalBusy =
+    createMutation.isPending ||
+    updateMutation.isPending ||
+    deleteMutation.isPending;
 
-  const handleCreateItem = async (e: React.FormEvent<HTMLFormElement>) => {
+  const openCreateModal = () => {
+    resetForm();
+    createMutation.reset();
+    updateMutation.reset();
+    deleteMutation.reset();
+    setIsModalOpen(true);
+  };
+
+  const openEditModal = (item: TeamInventoryItem) => {
+    if (!isAdmin) return;
+    setEditingItemId(item.id);
+    setName(item.name);
+    setDescription(item.description ?? "");
+    setTotalStock(String(item.totalStock));
+    setCheckoutLimit(
+      item.checkoutLimit === null || item.checkoutLimit === undefined
+        ? ""
+        : String(item.checkoutLimit),
+    );
+    setImageFile(null);
+    setExistingImageUrl(item.imageUrl);
+    setFormError(undefined);
+    createMutation.reset();
+    updateMutation.reset();
+    deleteMutation.reset();
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    if (isModalBusy) return;
+    createMutation.reset();
+    updateMutation.reset();
+    deleteMutation.reset();
+    closeModal();
+  };
+
+  const handleSubmitItem = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const trimmedName = name.trim();
     const stock = Number.parseInt(totalStock, 10);
@@ -94,16 +151,28 @@ export function InventoryView() {
         ? undefined
         : Number.parseInt(checkoutLimit, 10);
 
-    if (!trimmedName || createMutation.isPending) return;
+    if (!trimmedName || isModalBusy) return;
     if (!Number.isInteger(stock) || stock < 0) return;
     if (limit !== undefined && (!Number.isInteger(limit) || limit < 1)) return;
 
-    setCreateError(undefined);
+    setFormError(undefined);
 
     try {
       const imageUrl = imageFile
         ? await uploadInventoryImage(imageFile)
         : undefined;
+
+      if (isEditMode && editingItemId) {
+        await updateMutation.mutateAsync({
+          itemId: editingItemId,
+          name: trimmedName,
+          description: description.trim() || undefined,
+          totalStock: stock,
+          checkoutLimit: limit,
+          ...(imageUrl !== undefined ? { imageUrl } : {}),
+        });
+        return;
+      }
 
       await createMutation.mutateAsync({
         name: trimmedName,
@@ -113,11 +182,35 @@ export function InventoryView() {
         imageUrl,
       });
     } catch (error) {
-      setCreateError(
+      setFormError(
         error instanceof Error
           ? error.message
-          : "Failed to create inventory item.",
+          : isEditMode
+            ? "Failed to update inventory item."
+            : "Failed to create inventory item.",
       );
+    }
+  };
+
+  const handleDeleteItem = () => {
+    if (!editingItemId || isModalBusy) return;
+    setIsDeleteConfirmOpen(true);
+  };
+
+  const confirmDeleteItem = async () => {
+    if (!editingItemId) return;
+    setFormError(undefined);
+
+    try {
+      await deleteMutation.mutateAsync(editingItemId);
+      setIsDeleteConfirmOpen(false);
+    } catch (error) {
+      setFormError(
+        error instanceof Error
+          ? error.message
+          : "Failed to delete inventory item.",
+      );
+      setIsDeleteConfirmOpen(false);
     }
   };
 
@@ -264,6 +357,7 @@ export function InventoryView() {
                     teamId={teamId}
                     isAdmin={isAdmin}
                     index={index}
+                    onEdit={isAdmin ? () => openEditModal(item) : undefined}
                   />
                 ))}
               </div>
@@ -282,28 +376,44 @@ export function InventoryView() {
         )}
       </div>
 
-      <InventoryItemModal
-        isOpen={isModalOpen}
-        name={name}
-        description={description}
-        totalStock={totalStock}
-        checkoutLimit={checkoutLimit}
-        imageFile={imageFile}
-        onNameChange={setName}
-        onDescriptionChange={setDescription}
-        onTotalStockChange={setTotalStock}
-        onCheckoutLimitChange={setCheckoutLimit}
-        onImageFileChange={setImageFile}
-        onClose={() => {
-          if (!createMutation.isPending) {
-            createMutation.reset();
-            setCreateError(undefined);
-            setIsModalOpen(false);
+      {isAdmin ? (
+        <InventoryItemModal
+          isOpen={isModalOpen}
+          mode={isEditMode ? "edit" : "create"}
+          name={name}
+          description={description}
+          totalStock={totalStock}
+          checkoutLimit={checkoutLimit}
+          imageFile={imageFile}
+          existingImageUrl={existingImageUrl}
+          onNameChange={setName}
+          onDescriptionChange={setDescription}
+          onTotalStockChange={setTotalStock}
+          onCheckoutLimitChange={setCheckoutLimit}
+          onImageFileChange={setImageFile}
+          onClose={handleCloseModal}
+          onSubmit={handleSubmitItem}
+          onDelete={isEditMode ? handleDeleteItem : undefined}
+          isSubmitting={
+            createMutation.isPending || updateMutation.isPending
           }
+          isDeleting={deleteMutation.isPending}
+          error={formError}
+        />
+      ) : null}
+
+      <ConfirmationDialog
+        isOpen={isDeleteConfirmOpen}
+        title="Delete this inventory part?"
+        description="This permanently removes the part from team inventory."
+        confirmLabel="Delete"
+        variant="danger"
+        pending={deleteMutation.isPending}
+        pendingLabel="Deleting..."
+        onClose={() => setIsDeleteConfirmOpen(false)}
+        onConfirm={() => {
+          void confirmDeleteItem();
         }}
-        onSubmit={handleCreateItem}
-        isSubmitting={createMutation.isPending}
-        error={createError}
       />
     </div>
   );

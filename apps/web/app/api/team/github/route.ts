@@ -76,17 +76,6 @@ export async function PATCH(request: Request) {
 }
 
 export async function DELETE(request: Request) {
-  // #region agent log
-  try {
-    const { appendFileSync } = await import("node:fs");
-    appendFileSync(
-      "c:/Users/griff/OneDrive/Documents/coding-workspace/VexRobotics/VEXApp/debug-d8eb0f.log",
-      `${JSON.stringify({ sessionId: "d8eb0f", runId: "post-fix", hypothesisId: "H-D", location: "github/route.ts:DELETE", message: "github DELETE entry", data: { hasRequest: request != null, argCount: arguments.length }, timestamp: Date.now() })}\n`,
-    );
-  } catch {
-    /* ignore */
-  }
-  // #endregion
   const access = await requireTeamIntegrationAccess();
 
   if (!access.ok) {

@@ -10,7 +10,7 @@ export default async function AdminPage() {
     return null;
   }
 
-  const [users, teams] = await Promise.all([
+  const [users, teams, invites] = await Promise.all([
     prisma.user.findMany({
       select: {
         id: true,
@@ -39,6 +39,24 @@ export default async function AdminPage() {
       },
       orderBy: [{ name: "asc" }, { number: "asc" }],
     }),
+    prisma.invite.findMany({
+      select: {
+        id: true,
+        teamId: true,
+        maxUses: true,
+        usesCount: true,
+        expiresAt: true,
+        createdAt: true,
+        team: {
+          select: {
+            id: true,
+            name: true,
+            number: true,
+          },
+        },
+      },
+      orderBy: { createdAt: "desc" },
+    }),
   ]);
 
   return (
@@ -55,6 +73,11 @@ export default async function AdminPage() {
       <AdminUserPermissionsTable
         users={users}
         teams={teams}
+        invites={invites.map((invite) => ({
+          ...invite,
+          expiresAt: invite.expiresAt.toISOString(),
+          createdAt: invite.createdAt.toISOString(),
+        }))}
         currentUserId={currentUser.profile.id}
       />
     </div>

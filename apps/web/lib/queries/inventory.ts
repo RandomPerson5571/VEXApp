@@ -31,6 +31,11 @@ export async function fetchTeamInventoryFromApi(): Promise<TeamInventoryItem[]> 
   return response.json() as Promise<TeamInventoryItem[]>;
 }
 
+export type UpdateInventoryItemPayload = CreateInventoryItemPayload & {
+  itemId: string;
+  imageUrl?: string | null;
+};
+
 export async function createInventoryItemFromApi(
   payload: CreateInventoryItemPayload,
 ): Promise<TeamInventoryItem> {
@@ -51,6 +56,43 @@ export async function createInventoryItemFromApi(
   }
 
   return body as TeamInventoryItem;
+}
+
+export async function updateInventoryItemFromApi(
+  payload: UpdateInventoryItemPayload,
+): Promise<TeamInventoryItem> {
+  const { itemId, ...body } = payload;
+  const response = await fetch(`/api/inventory/${itemId}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+
+  throwIfRateLimited(response);
+
+  const result = (await response.json()) as TeamInventoryItem | { error?: string };
+
+  if (!response.ok) {
+    throw new Error(
+      "error" in result && result.error
+        ? result.error
+        : "Failed to update inventory item.",
+    );
+  }
+
+  return result as TeamInventoryItem;
+}
+
+export async function deleteInventoryItemFromApi(itemId: string): Promise<void> {
+  const response = await fetch(`/api/inventory/${itemId}`, { method: "DELETE" });
+
+  throwIfRateLimited(response);
+
+  if (response.status === 204) return;
+
+  const body = (await response.json()) as { error?: string };
+
+  throw new Error(body.error ?? "Failed to delete inventory item.");
 }
 
 export async function signOutInventoryItemFromApi(

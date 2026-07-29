@@ -23,6 +23,7 @@ export function CalendarScheduleGrid({
   selectedDate,
   todayStr,
   onSelectDate,
+  onEventClick,
 }: {
   mode: "week" | "day";
   days: CalendarDayCell[];
@@ -31,6 +32,7 @@ export function CalendarScheduleGrid({
   selectedDate: string;
   todayStr: string;
   onSelectDate: (date: string) => void;
+  onEventClick: (event: CalendarEvent) => void;
 }) {
   const hours = getScheduleHours();
   const gridHeight = hours.length * SCHEDULE_HOUR_HEIGHT;
@@ -135,9 +137,11 @@ export function CalendarScheduleGrid({
                   const position = getEventTimePosition(event.startTime, event.endTime);
 
                   return (
-                    <div
+                    <button
                       key={event.id}
-                      className={`absolute left-1 right-1 rounded-md border px-2 py-1 overflow-hidden shadow-sm ${style.bg}`}
+                      type="button"
+                      onClick={() => onEventClick(event)}
+                      className={`absolute left-1 right-1 rounded-md border px-2 py-1 overflow-hidden shadow-sm text-left cursor-pointer hover:brightness-95 ${style.bg}`}
                       style={{
                         top: `${position.top}%`,
                         height: `${position.height}%`,
@@ -150,7 +154,7 @@ export function CalendarScheduleGrid({
                       <p className="text-[9px] font-mono text-slate-400 truncate">
                         {event.startTime} – {event.endTime}
                       </p>
-                    </div>
+                    </button>
                   );
                 })}
               </div>

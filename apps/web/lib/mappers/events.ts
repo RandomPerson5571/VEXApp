@@ -1,5 +1,6 @@
 import type { Event, EventType as PrismaEventType } from "@stlvex/database/types";
 
+import type { EventWithCreator } from "@/lib/data/events";
 import type { CalendarEvent, EventType as UiEventType } from "@/lib/types/team";
 
 function formatDate(value: Date): string {
@@ -51,7 +52,16 @@ export function fromUiEventType(type: UiEventType): PrismaEventType {
   }
 }
 
-export function toCalendarEvent(event: Event): CalendarEvent {
+function creatorName(
+  creator?: { firstName: string; lastName: string } | null,
+): string | undefined {
+  if (!creator) return undefined;
+  return `${creator.firstName} ${creator.lastName}`.trim() || undefined;
+}
+
+export function toCalendarEvent(
+  event: Event | EventWithCreator,
+): CalendarEvent {
   return {
     id: event.id,
     title: event.name,
@@ -61,9 +71,14 @@ export function toCalendarEvent(event: Event): CalendarEvent {
     type: mapEventType(event.type, event.name),
     location: event.location,
     description: event.description ?? undefined,
+    createdBy: creatorName(
+      "creator" in event ? event.creator : undefined,
+    ),
   };
 }
 
-export function toCalendarEvents(events: Event[]): CalendarEvent[] {
+export function toCalendarEvents(
+  events: Array<Event | EventWithCreator>,
+): CalendarEvent[] {
   return events.map(toCalendarEvent);
 }

@@ -2,8 +2,11 @@ import "server-only";
 
 import {
   createEventForTeam,
+  deleteEventForTeam,
   listEventsForTeam,
+  updateEventForTeam,
   type CreateEventInput,
+  type UpdateEventInput,
 } from "@/lib/data/events";
 import { toCalendarEvent, toCalendarEvents } from "@/lib/mappers/events";
 import { createTeamEventsQueryOptions } from "@/lib/queries/shared/events";
@@ -21,6 +24,20 @@ export async function createTeamEvent(
 ): Promise<CalendarEvent> {
   const event = await createEventForTeam(input);
   return toCalendarEvent(event);
+}
+
+export async function updateTeamEvent(
+  input: UpdateEventInput,
+): Promise<CalendarEvent> {
+  const event = await updateEventForTeam(input);
+  return toCalendarEvent(event);
+}
+
+export async function deleteTeamEvent(
+  eventId: string,
+  teamId: string,
+): Promise<void> {
+  await deleteEventForTeam(eventId, teamId);
 }
 
 export function teamEventsQueryOptions(teamId: string) {
