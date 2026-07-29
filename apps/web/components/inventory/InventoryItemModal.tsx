@@ -99,9 +99,9 @@ export function InventoryItemModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/40 p-4 backdrop-blur-sm select-none dark:bg-[#000]/70">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/40 p-4 backdrop-blur-sm select-none motion-safe:animate-in motion-safe:fade-in motion-safe:duration-200 motion-reduce:animate-none dark:bg-[#000]/70">
       <div
-        className="relative w-full max-w-md overflow-hidden rounded-2xl border border-slate-200 bg-white p-6 font-sans dark:border-[#1a1a1a] dark:bg-[#0a0a0a] dark:bg-gradient-to-b dark:from-white/[0.02] dark:to-transparent"
+        className="relative w-full max-w-md overflow-hidden rounded-2xl border border-slate-200 bg-white p-6 font-sans shadow-2xl motion-safe:animate-in motion-safe:fade-in motion-safe:zoom-in-95 motion-safe:slide-in-from-bottom-3 motion-safe:duration-300 motion-safe:ease-out motion-reduce:animate-none dark:border-[#1a1a1a] dark:bg-[#0a0a0a] dark:bg-gradient-to-b dark:from-white/[0.02] dark:to-transparent"
         role="dialog"
         aria-modal="true"
         aria-labelledby="inventory-item-modal-title"
@@ -145,7 +145,7 @@ export function InventoryItemModal({
                 placeholder="e.g. REV HD Hex Motor"
                 value={name}
                 onChange={(e) => onNameChange(e.target.value)}
-                className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-900 transition-[border-color,box-shadow] focus:border-yellow-500 focus:outline-none focus:ring-1 focus:ring-yellow-500/30 dark:border-[#1a1a1a] dark:bg-[#121212] dark:text-slate-200 dark:focus:border-yellow-500/40"
+                className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-900 transition-[border-color,box-shadow,background-color] duration-300 ease-out focus:border-yellow-500 focus:outline-none focus:ring-1 focus:ring-yellow-500/30 dark:border-[#1a1a1a] dark:bg-[#121212] dark:text-slate-200 dark:focus:border-yellow-500/40"
               />
             </div>
 
@@ -165,7 +165,7 @@ export function InventoryItemModal({
                 placeholder="0"
                 value={totalStock}
                 onChange={(e) => onTotalStockChange(e.target.value)}
-                className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 font-mono text-xs text-slate-900 transition-[border-color,box-shadow] focus:border-yellow-500 focus:outline-none focus:ring-1 focus:ring-yellow-500/30 dark:border-[#1a1a1a] dark:bg-[#121212] dark:text-slate-200 dark:focus:border-yellow-500/40"
+                className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 font-mono text-xs text-slate-900 transition-[border-color,box-shadow,background-color] duration-300 ease-out focus:border-yellow-500 focus:outline-none focus:ring-1 focus:ring-yellow-500/30 dark:border-[#1a1a1a] dark:bg-[#121212] dark:text-slate-200 dark:focus:border-yellow-500/40"
               />
             </div>
 
@@ -187,7 +187,7 @@ export function InventoryItemModal({
                 placeholder="No limit"
                 value={checkoutLimit}
                 onChange={(e) => onCheckoutLimitChange(e.target.value)}
-                className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 font-mono text-xs text-slate-900 transition-[border-color,box-shadow] focus:border-yellow-500 focus:outline-none focus:ring-1 focus:ring-yellow-500/30 dark:border-slate-900 dark:bg-slate-950 dark:text-slate-200 dark:focus:border-yellow-500/40"
+                className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 font-mono text-xs text-slate-900 transition-[border-color,box-shadow,background-color] duration-300 ease-out focus:border-yellow-500 focus:outline-none focus:ring-1 focus:ring-yellow-500/30 dark:border-slate-900 dark:bg-slate-950 dark:text-slate-200 dark:focus:border-yellow-500/40"
               />
               <p className="text-[10px] font-semibold leading-relaxed text-slate-500">
                 Maximum units someone can check out at once.
@@ -208,7 +208,7 @@ export function InventoryItemModal({
                       type="button"
                       onClick={() => onColorChange(preset.value)}
                       disabled={busy}
-                      className={`flex h-9 items-center justify-center rounded-lg border text-[10px] font-bold transition ${
+                      className={`flex h-9 items-center justify-center rounded-lg border text-[10px] font-bold transition-[transform,background-color,border-color,color,box-shadow] duration-300 ease-out motion-safe:active:scale-95 motion-reduce:transition-none ${
                         selected
                           ? "border-slate-900 bg-slate-100 text-slate-900 dark:border-slate-100 dark:bg-slate-900 dark:text-slate-100"
                           : "border-slate-200 bg-white text-slate-600 hover:border-slate-400 dark:border-[#1a1a1a] dark:bg-[#121212] dark:text-slate-400"
@@ -225,7 +225,7 @@ export function InventoryItemModal({
                   );
                 })}
               </div>
-              <label className="flex items-center gap-3 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 dark:border-[#1a1a1a] dark:bg-[#121212]">
+              <label className="flex items-center gap-3 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 transition-[border-color,background-color] duration-300 ease-out dark:border-[#1a1a1a] dark:bg-[#121212]">
                 <span className="text-[10px] font-bold uppercase tracking-widest text-slate-600 dark:text-slate-400">
                   Custom
                 </span>
@@ -236,7 +236,7 @@ export function InventoryItemModal({
                     onColorChange(muteInventoryColor(event.target.value))
                   }
                   disabled={busy}
-                  className="h-7 w-10 cursor-pointer rounded border border-slate-300 bg-transparent p-0 disabled:opacity-50 dark:border-slate-700"
+                  className="h-7 w-10 cursor-pointer rounded border border-slate-300 bg-transparent p-0 transition-transform duration-300 ease-out disabled:opacity-50 motion-safe:active:scale-95 motion-reduce:transition-none dark:border-slate-700"
                   aria-label="Custom inventory color"
                 />
                 <span
@@ -260,7 +260,7 @@ export function InventoryItemModal({
               <div className="flex items-center gap-3">
                 <label
                   htmlFor="inventory-image"
-                  className="flex flex-1 cursor-pointer items-center gap-2 rounded-lg border border-dashed border-slate-300 bg-slate-50 px-3 py-2 text-xs font-semibold text-slate-600 transition hover:border-yellow-500/50 hover:bg-yellow-500/5 dark:border-[#1a1a1a] dark:bg-[#121212] dark:text-slate-400 dark:hover:border-yellow-500/30"
+                  className="flex flex-1 cursor-pointer items-center gap-2 rounded-lg border border-dashed border-slate-300 bg-slate-50 px-3 py-2 text-xs font-semibold text-slate-600 transition-[background-color,border-color,transform] duration-300 ease-out hover:border-yellow-500/50 hover:bg-yellow-500/5 motion-safe:active:scale-[0.99] motion-reduce:transition-none dark:border-[#1a1a1a] dark:bg-[#121212] dark:text-slate-400 dark:hover:border-yellow-500/30"
                 >
                   <ImagePlus className="h-4 w-4 shrink-0 text-yellow-600 dark:text-yellow-400" />
                   <span className="truncate">
@@ -277,7 +277,7 @@ export function InventoryItemModal({
                     onClick={clearImage}
                     disabled={busy}
                     aria-label="Remove image"
-                    className="flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-500 transition hover:border-red-500/30 hover:bg-red-500/5 hover:text-red-500 disabled:opacity-50 dark:border-[#1a1a1a] dark:bg-[#121212] dark:hover:text-red-400"
+                    className="flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-500 transition-[transform,background-color,border-color,color,opacity] duration-300 ease-out hover:border-red-500/30 hover:bg-red-500/5 hover:text-red-500 disabled:opacity-50 motion-safe:active:scale-95 motion-reduce:transition-none dark:border-[#1a1a1a] dark:bg-[#121212] dark:hover:text-red-400"
                   >
                     <X className="h-4 w-4" />
                   </button>
@@ -292,7 +292,7 @@ export function InventoryItemModal({
                 className="sr-only"
               />
               {displayPreview ? (
-                <div className="overflow-hidden rounded-lg border border-slate-200 bg-slate-50 dark:border-[#1a1a1a] dark:bg-[#121212]">
+                <div className="overflow-hidden rounded-lg border border-slate-200 bg-slate-50 motion-safe:animate-in motion-safe:fade-in motion-safe:zoom-in-95 motion-safe:duration-300 motion-reduce:animate-none dark:border-[#1a1a1a] dark:bg-[#121212]">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={displayPreview}
@@ -321,12 +321,14 @@ export function InventoryItemModal({
                 value={description}
                 onChange={(e) => onDescriptionChange(e.target.value)}
                 rows={3}
-                className="w-full resize-none rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-900 transition-[border-color,box-shadow] focus:border-yellow-500 focus:outline-none focus:ring-1 focus:ring-yellow-500/30 dark:border-[#1a1a1a] dark:bg-[#121212] dark:text-slate-200 dark:focus:border-yellow-500/40"
+                className="w-full resize-none rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-900 transition-[border-color,box-shadow,background-color] duration-300 ease-out focus:border-yellow-500 focus:outline-none focus:ring-1 focus:ring-yellow-500/30 dark:border-[#1a1a1a] dark:bg-[#121212] dark:text-slate-200 dark:focus:border-yellow-500/40"
               />
             </div>
 
             {error ? (
-              <p className="text-xs font-semibold text-red-500">{error}</p>
+              <p className="text-xs font-semibold text-red-500 motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-1 motion-safe:duration-300 motion-reduce:animate-none">
+                {error}
+              </p>
             ) : null}
 
             <div className="flex items-center justify-between gap-3 border-t border-slate-200 pt-3 dark:border-[#1a1a1a]">
@@ -335,7 +337,7 @@ export function InventoryItemModal({
                   type="button"
                   onClick={onDelete}
                   disabled={busy}
-                  className="cursor-pointer rounded-lg px-4 py-2 text-xs font-semibold text-red-600 transition hover:bg-red-500/10 disabled:opacity-50"
+                  className="cursor-pointer rounded-lg px-4 py-2 text-xs font-semibold text-red-600 transition-[transform,background-color,opacity] duration-300 ease-out hover:bg-red-500/10 disabled:opacity-50 motion-safe:active:scale-95 motion-reduce:transition-none"
                 >
                   {isDeleting ? "Deleting..." : "Delete"}
                 </button>
@@ -347,14 +349,14 @@ export function InventoryItemModal({
                   type="button"
                   onClick={onClose}
                   disabled={busy}
-                  className="cursor-pointer rounded-lg bg-slate-100 px-4 py-2 text-xs font-semibold text-slate-700 transition hover:bg-slate-200 hover:text-slate-900 disabled:opacity-50 dark:bg-[#121212] dark:text-slate-400 dark:hover:bg-[#121212] dark:hover:text-white"
+                  className="cursor-pointer rounded-lg bg-slate-100 px-4 py-2 text-xs font-semibold text-slate-700 transition-[transform,background-color,color,opacity] duration-300 ease-out hover:bg-slate-200 hover:text-slate-900 disabled:opacity-50 motion-safe:active:scale-95 motion-reduce:transition-none dark:bg-[#121212] dark:text-slate-400 dark:hover:bg-[#121212] dark:hover:text-white"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={busy}
-                  className="flex cursor-pointer items-center gap-1.5 rounded-lg bg-yellow-600 px-5 py-2 text-xs font-bold text-white shadow-lg shadow-yellow-500/15 transition hover:bg-yellow-500 disabled:opacity-50"
+                  className="flex cursor-pointer items-center gap-1.5 rounded-lg bg-yellow-600 px-5 py-2 text-xs font-bold text-white shadow-lg shadow-yellow-500/15 transition-[transform,background-color,box-shadow,opacity] duration-300 ease-out hover:bg-yellow-500 hover:shadow-yellow-500/25 disabled:opacity-50 motion-safe:active:scale-95 motion-reduce:transition-none"
                 >
                   {!isEdit ? <Plus className="h-3.5 w-3.5" /> : null}
                   {isSubmitting
