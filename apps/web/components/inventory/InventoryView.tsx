@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState, type CSSProperties } from "react";
 import { AlertTriangle, Package, Plus } from "lucide-react";
 import type { TeamInventoryItem } from "@stlvex/database/types";
 
@@ -24,6 +24,10 @@ import {
   summarizeInventory,
 } from "@/lib/inventory/inventory-utils";
 import { INVENTORY_COLOR_PRESETS } from "@/lib/inventory/item-colors";
+
+type ViewTransitionDocument = Document & {
+  startViewTransition?: (update: () => void) => void;
+};
 
 function filterInventory(
   items: ReturnType<typeof useTeamInventory>["data"],
@@ -108,6 +112,25 @@ export function InventoryView() {
     createMutation.isPending ||
     updateMutation.isPending ||
     deleteMutation.isPending;
+
+  const runSmoothInventoryUpdate = useCallback((update: () => void) => {
+    if (
+      typeof document === "undefined" ||
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    ) {
+      update();
+      return;
+    }
+
+    const transitionDocument = document as ViewTransitionDocument;
+
+    if (!transitionDocument.startViewTransition) {
+      update();
+      return;
+    }
+
+    transitionDocument.startViewTransition(update);
+  }, []);
 
   const openCreateModal = () => {
     resetForm();
@@ -269,8 +292,9 @@ export function InventoryView() {
                 </div>
               </div>
               <p className="mt-3 max-w-2xl text-sm font-medium leading-relaxed text-slate-600 dark:text-slate-400">
-                Track organization stock, sign-outs, and availability for {teamLabel}.
-                Parts checked out by your team appear with borrower details.
+                Track organization stock, sign-outs, and availability for{" "}
+                {teamLabel}. Parts checked out by your team appear with borrower
+                details.
               </p>
             </div>
 
@@ -293,49 +317,63 @@ export function InventoryView() {
               {Array.from({ length: 5 }).map((_, index) => (
                 <div
                   key={index}
-                  className="h-20 animate-pulse rounded-xl border border-slate-300 dark:border-[#1a1a1a] bg-slate-200 dark:bg-[#121212]/60"
+                  className="h-20 animate-pulse rounded-xl border border-slate-300 bg-slate-200 motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-1 motion-safe:fill-mode-backwards motion-safe:duration-500 motion-reduce:animate-pulse dark:border-[#1a1a1a] dark:bg-[#121212]/60"
+                  style={{ animationDelay: `${index * 60}ms` }}
                 />
               ))}
             </div>
-            <div className="h-28 animate-pulse rounded-2xl border border-slate-300 dark:border-[#1a1a1a] bg-slate-200 dark:bg-[#121212]/60" />
+            <div className="h-28 animate-pulse rounded-2xl border border-slate-300 bg-slate-200 motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-1 motion-safe:duration-500 motion-reduce:animate-pulse dark:border-[#1a1a1a] dark:bg-[#121212]/60" />
             <div className="grid gap-4 lg:grid-cols-2">
               {Array.from({ length: 4 }).map((_, index) => (
                 <div
                   key={index}
-                  className="h-48 animate-pulse rounded-2xl border border-[#1a1a1a] bg-slate-950/60"
+                  className="h-48 animate-pulse rounded-2xl border border-[#1a1a1a] bg-slate-950/60 motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-2 motion-safe:fill-mode-backwards motion-safe:duration-500 motion-reduce:animate-pulse"
+                  style={{ animationDelay: `${(index + 5) * 60}ms` }}
                 />
               ))}
             </div>
           </div>
         ) : isError ? (
-          <div className="rounded-2xl border border-red-500/20 bg-red-500/5 p-12 text-center">
+          <div className="rounded-2xl border border-red-500/20 bg-red-500/5 p-12 text-center motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-2 motion-safe:duration-500 motion-reduce:animate-none">
             <AlertTriangle className="mx-auto mb-4 h-8 w-8 text-red-500 dark:text-red-400" />
             <h2 className="text-lg font-black text-slate-900 dark:text-slate-200">
               Unable to load inventory
             </h2>
             <p className="mt-2 text-sm text-slate-600 dark:text-slate-500">
-              Something went wrong while fetching parts. Please refresh and try again.
+              Something went wrong while fetching parts. Please refresh and try
+              again.
             </p>
           </div>
         ) : (
           <>
-            <div className="mb-6 space-y-4">
+            <div className="mb-6 space-y-4 motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-1 motion-safe:duration-500 motion-reduce:animate-none">
               <InventoryStats items={items} teamId={teamId} />
               <InventoryFilters
                 search={search}
                 availabilityFilter={availabilityFilter}
-                onSearchChange={setSearch}
-                onAvailabilityChange={setAvailabilityFilter}
+                onSearchChange={(value) =>
+                  runSmoothInventoryUpdate(() => setSearch(value))
+                }
+                onAvailabilityChange={(value) =>
+                  runSmoothInventoryUpdate(() => setAvailabilityFilter(value))
+                }
                 resultCount={filteredItems.length}
               />
             </div>
 
             {filteredItems.length === 0 ? (
-              <div className="rounded-2xl border border-slate-300 dark:border-[#1a1a1a] bg-slate-100 dark:bg-[#0a0a0a] p-12 text-center shadow-md">
+              <div
+                className="rounded-2xl border border-slate-300 bg-slate-100 p-12 text-center shadow-md motion-safe:animate-in motion-safe:fade-in motion-safe:zoom-in-95 motion-safe:slide-in-from-bottom-2 motion-safe:duration-500 motion-reduce:animate-none dark:border-[#1a1a1a] dark:bg-[#0a0a0a]"
+                style={
+                  { viewTransitionName: "inventory-results" } as CSSProperties
+                }
+              >
                 <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full border border-slate-400 dark:border-slate-800 bg-slate-200 dark:bg-[#121212]/60">
                   <Package className="h-7 w-7 text-slate-600 dark:text-slate-500" />
                 </div>
-                <h2 className="text-lg font-black text-slate-900 dark:text-slate-200">No parts found</h2>
+                <h2 className="text-lg font-black text-slate-900 dark:text-slate-200">
+                  No parts found
+                </h2>
                 <p className="mt-2 text-sm text-slate-600 dark:text-slate-500">
                   {items.length === 0
                     ? isAdmin
@@ -347,7 +385,7 @@ export function InventoryView() {
                   <button
                     type="button"
                     onClick={openCreateModal}
-                    className="mt-5 inline-flex cursor-pointer items-center gap-1.5 rounded-lg bg-yellow-600 px-4 py-2 text-xs font-bold text-white shadow-lg shadow-yellow-500/15 transition hover:bg-yellow-500 motion-safe:active:scale-95 motion-reduce:transition-none"
+                    className="mt-5 inline-flex cursor-pointer items-center gap-1.5 rounded-lg bg-yellow-600 px-4 py-2 text-xs font-bold text-white shadow-lg shadow-yellow-500/15 transition-[transform,background-color,box-shadow] duration-300 ease-out hover:bg-yellow-500 hover:shadow-yellow-500/25 motion-safe:active:scale-95 motion-reduce:transition-none"
                   >
                     <Plus className="h-4 w-4" />
                     <span>Add First Part</span>
@@ -355,7 +393,12 @@ export function InventoryView() {
                 ) : null}
               </div>
             ) : (
-              <div className="grid gap-4 pb-8 lg:grid-cols-2">
+              <div
+                className="grid gap-4 pb-8 lg:grid-cols-2"
+                style={
+                  { viewTransitionName: "inventory-results" } as CSSProperties
+                }
+              >
                 {filteredItems.map((item, index) => (
                   <InventoryCard
                     key={item.id}
@@ -370,11 +413,12 @@ export function InventoryView() {
             )}
 
             {summary.depleted > 0 ? (
-              <div className="sticky bottom-4 flex items-center gap-3 rounded-xl border border-red-500/20 bg-red-500/10 px-4 py-3 backdrop-blur-md">
+              <div className="sticky bottom-4 flex items-center gap-3 rounded-xl border border-red-500/20 bg-red-500/10 px-4 py-3 backdrop-blur-md motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-2 motion-safe:duration-500 motion-reduce:animate-none">
                 <AlertTriangle className="h-4 w-4 shrink-0 text-red-400 motion-safe:animate-pulse" />
                 <p className="text-xs font-bold text-red-200/90">
-                  {summary.depleted} part{summary.depleted === 1 ? "" : "s"} fully
-                  depleted — coordinate returns or reorder before the next build session.
+                  {summary.depleted} part{summary.depleted === 1 ? "" : "s"}{" "}
+                  fully depleted — coordinate returns or reorder before the next
+                  build session.
                 </p>
               </div>
             ) : null}
@@ -402,9 +446,7 @@ export function InventoryView() {
           onClose={handleCloseModal}
           onSubmit={handleSubmitItem}
           onDelete={isEditMode ? handleDeleteItem : undefined}
-          isSubmitting={
-            createMutation.isPending || updateMutation.isPending
-          }
+          isSubmitting={createMutation.isPending || updateMutation.isPending}
           isDeleting={deleteMutation.isPending}
           error={formError}
         />

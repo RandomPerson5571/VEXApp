@@ -1,8 +1,13 @@
 "use client";
 
 import { AlertCircle, Clock, MapPin, Plus, UserRound, X } from "lucide-react";
+import { DayPlanIcon } from "@/components/calendar/DayPlanIcon";
 import type { CalendarEvent, DayPlanType, TeamDayPlan } from "@/lib/types/team";
-import { formatSelectedDayLabel, getDayPlanStyle, getEventStyle } from "@/lib/utils/calendar";
+import {
+  formatSelectedDayLabel,
+  getDayPlanStyle,
+  getEventStyle,
+} from "@/lib/utils/calendar";
 
 const DAY_PLAN_TYPES: DayPlanType[] = ["build", "coding", "testing"];
 
@@ -97,7 +102,15 @@ export function CalendarSidePanel({
                     isActive ? style.buttonActive : style.button
                   } ${isDayPlanPending ? "opacity-80" : ""}`}
                 >
-                  <span className={`h-3 w-3 rounded-full ${style.dot} ${isActive ? "ring-2 ring-white/40" : ""}`} />
+                  <span
+                    className={`flex h-6 w-6 items-center justify-center rounded-full ${isActive ? "bg-white/15 ring-2 ring-white/30" : "bg-black/5 dark:bg-white/5"}`}
+                  >
+                    <DayPlanIcon
+                      type={type}
+                      className="h-3.5 w-3.5"
+                      decorative
+                    />
+                  </span>
                   {style.label}
                 </button>
               );
@@ -108,13 +121,17 @@ export function CalendarSidePanel({
             <div
               className={`flex items-center gap-2 px-3 py-2 rounded-lg border ${getDayPlanStyle(selectedDayPlan.type).badge}`}
             >
-              <span className={`h-2.5 w-2.5 rounded-full flex-shrink-0 ${getDayPlanStyle(selectedDayPlan.type).dot}`} />
+              <DayPlanIcon
+                type={selectedDayPlan.type}
+                className="h-3.5 w-3.5"
+                decorative
+              />
               <p className="text-[10px] font-semibold leading-snug">
                 Team focus:{" "}
                 <span className="font-black">
                   {getDayPlanStyle(selectedDayPlan.type).label}
-                </span>
-                {" "}— tap again to clear
+                </span>{" "}
+                — tap again to clear
               </p>
             </div>
           )}
@@ -124,7 +141,9 @@ export function CalendarSidePanel({
           {selectedDayEvents.length === 0 ? (
             <div className="p-8 text-center rounded-xl border border-slate-200 dark:border-[#1a1a1a] bg-slate-50 dark:bg-[#121212]/40 text-xs">
               <AlertCircle className="h-5 w-5 text-slate-500 dark:text-slate-600 mx-auto mb-2" />
-              <p className="font-semibold text-slate-700 dark:text-slate-400">Empty checklist schedule.</p>
+              <p className="font-semibold text-slate-700 dark:text-slate-400">
+                Empty checklist schedule.
+              </p>
               <p className="text-[10px] text-slate-600 dark:text-slate-600 mt-1">
                 No activities listed. Try adding an event to organize your day.
               </p>
@@ -149,7 +168,9 @@ export function CalendarSidePanel({
                     </div>
                   </div>
 
-                  <h4 className="text-sm font-extrabold text-slate-900 dark:text-slate-100 pr-1">{ev.title}</h4>
+                  <h4 className="text-sm font-extrabold text-slate-900 dark:text-slate-100 pr-1">
+                    {ev.title}
+                  </h4>
 
                   {ev.location && (
                     <div className="flex items-center gap-1.5 text-[10.5px] text-slate-600 dark:text-slate-400 font-semibold mt-1">
