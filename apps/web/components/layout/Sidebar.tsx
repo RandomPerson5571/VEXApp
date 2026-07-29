@@ -33,7 +33,7 @@ const menuItems: SidebarItem[] = [
   { href: "/knowledge/scouting", label: "Scouting", icon: Binoculars },
   { href: "/team-management", label: "Members", icon: Users2 },
   { href: "/invite", label: "Invites", icon: LinkIcon, requiresInviteAccess: true },
-  { href: "/settings", label: "Settings", icon: Settings },
+  { href: "/settings", label: "User Settings", icon: Settings },
 ];
 
 type AppSidebarProps = {

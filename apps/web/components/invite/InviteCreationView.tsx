@@ -157,18 +157,18 @@ export function InviteCreationView({
                           Team {selectedTeam.number}
                         </p>
                       </div>
-                      <span className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-amber-500/25 bg-amber-500/10 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-amber-600 dark:text-amber-400">
+                      <span className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-[color:var(--site-accent)]/25 bg-[color:var(--site-accent)]/10 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-[color:var(--site-accent)] dark:text-[color:var(--site-accent)]">
                         <Lock className="h-3 w-3" aria-hidden="true" />
                         Locked
                       </span>
                     </div>
                   </div>
-                  <div className="flex items-start gap-2.5 rounded-lg border border-amber-500/20 bg-amber-500/5 px-3.5 py-3 motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-1 motion-safe:duration-500 motion-reduce:animate-none">
+                  <div className="flex items-start gap-2.5 rounded-lg border border-[color:var(--site-accent)]/20 bg-[color:var(--site-accent)]/5 px-3.5 py-3 motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-1 motion-safe:duration-500 motion-reduce:animate-none">
                     <Lock
-                      className="mt-0.5 h-4 w-4 shrink-0 text-amber-600 dark:text-amber-400"
+                      className="mt-0.5 h-4 w-4 shrink-0 text-[color:var(--site-accent)] dark:text-[color:var(--site-accent)]"
                       aria-hidden="true"
                     />
-                    <p className="text-xs font-medium leading-relaxed text-amber-800 dark:text-amber-300/90">
+                    <p className="text-xs font-medium leading-relaxed text-[color:var(--site-accent)] dark:text-[color:var(--site-accent)]/90">
                       As a team leader, invite links are scoped to your assigned
                       team. Platform administrators can create invites for any
                       team.

@@ -552,7 +552,7 @@ export function InventoryCard({
                   <div className="flex min-w-0 items-center gap-2">
                     <div
                       title={formatBorrowerName(signOut.user)}
-                      className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-slate-800 dark:border-slate-800 bg-gradient-to-br from-yellow-700 dark:from-yellow-700 to-amber-900 dark:to-amber-900 text-[9px] font-bold text-white dark:text-white"
+                      className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-slate-800 dark:border-slate-800 bg-gradient-to-br from-[color:var(--site-accent)] dark:from-[color:var(--site-accent)] to-[color:var(--site-accent)] dark:to-[color:var(--site-accent)] text-[9px] font-bold text-white dark:text-white"
                     >
                       {getBorrowerInitials(signOut.user)}
                     </div>
@@ -600,7 +600,7 @@ export function InventoryCard({
               value={quantity}
               onChange={(event) => setQuantity(event.target.value)}
               disabled={available <= 0 || isSigningOut}
-              className="h-10 w-full rounded-lg border border-slate-300 bg-slate-50 px-3 text-sm font-bold text-slate-900 outline-none transition-[border-color,box-shadow] disabled:cursor-not-allowed disabled:opacity-50 focus:border-yellow-500 focus:shadow-[0_0_0_3px_rgba(234,179,8,0.12)] dark:border-slate-800 dark:bg-slate-950 dark:text-slate-100 dark:focus:border-yellow-500/40"
+              className="h-10 w-full rounded-lg border border-slate-300 bg-slate-50 px-3 text-sm font-bold text-slate-900 outline-none transition-[border-color,box-shadow] disabled:cursor-not-allowed disabled:opacity-50 focus:border-[color:var(--site-accent)] focus:shadow-[0_0_0_3px_rgba(var(--site-accent-rgb),0.12)] dark:border-slate-800 dark:bg-slate-950 dark:text-slate-100 dark:focus:border-[color:var(--site-accent)]/40"
             />
           </label>
           {actionError ? (
@@ -621,7 +621,7 @@ export function InventoryCard({
               type="button"
               onClick={handleSignOut}
               disabled={!canSignOut}
-              className="inline-flex items-center gap-1.5 rounded-lg bg-yellow-600 px-4 py-2 text-xs font-bold text-white shadow-lg shadow-yellow-500/15 transition-[transform,background-color,box-shadow,opacity] duration-300 ease-out hover:bg-yellow-500 hover:shadow-yellow-500/25 disabled:cursor-not-allowed disabled:opacity-50 motion-safe:active:scale-95 motion-reduce:transition-none"
+              className="inline-flex items-center gap-1.5 rounded-lg bg-[color:var(--site-accent)] px-4 py-2 text-xs font-bold text-white shadow-lg shadow-[color:var(--site-accent)]/15 transition-[transform,background-color,box-shadow,opacity] duration-300 ease-out hover:bg-[color:var(--site-accent)]/90 hover:shadow-[color:var(--site-accent)]/25 disabled:cursor-not-allowed disabled:opacity-50 motion-safe:active:scale-95 motion-reduce:transition-none"
             >
               <PackagePlus className="h-4 w-4" />
               {isSigningOut ? "Checking out..." : "Check out"}

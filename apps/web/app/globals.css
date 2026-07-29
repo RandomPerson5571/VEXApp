@@ -191,6 +191,53 @@ html[data-site-theme="custom"] [class~="text-blue-600"] {
   color: var(--accent-text) !important;
 }
 
+/* Broad catch-all: map legacy orange/amber/yellow utility classes to the accent variables
+   so changing the accent theme updates all places without updating every file. */
+html[data-site-theme="monochrome"] [class*="orange"],
+html[data-site-theme="monochrome"] [class*="amber"],
+html[data-site-theme="monochrome"] [class*="yellow"],
+html[data-site-theme="custom"] [class*="orange"],
+html[data-site-theme="custom"] [class*="amber"],
+html[data-site-theme="custom"] [class*="yellow"] {
+  /* Generic mapping: text, background, and border uses are resolved below via more specific selectors */
+}
+
+html[data-site-theme="monochrome"] [class*="text-orange"],
+html[data-site-theme="monochrome"] [class*="text-amber"],
+html[data-site-theme="monochrome"] [class*="text-yellow"],
+html[data-site-theme="custom"] [class*="text-orange"],
+html[data-site-theme="custom"] [class*="text-amber"],
+html[data-site-theme="custom"] [class*="text-yellow"] {
+  color: var(--accent-text) !important;
+}
+
+html[data-site-theme="monochrome"] [class*="bg-orange"],
+html[data-site-theme="monochrome"] [class*="bg-amber"],
+html[data-site-theme="monochrome"] [class*="bg-yellow"],
+html[data-site-theme="custom"] [class*="bg-orange"],
+html[data-site-theme="custom"] [class*="bg-amber"],
+html[data-site-theme="custom"] [class*="bg-yellow"] {
+  background-color: var(--accent-solid) !important;
+}
+
+html[data-site-theme="monochrome"] [class*="border-orange"],
+html[data-site-theme="monochrome"] [class*="border-amber"],
+html[data-site-theme="monochrome"] [class*="border-yellow"],
+html[data-site-theme="custom"] [class*="border-orange"],
+html[data-site-theme="custom"] [class*="border-amber"],
+html[data-site-theme="custom"] [class*="border-yellow"] {
+  border-color: var(--accent-border) !important;
+}
+
+html[data-site-theme="monochrome"] [class*="hover:bg-orange"],
+html[data-site-theme="monochrome"] [class*="hover:bg-amber"],
+html[data-site-theme="monochrome"] [class*="hover:bg-yellow"],
+html[data-site-theme="custom"] [class*="hover:bg-orange"],
+html[data-site-theme="custom"] [class*="hover:bg-amber"],
+html[data-site-theme="custom"] [class*="hover:bg-yellow"]:hover {
+  background-color: color-mix(in srgb, var(--site-accent) 88%, white 12%) !important;
+}
+
 html[data-site-theme="monochrome"] [class~="bg-orange-500"],
 html[data-site-theme="monochrome"] [class~="bg-orange-600"],
 html[data-site-theme="monochrome"] [class~="bg-orange-700"],

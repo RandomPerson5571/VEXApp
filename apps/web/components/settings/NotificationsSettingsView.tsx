@@ -299,9 +299,9 @@ export function NotificationsSettingsView({
         </div>
 
         {!enableDiscordPushNotifs ? (
-          <div className="mt-4 flex items-start gap-2 rounded-lg border border-amber-500/20 bg-amber-500/5 px-3.5 py-3">
-            <Bell className="mt-0.5 h-4 w-4 shrink-0 text-amber-600 dark:text-amber-400" />
-            <p className="text-xs leading-relaxed text-amber-800 dark:text-amber-300/90">
+            <div className="mt-4 flex items-start gap-2 rounded-lg border border-[color:var(--site-accent)]/20 bg-[color:var(--site-accent)]/5 px-3.5 py-3">
+            <Bell className="mt-0.5 h-4 w-4 shrink-0 text-[color:var(--site-accent)] dark:text-[color:var(--site-accent)]" />
+            <p className="text-xs leading-relaxed text-[color:var(--site-accent)] dark:text-[color:var(--site-accent)]/90">
               Integration alerts will still be recorded in the team hub, but
               Discord delivery is paused until you re-enable push notifications.
             </p>
@@ -364,7 +364,7 @@ export function NotificationsSettingsView({
                   ))}
                 </div>
                 {githubEvents.length === 0 ? (
-                  <p className="mt-3 text-xs text-amber-700 dark:text-amber-400">
+                  <p className="mt-3 text-xs text-[color:var(--site-accent)] dark:text-[color:var(--site-accent)]">
                     Select at least one event to receive GitHub notifications.
                   </p>
                 ) : null}
