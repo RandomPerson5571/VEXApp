@@ -53,6 +53,13 @@
 :root {
   --site-accent: #ea580c;
   --site-accent-rgb: 234 88 12;
+  --accent-solid: rgb(var(--site-accent-rgb));
+  --accent-soft: rgb(var(--site-accent-rgb) / 0.12);
+  --accent-softer: rgb(var(--site-accent-rgb) / 0.08);
+  --accent-border: rgb(var(--site-accent-rgb) / 0.32);
+  --accent-text: color-mix(in srgb, var(--site-accent) 86%, white 14%);
+  --accent-text-strong: color-mix(in srgb, var(--site-accent) 78%, black 22%);
+  --accent-shadow: rgb(var(--site-accent-rgb) / 0.18);
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
@@ -130,6 +137,13 @@ html.dark[data-site-theme="custom"] {
   --muted-foreground: #a1a1aa;
   --accent: #121212;
   --accent-foreground: #f4f4f5;
+  --accent-solid: rgb(var(--site-accent-rgb));
+  --accent-soft: rgb(var(--site-accent-rgb) / 0.12);
+  --accent-softer: rgb(var(--site-accent-rgb) / 0.08);
+  --accent-border: rgb(var(--site-accent-rgb) / 0.32);
+  --accent-text: color-mix(in srgb, var(--site-accent) 78%, white 22%);
+  --accent-text-strong: color-mix(in srgb, var(--site-accent) 88%, white 12%);
+  --accent-shadow: rgb(var(--site-accent-rgb) / 0.18);
   --destructive: oklch(0.704 0.191 22.216);
   --border: #1a1a1a;
   --input: #1a1a1a;
