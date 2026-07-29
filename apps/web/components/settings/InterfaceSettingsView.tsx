@@ -78,7 +78,7 @@ export function InterfaceSettingsView() {
                 onClick={() => setAccentTheme(option.id)}
                 className={`group flex min-h-28 flex-col items-start justify-between rounded-xl border p-4 text-left transition-[background-color,border-color,box-shadow,transform] duration-300 ease-out motion-safe:active:scale-[0.98] motion-reduce:transition-none ${
                   isActive
-                    ? "border-orange-500/30 bg-orange-500/10 shadow-lg shadow-orange-500/10"
+                    ? "border-[color:var(--site-accent)]/30 bg-[color:var(--site-accent)]/10 shadow-lg shadow-[color:var(--site-accent)]/10"
                     : "border-slate-200 bg-slate-50 hover:border-slate-300 hover:bg-white dark:border-[#1a1a1a] dark:bg-[#121212]/60 dark:hover:border-slate-800 dark:hover:bg-[#121212]"
                 }`}
               >
@@ -93,7 +93,7 @@ export function InterfaceSettingsView() {
                     ) : null}
                   </span>
                   {isActive ? (
-                    <span className="flex h-6 w-6 items-center justify-center rounded-full bg-orange-500 text-white">
+                    <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[color:var(--site-accent)] text-white">
                       <Check className="h-3.5 w-3.5" />
                     </span>
                   ) : null}
@@ -114,7 +114,7 @@ export function InterfaceSettingsView() {
         <div className="mt-4 flex flex-col gap-3 rounded-xl border border-slate-200 bg-slate-50 p-4 dark:border-[#1a1a1a] dark:bg-[#121212]/60 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-lg border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-950">
-              <Palette className="h-4.5 w-4.5 text-orange-500" />
+              <Palette className="h-4.5 w-4.5 text-[color:var(--site-accent)]" />
             </div>
             <div>
               <p className="text-xs font-black text-slate-900 dark:text-slate-100">
@@ -143,7 +143,7 @@ export function InterfaceSettingsView() {
           <div className="flex flex-col gap-3 rounded-xl border border-slate-200 bg-slate-50 p-4 dark:border-[#1a1a1a] dark:bg-[#121212]/60 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-center gap-3">
               <div className="flex h-10 w-10 items-center justify-center rounded-lg border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-950">
-                <Type className="h-4.5 w-4.5 text-orange-500" />
+                <Type className="h-4.5 w-4.5 text-[color:var(--site-accent)]" />
               </div>
               <div>
                 <p className="text-xs font-black text-slate-900 dark:text-slate-100">
@@ -170,7 +170,7 @@ export function InterfaceSettingsView() {
               step={1}
               value={fontSize}
               onChange={(event) => setFontSize(Number(event.target.value))}
-              className="w-full accent-orange-600"
+              className="w-full accent-[color:var(--site-accent)]"
               aria-label="Interface font size"
             />
             <div className="flex items-center justify-between text-[10px] font-bold uppercase tracking-wider text-slate-500">
