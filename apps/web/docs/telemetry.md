@@ -20,21 +20,24 @@ lib/data/* mutations (post-commit)
   → POST {BOT_PUBLIC_URL}/api/webhooks
 
 Bot
-  → telemetry.security | telemetry.info | telemetry.inventory → guild channel embeds
+  → telemetry.security | telemetry.info | telemetry.inventory
+      → broadcast embed to every guild with that category channel configured
   → task.assigned → DM each assignee
 ```
 
 Env: `BOT_PUBLIC_URL`, `WEBHOOK_SECRET` (header `x-webhook-secret`).
 
+Telemetry does **not** route via `Team.discordServerId`. Any server where a platform admin runs `/set-*-logs-channel` receives all platform activity for that category. Embeds include `Team {number}` in the footer when `teamId` is known.
+
 ## Admin setup (Discord)
 
-Platform admin, run in the target server:
+Platform admin, in **each** server that should receive logs:
 
 1. `/set-security-logs-channel`
 2. `/set-info-logs-channel`
 3. `/set-inventory-logs-channel`
 
-Also required for routing: `/set-team-server` binds `Team.discordServerId`.
+Team server binding (`/set-team-server`) is for member verify/roles — not required for logging.
 
 ## Web modules
 
@@ -42,7 +45,6 @@ Also required for routing: `/set-team-server` binds `Team.discordServerId`.
 |------|------|
 | `lib/telemetry/types.ts` | Category and payload types |
 | `lib/telemetry/dispatch.ts` | `logTelemetry`, `notifyTaskAssigned`, `logEndpointFailure`, `logWarning` |
-| `lib/telemetry/resolve.ts` | `resolveGuildIdForTeam` with 5-minute TTL cache |
 | `lib/telemetry/messages.ts` | Human-readable log lines |
 | `lib/api/route-error.ts` | Optional API error helper with security logging |
 
@@ -56,4 +58,4 @@ All dispatch functions are fire-and-forget; failures log to stdout only.
 
 ## Removed (legacy)
 
-Daily digest buffer, routine/actionable tiers, low-stock alert loop, announcements channel, `TeamDigestBuffer`, `restockPending`, `orderPlacedAt`.
+Daily digest buffer, routine/actionable tiers, low-stock alert loop, announcements channel, `TeamDigestBuffer`, `restockPending`, `orderPlacedAt`, per-team guild routing for log channels.

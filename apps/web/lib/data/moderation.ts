@@ -46,12 +46,11 @@ function telemetryForAudit(
 function sideEffects() {
   return {
     onAudited: (event: ModerationAuditPayload) => {
-      if (!event.teamId) return;
       const mapped = telemetryForAudit(event);
       if (!mapped) return;
       logTelemetry({
         category: "security",
-        teamId: event.teamId,
+        teamId: event.teamId ?? undefined,
         message: mapped.message,
         action: mapped.action,
       });

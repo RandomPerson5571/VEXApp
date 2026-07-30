@@ -50,7 +50,7 @@ const timeoutCommand: SlashCommand = {
           reason,
           until,
         },
-        moderationTelemetrySideEffects(interaction.client, interaction.guildId),
+        moderationTelemetrySideEffects(interaction.client),
       );
       await interaction.editReply({
         content: `✅ Timed out **${target.discordUser.tag}** for ${hours}h.`,

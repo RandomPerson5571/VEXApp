@@ -1,4 +1,4 @@
-import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
+import { describe, expect, it } from "vitest";
 
 import {
   isUserSuppressed,
@@ -6,45 +6,12 @@ import {
 } from "@/lib/auth/moderation";
 import { taskCreatedMessage, taskUpdatedMessage } from "@/lib/telemetry/messages";
 
-const findUniqueMock = vi.hoisted(() => vi.fn());
-
-vi.mock("@stlvex/database", () => ({
-  prisma: {
-    team: {
-      findUnique: findUniqueMock,
-    },
-  },
-}));
-
 describe("telemetry messages", () => {
   it("formats task created and updated messages", () => {
     expect(taskCreatedMessage("Wire intake")).toBe("Task created: **Wire intake**");
     expect(taskUpdatedMessage("Wire intake", ["status", "assignees"])).toBe(
       "Task updated: **Wire intake** (status, assignees)",
     );
-  });
-});
-
-describe("resolveGuildIdForTeam cache", () => {
-  beforeEach(() => {
-    findUniqueMock.mockReset();
-    vi.resetModules();
-  });
-
-  afterEach(() => {
-    vi.resetModules();
-  });
-
-  it("caches guild id for repeated lookups", async () => {
-    findUniqueMock.mockResolvedValue({ discordServerId: "guild-123" });
-
-    const { resolveGuildIdForTeam: resolve } = await import(
-      "@/lib/telemetry/resolve"
-    );
-
-    await expect(resolve("team-a")).resolves.toBe("guild-123");
-    await expect(resolve("team-a")).resolves.toBe("guild-123");
-    expect(findUniqueMock).toHaveBeenCalledTimes(1);
   });
 });
 

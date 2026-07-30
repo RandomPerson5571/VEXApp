@@ -18,7 +18,6 @@ export type NotificationSendPayload = {
 };
 
 export type TelemetryLogPayload = {
-  guildId: string;
   teamId?: string;
   message: string;
   action?: string;

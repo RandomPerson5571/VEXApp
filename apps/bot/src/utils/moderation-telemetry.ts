@@ -1,6 +1,5 @@
 import type { ModerationAuditPayload, ModerationSideEffects } from "@stlvex/database";
 import type { Client } from "discord.js";
-import { prisma } from "@stlvex/database";
 
 import { dispatchSecurityTelemetry } from "../api/handlers/telemetry-logs.js";
 
@@ -36,37 +35,17 @@ function telemetryForAudit(
 
 export function moderationTelemetrySideEffects(
   client: Client,
-  guildId: string | null,
 ): ModerationSideEffects {
   return {
     onAudited: (event) => {
-      if (!event.teamId) return;
       const mapped = telemetryForAudit(event);
       if (!mapped) return;
 
-      void (async () => {
-        let resolvedGuildId = guildId;
-        if (!resolvedGuildId) {
-          const team = await prisma.team.findUnique({
-            where: { id: event.teamId! },
-            select: { discordServerId: true },
-          });
-          resolvedGuildId = team?.discordServerId ?? null;
-        }
-        if (!resolvedGuildId) {
-          console.warn(
-            `[moderation] no guild for team ${event.teamId}; skip security log`,
-          );
-          return;
-        }
-
-        await dispatchSecurityTelemetry(client, {
-          guildId: resolvedGuildId,
-          teamId: event.teamId ?? undefined,
-          message: mapped.message,
-          action: mapped.action,
-        });
-      })().catch((error) => {
+      void dispatchSecurityTelemetry(client, {
+        teamId: event.teamId ?? undefined,
+        message: mapped.message,
+        action: mapped.action,
+      }).catch((error) => {
         console.warn("[moderation] security telemetry failed:", error);
       });
     },

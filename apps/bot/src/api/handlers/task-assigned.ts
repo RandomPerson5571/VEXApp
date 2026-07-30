@@ -11,6 +11,17 @@ function discordIdForUser(user: {
   return user.discordId ?? user.discordAccount?.discordId ?? null;
 }
 
+function taskListUrl(): string | null {
+  const base = (
+    process.env.NEXT_PUBLIC_APP_URL ??
+    process.env.NEXT_PUBLIC_SITE_URL ??
+    ""
+  )
+    .trim()
+    .replace(/\/$/, "");
+  return base ? `${base}/task-list` : null;
+}
+
 async function sendTaskAssignmentDm(
   client: import("discord.js").Client,
   discordId: string,
@@ -47,9 +58,14 @@ export async function handleTaskAssigned(
       },
     });
 
+    const listUrl = taskListUrl();
+    const description = listUrl
+      ? `You were assigned: **${payload.title}**\n\n[View task list](${listUrl})`
+      : `You were assigned: **${payload.title}**`;
+
     const embed = new EmbedBuilder()
       .setTitle("Task assigned")
-      .setDescription(`You were assigned: **${payload.title}**`)
+      .setDescription(description)
       .setColor(0x57f287)
       .setTimestamp(new Date())
       .setFooter({ text: `Task ${payload.taskId}` });

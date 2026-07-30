@@ -38,7 +38,7 @@ const liftTimeoutCommand: SlashCommand = {
           targetUserId: target.dbUser.id,
           reason: interaction.options.getString("reason"),
         },
-        moderationTelemetrySideEffects(interaction.client, interaction.guildId),
+        moderationTelemetrySideEffects(interaction.client),
       );
       await interaction.editReply({
         content: `✅ Lifted timeout for **${target.discordUser.tag}**.`,

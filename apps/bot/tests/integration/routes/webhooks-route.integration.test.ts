@@ -23,7 +23,6 @@ describe("POST /api/webhooks integration", () => {
       .send({
         type: "telemetry.info",
         payload: {
-          guildId: "guild-1",
           teamId: "team-1",
           message: "Task created",
           action: "task.created",
@@ -48,7 +47,7 @@ describe("POST /api/webhooks integration", () => {
       .set("x-webhook-secret", "wrong-secret")
       .send({
         type: "telemetry.info",
-        payload: { guildId: "guild-1", message: "test" },
+        payload: { message: "test" },
       });
 
     expect(response.status).toBe(401);

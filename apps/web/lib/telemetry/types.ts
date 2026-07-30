@@ -4,7 +4,7 @@ export type TelemetryLevel = "error" | "warning";
 
 export type LogTelemetryInput = {
   category: TelemetryCategory;
-  teamId: string;
+  teamId?: string;
   message: string;
   action?: string;
   level?: TelemetryLevel;

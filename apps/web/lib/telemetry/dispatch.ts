@@ -5,7 +5,6 @@ import type {
   LogTelemetryInput,
   TaskAssignedInput,
 } from "@/lib/telemetry/types";
-import { resolveGuildIdForTeam } from "@/lib/telemetry/resolve";
 
 function botWebhookConfig(): { url: string; secret: string } | null {
   const base = process.env.BOT_PUBLIC_URL?.trim().replace(/\/$/, "");
@@ -55,16 +54,7 @@ function webhookTypeForCategory(
 }
 
 export async function logTelemetryAsync(input: LogTelemetryInput): Promise<void> {
-  const guildId = await resolveGuildIdForTeam(input.teamId);
-  if (!guildId) {
-    console.warn(
-      `[telemetry] team ${input.teamId} has no discordServerId; skip ${input.category} log`,
-    );
-    return;
-  }
-
   await postBotWebhook(webhookTypeForCategory(input.category), {
-    guildId,
     teamId: input.teamId,
     message: input.message,
     action: input.action,
@@ -108,19 +98,13 @@ export async function logEndpointFailureAsync(
     .filter(Boolean)
     .join(" — ");
 
-  if (input.teamId) {
-    await logTelemetryAsync({
-      category: "security",
-      teamId: input.teamId,
-      message,
-      action: "endpoint.failure",
-      level: "error",
-    });
-    return;
-  }
-
-  // No team context — still try webhook with guild unknown; skip if no team
-  console.warn("[telemetry] endpoint failure without teamId:", message);
+  await logTelemetryAsync({
+    category: "security",
+    teamId: input.teamId,
+    message,
+    action: "endpoint.failure",
+    level: "error",
+  });
 }
 
 export function logEndpointFailure(input: EndpointFailureInput): void {
@@ -130,7 +114,7 @@ export function logEndpointFailure(input: EndpointFailureInput): void {
 }
 
 export async function logWarningAsync(input: {
-  teamId: string;
+  teamId?: string;
   route: string;
   message: string;
 }): Promise<void> {
@@ -144,7 +128,7 @@ export async function logWarningAsync(input: {
 }
 
 export function logWarning(input: {
-  teamId: string;
+  teamId?: string;
   route: string;
   message: string;
 }): void {

@@ -222,21 +222,14 @@ const createTaskCommand: SlashCommand = {
       },
     });
 
-    const team = await prisma.team.findUnique({
-      where: { id: dbUser.teamId },
-      select: { discordServerId: true },
-    });
-    if (team?.discordServerId) {
-      void handleTelemetryInfo(
-        { client: interaction.client },
-        {
-          guildId: team.discordServerId,
-          teamId: dbUser.teamId,
-          message: `Task created: **${title}**`,
-          action: "task.created",
-        },
-      );
-    }
+    void handleTelemetryInfo(
+      { client: interaction.client },
+      {
+        teamId: dbUser.teamId,
+        message: `Task created: **${title}**`,
+        action: "task.created",
+      },
+    );
 
     const embed = new EmbedBuilder()
       .setColor(0x57f287)

@@ -45,7 +45,7 @@ const unbanCommand: SlashCommand = {
           targetUserId: target.id,
           reason: interaction.options.getString("reason"),
         },
-        moderationTelemetrySideEffects(interaction.client, interaction.guildId),
+        moderationTelemetrySideEffects(interaction.client),
       );
       await interaction.editReply({
         content: `✅ Unbanned **${target.firstName} ${target.lastName}** (\`${target.id}\`).`,
