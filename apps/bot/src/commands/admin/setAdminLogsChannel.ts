@@ -1,33 +1,21 @@
 import { findUserByDiscordId, prisma } from "@stlvex/database";
-import { ChannelType, SlashCommandBuilder, channelMention, inlineCode } from "discord.js";
+import { ChannelType, SlashCommandBuilder, channelMention } from "discord.js";
 import type { SlashCommand } from "../../types.js";
-import {
-  autocompleteTeamOption,
-  isPlatformAdmin,
-  resolveTargetTeam,
-} from "../../utils/team-options.js";
+import { isPlatformAdmin } from "../../utils/team-options.js";
 
 const setAdminLogsChannel: SlashCommand = {
   data: new SlashCommandBuilder()
     .setName("set-admin-logs-channel")
-    .setDescription("Set the private admin-logs channel for security alerts")
-    .addStringOption((option) =>
-      option
-        .setName("team")
-        .setDescription("Team to configure")
-        .setRequired(true)
-        .setAutocomplete(true),
-    )
+    .setDescription("Set this server's private admin-logs channel for security alerts")
     .addChannelOption((option) =>
       option
         .setName("channel")
-        .setDescription("Admin logs channel")
+        .setDescription("Admin logs channel for this server")
         .setRequired(true)
         .addChannelTypes(ChannelType.GuildText, ChannelType.GuildAnnouncement),
     ),
-  autocomplete: autocompleteTeamOption,
   async execute(interaction) {
-    if (!interaction.inGuild()) {
+    if (!interaction.inGuild() || !interaction.guildId) {
       await interaction.reply({
         content: "This command can only be used in a server.",
         ephemeral: true,
@@ -48,36 +36,29 @@ const setAdminLogsChannel: SlashCommand = {
 
     if (!isPlatformAdmin(dbUser)) {
       await interaction.editReply({
-        content: "❌ Only admins can set a team's admin-logs channel.",
+        content: "❌ Only admins can set the admin-logs channel.",
       });
       return;
     }
 
-    const teamIdInput = interaction.options.getString("team");
     const channel = interaction.options.getChannel("channel", true);
 
-    const targetTeam = await resolveTargetTeam(dbUser, teamIdInput, {
-      adminRequiredMessage: "❌ Admins must select a team.",
-      leaderScopeMessage: "❌ Only admins can set a team's admin-logs channel.",
-    });
-
-    if (!targetTeam.ok) {
-      await interaction.editReply({ content: targetTeam.message });
-      return;
-    }
-
     try {
-      const updatedTeam = await prisma.team.update({
-        where: { id: targetTeam.teamId },
-        data: { adminLogsChannelId: channel.id },
+      await prisma.discordGuildSettings.upsert({
+        where: { guildId: interaction.guildId },
+        create: {
+          guildId: interaction.guildId,
+          adminLogsChannelId: channel.id,
+        },
+        update: { adminLogsChannelId: channel.id },
       });
 
       await interaction.editReply({
-        content: `✅ Admin-logs channel for team ${inlineCode(updatedTeam.number)} set to ${channelMention(channel.id)}.`,
+        content: `✅ Admin-logs channel for this server set to ${channelMention(channel.id)}.`,
       });
     } catch {
       await interaction.editReply({
-        content: "❌ Could not update that team. It may not exist.",
+        content: "❌ Could not save the admin-logs channel.",
       });
     }
   },

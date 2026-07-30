@@ -4,10 +4,9 @@ import { prisma } from "@stlvex/database";
 import type { WebhookContext } from "../context.js";
 import type { TelemetryChannelPayload } from "../types/webhook.js";
 
-async function sendToTeamChannel(
+async function sendToTeamAnnouncementsChannel(
   context: WebhookContext,
   teamId: string,
-  channelField: "annoucementsChannelId" | "adminLogsChannelId",
   content: string,
   embed: EmbedBuilder,
 ): Promise<void> {
@@ -15,9 +14,7 @@ async function sendToTeamChannel(
     where: { id: teamId },
     select: {
       annoucementsChannelId: true,
-      adminLogsChannelId: true,
       number: true,
-      name: true,
     },
   });
 
@@ -26,10 +23,10 @@ async function sendToTeamChannel(
     return;
   }
 
-  const channelId = team[channelField];
+  const channelId = team.annoucementsChannelId;
   if (!channelId) {
     console.warn(
-      `[telemetry] team ${team.number} has no ${channelField}; skip send`,
+      `[telemetry] team ${team.number} has no annoucementsChannelId; skip send`,
     );
     return;
   }
@@ -41,6 +38,55 @@ async function sendToTeamChannel(
   }
 
   await channel.send({ content, embeds: [embed] });
+}
+
+async function sendToGuildAdminLogsChannel(
+  context: WebhookContext,
+  teamId: string,
+  embed: EmbedBuilder,
+): Promise<void> {
+  const team = await prisma.team.findUnique({
+    where: { id: teamId },
+    select: {
+      discordServerId: true,
+      discordRoleId: true,
+      number: true,
+    },
+  });
+
+  if (!team) {
+    console.warn(`[telemetry] team ${teamId} not found`);
+    return;
+  }
+
+  if (!team.discordServerId) {
+    console.warn(
+      `[telemetry] team ${team.number} has no discordServerId; skip admin logs`,
+    );
+    return;
+  }
+
+  const guildSettings = await prisma.discordGuildSettings.findUnique({
+    where: { guildId: team.discordServerId },
+    select: { adminLogsChannelId: true },
+  });
+
+  const channelId = guildSettings?.adminLogsChannelId;
+  if (!channelId) {
+    console.warn(
+      `[telemetry] guild ${team.discordServerId} has no adminLogsChannelId; skip send`,
+    );
+    return;
+  }
+
+  const channel = await context.client.channels.fetch(channelId);
+  if (!channel?.isSendable()) {
+    console.warn(`[telemetry] channel ${channelId} not sendable`);
+    return;
+  }
+
+  const mention = team.discordRoleId ? `<@&${team.discordRoleId}>` : "";
+  await channel.send({ content: mention, embeds: [embed] });
 }
 
 export async function handleTelemetryActionable(
@@ -55,10 +101,9 @@ export async function handleTelemetryActionable(
       .setTimestamp(new Date())
       .setFooter({ text: payload.event });
 
-    await sendToTeamChannel(
+    await sendToTeamAnnouncementsChannel(
       context,
       payload.teamId,
-      "annoucementsChannelId",
       "",
       embed,
     );
@@ -72,13 +117,6 @@ export async function handleTelemetrySecurity(
   payload: TelemetryChannelPayload,
 ): Promise<void> {
   try {
-    const team = await prisma.team.findUnique({
-      where: { id: payload.teamId },
-      select: { discordRoleId: true },
-    });
-
-    const mention = team?.discordRoleId ? `<@&${team.discordRoleId}>` : "";
-
     const embed = new EmbedBuilder()
       .setTitle("Security")
       .setDescription(payload.message)
@@ -86,13 +124,7 @@ export async function handleTelemetrySecurity(
       .setTimestamp(new Date())
       .setFooter({ text: payload.event });
 
-    await sendToTeamChannel(
-      context,
-      payload.teamId,
-      "adminLogsChannelId",
-      mention,
-      embed,
-    );
+    await sendToGuildAdminLogsChannel(context, payload.teamId, embed);
   } catch (error) {
     console.warn("[telemetry.security] failed:", error);
   }

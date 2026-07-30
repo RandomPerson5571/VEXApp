@@ -136,7 +136,6 @@ model Team {
   discordRoleId   String?         @unique
   /// Actionable ops channel (typo preserved for existing rows)
   annoucementsChannelId String?
-  adminLogsChannelId    String?
   digestHourLocal       Int             @default(17)
   digestTimezone        String          @default("America/New_York")
   members         User[]
@@ -168,6 +167,8 @@ model TeamDigestBuffer {
 model DiscordGuildSettings {
   guildId             String   @id
   generalMemberRoleId String?
+  /// Server-wide security / admin-logs channel (not per-team)
+  adminLogsChannelId  String?
   createdAt           DateTime @default(now())
   updatedAt           DateTime @updatedAt
 }
