@@ -51,7 +51,7 @@ const typeConfig: Record<
   Hardware: {
     label: "Hardware",
     icon: Box,
-    className: "bg-orange-500/10 text-orange-600 border-orange-500/20 dark:text-orange-400",
+    className: "bg-[color:var(--site-accent)]/10 text-[color:var(--site-accent)] border-[color:var(--site-accent)]/20 dark:text-[color:var(--site-accent)]",
   },
   Software: {
     label: "Software",
@@ -80,7 +80,7 @@ const priorityConfig: Record<
   },
   Medium: {
     label: "Medium",
-    className: "bg-amber-500/10 text-amber-600 border-amber-500/25 dark:text-amber-400",
+    className: "bg-[color:var(--site-accent)]/10 text-[color:var(--site-accent)] border-[color:var(--site-accent)]/25 dark:text-[color:var(--site-accent)]",
   },
   High: {
     label: "High",

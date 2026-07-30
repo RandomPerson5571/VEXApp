@@ -26,13 +26,13 @@ import { DashboardRowSkeleton } from "./dashboard-skeletons";
 
 const statusBarClass: Record<StockStatus, string> = {
   nominal: "bg-slate-400 dark:bg-slate-500",
-  low: "bg-amber-500",
+  low: "bg-[color:var(--site-accent)]",
   depleted: "bg-red-500",
 };
 
 const statusLabelClass: Record<StockStatus, string> = {
   nominal: "text-slate-700 dark:text-slate-300",
-  low: "text-amber-600 dark:text-amber-400",
+  low: "text-[color:var(--site-accent)] dark:text-[color:var(--site-accent)]",
   depleted: "text-red-600 dark:text-red-400",
 };
 
@@ -57,7 +57,7 @@ function InventoryRow({ item, index }: { item: TeamInventoryItem; index: number 
                 className={`inline-flex items-center gap-1 rounded border px-1.5 py-0.5 text-[8.5px] font-bold uppercase tracking-wider ${
                   status === "depleted"
                     ? "border-red-500/30 bg-red-500/10 text-red-400"
-                    : "border-amber-500/30 bg-amber-500/10 text-amber-500"
+                    : "border-[color:var(--site-accent)]/30 bg-[color:var(--site-accent)]/10 text-[color:var(--site-accent)]"
                 }`}
               >
                 <AlertTriangle
@@ -129,7 +129,7 @@ export function InventoryTrackerWidget() {
             "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")",
         }}
       />
-      <div aria-hidden className="pointer-events-none absolute inset-0 bg-gradient-to-br from-orange-50/30 via-transparent to-transparent opacity-60 dark:from-orange-500/10 dark:to-transparent" />
+      <div aria-hidden className="pointer-events-none absolute inset-0 bg-gradient-to-br from-[color:var(--site-accent)]/30 via-transparent to-transparent opacity-60 dark:from-[color:var(--site-accent)]/10 dark:to-transparent" />
 
       <div className="relative mb-4 flex items-start justify-between gap-3 border-b border-slate-300 dark:border-[#1a1a1a] pb-3">
         <div>
@@ -147,7 +147,7 @@ export function InventoryTrackerWidget() {
         </div>
         <Link
           href="/inventory"
-          className="text-[10px] font-bold text-orange-600 transition-colors hover:text-orange-500 hover:underline dark:text-orange-500 dark:hover:text-orange-400"
+          className="text-[10px] font-bold text-[color:var(--site-accent)] transition-colors hover:text-[color:var(--site-accent)]/80 hover:underline dark:text-[color:var(--site-accent)] dark:hover:text-[color:var(--site-accent)]/80"
         >
           Manage Inventory →
         </Link>
@@ -188,7 +188,7 @@ export function InventoryTrackerWidget() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search parts…"
-            className="w-full rounded-3xl border border-slate-300 dark:border-[#1a1a1a] bg-slate-50 dark:bg-[#121212]/80 py-2.5 pl-10 pr-3 text-[11px] font-semibold text-slate-900 dark:text-slate-100 outline-none transition focus:border-orange-500 dark:focus:border-orange-400/40 focus:shadow-[0_0_0_3px_rgba(249,115,22,0.16)] placeholder:text-slate-600 dark:placeholder:text-slate-500"
+            className="w-full rounded-3xl border border-slate-300 dark:border-[#1a1a1a] bg-slate-50 dark:bg-[#121212]/80 py-2.5 pl-10 pr-3 text-[11px] font-semibold text-slate-900 dark:text-slate-100 outline-none transition focus:border-[color:var(--site-accent)] dark:focus:border-[color:var(--site-accent)]/40 focus:shadow-[0_0_0_3px_rgba(var(--site-accent-rgb),0.16)] placeholder:text-slate-600 dark:placeholder:text-slate-500"
           />
         </div>
       </div>

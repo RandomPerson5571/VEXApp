@@ -213,7 +213,7 @@ export function AdminInviteManagementTable({
                         className={cn(
                           "inline-flex items-center rounded-md border px-1.5 py-0.5 text-[11px] font-bold tabular-nums",
                           exhausted
-                            ? "border-amber-500/25 bg-amber-500/10 text-amber-300"
+                            ? "border-[color:var(--site-accent)]/25 bg-[color:var(--site-accent)]/10 text-[color:var(--site-accent)]"
                             : "border-[#1a1a1a] bg-slate-950/40 text-slate-300",
                         )}
                       >

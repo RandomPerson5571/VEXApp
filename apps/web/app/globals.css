@@ -51,6 +51,15 @@
 }
 
 :root {
+  --site-accent: #ea580c;
+  --site-accent-rgb: 234 88 12;
+  --accent-solid: rgb(var(--site-accent-rgb));
+  --accent-soft: rgb(var(--site-accent-rgb) / 0.12);
+  --accent-softer: rgb(var(--site-accent-rgb) / 0.08);
+  --accent-border: rgb(var(--site-accent-rgb) / 0.32);
+  --accent-text: color-mix(in srgb, var(--site-accent) 86%, white 14%);
+  --accent-text-strong: color-mix(in srgb, var(--site-accent) 78%, black 22%);
+  --accent-shadow: rgb(var(--site-accent-rgb) / 0.18);
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
@@ -95,6 +104,100 @@ html.dark {
   color-scheme: dark;
 }
 
+html[data-site-theme="monochrome"],
+html[data-site-theme="custom"] {
+  --accent-solid: rgb(var(--site-accent-rgb));
+  --accent-soft: rgb(var(--site-accent-rgb) / 0.12);
+  --accent-softer: rgb(var(--site-accent-rgb) / 0.08);
+  --accent-border: rgb(var(--site-accent-rgb) / 0.32);
+  --accent-text: color-mix(in srgb, var(--site-accent) 70%, black 30%);
+  --accent-text-strong: color-mix(in srgb, var(--site-accent) 50%, black 50%);
+  --accent-shadow: rgb(var(--site-accent-rgb) / 0.18);
+}
+
+html.dark[data-site-theme="monochrome"],
+html.dark[data-site-theme="custom"] {
+  --accent-text: color-mix(in srgb, var(--site-accent) 75%, white 25%);
+  --accent-text-strong: color-mix(in srgb, var(--site-accent) 60%, white 40%);
+}
+
+html[data-site-theme="monochrome"] [class*="ring-orange"],
+html[data-site-theme="monochrome"] [class*="ring-amber"],
+html[data-site-theme="monochrome"] [class*="ring-yellow"],
+html[data-site-theme="monochrome"] [class*="ring-blue"],
+html[data-site-theme="custom"] [class*="ring-orange"],
+html[data-site-theme="custom"] [class*="ring-amber"],
+html[data-site-theme="custom"] [class*="ring-yellow"],
+html[data-site-theme="custom"] [class*="ring-blue"] {
+  --tw-ring-color: var(--accent-solid) !important;
+}
+
+html[data-site-theme="monochrome"] [class*="shadow-orange"],
+html[data-site-theme="monochrome"] [class*="shadow-amber"],
+html[data-site-theme="monochrome"] [class*="shadow-yellow"],
+html[data-site-theme="monochrome"] [class*="shadow-blue"],
+html[data-site-theme="custom"] [class*="shadow-orange"],
+html[data-site-theme="custom"] [class*="shadow-amber"],
+html[data-site-theme="custom"] [class*="shadow-yellow"],
+html[data-site-theme="custom"] [class*="shadow-blue"] {
+  --tw-shadow-color: var(--accent-solid) !important;
+}
+
+html[data-site-theme="monochrome"] [class*="fill-orange"],
+html[data-site-theme="monochrome"] [class*="fill-amber"],
+html[data-site-theme="monochrome"] [class*="fill-yellow"],
+html[data-site-theme="monochrome"] [class*="fill-blue"],
+html[data-site-theme="custom"] [class*="fill-orange"],
+html[data-site-theme="custom"] [class*="fill-amber"],
+html[data-site-theme="custom"] [class*="fill-yellow"],
+html[data-site-theme="custom"] [class*="fill-blue"] {
+  fill: var(--accent-solid) !important;
+}
+
+html[data-site-theme="monochrome"] [class*="stroke-orange"],
+html[data-site-theme="monochrome"] [class*="stroke-amber"],
+html[data-site-theme="monochrome"] [class*="stroke-yellow"],
+html[data-site-theme="monochrome"] [class*="stroke-blue"],
+html[data-site-theme="custom"] [class*="stroke-orange"],
+html[data-site-theme="custom"] [class*="stroke-amber"],
+html[data-site-theme="custom"] [class*="stroke-yellow"],
+html[data-site-theme="custom"] [class*="stroke-blue"] {
+  stroke: var(--accent-solid) !important;
+}
+
+html[data-site-theme="monochrome"] [class*="from-orange"],
+html[data-site-theme="monochrome"] [class*="from-amber"],
+html[data-site-theme="monochrome"] [class*="from-yellow"],
+html[data-site-theme="monochrome"] [class*="from-blue"],
+html[data-site-theme="custom"] [class*="from-orange"],
+html[data-site-theme="custom"] [class*="from-amber"],
+html[data-site-theme="custom"] [class*="from-yellow"],
+html[data-site-theme="custom"] [class*="from-blue"] {
+  --tw-gradient-from: var(--accent-solid) !important;
+}
+
+html[data-site-theme="monochrome"] [class*="to-orange"],
+html[data-site-theme="monochrome"] [class*="to-amber"],
+html[data-site-theme="monochrome"] [class*="to-yellow"],
+html[data-site-theme="monochrome"] [class*="to-blue"],
+html[data-site-theme="custom"] [class*="to-orange"],
+html[data-site-theme="custom"] [class*="to-amber"],
+html[data-site-theme="custom"] [class*="to-yellow"],
+html[data-site-theme="custom"] [class*="to-blue"] {
+  --tw-gradient-to: var(--accent-solid) !important;
+}
+
+html[data-site-theme="monochrome"] [class*="via-orange"],
+html[data-site-theme="monochrome"] [class*="via-amber"],
+html[data-site-theme="monochrome"] [class*="via-yellow"],
+html[data-site-theme="monochrome"] [class*="via-blue"],
+html[data-site-theme="custom"] [class*="via-orange"],
+html[data-site-theme="custom"] [class*="via-amber"],
+html[data-site-theme="custom"] [class*="via-yellow"],
+html[data-site-theme="custom"] [class*="via-blue"] {
+  --tw-gradient-stops: var(--tw-gradient-from), var(--accent-solid), var(--tw-gradient-to) !important;
+}
+
 /* Industrial Obsidian — dark theme */
 .dark {
   --background: #000000;
@@ -111,6 +214,13 @@ html.dark {
   --muted-foreground: #a1a1aa;
   --accent: #121212;
   --accent-foreground: #f4f4f5;
+  --accent-solid: rgb(var(--site-accent-rgb));
+  --accent-soft: rgb(var(--site-accent-rgb) / 0.12);
+  --accent-softer: rgb(var(--site-accent-rgb) / 0.08);
+  --accent-border: rgb(var(--site-accent-rgb) / 0.32);
+  --accent-text: color-mix(in srgb, var(--site-accent) 78%, white 22%);
+  --accent-text-strong: color-mix(in srgb, var(--site-accent) 88%, white 12%);
+  --accent-shadow: rgb(var(--site-accent-rgb) / 0.18);
   --destructive: oklch(0.704 0.191 22.216);
   --border: #1a1a1a;
   --input: #1a1a1a;
@@ -147,6 +257,136 @@ html.dark {
   html.dark {
     color-scheme: dark;
   }
+}
+
+html[data-site-theme="monochrome"] [class~="text-orange-400"],
+html[data-site-theme="monochrome"] [class~="text-orange-500"],
+html[data-site-theme="monochrome"] [class~="text-orange-600"],
+html[data-site-theme="monochrome"] [class~="text-yellow-300"],
+html[data-site-theme="monochrome"] [class~="text-yellow-400"],
+html[data-site-theme="monochrome"] [class~="text-yellow-500"],
+html[data-site-theme="monochrome"] [class~="text-yellow-600"],
+html[data-site-theme="monochrome"] [class~="text-blue-400"],
+html[data-site-theme="monochrome"] [class~="text-blue-500"],
+html[data-site-theme="monochrome"] [class~="text-blue-600"],
+html[data-site-theme="custom"] [class~="text-orange-400"],
+html[data-site-theme="custom"] [class~="text-orange-500"],
+html[data-site-theme="custom"] [class~="text-orange-600"],
+html[data-site-theme="custom"] [class~="text-yellow-300"],
+html[data-site-theme="custom"] [class~="text-yellow-400"],
+html[data-site-theme="custom"] [class~="text-yellow-500"],
+html[data-site-theme="custom"] [class~="text-yellow-600"],
+html[data-site-theme="custom"] [class~="text-blue-400"],
+html[data-site-theme="custom"] [class~="text-blue-500"],
+html[data-site-theme="custom"] [class~="text-blue-600"] {
+  color: var(--accent-text) !important;
+}
+
+/* Broad catch-all: map legacy orange/amber/yellow utility classes to the accent variables
+   so changing the accent theme updates all places without updating every file. */
+html[data-site-theme="monochrome"] [class*="orange"],
+html[data-site-theme="monochrome"] [class*="amber"],
+html[data-site-theme="monochrome"] [class*="yellow"],
+html[data-site-theme="custom"] [class*="orange"],
+html[data-site-theme="custom"] [class*="amber"],
+html[data-site-theme="custom"] [class*="yellow"] {
+  /* Generic mapping: text, background, and border uses are resolved below via more specific selectors */
+}
+
+html[data-site-theme="monochrome"] [class*="text-orange"],
+html[data-site-theme="monochrome"] [class*="text-amber"],
+html[data-site-theme="monochrome"] [class*="text-yellow"],
+html[data-site-theme="custom"] [class*="text-orange"],
+html[data-site-theme="custom"] [class*="text-amber"],
+html[data-site-theme="custom"] [class*="text-yellow"] {
+  color: var(--accent-text) !important;
+}
+
+html[data-site-theme="monochrome"] [class*="bg-orange"],
+html[data-site-theme="monochrome"] [class*="bg-amber"],
+html[data-site-theme="monochrome"] [class*="bg-yellow"],
+html[data-site-theme="custom"] [class*="bg-orange"],
+html[data-site-theme="custom"] [class*="bg-amber"],
+html[data-site-theme="custom"] [class*="bg-yellow"] {
+  background-color: var(--accent-solid) !important;
+}
+
+html[data-site-theme="monochrome"] [class*="border-orange"],
+html[data-site-theme="monochrome"] [class*="border-amber"],
+html[data-site-theme="monochrome"] [class*="border-yellow"],
+html[data-site-theme="custom"] [class*="border-orange"],
+html[data-site-theme="custom"] [class*="border-amber"],
+html[data-site-theme="custom"] [class*="border-yellow"] {
+  border-color: var(--accent-border) !important;
+}
+
+html[data-site-theme="monochrome"] [class*="hover:bg-orange"],
+html[data-site-theme="monochrome"] [class*="hover:bg-amber"],
+html[data-site-theme="monochrome"] [class*="hover:bg-yellow"],
+html[data-site-theme="custom"] [class*="hover:bg-orange"],
+html[data-site-theme="custom"] [class*="hover:bg-amber"],
+html[data-site-theme="custom"] [class*="hover:bg-yellow"]:hover {
+  background-color: color-mix(in srgb, var(--site-accent) 88%, white 12%) !important;
+}
+
+html[data-site-theme="monochrome"] [class~="bg-orange-500"],
+html[data-site-theme="monochrome"] [class~="bg-orange-600"],
+html[data-site-theme="monochrome"] [class~="bg-orange-700"],
+html[data-site-theme="monochrome"] [class~="bg-orange-800"],
+html[data-site-theme="monochrome"] [class~="bg-yellow-500"],
+html[data-site-theme="monochrome"] [class~="bg-yellow-600"],
+html[data-site-theme="monochrome"] [class~="bg-blue-500"],
+html[data-site-theme="monochrome"] [class~="bg-blue-600"],
+html[data-site-theme="custom"] [class~="bg-orange-500"],
+html[data-site-theme="custom"] [class~="bg-orange-600"],
+html[data-site-theme="custom"] [class~="bg-orange-700"],
+html[data-site-theme="custom"] [class~="bg-orange-800"],
+html[data-site-theme="custom"] [class~="bg-yellow-500"],
+html[data-site-theme="custom"] [class~="bg-yellow-600"],
+html[data-site-theme="custom"] [class~="bg-blue-500"],
+html[data-site-theme="custom"] [class~="bg-blue-600"] {
+  background-color: var(--accent-solid) !important;
+}
+
+html[data-site-theme="monochrome"] [class~="hover:bg-orange-500"]:hover,
+html[data-site-theme="monochrome"] [class~="hover:bg-yellow-500"]:hover,
+html[data-site-theme="monochrome"] [class~="hover:bg-blue-500"]:hover,
+html[data-site-theme="custom"] [class~="hover:bg-orange-500"]:hover,
+html[data-site-theme="custom"] [class~="hover:bg-yellow-500"]:hover,
+html[data-site-theme="custom"] [class~="hover:bg-blue-500"]:hover {
+  background-color: color-mix(in srgb, var(--site-accent) 88%, white 12%) !important;
+}
+
+html[data-site-theme="monochrome"] [class~="bg-orange-500/10"],
+html[data-site-theme="monochrome"] [class~="bg-orange-500/15"],
+html[data-site-theme="monochrome"] [class~="bg-yellow-500/5"],
+html[data-site-theme="monochrome"] [class~="bg-yellow-500/10"],
+html[data-site-theme="monochrome"] [class~="bg-yellow-500/15"],
+html[data-site-theme="monochrome"] [class~="bg-blue-500/10"],
+html[data-site-theme="custom"] [class~="bg-orange-500/10"],
+html[data-site-theme="custom"] [class~="bg-orange-500/15"],
+html[data-site-theme="custom"] [class~="bg-yellow-500/5"],
+html[data-site-theme="custom"] [class~="bg-yellow-500/10"],
+html[data-site-theme="custom"] [class~="bg-yellow-500/15"],
+html[data-site-theme="custom"] [class~="bg-blue-500/10"] {
+  background-color: var(--accent-soft) !important;
+}
+
+html[data-site-theme="monochrome"] [class~="border-orange-500/20"],
+html[data-site-theme="monochrome"] [class~="border-orange-500/25"],
+html[data-site-theme="monochrome"] [class~="border-orange-500/30"],
+html[data-site-theme="monochrome"] [class~="border-yellow-500/20"],
+html[data-site-theme="monochrome"] [class~="border-yellow-500/30"],
+html[data-site-theme="monochrome"] [class~="border-blue-500/10"],
+html[data-site-theme="monochrome"] [class~="border-blue-500/20"],
+html[data-site-theme="custom"] [class~="border-orange-500/20"],
+html[data-site-theme="custom"] [class~="border-orange-500/25"],
+html[data-site-theme="custom"] [class~="border-orange-500/30"],
+html[data-site-theme="custom"] [class~="border-yellow-500/20"],
+html[data-site-theme="custom"] [class~="border-yellow-500/30"],
+html[data-site-theme="custom"] [class~="border-blue-500/10"],
+html[data-site-theme="custom"] [class~="border-blue-500/20"] {
+  border-color: var(--accent-border) !important;
 }
 
 /* Native selects — custom chevron, hide OS chrome (unlayered so pe beats utilities) */

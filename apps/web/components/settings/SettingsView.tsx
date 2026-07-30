@@ -7,6 +7,7 @@ import type { NotificationPreferences } from "@/lib/notifications/preferences";
 import { NotificationsSettingsView } from "./NotificationsSettingsView";
 import { ProfileSettingsView } from "./ProfileSettingsView";
 import { SettingsSidebar, type SettingsSectionId } from "./SettingsSidebar";
+import { InterfaceSettingsView } from "./InterfaceSettingsView";
 
 type SettingsViewProps = {
   firstName: string;
@@ -37,7 +38,11 @@ export function SettingsView({
   function handleSectionChange(next: SettingsSectionId) {
     // ponytail: drop message/error on tab switch; deep links land via server initialSection
     const href =
-      next === "notifications" ? "/settings?section=notifications" : "/settings";
+      next === "notifications"
+        ? "/settings?section=notifications"
+        : next === "interface"
+          ? "/settings?section=interface"
+          : "/settings";
     router.replace(href, { scroll: false });
   }
 
@@ -55,6 +60,9 @@ export function SettingsView({
               message={message}
               error={error}
             />
+          </div>
+          <div className={section === "interface" ? undefined : "hidden"}>
+            <InterfaceSettingsView />
           </div>
           <div className={section === "notifications" ? undefined : "hidden"}>
             <NotificationsSettingsView

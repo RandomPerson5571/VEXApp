@@ -70,7 +70,7 @@ const ROLE_OPTIONS: UserRole[] = ["ADMIN", "TEAM_LEADER", "TEAM_MEMBER"];
 const NO_TEAM_VALUE = "__none__";
 
 const ROLE_ACCENT: Record<UserRole, string> = {
-  ADMIN: "text-amber-300",
+  ADMIN: "text-[color:var(--site-accent)]",
   TEAM_LEADER: "text-blue-300",
   TEAM_MEMBER: "text-slate-300",
 };
@@ -369,7 +369,7 @@ export function AdminUserManagementTable({
                                 </span>
                               ) : null}
                               {user.isAdmin ? (
-                                <span className="inline-flex h-5 items-center gap-1 rounded-md border border-amber-500/25 bg-amber-500/10 px-1.5 text-[10px] font-bold text-amber-300">
+                                <span className="inline-flex h-5 items-center gap-1 rounded-md border border-[color:var(--site-accent)]/25 bg-[color:var(--site-accent)]/10 px-1.5 text-[10px] font-bold text-[color:var(--site-accent)]">
                                   <Crown className="size-3" aria-hidden />
                                   Admin
                                 </span>

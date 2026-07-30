@@ -33,7 +33,7 @@ const menuItems: SidebarItem[] = [
   { href: "/knowledge/scouting", label: "Scouting", icon: Binoculars },
   { href: "/team-management", label: "Members", icon: Users2 },
   { href: "/invite", label: "Invites", icon: LinkIcon, requiresInviteAccess: true },
-  { href: "/settings", label: "Settings", icon: Settings },
+  { href: "/settings", label: "User Settings", icon: Settings },
 ];
 
 type AppSidebarProps = {
@@ -99,16 +99,16 @@ export function AppSidebar({ onClose, onNavigate }: AppSidebarProps) {
               onClick={onNavigate}
               className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-xs font-semibold tracking-normal transition-all duration-150 ${
                 isActive
-                  ? "bg-orange-600/15 text-orange-400 border border-orange-500/20 shadow-sm shadow-orange-500/5"
+                  ? "bg-[color:var(--accent-soft)] text-[color:var(--accent-text-strong)] border border-[color:var(--accent-border)] shadow-sm shadow-[color:var(--accent-solid)]/10"
                   : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-[#121212]/50 hover:text-slate-900 dark:hover:text-slate-200 border border-transparent"
               }`}
             >
               <div className="flex items-center gap-3">
-                <Icon className={`h-4.5 w-4.5 ${isActive ? "text-orange-400" : "text-slate-400"}`} />
+                <Icon className={`h-4.5 w-4.5 ${isActive ? "text-[color:var(--accent-text-strong)]" : "text-slate-400"}`} />
                 <span>{item.label}</span>
               </div>
               {item.badge && (
-                <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-orange-500/10 text-orange-400 border border-orange-400/20 text-center scale-90">
+                <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-[color:var(--accent-soft)] text-[color:var(--accent-text-strong)] border border-[color:var(--accent-border)] text-center scale-90">
                   {item.badge}
                 </span>
               )}
@@ -124,14 +124,14 @@ export function AppSidebar({ onClose, onNavigate }: AppSidebarProps) {
             onClick={onNavigate}
             className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-semibold tracking-normal transition-all duration-150 ${
               pathname === "/admin" || pathname.startsWith("/admin/")
-                ? "bg-orange-600/15 text-orange-400 border border-orange-500/20 shadow-sm shadow-orange-500/5"
+                ? "bg-[color:var(--accent-soft)] text-[color:var(--accent-text-strong)] border border-[color:var(--accent-border)] shadow-sm shadow-[color:var(--accent-solid)]/10"
                 : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-[#121212]/50 hover:text-slate-900 dark:hover:text-slate-200 border border-transparent"
             }`}
           >
             <ShieldCheck
               className={`h-4.5 w-4.5 ${
                 pathname === "/admin" || pathname.startsWith("/admin/")
-                  ? "text-orange-400"
+                  ? "text-[color:var(--accent-text-strong)]"
                   : "text-slate-400"
               }`}
             />

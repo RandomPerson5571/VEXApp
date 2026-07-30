@@ -20,8 +20,8 @@ export function IntegrationStatusBadge({
 
   if (!active) {
     return (
-      <span className="inline-flex items-center gap-1.5 rounded-full border border-amber-500/20 bg-amber-500/10 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-amber-700 dark:text-amber-400">
-        <span className="h-1.5 w-1.5 rounded-full bg-amber-400" />
+      <span className="inline-flex items-center gap-1.5 rounded-full border border-[color:var(--site-accent)]/20 bg-[color:var(--site-accent)]/10 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-[color:var(--site-accent)] dark:text-[color:var(--site-accent)]">
+        <span className="h-1.5 w-1.5 rounded-full bg-[color:var(--site-accent)]" />
         Paused
       </span>
     );

@@ -43,12 +43,29 @@ export default function RootLayout({
         <Script id="theme-init" strategy="beforeInteractive">
           {`(function() {
               const theme = localStorage.getItem('theme') || 'dark';
+              const accentTheme = localStorage.getItem('accent-theme') || 'orange';
+              const customAccent = localStorage.getItem('custom-accent-color') || '#b65f2a';
+              const fontSize = Number(localStorage.getItem('font-size') || '100');
+              const normalizedFontSize = Math.min(Math.max(Math.round(Number.isFinite(fontSize) ? fontSize : 100), 90), 115);
+              const accentColor = accentTheme === 'monochrome'
+                ? '#a1a1aa'
+                : accentTheme === 'custom' && /^#[0-9a-f]{6}$/i.test(customAccent)
+                  ? customAccent
+                  : '#ea580c';
+              const red = parseInt(accentColor.slice(1, 3), 16);
+              const green = parseInt(accentColor.slice(3, 5), 16);
+              const blue = parseInt(accentColor.slice(5, 7), 16);
               if (theme === 'light') {
                 document.documentElement.classList.remove('dark');
               } else {
                 document.documentElement.classList.add('dark');
               }
               document.documentElement.style.colorScheme = theme;
+              document.documentElement.dataset.siteTheme =
+                accentTheme === 'monochrome' || accentTheme === 'custom' ? accentTheme : 'orange';
+              document.documentElement.style.setProperty('--site-accent', accentColor);
+              document.documentElement.style.setProperty('--site-accent-rgb', red + ' ' + green + ' ' + blue);
+              document.documentElement.style.fontSize = normalizedFontSize + '%';
             })();`}
         </Script>
       </head>

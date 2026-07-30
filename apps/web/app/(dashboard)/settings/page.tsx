@@ -36,7 +36,11 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
         : (params.message ?? null);
 
   const initialSection =
-    params.section === "notifications" ? "notifications" : "profile";
+    params.section === "notifications"
+      ? "notifications"
+      : params.section === "interface"
+        ? "interface"
+        : "profile";
 
   return (
     <SettingsView
