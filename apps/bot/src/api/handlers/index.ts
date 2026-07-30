@@ -1,13 +1,12 @@
 import type { WebhookContext } from "../context.js";
 import type { WebhookEvent } from "../types/webhook.js";
-import { handleInventoryLowStock } from "./inventory-low-stock.js";
 import { handleNotificationSend } from "./notification-send.js";
-import { handleTaskCompleted } from "./task-completed.js";
-import { handleTaskCreated } from "./task-created.js";
+import { handleTaskAssigned } from "./task-assigned.js";
 import {
-  handleTelemetryActionable,
+  handleTelemetryInfo,
+  handleTelemetryInventory,
   handleTelemetrySecurity,
-} from "./telemetry.js";
+} from "./telemetry-logs.js";
 
 export async function dispatchWebhookEvent(
   context: WebhookContext,
@@ -20,34 +19,28 @@ export async function dispatchWebhookEvent(
         event.payload as WebhookEvent<"notification.send">["payload"],
       );
       return;
-    case "task.created":
-      await handleTaskCreated(
-        context,
-        event.payload as WebhookEvent<"task.created">["payload"],
-      );
-      return;
-    case "task.completed":
-      await handleTaskCompleted(
-        context,
-        event.payload as WebhookEvent<"task.completed">["payload"],
-      );
-      return;
-    case "telemetry.actionable":
-      await handleTelemetryActionable(
-        context,
-        event.payload as WebhookEvent<"telemetry.actionable">["payload"],
-      );
-      return;
     case "telemetry.security":
       await handleTelemetrySecurity(
         context,
         event.payload as WebhookEvent<"telemetry.security">["payload"],
       );
       return;
-    case "inventory.low_stock":
-      await handleInventoryLowStock(
+    case "telemetry.info":
+      await handleTelemetryInfo(
         context,
-        event.payload as WebhookEvent<"inventory.low_stock">["payload"],
+        event.payload as WebhookEvent<"telemetry.info">["payload"],
+      );
+      return;
+    case "telemetry.inventory":
+      await handleTelemetryInventory(
+        context,
+        event.payload as WebhookEvent<"telemetry.inventory">["payload"],
+      );
+      return;
+    case "task.assigned":
+      await handleTaskAssigned(
+        context,
+        event.payload as WebhookEvent<"task.assigned">["payload"],
       );
       return;
   }

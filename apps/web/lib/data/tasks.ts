@@ -11,6 +11,15 @@ import {
   type TaskType,
 } from "@stlvex/database/types";
 
+import {
+  logTelemetry,
+  notifyTaskAssigned,
+} from "@/lib/telemetry/dispatch";
+import {
+  taskCreatedMessage,
+  taskUpdatedMessage,
+} from "@/lib/telemetry/messages";
+
 export type CreateTaskInput = {
   title: string;
   description?: string | null;
@@ -73,7 +82,7 @@ export async function createTaskForTeam(
     }
   }
 
-  return prisma.task.create({
+  const task = await prisma.task.create({
     data: {
       title: input.title.trim(),
       description: input.description?.trim() || null,
@@ -89,6 +98,25 @@ export async function createTaskForTeam(
     },
     include: taskListTaskInclude,
   });
+
+  logTelemetry({
+    category: "info",
+    teamId: input.teamId,
+    message: taskCreatedMessage(task.title),
+    action: "task.created",
+  });
+
+  if (assigneeIds.length > 0) {
+    notifyTaskAssigned({
+      teamId: input.teamId,
+      taskId: task.id,
+      title: task.title,
+      assigneeUserIds: assigneeIds,
+      actorId: input.createdBy,
+    });
+  }
+
+  return task;
 }
 
 export async function updateTaskForTeam(
@@ -96,7 +124,12 @@ export async function updateTaskForTeam(
 ): Promise<TaskListTask> {
   const existing = await prisma.task.findFirst({
     where: { id: input.taskId, teamId: input.teamId },
-    select: { id: true, status: true },
+    select: {
+      id: true,
+      title: true,
+      status: true,
+      assignments: { select: { userId: true } },
+    },
   });
 
   if (!existing) {
@@ -116,33 +149,43 @@ export async function updateTaskForTeam(
     };
   } = {};
 
+  const changes: string[] = [];
+
   if (input.title !== undefined) {
     const title = input.title.trim();
     if (!title) {
       throw new Error("Title is required.");
     }
+    if (title !== existing.title) changes.push("title");
     data.title = title;
   }
 
   if (input.description !== undefined) {
+    changes.push("description");
     data.description = input.description?.trim() || null;
   }
 
   if (input.status !== undefined) {
+    if (input.status !== existing.status) changes.push("status");
     data.status = input.status;
   }
 
   if (input.type !== undefined) {
+    changes.push("type");
     data.type = input.type;
   }
 
   if (input.priority !== undefined) {
+    changes.push("priority");
     data.priority = input.priority;
   }
 
   if (input.dueDate !== undefined) {
+    changes.push("due date");
     data.dueDate = input.dueDate;
   }
+
+  let newAssigneeIds: string[] | undefined;
 
   if (input.assigneeIds !== undefined) {
     const assigneeIds = [...new Set(input.assigneeIds)];
@@ -157,10 +200,14 @@ export async function updateTaskForTeam(
       }
     }
 
+    changes.push("assignees");
     data.assignments = {
       deleteMany: {},
       create: assigneeIds.map((userId) => ({ userId })),
     };
+
+    const existingIds = existing.assignments.map((a) => a.userId);
+    newAssigneeIds = assigneeIds.filter((id) => !existingIds.includes(id));
   }
 
   if (Object.keys(data).length === 0) {
@@ -173,12 +220,20 @@ export async function updateTaskForTeam(
     include: taskListTaskInclude,
   });
 
-  if (
-    input.status === "Done" &&
-    existing.status !== "Done"
-  ) {
-    const { dispatchTelemetry } = await import("@/lib/telemetry/dispatch");
-    dispatchTelemetry({ teamId: input.teamId, event: "tasksCompleted" });
+  logTelemetry({
+    category: "info",
+    teamId: input.teamId,
+    message: taskUpdatedMessage(updated.title, changes),
+    action: "task.updated",
+  });
+
+  if (newAssigneeIds && newAssigneeIds.length > 0) {
+    notifyTaskAssigned({
+      teamId: input.teamId,
+      taskId: updated.id,
+      title: updated.title,
+      assigneeUserIds: newAssigneeIds,
+    });
   }
 
   return updated;

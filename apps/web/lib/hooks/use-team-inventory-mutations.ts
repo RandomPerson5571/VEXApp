@@ -11,7 +11,6 @@ import {
 import {
   createInventoryItemFromApi,
   deleteInventoryItemFromApi,
-  orderPlacedInventoryItemFromApi,
   returnInventorySignOutFromApi,
   signOutInventoryItemFromApi,
   updateInventoryItemFromApi,
@@ -93,22 +92,11 @@ export function useTeamInventoryMutations({
     onSettled: invalidateDashboard,
   });
 
-  const orderPlacedMutation = useMutation({
-    mutationFn: orderPlacedInventoryItemFromApi,
-    onSuccess: (updatedItem) => {
-      if (teamId) {
-        replaceTeamInventoryItem(queryClient, teamId, updatedItem);
-      }
-    },
-    onSettled: invalidateDashboard,
-  });
-
   return {
     createMutation,
     updateMutation,
     deleteMutation,
     signOutMutation,
     returnMutation,
-    orderPlacedMutation,
   };
 }

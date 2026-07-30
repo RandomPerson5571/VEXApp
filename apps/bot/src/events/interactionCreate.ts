@@ -1,32 +1,10 @@
 import type { BotClient, BotEvent } from "../types.js";
 import { wrapInteractionWithLatency } from "../utils/latency.js";
-import { handleInventoryOrderPlacedButton } from "./inventory-order-placed.js";
-import { ORDER_PLACED_CUSTOM_ID_PREFIX } from "../api/handlers/inventory-low-stock.js";
 
 const interactionCreate: BotEvent<"interactionCreate"> = {
   name: "interactionCreate",
   async execute(interaction) {
     const client = interaction.client as BotClient;
-
-    if (interaction.isButton()) {
-      if (interaction.customId.startsWith(ORDER_PLACED_CUSTOM_ID_PREFIX)) {
-        try {
-          await handleInventoryOrderPlacedButton(interaction);
-        } catch (error) {
-          console.error("Error handling Order Placed button:", error);
-          const errorReply = {
-            content: "Something went wrong marking that order.",
-            ephemeral: true,
-          };
-          if (interaction.deferred || interaction.replied) {
-            await interaction.followUp(errorReply);
-          } else {
-            await interaction.reply(errorReply);
-          }
-        }
-      }
-      return;
-    }
 
     if (interaction.isAutocomplete()) {
       const command = client.commands.get(interaction.commandName);

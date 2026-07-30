@@ -17,7 +17,6 @@ import {
 import type { TeamInventoryItem } from "@stlvex/database/types";
 import { useTeamInventoryMutations } from "@/lib/hooks/use-team-inventory-mutations";
 import { useInventoryImageUrl } from "@/lib/hooks/use-inventory-image-url";
-import { useUser } from "@/components/providers/UserProvider";
 import {
   type AvailabilityFilter,
   formatBorrowerName,
@@ -340,18 +339,11 @@ export function InventoryCard({
   const [actionError, setActionError] = useState<string | undefined>();
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
   const [isCheckinOpen, setIsCheckinOpen] = useState(false);
-  const { signOutMutation, returnMutation, orderPlacedMutation } =
-    useTeamInventoryMutations({
+  const { signOutMutation, returnMutation } = useTeamInventoryMutations({
       teamId,
     });
-  const { profile } = useUser();
-  const canMarkOrderPlaced =
-    profile.isAdmin ||
-    profile.role === "TEAM_LEADER" ||
-    profile.role === "ADMIN";
   const isSigningOut = signOutMutation.isPending;
   const isReturning = returnMutation.isPending;
-  const isMarkingOrder = orderPlacedMutation.isPending;
   const parsedQuantity = Number.parseInt(quantity, 10);
   const maxCheckoutQuantity =
     item.checkoutLimit === null || item.checkoutLimit === undefined
@@ -409,18 +401,6 @@ export function InventoryCard({
         error instanceof Error
           ? error.message
           : "Failed to return inventory item.",
-      );
-    }
-  };
-
-  const handleOrderPlaced = async () => {
-    if (isMarkingOrder) return;
-    setActionError(undefined);
-    try {
-      await orderPlacedMutation.mutateAsync(item.id);
-    } catch (error) {
-      setActionError(
-        error instanceof Error ? error.message : "Failed to mark order placed.",
       );
     }
   };
@@ -527,29 +507,6 @@ export function InventoryCard({
             />
           </div>
         </div>
-
-        {item.restockPending ? (
-          <div className="flex flex-wrap items-center gap-2 rounded-lg border border-amber-500/30 bg-amber-500/10 px-3 py-2">
-            <p className="flex-1 text-[10px] font-semibold text-amber-700 dark:text-amber-300">
-              {item.orderPlacedAt
-                ? "Order placed — alerts muted until restocked."
-                : "Low stock alert active — alerts muted."}
-            </p>
-            {canMarkOrderPlaced && !item.orderPlacedAt ? (
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  void handleOrderPlaced();
-                }}
-                disabled={isMarkingOrder}
-                className="inline-flex h-8 items-center justify-center rounded-md bg-emerald-600 px-2.5 text-[10px] font-bold uppercase tracking-wider text-white hover:bg-emerald-500 disabled:opacity-50"
-              >
-                Order Placed
-              </button>
-            ) : null}
-          </div>
-        ) : null}
 
         <div className="grid gap-2 sm:grid-cols-2">
           <button

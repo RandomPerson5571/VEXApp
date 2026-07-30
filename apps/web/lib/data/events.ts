@@ -3,6 +3,13 @@ import "server-only";
 import { prisma } from "@stlvex/database";
 import type { Event, EventType, Prisma } from "@stlvex/database/types";
 
+import { logTelemetry } from "@/lib/telemetry/dispatch";
+import {
+  eventCreatedMessage,
+  eventDeletedMessage,
+  eventUpdatedMessage,
+} from "@/lib/telemetry/messages";
+
 const eventCreatorSelect = {
   creator: {
     select: {
@@ -74,6 +81,14 @@ export async function createEventForTeam(
       },
     },
     include: eventCreatorSelect,
+  }).then((event) => {
+    logTelemetry({
+      category: "info",
+      teamId: input.teamId,
+      message: eventCreatedMessage(event.name),
+      action: "event.created",
+    });
+    return event;
   });
 }
 
@@ -115,7 +130,7 @@ export async function updateEventForTeam(
 
   await findTeamEventOrThrow(input.eventId, input.teamId);
 
-  return prisma.event.update({
+  const event = await prisma.event.update({
     where: { id: input.eventId },
     data: {
       name: input.name.trim(),
@@ -127,12 +142,27 @@ export async function updateEventForTeam(
     },
     include: eventCreatorSelect,
   });
+
+  logTelemetry({
+    category: "info",
+    teamId: input.teamId,
+    message: eventUpdatedMessage(event.name),
+    action: "event.updated",
+  });
+
+  return event;
 }
 
 export async function deleteEventForTeam(
   eventId: string,
   teamId: string,
 ): Promise<void> {
-  await findTeamEventOrThrow(eventId, teamId);
+  const event = await findTeamEventOrThrow(eventId, teamId);
   await prisma.event.delete({ where: { id: eventId } });
+  logTelemetry({
+    category: "info",
+    teamId,
+    message: eventDeletedMessage(event.name),
+    action: "event.deleted",
+  });
 }

@@ -83,13 +83,21 @@ export async function PATCH(request: Request, context: RouteContext) {
   }
 
   try {
+    const teamId = currentUser.profile.teamId;
+    if (!teamId) {
+      return NextResponse.json(
+        { error: "Team context required for inventory operations." },
+        { status: 400 },
+      );
+    }
+
     const item = await updateTeamInventoryItem({
       itemId,
+      teamId,
       name,
       description: body.description ?? null,
       totalStock,
       checkoutLimit,
-      teamId: currentUser.profile.teamId ?? undefined,
       ...(body.imageUrl !== undefined ? { imageUrl: body.imageUrl } : {}),
       ...(body.color !== undefined ? { color: body.color } : {}),
     });
@@ -131,7 +139,15 @@ export async function DELETE(request: Request, context: RouteContext) {
   }
 
   try {
-    await deleteTeamInventoryItem(itemId);
+    const teamId = currentUser.profile.teamId;
+    if (!teamId) {
+      return NextResponse.json(
+        { error: "Team context required for inventory operations." },
+        { status: 400 },
+      );
+    }
+
+    await deleteTeamInventoryItem(itemId, teamId);
     return new NextResponse(null, { status: 204 });
   } catch (error) {
     const message =

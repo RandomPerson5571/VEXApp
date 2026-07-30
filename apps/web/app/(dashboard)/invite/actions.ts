@@ -7,6 +7,8 @@ import { prisma } from "@stlvex/database";
 import { getSiteUrl } from "@/app/(auth)/lib/site-url";
 import { canCreateInvites } from "@/lib/auth/auth-guards";
 import { verifyCurrentUserPermissions } from "@/lib/auth/auth-guards-server";
+import { logTelemetry } from "@/lib/telemetry/dispatch";
+import { inviteCreatedMessage } from "@/lib/telemetry/messages";
 
 export type CreateInviteInput = {
   teamId: string;
@@ -75,6 +77,13 @@ export async function createInviteLink({
   });
 
   const siteUrl = await getSiteUrl();
+
+  logTelemetry({
+    category: "info",
+    teamId: team.id,
+    message: inviteCreatedMessage(maxUses),
+    action: "invite.created",
+  });
 
   return {
     ok: true,

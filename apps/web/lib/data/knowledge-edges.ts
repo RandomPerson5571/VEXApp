@@ -6,6 +6,12 @@ import {
   type KnowledgeEdgeDetail,
 } from "@stlvex/database/types";
 
+import { logTelemetry } from "@/lib/telemetry/dispatch";
+import {
+  knowledgeEdgeCreatedMessage,
+  knowledgeEdgeDeletedMessage,
+} from "@/lib/telemetry/messages";
+
 export type CreateKnowledgeEdgeInput = {
   teamId: string;
   sourceId: string;
@@ -58,7 +64,7 @@ export async function createKnowledgeEdge(
   }
 
   try {
-    return await prisma.knowledgeEdge.create({
+    const edge = await prisma.knowledgeEdge.create({
       data: {
         sourceId: input.sourceId,
         targetId: input.targetId,
@@ -66,6 +72,13 @@ export async function createKnowledgeEdge(
       },
       include: knowledgeEdgeInclude,
     });
+    logTelemetry({
+      category: "info",
+      teamId: input.teamId,
+      message: knowledgeEdgeCreatedMessage(),
+      action: "knowledge_edge.created",
+    });
+    return edge;
   } catch (error) {
     if (
       error instanceof Error &&
@@ -94,4 +107,10 @@ export async function deleteKnowledgeEdge(
   }
 
   await prisma.knowledgeEdge.delete({ where: { id: edgeId } });
+  logTelemetry({
+    category: "info",
+    teamId,
+    message: knowledgeEdgeDeletedMessage(),
+    action: "knowledge_edge.deleted",
+  });
 }

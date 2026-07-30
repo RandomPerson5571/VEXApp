@@ -6,6 +6,15 @@ import {
   type TeamInventoryItem,
 } from "@stlvex/database/types";
 import { normalizeInventoryColor } from "@/lib/inventory/item-colors";
+import { logTelemetry } from "@/lib/telemetry/dispatch";
+import {
+  formatUserName,
+  inventoryItemCreatedMessage,
+  inventoryItemDeletedMessage,
+  inventoryItemUpdatedMessage,
+  inventoryReturnMessage,
+  inventorySignOutMessage,
+} from "@/lib/telemetry/messages";
 
 export async function countInventoryItems(): Promise<number> {
   return prisma.inventoryItem.count();
@@ -48,6 +57,7 @@ export async function listInventoryForTeam(
 }
 
 export type CreateInventoryItemInput = {
+  teamId: string;
   name: string;
   description?: string | null;
   totalStock: number;
@@ -86,7 +96,7 @@ export async function createInventoryItem(
     throw new Error("Checkout limit must be at least 1.");
   }
 
-  return prisma.inventoryItem.create({
+  const item = await prisma.inventoryItem.create({
     data: {
       name: input.name.trim(),
       description: input.description?.trim() || null,
@@ -97,10 +107,20 @@ export async function createInventoryItem(
     },
     include: teamInventoryItemInclude,
   });
+
+  logTelemetry({
+    category: "inventory",
+    teamId: input.teamId,
+    message: inventoryItemCreatedMessage(item.name),
+    action: "inventory_item.created",
+  });
+
+  return item;
 }
 
 export type UpdateInventoryItemInput = {
   itemId: string;
+  teamId: string;
   name: string;
   description?: string | null;
   totalStock: number;
@@ -127,7 +147,7 @@ export async function updateInventoryItem(
 
   await findInventoryItemOrThrow(input.itemId);
 
-  return prisma.inventoryItem.update({
+  const item = await prisma.inventoryItem.update({
     where: { id: input.itemId },
     data: {
       name: input.name.trim(),
@@ -146,11 +166,35 @@ export async function updateInventoryItem(
     },
     include: teamInventoryItemInclude,
   });
+
+  logTelemetry({
+    category: "inventory",
+    teamId: input.teamId,
+    message: inventoryItemUpdatedMessage(item.name),
+    action: "inventory_item.updated",
+  });
+
+  return item;
 }
 
-export async function deleteInventoryItem(itemId: string): Promise<void> {
-  await findInventoryItemOrThrow(itemId);
+export async function deleteInventoryItem(
+  itemId: string,
+  teamId: string,
+): Promise<void> {
+  const item = await prisma.inventoryItem.findUnique({
+    where: { id: itemId },
+    select: { name: true },
+  });
+  if (!item) {
+    throw new Error("Inventory item not found.");
+  }
   await prisma.inventoryItem.delete({ where: { id: itemId } });
+  logTelemetry({
+    category: "inventory",
+    teamId,
+    message: inventoryItemDeletedMessage(item.name),
+    action: "inventory_item.deleted",
+  });
 }
 
 export type SignOutInventoryItemInput = {
@@ -201,7 +245,23 @@ export async function signOutInventoryItem(
     });
   });
 
-  return findInventoryItemOrThrow(input.inventoryItemId);
+  const item = await findInventoryItemOrThrow(input.inventoryItemId);
+  const user = await prisma.user.findUnique({
+    where: { id: input.userId },
+    select: { firstName: true, lastName: true },
+  });
+  const userName = user
+    ? formatUserName(user.firstName, user.lastName)
+    : "Unknown user";
+
+  logTelemetry({
+    category: "inventory",
+    teamId: input.teamId,
+    message: inventorySignOutMessage(item.name, input.quantity, userName),
+    action: "inventory.sign_out",
+  });
+
+  return item;
 }
 
 export type ReturnInventorySignOutInput = {
@@ -220,7 +280,11 @@ export async function returnInventorySignOut(
       teamId: input.teamId,
       returnedAt: null,
     },
-    select: { id: true },
+    select: {
+      id: true,
+      quantity: true,
+      user: { select: { firstName: true, lastName: true } },
+    },
   });
 
   if (!signOut) {
@@ -232,5 +296,18 @@ export async function returnInventorySignOut(
     data: { returnedAt: new Date() },
   });
 
-  return findInventoryItemOrThrow(input.inventoryItemId);
+  const item = await findInventoryItemOrThrow(input.inventoryItemId);
+  const userName = formatUserName(
+    signOut.user.firstName,
+    signOut.user.lastName,
+  );
+
+  logTelemetry({
+    category: "inventory",
+    teamId: input.teamId,
+    message: inventoryReturnMessage(item.name, signOut.quantity, userName),
+    action: "inventory.return",
+  });
+
+  return item;
 }

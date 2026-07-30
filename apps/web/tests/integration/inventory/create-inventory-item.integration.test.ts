@@ -8,6 +8,11 @@ import {
 } from "../../helpers/auth/test-database";
 
 vi.mock("server-only", () => ({}));
+vi.mock("@/lib/telemetry/dispatch", () => ({
+  logTelemetry: vi.fn(),
+}));
+
+const TEAM_ID = "team-integration";
 
 const describeIntegration = hasTestDatabase() ? describe : describe.skip;
 
@@ -22,6 +27,7 @@ describeIntegration("createInventoryItem integration", () => {
 
   it("persists a new inventory item with active sign-outs included", async () => {
     const item = await createInventoryItem({
+      teamId: TEAM_ID,
       name: `Vitest Motor ${crypto.randomUUID().slice(0, 8)}`,
       description: "Integration test part",
       totalStock: 6,
@@ -47,6 +53,7 @@ describeIntegration("createInventoryItem integration", () => {
   it("appears in the team inventory list after creation", async () => {
     const name = `Vitest Bearing ${crypto.randomUUID().slice(0, 8)}`;
     const item = await createInventoryItem({
+      teamId: TEAM_ID,
       name,
       totalStock: 10,
     });
@@ -61,6 +68,7 @@ describeIntegration("createInventoryItem integration", () => {
   it("rejects negative stock against the real database layer", async () => {
     await expect(
       createInventoryItem({
+        teamId: TEAM_ID,
         name: "Invalid stock item",
         totalStock: -1,
       }),

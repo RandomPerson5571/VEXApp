@@ -11,32 +11,31 @@ import {
 import type { User } from "@stlvex/database/types";
 
 import { createAdminClient } from "@/lib/supabase/admin";
-import { dispatchTelemetry } from "@/lib/telemetry/dispatch";
-import type { TelemetryEventKey } from "@/lib/telemetry/events";
+import { logTelemetry } from "@/lib/telemetry/dispatch";
 
 function telemetryForAudit(
   event: ModerationAuditPayload,
-): { key: TelemetryEventKey; message: string } | null {
+): { action: string; message: string } | null {
   const name = `**${event.targetFirstName} ${event.targetLastName}**`;
   switch (event.action) {
     case "SUPPRESS":
       return {
-        key: "userSuppressed",
+        action: "userSuppressed",
         message: `User ${name} suppressed until ${event.until?.toISOString() ?? "?"} — ${event.reason}`,
       };
     case "KICK":
       return {
-        key: "userKicked",
+        action: "userKicked",
         message: `User ${name} kicked from team — ${event.reason}`,
       };
     case "BAN":
       return {
-        key: "userBanned",
+        action: "userBanned",
         message: `User ${name} banned — ${event.reason}`,
       };
     case "UNBAN":
       return {
-        key: "userUnbanned",
+        action: "userUnbanned",
         message: `User ${name} unbanned — ${event.reason}`,
       };
     default:
@@ -50,10 +49,11 @@ function sideEffects() {
       if (!event.teamId) return;
       const mapped = telemetryForAudit(event);
       if (!mapped) return;
-      dispatchTelemetry({
+      logTelemetry({
+        category: "security",
         teamId: event.teamId,
-        event: mapped.key,
         message: mapped.message,
+        action: mapped.action,
       });
     },
   };

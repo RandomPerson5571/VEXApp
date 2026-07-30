@@ -4,6 +4,11 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { createInventoryItem } from "@/lib/data/inventory";
 
 vi.mock("server-only", () => ({}));
+vi.mock("@/lib/telemetry/dispatch", () => ({
+  logTelemetry: vi.fn(),
+}));
+
+const TEAM_ID = "team-test";
 
 describe("createInventoryItem", () => {
   beforeEach(() => {
@@ -15,6 +20,7 @@ describe("createInventoryItem", () => {
 
     await expect(
       createInventoryItem({
+        teamId: TEAM_ID,
         name: "Motor",
         totalStock: -1,
       }),
@@ -40,6 +46,7 @@ describe("createInventoryItem", () => {
       .mockResolvedValue(created as never);
 
     const result = await createInventoryItem({
+      teamId: TEAM_ID,
       name: "  Motor  ",
       description: "  Green  ",
       totalStock: 3,
@@ -51,7 +58,9 @@ describe("createInventoryItem", () => {
         name: "Motor",
         description: "Green",
         totalStock: 3,
+        checkoutLimit: null,
         imageUrl: "parts/motor.png",
+        color: null,
       },
       include: expect.any(Object),
     });
@@ -75,6 +84,7 @@ describe("createInventoryItem", () => {
       .mockResolvedValue(created as never);
 
     await createInventoryItem({
+      teamId: TEAM_ID,
       name: "Bearing",
       description: "   ",
       totalStock: 0,
@@ -86,7 +96,9 @@ describe("createInventoryItem", () => {
         name: "Bearing",
         description: null,
         totalStock: 0,
+        checkoutLimit: null,
         imageUrl: null,
+        color: null,
       },
       include: expect.any(Object),
     });

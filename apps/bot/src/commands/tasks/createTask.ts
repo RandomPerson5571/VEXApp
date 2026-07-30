@@ -12,6 +12,7 @@ import {
   bold,
 } from "discord.js";
 import type { ChatInputCommandInteraction, ModalSubmitInteraction } from "discord.js";
+import { handleTelemetryInfo } from "../../api/handlers/telemetry-logs.js";
 import type { SlashCommand } from "../../types.js";
 import { eventDateFormatHint, parseEventDate } from "../../utils/parse-event-date.js";
 
@@ -220,6 +221,22 @@ const createTaskCommand: SlashCommand = {
         createdBy: dbUser.id,
       },
     });
+
+    const team = await prisma.team.findUnique({
+      where: { id: dbUser.teamId },
+      select: { discordServerId: true },
+    });
+    if (team?.discordServerId) {
+      void handleTelemetryInfo(
+        { client: interaction.client },
+        {
+          guildId: team.discordServerId,
+          teamId: dbUser.teamId,
+          message: `Task created: **${title}**`,
+          action: "task.created",
+        },
+      );
+    }
 
     const embed = new EmbedBuilder()
       .setColor(0x57f287)

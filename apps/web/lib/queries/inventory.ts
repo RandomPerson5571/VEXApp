@@ -139,26 +139,6 @@ export async function returnInventorySignOutFromApi(
   return body as TeamInventoryItem;
 }
 
-export async function orderPlacedInventoryItemFromApi(
-  itemId: string,
-): Promise<TeamInventoryItem> {
-  const response = await fetch(`/api/inventory/${itemId}/order-placed`, {
-    method: "POST",
-  });
-
-  throwIfRateLimited(response);
-
-  const body = (await response.json()) as TeamInventoryItem | { error?: string };
-
-  if (!response.ok) {
-    throw new Error(
-      "error" in body && body.error ? body.error : "Failed to mark order placed.",
-    );
-  }
-
-  return body as TeamInventoryItem;
-}
-
 export function teamInventoryQueryOptions(teamId: string) {
   return createTeamInventoryQueryOptions(teamId, fetchTeamInventoryFromApi);
 }

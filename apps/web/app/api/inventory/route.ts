@@ -88,7 +88,16 @@ export async function POST(request: Request) {
   }
 
   try {
+    const teamId = currentUser.profile.teamId;
+    if (!teamId) {
+      return NextResponse.json(
+        { error: "Team context required for inventory operations." },
+        { status: 400 },
+      );
+    }
+
     const item = await createTeamInventoryItem({
+      teamId,
       name,
       description: body.description ?? null,
       totalStock,

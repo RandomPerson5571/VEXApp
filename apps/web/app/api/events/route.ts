@@ -140,13 +140,6 @@ export async function POST(request: Request) {
       createdById: currentUser.profile.id,
     });
 
-    const { dispatchTelemetry } = await import("@/lib/telemetry/dispatch");
-    dispatchTelemetry({
-      teamId,
-      event: "calendarEventCreated",
-      message: `New calendar event: **${title}**`,
-    });
-
     return NextResponse.json(event, { status: 201 });
   } catch (error) {
     const message =

@@ -3,14 +3,14 @@ import { ChannelType, SlashCommandBuilder, channelMention } from "discord.js";
 import type { SlashCommand } from "../../types.js";
 import { isPlatformAdmin } from "../../utils/team-options.js";
 
-const setAdminLogsChannel: SlashCommand = {
+const setInventoryLogsChannel: SlashCommand = {
   data: new SlashCommandBuilder()
-    .setName("set-admin-logs-channel")
-    .setDescription("Set this server's private admin-logs channel for security alerts")
+    .setName("set-inventory-logs-channel")
+    .setDescription("Set this server's inventory logs channel")
     .addChannelOption((option) =>
       option
         .setName("channel")
-        .setDescription("Admin logs channel for this server")
+        .setDescription("The inventory logs channel for this server")
         .setRequired(true)
         .addChannelTypes(ChannelType.GuildText, ChannelType.GuildAnnouncement),
     ),
@@ -36,7 +36,7 @@ const setAdminLogsChannel: SlashCommand = {
 
     if (!isPlatformAdmin(dbUser)) {
       await interaction.editReply({
-        content: "❌ Only admins can set the admin-logs channel.",
+        content: "❌ Only admins can set log channels.",
       });
       return;
     }
@@ -48,20 +48,20 @@ const setAdminLogsChannel: SlashCommand = {
         where: { guildId: interaction.guildId },
         create: {
           guildId: interaction.guildId,
-          adminLogsChannelId: channel.id,
+          inventoryLogsChannelId: channel.id,
         },
-        update: { adminLogsChannelId: channel.id },
+        update: { inventoryLogsChannelId: channel.id },
       });
 
       await interaction.editReply({
-        content: `✅ Admin-logs channel for this server set to ${channelMention(channel.id)}.`,
+        content: `✅ Inventory logs channel for this server set to ${channelMention(channel.id)}.`,
       });
     } catch {
       await interaction.editReply({
-        content: "❌ Could not save the admin-logs channel.",
+        content: "❌ Could not save the inventory logs channel.",
       });
     }
   },
 };
 
-export default setAdminLogsChannel;
+export default setInventoryLogsChannel;

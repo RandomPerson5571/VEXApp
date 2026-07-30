@@ -1,20 +1,11 @@
 import "server-only";
 
-import { prisma, Prisma } from "@stlvex/database";
-
-import {
-  mergeDigestCounters,
-  TELEMETRY_EVENTS,
-  type DigestCounters,
-  type TelemetryEventKey,
-} from "@/lib/telemetry/events";
-
-export type { DigestCounters, TelemetryEventKey } from "@/lib/telemetry/events";
-export {
-  formatDigestSummary,
-  mergeDigestCounters,
-  TELEMETRY_EVENTS,
-} from "@/lib/telemetry/events";
+import type {
+  EndpointFailureInput,
+  LogTelemetryInput,
+  TaskAssignedInput,
+} from "@/lib/telemetry/types";
+import { resolveGuildIdForTeam } from "@/lib/telemetry/resolve";
 
 function botWebhookConfig(): { url: string; secret: string } | null {
   const base = process.env.BOT_PUBLIC_URL?.trim().replace(/\/$/, "");
@@ -50,101 +41,114 @@ async function postBotWebhook(
   }
 }
 
-async function bumpRoutineCounter(
-  teamId: string,
-  key: TelemetryEventKey,
-  amount = 1,
-): Promise<void> {
-  const existing = await prisma.teamDigestBuffer.findUnique({
-    where: { teamId },
-    select: { counters: true },
-  });
+function webhookTypeForCategory(
+  category: LogTelemetryInput["category"],
+): string {
+  switch (category) {
+    case "security":
+      return "telemetry.security";
+    case "info":
+      return "telemetry.info";
+    case "inventory":
+      return "telemetry.inventory";
+  }
+}
 
-  const current =
-    existing?.counters &&
-    typeof existing.counters === "object" &&
-    !Array.isArray(existing.counters)
-      ? (existing.counters as DigestCounters)
-      : {};
+export async function logTelemetryAsync(input: LogTelemetryInput): Promise<void> {
+  const guildId = await resolveGuildIdForTeam(input.teamId);
+  if (!guildId) {
+    console.warn(
+      `[telemetry] team ${input.teamId} has no discordServerId; skip ${input.category} log`,
+    );
+    return;
+  }
 
-  const counters = mergeDigestCounters(current, { [key]: amount });
-
-  await prisma.teamDigestBuffer.upsert({
-    where: { teamId },
-    create: { teamId, counters: counters as Prisma.InputJsonValue },
-    update: { counters: counters as Prisma.InputJsonValue },
+  await postBotWebhook(webhookTypeForCategory(input.category), {
+    guildId,
+    teamId: input.teamId,
+    message: input.message,
+    action: input.action,
+    level: input.level,
   });
 }
 
-export type DispatchTelemetryInput = {
-  teamId: string;
-  event: TelemetryEventKey;
-  /** Human-readable line for actionable/security embeds */
-  message?: string;
-  /** Extra payload fields for specialized handlers */
-  extra?: Record<string, unknown>;
-  amount?: number;
-};
-
-/**
- * Fire-and-forget telemetry. Never throw to callers.
- * Routine → digest buffer; actionable/security → bot webhook.
- */
-export function dispatchTelemetry(input: DispatchTelemetryInput): void {
-  void dispatchTelemetryAsync(input).catch((error) => {
+export function logTelemetry(input: LogTelemetryInput): void {
+  void logTelemetryAsync(input).catch((error) => {
     console.warn("[telemetry] dispatch failed:", error);
   });
 }
 
-export async function dispatchTelemetryAsync(
-  input: DispatchTelemetryInput,
+export async function notifyTaskAssignedAsync(
+  input: TaskAssignedInput,
 ): Promise<void> {
-  const urgency = TELEMETRY_EVENTS[input.event];
-  const amount = input.amount ?? 1;
+  if (input.assigneeUserIds.length === 0) return;
 
-  if (urgency === "routine") {
-    await bumpRoutineCounter(input.teamId, input.event, amount);
+  await postBotWebhook("task.assigned", {
+    teamId: input.teamId,
+    taskId: input.taskId,
+    title: input.title,
+    assigneeUserIds: input.assigneeUserIds,
+    actorId: input.actorId,
+  });
+}
+
+export function notifyTaskAssigned(input: TaskAssignedInput): void {
+  void notifyTaskAssignedAsync(input).catch((error) => {
+    console.warn("[telemetry] task assignment notify failed:", error);
+  });
+}
+
+export async function logEndpointFailureAsync(
+  input: EndpointFailureInput,
+): Promise<void> {
+  const message = [
+    `API ${input.status} on ${input.route}`,
+    input.error instanceof Error ? input.error.message : undefined,
+  ]
+    .filter(Boolean)
+    .join(" — ");
+
+  if (input.teamId) {
+    await logTelemetryAsync({
+      category: "security",
+      teamId: input.teamId,
+      message,
+      action: "endpoint.failure",
+      level: "error",
+    });
     return;
   }
 
-  const type = urgency === "security" ? "telemetry.security" : "telemetry.actionable";
-  const payload: Record<string, unknown> = {
-    teamId: input.teamId,
-    event: input.event,
-    message: input.message ?? input.event,
-    ...input.extra,
-  };
-
-  if (urgency === "security") {
-    const team = await prisma.team.findUnique({
-      where: { id: input.teamId },
-      select: { discordServerId: true },
-    });
-    if (team?.discordServerId) {
-      payload.guildId = team.discordServerId;
-    }
-  }
-
-  await postBotWebhook(type, payload);
+  // No team context — still try webhook with guild unknown; skip if no team
+  console.warn("[telemetry] endpoint failure without teamId:", message);
 }
 
-export type LowStockAlertInput = {
-  teamId: string;
-  itemId: string;
-  itemName: string;
-  available: number;
-  threshold: number;
-};
+export function logEndpointFailure(input: EndpointFailureInput): void {
+  void logEndpointFailureAsync(input).catch((error) => {
+    console.error("[telemetry] failed to dispatch endpoint failure:", error);
+  });
+}
 
-/** Specialized actionable alert with Discord Order Placed button. */
-export function dispatchLowStockAlert(input: LowStockAlertInput): void {
-  void postBotWebhook("inventory.low_stock", {
+export async function logWarningAsync(input: {
+  teamId: string;
+  route: string;
+  message: string;
+}): Promise<void> {
+  await logTelemetryAsync({
+    category: "security",
     teamId: input.teamId,
-    itemId: input.itemId,
-    itemName: input.itemName,
-    available: input.available,
-    threshold: input.threshold,
-  }).catch((error) => {
-    console.warn("[telemetry] low-stock webhook failed:", error);
+    message: `${input.route}: ${input.message}`,
+    action: "warning",
+    level: "warning",
+  });
+}
+
+export function logWarning(input: {
+  teamId: string;
+  route: string;
+  message: string;
+}): void {
+  void logWarningAsync(input).catch((error) => {
+    console.error("[telemetry] failed to dispatch warning:", error);
   });
 }

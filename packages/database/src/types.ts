@@ -12,7 +12,6 @@ export type {
   TaskAssignment,
   Team,
   TeamDayPlan,
-  TeamDigestBuffer,
   User,
 } from "../generated/prisma/index.js";
 

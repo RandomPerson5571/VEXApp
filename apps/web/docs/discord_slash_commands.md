@@ -59,9 +59,10 @@ Run these as a **platform admin** in the Discord server, in order:
 | 1 | `/set-team-server` | Bind a team to this guild (`Team.discordServerId`) |
 | 2 | `/set-team-role` | Team Discord role (`Team.discordRoleId`) |
 | 3 | `/set-general-member-role` | Verified-member role for this guild |
-| 4 | `/set-announcements-channel` | Ops / digests / low-stock / most telemetry |
-| 5 | `/set-admin-logs-channel` | Private security-style alerts |
-| 6 | `/verify` (members) | Sync nickname + assign roles from the DB |
+| 4 | `/set-security-logs-channel` | Moderation, API errors, warnings |
+| 5 | `/set-info-logs-channel` | Tasks, events, scouting, knowledge, invites, day plans |
+| 6 | `/set-inventory-logs-channel` | Inventory sign-outs, returns, item CRUD |
+| 7 | `/verify` (members) | Sync nickname + assign roles from the DB |
 
 Bot needs **Manage Nicknames** and a role hierarchy above the roles it assigns.
 
@@ -117,23 +118,32 @@ Bot needs **Manage Nicknames** and a role hierarchy above the roles it assigns.
 | **How** | Pick the base member role for **this guild** (server-scoped, not team-scoped). |
 | **Works** | Upserts `DiscordGuildSettings.generalMemberRoleId`. `/verify` adds this role. |
 
-### `/set-announcements-channel`
+### `/set-security-logs-channel`
 
 | | |
 |--|--|
 | **Who** | Platform admin |
-| **Options** | `team` (required); `channel` (text or announcement) |
-| **How** | Pick the channel for actionable ops notifications. |
-| **Works** | Stores `Team.annoucementsChannelId` (schema typo preserved). Digests, low-stock, and most telemetry post here. |
+| **Options** | `channel` (text or announcement) |
+| **How** | Pick the guild channel for security telemetry. |
+| **Works** | Stores `DiscordGuildSettings.securityLogsChannelId`. |
 
-### `/set-admin-logs-channel`
+### `/set-info-logs-channel`
 
 | | |
 |--|--|
 | **Who** | Platform admin |
-| **Options** | `team` (required); `channel` (text or announcement) |
-| **How** | Pick a private admin channel for sensitive alerts. |
-| **Works** | Stores `Team.adminLogsChannelId`. Security telemetry routes here. |
+| **Options** | `channel` (text or announcement) |
+| **How** | Pick the guild channel for info telemetry (tasks, events, etc.). |
+| **Works** | Stores `DiscordGuildSettings.infoLogsChannelId`. |
+
+### `/set-inventory-logs-channel`
+
+| | |
+|--|--|
+| **Who** | Platform admin |
+| **Options** | `channel` (text or announcement) |
+| **How** | Pick the guild channel for inventory telemetry. |
+| **Works** | Stores `DiscordGuildSettings.inventoryLogsChannelId`. |
 
 ---
 

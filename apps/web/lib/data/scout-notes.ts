@@ -3,6 +3,13 @@ import "server-only";
 import { Prisma, prisma } from "@stlvex/database";
 import { scoutNoteInclude } from "@stlvex/database/types";
 
+import { logTelemetry } from "@/lib/telemetry/dispatch";
+import {
+  scoutNoteCreatedMessage,
+  scoutNoteDeletedMessage,
+  scoutNoteUpdatedMessage,
+} from "@/lib/telemetry/messages";
+
 const scoutNoteSelect = {
   id: true,
   teamId: true,
@@ -106,7 +113,7 @@ export async function createScoutNote(
   }
 
   try {
-    return await prisma.scoutNote.create({
+    const note = await prisma.scoutNote.create({
       data: {
         teamId: input.teamId,
         targetTeamNumber,
@@ -124,6 +131,13 @@ export async function createScoutNote(
       },
       select: scoutNoteSelect,
     });
+    logTelemetry({
+      category: "info",
+      teamId: input.teamId,
+      message: scoutNoteCreatedMessage(note.targetTeamNumber),
+      action: "scout_note.created",
+    });
+    return note;
   } catch (error) {
     if (
       error instanceof Prisma.PrismaClientKnownRequestError &&
@@ -189,11 +203,18 @@ export async function updateScoutNote(
   }
 
   try {
-    return await prisma.scoutNote.update({
+    const note = await prisma.scoutNote.update({
       where: { id: input.noteId },
       data,
       select: scoutNoteSelect,
     });
+    logTelemetry({
+      category: "info",
+      teamId: input.teamId,
+      message: scoutNoteUpdatedMessage(note.targetTeamNumber),
+      action: "scout_note.updated",
+    });
+    return note;
   } catch (error) {
     if (
       error instanceof Prisma.PrismaClientKnownRequestError &&
@@ -269,11 +290,17 @@ export async function deleteScoutNote(
 ): Promise<void> {
   const existing = await prisma.scoutNote.findUnique({
     where: { id: noteId },
-    select: { id: true, teamId: true },
+    select: { id: true, teamId: true, targetTeamNumber: true },
   });
   if (!existing || existing.teamId !== teamId) {
     throw new Error("Scout note not found.");
   }
 
   await prisma.scoutNote.delete({ where: { id: noteId } });
+  logTelemetry({
+    category: "info",
+    teamId,
+    message: scoutNoteDeletedMessage(existing.targetTeamNumber),
+    action: "scout_note.deleted",
+  });
 }

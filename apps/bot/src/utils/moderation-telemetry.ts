@@ -1,31 +1,32 @@
 import type { ModerationAuditPayload, ModerationSideEffects } from "@stlvex/database";
 import type { Client } from "discord.js";
+import { prisma } from "@stlvex/database";
 
-import { dispatchSecurityTelemetry } from "../api/handlers/telemetry.js";
+import { dispatchSecurityTelemetry } from "../api/handlers/telemetry-logs.js";
 
 function telemetryForAudit(
   event: ModerationAuditPayload,
-): { event: string; message: string } | null {
+): { action: string; message: string } | null {
   const name = `**${event.targetFirstName} ${event.targetLastName}**`;
   switch (event.action) {
     case "SUPPRESS":
       return {
-        event: "userSuppressed",
+        action: "userSuppressed",
         message: `User ${name} suppressed until ${event.until?.toISOString() ?? "?"} — ${event.reason}`,
       };
     case "KICK":
       return {
-        event: "userKicked",
+        action: "userKicked",
         message: `User ${name} kicked from team — ${event.reason}`,
       };
     case "BAN":
       return {
-        event: "userBanned",
+        action: "userBanned",
         message: `User ${name} banned — ${event.reason}`,
       };
     case "UNBAN":
       return {
-        event: "userUnbanned",
+        action: "userUnbanned",
         message: `User ${name} unbanned — ${event.reason}`,
       };
     default:
@@ -42,12 +43,30 @@ export function moderationTelemetrySideEffects(
       if (!event.teamId) return;
       const mapped = telemetryForAudit(event);
       if (!mapped) return;
-      void dispatchSecurityTelemetry(client, {
-        teamId: event.teamId,
-        guildId,
-        event: mapped.event,
-        message: mapped.message,
-      }).catch((error) => {
+
+      void (async () => {
+        let resolvedGuildId = guildId;
+        if (!resolvedGuildId) {
+          const team = await prisma.team.findUnique({
+            where: { id: event.teamId! },
+            select: { discordServerId: true },
+          });
+          resolvedGuildId = team?.discordServerId ?? null;
+        }
+        if (!resolvedGuildId) {
+          console.warn(
+            `[moderation] no guild for team ${event.teamId}; skip security log`,
+          );
+          return;
+        }
+
+        await dispatchSecurityTelemetry(client, {
+          guildId: resolvedGuildId,
+          teamId: event.teamId ?? undefined,
+          message: mapped.message,
+          action: mapped.action,
+        });
+      })().catch((error) => {
         console.warn("[moderation] security telemetry failed:", error);
       });
     },

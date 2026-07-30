@@ -13,6 +13,12 @@ import {
   createEmbedding,
   toVectorLiteral,
 } from "@/lib/knowledge/embeddings";
+import { logTelemetry } from "@/lib/telemetry/dispatch";
+import {
+  knowledgeNodeCreatedMessage,
+  knowledgeNodeDeletedMessage,
+  knowledgeNodeUpdatedMessage,
+} from "@/lib/telemetry/messages";
 
 export type CreateKnowledgeNodeInput = {
   teamId: string;
@@ -137,6 +143,13 @@ export async function createKnowledgeNode(
     console.error("Failed to embed knowledge node:", error);
   }
 
+  logTelemetry({
+    category: "info",
+    teamId: input.teamId,
+    message: knowledgeNodeCreatedMessage(node.title),
+    action: "knowledge_node.created",
+  });
+
   return node;
 }
 
@@ -215,6 +228,13 @@ export async function updateKnowledgeNode(
     }
   }
 
+  logTelemetry({
+    category: "info",
+    teamId: input.teamId,
+    message: knowledgeNodeUpdatedMessage(node.title),
+    action: "knowledge_node.updated",
+  });
+
   return node;
 }
 
@@ -226,7 +246,7 @@ export async function deleteKnowledgeNode(
 ): Promise<void> {
   const existing = await prisma.knowledgeNode.findUnique({
     where: { id: nodeId },
-    select: { id: true, teamId: true, createdById: true },
+    select: { id: true, teamId: true, createdById: true, title: true },
   });
 
   if (!existing || existing.teamId !== teamId) {
@@ -238,6 +258,12 @@ export async function deleteKnowledgeNode(
   }
 
   await prisma.knowledgeNode.delete({ where: { id: nodeId } });
+  logTelemetry({
+    category: "info",
+    teamId,
+    message: knowledgeNodeDeletedMessage(existing.title),
+    action: "knowledge_node.deleted",
+  });
 }
 
 // Keep type alias available for callers expecting Detail shape

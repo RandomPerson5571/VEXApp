@@ -134,10 +134,6 @@ model Team {
   number          String          @unique // e.g., "82855T"
   discordServerId String?         @unique
   discordRoleId   String?         @unique
-  /// Actionable ops channel (typo preserved for existing rows)
-  annoucementsChannelId String?
-  digestHourLocal       Int             @default(17)
-  digestTimezone        String          @default("America/New_York")
   members         User[]
   events          Event[]         @relation("TeamEvents")
   inventorySignOuts InventoryItemSignOut[]
@@ -148,29 +144,18 @@ model Team {
   dayPlans          TeamDayPlan[]
   knowledgeNodes    KnowledgeNode[]
   scoutNotes        ScoutNote[]
-  digestBuffer      TeamDigestBuffer?
   createdAt         DateTime        @default(now())
   updatedAt         DateTime        @updatedAt
 }
 
-/// Routine telemetry counters awaiting the daily digest flush.
-model TeamDigestBuffer {
-  teamId    String   @id
-  team      Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
-  /// e.g. { "tasksCompleted": 14, "partsReturned": 5, "scoutNotesSaved": 2 }
-  counters  Json     @default("{}")
-  updatedAt DateTime @updatedAt
-  /// Last digest flush day key (yyyy-mm-dd in team timezone) to avoid double-send
-  lastFlushedDateKey String?
-}
-
 model DiscordGuildSettings {
-  guildId             String   @id
-  generalMemberRoleId String?
-  /// Server-wide security / admin-logs channel (not per-team)
-  adminLogsChannelId  String?
-  createdAt           DateTime @default(now())
-  updatedAt           DateTime @updatedAt
+  guildId                 String   @id
+  generalMemberRoleId     String?
+  securityLogsChannelId   String?
+  infoLogsChannelId       String?
+  inventoryLogsChannelId  String?
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime @updatedAt
 }
 
 model TeamGitHubIntegration {
@@ -414,9 +399,6 @@ model InventoryItem {
   checkoutLimit Int?    // Optional max units a user can check out in one sign-out
   /// Absolute available qty that triggers low-stock; null = 25% heuristic
   lowStockThreshold Int?
-  /// Set on first low-stock alert fire — mutes further alerts until restocked
-  restockPending    Boolean   @default(false)
-  orderPlacedAt     DateTime?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 

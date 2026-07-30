@@ -95,8 +95,6 @@ export async function POST(request: Request) {
       crossedOff: body.crossedOff,
       createdById: currentUser.profile.id,
     });
-    const { dispatchTelemetry } = await import("@/lib/telemetry/dispatch");
-    dispatchTelemetry({ teamId, event: "scoutNotesSaved" });
     return NextResponse.json(note, { status: 201 });
   } catch (error) {
     const message =

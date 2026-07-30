@@ -157,6 +157,7 @@ describe("api/inventory POST", () => {
       signOuts: [],
     });
     expect(createTeamInventoryItemMock).toHaveBeenCalledWith({
+      teamId: TEAM_ID,
       name: "REV HD Hex Motor",
       description: "Green cartridge",
       totalStock: 4,

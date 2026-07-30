@@ -4,7 +4,6 @@ import { Client, GatewayIntentBits } from "discord.js";
 import { closeWebhookServer, createWebhookServer } from "./api/server.js";
 import { config } from "./config.js";
 import { loadCommands, loadEvents } from "./loaders.js";
-import { startDigestCron } from "./services/digest-cron.js";
 import type { BotClient } from "./types.js";
 import { srcDirectory } from "./utils/paths.js";
 
@@ -35,7 +34,6 @@ async function bootstrap(): Promise<void> {
   }
 
   ({ server: webhookServer } = createWebhookServer(client));
-  startDigestCron(client);
   await client.login(config.token);
 }
 

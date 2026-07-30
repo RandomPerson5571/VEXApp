@@ -62,7 +62,8 @@ vi.mock("@/lib/supabase/admin", () => ({
 }));
 
 vi.mock("@/lib/telemetry/dispatch", () => ({
-  dispatchTelemetry: vi.fn(),
+  logTelemetry: vi.fn(),
+  notifyTaskAssigned: vi.fn(),
 }));
 
 import { POST as banPost } from "@/app/api/moderation/ban/route";

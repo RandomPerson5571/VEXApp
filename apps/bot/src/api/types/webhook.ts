@@ -4,11 +4,10 @@
  */
 export const WEBHOOK_EVENT_TYPES = [
   "notification.send",
-  "task.created",
-  "task.completed",
-  "telemetry.actionable",
   "telemetry.security",
-  "inventory.low_stock",
+  "telemetry.info",
+  "telemetry.inventory",
+  "task.assigned",
 ] as const;
 
 export type WebhookEventType = (typeof WEBHOOK_EVENT_TYPES)[number];
@@ -18,36 +17,28 @@ export type NotificationSendPayload = {
   content: string;
 };
 
-export type TaskWebhookPayload = {
-  taskId: string;
-  teamId: string;
-  title: string;
-  assigneeDiscordId?: string | null;
-};
-
-export type TelemetryChannelPayload = {
-  teamId: string;
-  event: string;
+export type TelemetryLogPayload = {
+  guildId: string;
+  teamId?: string;
   message: string;
-  /** Guild where the event originated; used when Team.discordServerId is unset. */
-  guildId?: string | null;
+  action?: string;
+  level?: "error" | "warning";
 };
 
-export type InventoryLowStockPayload = {
+export type TaskAssignedPayload = {
   teamId: string;
-  itemId: string;
-  itemName: string;
-  available: number;
-  threshold: number;
+  taskId: string;
+  title: string;
+  assigneeUserIds: string[];
+  actorId?: string;
 };
 
 export type WebhookPayloadByType = {
   "notification.send": NotificationSendPayload;
-  "task.created": TaskWebhookPayload;
-  "task.completed": TaskWebhookPayload;
-  "telemetry.actionable": TelemetryChannelPayload;
-  "telemetry.security": TelemetryChannelPayload;
-  "inventory.low_stock": InventoryLowStockPayload;
+  "telemetry.security": TelemetryLogPayload;
+  "telemetry.info": TelemetryLogPayload;
+  "telemetry.inventory": TelemetryLogPayload;
+  "task.assigned": TaskAssignedPayload;
 };
 
 export type WebhookEvent<T extends WebhookEventType = WebhookEventType> = {

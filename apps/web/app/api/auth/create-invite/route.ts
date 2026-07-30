@@ -5,6 +5,8 @@ import { canCreateInvites } from "@/lib/auth/auth-guards";
 import { getCurrentUser } from "@/lib/auth/current-user";
 import { verifyCurrentUserPermissions } from "@/lib/auth/auth-guards-server";
 import { enforceApiRateLimit } from "@/lib/security/enforce-api-rate-limit";
+import { logTelemetry } from "@/lib/telemetry/dispatch";
+import { inviteCreatedMessage } from "@/lib/telemetry/messages";
 
 export async function POST(req: Request) {
   const currentUser = await getCurrentUser();
@@ -82,11 +84,11 @@ export async function POST(req: Request) {
   const origin = req.headers.get("origin") || `${req.url?.startsWith("https://") ? "https" : "http"}://${req.headers.get("host")}`;
   const link = `${origin?.replace(/\/$/, "")}/join/${invite.id}`;
 
-  const { dispatchTelemetry } = await import("@/lib/telemetry/dispatch");
-  dispatchTelemetry({
+  logTelemetry({
+    category: "info",
     teamId: team.id,
-    event: "inviteGenerated",
-    message: `Invite link generated (max ${parsedMaxUses} uses).`,
+    message: inviteCreatedMessage(parsedMaxUses),
+    action: "invite.created",
   });
 
   return NextResponse.json({ inviteId: invite.id, link });
