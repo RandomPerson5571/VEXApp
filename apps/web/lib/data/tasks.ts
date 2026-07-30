@@ -16,6 +16,11 @@ import {
   notifyTaskAssigned,
 } from "@/lib/telemetry/dispatch";
 import {
+  formatTelemetryDateTime,
+  telemetryFields,
+  truncateTelemetryValue,
+} from "@/lib/telemetry/detail";
+import {
   taskCreatedMessage,
   taskUpdatedMessage,
 } from "@/lib/telemetry/messages";
@@ -34,6 +39,7 @@ export type CreateTaskInput = {
 export type UpdateTaskInput = {
   taskId: string;
   teamId: string;
+  actorId?: string;
   title?: string;
   description?: string | null;
   status?: TaskStatus;
@@ -104,6 +110,21 @@ export async function createTaskForTeam(
     teamId: input.teamId,
     message: taskCreatedMessage(task.title),
     action: "task.created",
+    entityType: "task",
+    entityId: task.id,
+    actorId: input.createdBy,
+    occurredAt: task.createdAt,
+    fields: telemetryFields({
+      Title: task.title,
+      Type: task.type,
+      Priority: task.priority,
+      Status: task.status,
+      Due: task.dueDate ? formatTelemetryDateTime(task.dueDate) : undefined,
+      Description: task.description
+        ? truncateTelemetryValue(task.description)
+        : undefined,
+      Assignees: assigneeIds.length > 0 ? assigneeIds.join(", ") : "None",
+    }),
   });
 
   if (assigneeIds.length > 0) {
@@ -225,6 +246,21 @@ export async function updateTaskForTeam(
     teamId: input.teamId,
     message: taskUpdatedMessage(updated.title, changes),
     action: "task.updated",
+    entityType: "task",
+    entityId: updated.id,
+    actorId: input.actorId,
+    occurredAt: updated.updatedAt,
+    fields: telemetryFields({
+      Title: updated.title,
+      Type: updated.type,
+      Priority: updated.priority,
+      Status: updated.status,
+      Due: updated.dueDate ? formatTelemetryDateTime(updated.dueDate) : undefined,
+      Description: updated.description
+        ? truncateTelemetryValue(updated.description)
+        : undefined,
+      "Changed fields": changes.join(", "),
+    }),
   });
 
   if (newAssigneeIds && newAssigneeIds.length > 0) {
@@ -233,6 +269,7 @@ export async function updateTaskForTeam(
       taskId: updated.id,
       title: updated.title,
       assigneeUserIds: newAssigneeIds,
+      actorId: input.actorId,
     });
   }
 

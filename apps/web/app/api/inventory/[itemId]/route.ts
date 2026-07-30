@@ -94,6 +94,7 @@ export async function PATCH(request: Request, context: RouteContext) {
     const item = await updateTeamInventoryItem({
       itemId,
       teamId,
+      actorId: currentUser.profile.id,
       name,
       description: body.description ?? null,
       totalStock,
@@ -147,7 +148,7 @@ export async function DELETE(request: Request, context: RouteContext) {
       );
     }
 
-    await deleteTeamInventoryItem(itemId, teamId);
+    await deleteTeamInventoryItem(itemId, teamId, currentUser.profile.id);
     return new NextResponse(null, { status: 204 });
   } catch (error) {
     const message =

@@ -45,10 +45,13 @@ Team server binding (`/set-team-server`) is for member verify/roles — not requ
 |------|------|
 | `lib/telemetry/types.ts` | Category and payload types |
 | `lib/telemetry/dispatch.ts` | `logTelemetry`, `notifyTaskAssigned`, `logEndpointFailure`, `logWarning` |
-| `lib/telemetry/messages.ts` | Human-readable log lines |
+| `lib/telemetry/detail.ts` | `formatTelemetryDateTime`, `telemetryFields`, truncation helpers |
+| `lib/telemetry/messages.ts` | Short summary lines (embed description) |
 | `lib/api/route-error.ts` | Optional API error helper with security logging |
 
 All dispatch functions are fire-and-forget; failures log to stdout only.
+
+Discord embeds include: humanized action title, summary description, entity type/ID, actor (name, email, Discord ID), team (number + name), full date/time (local + ISO), action-specific fields, and footer action key.
 
 ## Guardrails
 

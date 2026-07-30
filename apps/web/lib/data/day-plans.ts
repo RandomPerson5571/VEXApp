@@ -5,6 +5,10 @@ import type { DayPlanType } from "@stlvex/database/types";
 
 import { logTelemetry } from "@/lib/telemetry/dispatch";
 import {
+  formatTelemetryDateTime,
+  telemetryFields,
+} from "@/lib/telemetry/detail";
+import {
   dayPlanCreatedMessage,
   dayPlanDeletedMessage,
   dayPlanUpdatedMessage,
@@ -67,12 +71,25 @@ export async function upsertDayPlan(input: UpsertDayPlanInput) {
       ? dayPlanUpdatedMessage(dateKey, input.type)
       : dayPlanCreatedMessage(dateKey, input.type),
     action: existing ? "day_plan.updated" : "day_plan.created",
+    entityType: "day_plan",
+    entityId: plan.id,
+    actorId: input.createdBy,
+    occurredAt: plan.updatedAt,
+    fields: telemetryFields({
+      Date: dateKey,
+      Type: input.type,
+      "Plan ID": plan.id,
+    }),
   });
 
   return plan;
 }
 
-export async function deleteDayPlan(teamId: string, date: string) {
+export async function deleteDayPlan(
+  teamId: string,
+  date: string,
+  actorId?: string,
+) {
   const parsed = parseDateOnly(date);
   const existing = await prisma.teamDayPlan.findUnique({
     where: {
@@ -97,5 +114,13 @@ export async function deleteDayPlan(teamId: string, date: string) {
     teamId,
     message: dayPlanDeletedMessage(date.trim()),
     action: "day_plan.deleted",
+    entityType: "day_plan",
+    entityId: existing.id,
+    actorId,
+    occurredAt: new Date(),
+    fields: telemetryFields({
+      Date: date.trim(),
+      "Plan ID": existing.id,
+    }),
   });
 }

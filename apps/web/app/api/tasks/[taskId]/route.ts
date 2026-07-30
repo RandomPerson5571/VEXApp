@@ -109,6 +109,7 @@ export async function PATCH(request: Request, context: RouteContext) {
     const task = await updateTeamTask({
       taskId,
       teamId,
+      actorId: currentUser.profile.id,
       title: hasTitle ? body.title : undefined,
       description: hasDescription ? body.description ?? null : undefined,
       status: hasStatus ? body.status : undefined,

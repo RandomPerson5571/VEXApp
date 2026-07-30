@@ -36,8 +36,9 @@ export async function updateTeamEvent(
 export async function deleteTeamEvent(
   eventId: string,
   teamId: string,
+  actorId?: string,
 ): Promise<void> {
-  await deleteEventForTeam(eventId, teamId);
+  await deleteEventForTeam(eventId, teamId, actorId);
 }
 
 export function teamEventsQueryOptions(teamId: string) {

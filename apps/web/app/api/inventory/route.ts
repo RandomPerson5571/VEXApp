@@ -98,6 +98,7 @@ export async function POST(request: Request) {
 
     const item = await createTeamInventoryItem({
       teamId,
+      actorId: currentUser.profile.id,
       name,
       description: body.description ?? null,
       totalStock,

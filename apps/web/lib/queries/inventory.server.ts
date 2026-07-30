@@ -36,8 +36,9 @@ export async function updateTeamInventoryItem(
 export async function deleteTeamInventoryItem(
   itemId: string,
   teamId: string,
+  actorId?: string,
 ): Promise<void> {
-  await deleteInventoryItem(itemId, teamId);
+  await deleteInventoryItem(itemId, teamId, actorId);
 }
 
 export async function signOutTeamInventoryItem(

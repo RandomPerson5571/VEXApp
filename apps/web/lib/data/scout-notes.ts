@@ -5,6 +5,10 @@ import { scoutNoteInclude } from "@stlvex/database/types";
 
 import { logTelemetry } from "@/lib/telemetry/dispatch";
 import {
+  telemetryFields,
+  truncateTelemetryValue,
+} from "@/lib/telemetry/detail";
+import {
   scoutNoteCreatedMessage,
   scoutNoteDeletedMessage,
   scoutNoteUpdatedMessage,
@@ -136,6 +140,21 @@ export async function createScoutNote(
       teamId: input.teamId,
       message: scoutNoteCreatedMessage(note.targetTeamNumber),
       action: "scout_note.created",
+      entityType: "scout_note",
+      entityId: note.id,
+      actorId: input.createdById,
+      occurredAt: note.createdAt,
+      fields: telemetryFields({
+        "Target team": note.targetTeamNumber,
+        "Target name": note.targetTeamName ?? undefined,
+        Content: note.content ? truncateTelemetryValue(note.content) : undefined,
+        "Drive rating": note.driveRating ?? undefined,
+        "Auton reliability": note.autonReliability ?? undefined,
+        Mechanisms: note.mechanisms ?? undefined,
+        "Pick rank": note.pickRank ?? undefined,
+        "Do not pick": note.doNotPick,
+        "Crossed off": note.crossedOff,
+      }),
     });
     return note;
   } catch (error) {
@@ -213,6 +232,20 @@ export async function updateScoutNote(
       teamId: input.teamId,
       message: scoutNoteUpdatedMessage(note.targetTeamNumber),
       action: "scout_note.updated",
+      entityType: "scout_note",
+      entityId: note.id,
+      occurredAt: note.updatedAt,
+      fields: telemetryFields({
+        "Target team": note.targetTeamNumber,
+        "Target name": note.targetTeamName ?? undefined,
+        Content: note.content ? truncateTelemetryValue(note.content) : undefined,
+        "Drive rating": note.driveRating ?? undefined,
+        "Auton reliability": note.autonReliability ?? undefined,
+        Mechanisms: note.mechanisms ?? undefined,
+        "Pick rank": note.pickRank ?? undefined,
+        "Do not pick": note.doNotPick,
+        "Crossed off": note.crossedOff,
+      }),
     });
     return note;
   } catch (error) {
@@ -287,10 +320,11 @@ export async function reorderScoutNotes(
 export async function deleteScoutNote(
   noteId: string,
   teamId: string,
+  actorId?: string,
 ): Promise<void> {
   const existing = await prisma.scoutNote.findUnique({
     where: { id: noteId },
-    select: { id: true, teamId: true, targetTeamNumber: true },
+    select: { id: true, teamId: true, targetTeamNumber: true, targetTeamName: true },
   });
   if (!existing || existing.teamId !== teamId) {
     throw new Error("Scout note not found.");
@@ -302,5 +336,13 @@ export async function deleteScoutNote(
     teamId,
     message: scoutNoteDeletedMessage(existing.targetTeamNumber),
     action: "scout_note.deleted",
+    entityType: "scout_note",
+    entityId: noteId,
+    actorId,
+    occurredAt: new Date(),
+    fields: telemetryFields({
+      "Target team": existing.targetTeamNumber,
+      "Target name": existing.targetTeamName ?? undefined,
+    }),
   });
 }

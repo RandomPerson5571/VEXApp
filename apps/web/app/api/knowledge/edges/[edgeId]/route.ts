@@ -36,7 +36,7 @@ export async function DELETE(request: Request, context: RouteContext) {
   }
 
   try {
-    await deleteKnowledgeEdge(edgeId, teamId);
+    await deleteKnowledgeEdge(edgeId, teamId, currentUser.profile.id);
     return NextResponse.json({ success: true });
   } catch (error) {
     const message =

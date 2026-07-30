@@ -137,7 +137,7 @@ export async function DELETE(request: Request) {
   }
 
   try {
-    await clearTeamDayPlan(teamId, date);
+    await clearTeamDayPlan(teamId, date, currentUser.profile.id);
     return new NextResponse(null, { status: 204 });
   } catch (error) {
     const message =

@@ -6,6 +6,15 @@ import {
   type TeamInventoryItem,
 } from "@stlvex/database/types";
 import { normalizeInventoryColor } from "@/lib/inventory/item-colors";
+import {
+  getAvailableStock,
+  getCheckedOutQuantity,
+} from "@/lib/inventory/inventory-utils";
+import {
+  formatTelemetryDateTime,
+  telemetryFields,
+  truncateTelemetryValue,
+} from "@/lib/telemetry/detail";
 import { logTelemetry } from "@/lib/telemetry/dispatch";
 import {
   formatUserName,
@@ -58,6 +67,7 @@ export async function listInventoryForTeam(
 
 export type CreateInventoryItemInput = {
   teamId: string;
+  actorId?: string;
   name: string;
   description?: string | null;
   totalStock: number;
@@ -113,6 +123,21 @@ export async function createInventoryItem(
     teamId: input.teamId,
     message: inventoryItemCreatedMessage(item.name),
     action: "inventory_item.created",
+    entityType: "inventory_item",
+    entityId: item.id,
+    actorId: input.actorId,
+    occurredAt: item.createdAt,
+    fields: telemetryFields({
+      Name: item.name,
+      "Total stock": item.totalStock,
+      "Checked out": getCheckedOutQuantity(item.signOuts),
+      "Remaining stock": getAvailableStock(item),
+      "Checkout limit": item.checkoutLimit ?? "None",
+      Description: item.description
+        ? truncateTelemetryValue(item.description)
+        : undefined,
+      Color: item.color ?? undefined,
+    }),
   });
 
   return item;
@@ -121,6 +146,7 @@ export async function createInventoryItem(
 export type UpdateInventoryItemInput = {
   itemId: string;
   teamId: string;
+  actorId?: string;
   name: string;
   description?: string | null;
   totalStock: number;
@@ -172,6 +198,22 @@ export async function updateInventoryItem(
     teamId: input.teamId,
     message: inventoryItemUpdatedMessage(item.name),
     action: "inventory_item.updated",
+    entityType: "inventory_item",
+    entityId: item.id,
+    actorId: input.actorId,
+    occurredAt: item.updatedAt,
+    fields: telemetryFields({
+      Name: item.name,
+      "Total stock": item.totalStock,
+      "Checked out": getCheckedOutQuantity(item.signOuts),
+      "Remaining stock": getAvailableStock(item),
+      "Checkout limit": item.checkoutLimit ?? "None",
+      "Low stock threshold": item.lowStockThreshold ?? "Default",
+      Description: item.description
+        ? truncateTelemetryValue(item.description)
+        : undefined,
+      Color: item.color ?? undefined,
+    }),
   });
 
   return item;
@@ -180,20 +222,27 @@ export async function updateInventoryItem(
 export async function deleteInventoryItem(
   itemId: string,
   teamId: string,
+  actorId?: string,
 ): Promise<void> {
-  const item = await prisma.inventoryItem.findUnique({
-    where: { id: itemId },
-    select: { name: true },
-  });
-  if (!item) {
-    throw new Error("Inventory item not found.");
-  }
+  const item = await findInventoryItemOrThrow(itemId);
+  const checkedOut = getCheckedOutQuantity(item.signOuts);
+  const remaining = getAvailableStock(item);
   await prisma.inventoryItem.delete({ where: { id: itemId } });
   logTelemetry({
     category: "inventory",
     teamId,
     message: inventoryItemDeletedMessage(item.name),
     action: "inventory_item.deleted",
+    entityType: "inventory_item",
+    entityId: itemId,
+    actorId,
+    occurredAt: new Date(),
+    fields: telemetryFields({
+      Name: item.name,
+      "Total stock": item.totalStock,
+      "Checked out": checkedOut,
+      "Remaining stock": remaining,
+    }),
   });
 }
 
@@ -259,6 +308,18 @@ export async function signOutInventoryItem(
     teamId: input.teamId,
     message: inventorySignOutMessage(item.name, input.quantity, userName),
     action: "inventory.sign_out",
+    entityType: "inventory_sign_out",
+    entityId: input.inventoryItemId,
+    actorId: input.userId,
+    occurredAt: new Date(),
+    fields: telemetryFields({
+      Item: item.name,
+      Quantity: input.quantity,
+      User: userName,
+      "User ID": input.userId,
+      "Checked out": getCheckedOutQuantity(item.signOuts),
+      "Remaining stock": getAvailableStock(item),
+    }),
   });
 
   return item;
@@ -283,6 +344,7 @@ export async function returnInventorySignOut(
     select: {
       id: true,
       quantity: true,
+      userId: true,
       user: { select: { firstName: true, lastName: true } },
     },
   });
@@ -307,6 +369,18 @@ export async function returnInventorySignOut(
     teamId: input.teamId,
     message: inventoryReturnMessage(item.name, signOut.quantity, userName),
     action: "inventory.return",
+    entityType: "inventory_sign_out",
+    entityId: signOut.id,
+    actorId: signOut.userId,
+    occurredAt: new Date(),
+    fields: telemetryFields({
+      Item: item.name,
+      Quantity: signOut.quantity,
+      User: userName,
+      "Sign-out ID": signOut.id,
+      "Checked out": getCheckedOutQuantity(item.signOuts),
+      "Remaining stock": getAvailableStock(item),
+    }),
   });
 
   return item;

@@ -5,6 +5,7 @@ import {
   suppressedUntilLabel,
 } from "@/lib/auth/moderation";
 import { taskCreatedMessage, taskUpdatedMessage } from "@/lib/telemetry/messages";
+import { formatTelemetryDateTime } from "@/lib/telemetry/detail";
 
 describe("telemetry messages", () => {
   it("formats task created and updated messages", () => {
@@ -12,6 +13,12 @@ describe("telemetry messages", () => {
     expect(taskUpdatedMessage("Wire intake", ["status", "assignees"])).toBe(
       "Task updated: **Wire intake** (status, assignees)",
     );
+  });
+
+  it("formats full date and time for telemetry", () => {
+    const formatted = formatTelemetryDateTime("2030-01-15T17:00:00.000Z");
+    expect(formatted).toContain("2030-01-15T17:00:00.000Z");
+    expect(formatted.length).toBeGreaterThan(20);
   });
 });
 

@@ -15,6 +15,11 @@ import {
 } from "@/lib/knowledge/embeddings";
 import { logTelemetry } from "@/lib/telemetry/dispatch";
 import {
+  formatTelemetryDateTime,
+  telemetryFields,
+  truncateTelemetryValue,
+} from "@/lib/telemetry/detail";
+import {
   knowledgeNodeCreatedMessage,
   knowledgeNodeDeletedMessage,
   knowledgeNodeUpdatedMessage,
@@ -148,6 +153,17 @@ export async function createKnowledgeNode(
     teamId: input.teamId,
     message: knowledgeNodeCreatedMessage(node.title),
     action: "knowledge_node.created",
+    entityType: "knowledge_node",
+    entityId: node.id,
+    actorId: input.createdById,
+    occurredAt: node.createdAt,
+    fields: telemetryFields({
+      Title: node.title,
+      Category: node.topicCategory,
+      "Content type": node.contentType,
+      URL: node.contentUrl ?? undefined,
+      Content: node.content ? truncateTelemetryValue(node.content) : undefined,
+    }),
   });
 
   return node;
@@ -233,6 +249,17 @@ export async function updateKnowledgeNode(
     teamId: input.teamId,
     message: knowledgeNodeUpdatedMessage(node.title),
     action: "knowledge_node.updated",
+    entityType: "knowledge_node",
+    entityId: node.id,
+    actorId: input.userId,
+    occurredAt: node.updatedAt,
+    fields: telemetryFields({
+      Title: node.title,
+      Category: node.topicCategory,
+      "Content type": node.contentType,
+      URL: node.contentUrl ?? undefined,
+      Content: node.content ? truncateTelemetryValue(node.content) : undefined,
+    }),
   });
 
   return node;
@@ -263,6 +290,13 @@ export async function deleteKnowledgeNode(
     teamId,
     message: knowledgeNodeDeletedMessage(existing.title),
     action: "knowledge_node.deleted",
+    entityType: "knowledge_node",
+    entityId: nodeId,
+    actorId: userId,
+    occurredAt: new Date(),
+    fields: telemetryFields({
+      Title: existing.title,
+    }),
   });
 }
 

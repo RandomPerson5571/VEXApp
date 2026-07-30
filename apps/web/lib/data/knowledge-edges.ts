@@ -8,6 +8,10 @@ import {
 
 import { logTelemetry } from "@/lib/telemetry/dispatch";
 import {
+  telemetryFields,
+  truncateTelemetryValue,
+} from "@/lib/telemetry/detail";
+import {
   knowledgeEdgeCreatedMessage,
   knowledgeEdgeDeletedMessage,
 } from "@/lib/telemetry/messages";
@@ -77,6 +81,16 @@ export async function createKnowledgeEdge(
       teamId: input.teamId,
       message: knowledgeEdgeCreatedMessage(),
       action: "knowledge_edge.created",
+      entityType: "knowledge_edge",
+      entityId: edge.id,
+      occurredAt: edge.createdAt,
+      fields: telemetryFields({
+        Relationship: edge.relationshipType,
+        "Source ID": edge.sourceId,
+        "Source title": edge.source.title,
+        "Target ID": edge.targetId,
+        "Target title": edge.target.title,
+      }),
     });
     return edge;
   } catch (error) {
@@ -94,11 +108,14 @@ export async function createKnowledgeEdge(
 export async function deleteKnowledgeEdge(
   edgeId: string,
   teamId: string,
+  actorId?: string,
 ): Promise<void> {
   const existing = await prisma.knowledgeEdge.findUnique({
     where: { id: edgeId },
-    include: {
-      source: { select: { teamId: true } },
+    select: {
+      relationshipType: true,
+      source: { select: { teamId: true, title: true } },
+      target: { select: { title: true } },
     },
   });
 
@@ -112,5 +129,14 @@ export async function deleteKnowledgeEdge(
     teamId,
     message: knowledgeEdgeDeletedMessage(),
     action: "knowledge_edge.deleted",
+    entityType: "knowledge_edge",
+    entityId: edgeId,
+    actorId,
+    occurredAt: new Date(),
+    fields: telemetryFields({
+      Relationship: existing.relationshipType,
+      "Source title": existing.source.title,
+      "Target title": existing.target.title,
+    }),
   });
 }

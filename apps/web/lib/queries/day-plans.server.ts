@@ -30,8 +30,12 @@ export async function setTeamDayPlan(input: {
   return toTeamDayPlan(plan);
 }
 
-export async function clearTeamDayPlan(teamId: string, date: string): Promise<void> {
-  await deleteDayPlan(teamId, date);
+export async function clearTeamDayPlan(
+  teamId: string,
+  date: string,
+  actorId?: string,
+): Promise<void> {
+  await deleteDayPlan(teamId, date, actorId);
 }
 
 export function teamDayPlansQueryOptions(teamId: string) {

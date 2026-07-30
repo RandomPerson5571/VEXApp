@@ -112,6 +112,7 @@ export async function PATCH(request: Request, context: RouteContext) {
     const event = await updateTeamEvent({
       eventId,
       teamId,
+      actorId: currentUser.profile.id,
       name: title,
       description: body.description ?? null,
       location,
@@ -160,7 +161,7 @@ export async function DELETE(request: Request, context: RouteContext) {
   }
 
   try {
-    await deleteTeamEvent(eventId, teamId);
+    await deleteTeamEvent(eventId, teamId, currentUser.profile.id);
     return new NextResponse(null, { status: 204 });
   } catch (error) {
     const message =

@@ -6,8 +6,13 @@ import { prisma } from "@stlvex/database";
 
 import { getSiteUrl } from "@/app/(auth)/lib/site-url";
 import { canCreateInvites } from "@/lib/auth/auth-guards";
+import { getCurrentUser } from "@/lib/auth/current-user";
 import { verifyCurrentUserPermissions } from "@/lib/auth/auth-guards-server";
 import { logTelemetry } from "@/lib/telemetry/dispatch";
+import {
+  formatTelemetryDateTime,
+  telemetryFields,
+} from "@/lib/telemetry/detail";
 import { inviteCreatedMessage } from "@/lib/telemetry/messages";
 
 export type CreateInviteInput = {
@@ -30,6 +35,8 @@ export async function createInviteLink({
   if (!trimmedTeamId) {
     return { ok: false, error: "Select a team before creating a link." };
   }
+
+  const currentUser = await getCurrentUser();
 
   const permissions = await verifyCurrentUserPermissions(trimmedTeamId);
 
@@ -73,7 +80,7 @@ export async function createInviteLink({
       maxUses,
       expiresAt: parsedExpiry,
     },
-    select: { id: true },
+    select: { id: true, createdAt: true },
   });
 
   const siteUrl = await getSiteUrl();
@@ -83,6 +90,15 @@ export async function createInviteLink({
     teamId: team.id,
     message: inviteCreatedMessage(maxUses),
     action: "invite.created",
+    entityType: "invite",
+    entityId: invite.id,
+    actorId: currentUser?.profile.id,
+    occurredAt: invite.createdAt,
+    fields: telemetryFields({
+      "Max uses": maxUses,
+      Expires: formatTelemetryDateTime(parsedExpiry),
+      Link: `${siteUrl}/join/${invite.id}`,
+    }),
   });
 
   return {

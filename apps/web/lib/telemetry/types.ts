@@ -1,3 +1,5 @@
+import type { TelemetryDetailField } from "@/lib/telemetry/detail";
+
 export type TelemetryCategory = "security" | "info" | "inventory";
 
 export type TelemetryLevel = "error" | "warning";
@@ -8,6 +10,11 @@ export type LogTelemetryInput = {
   message: string;
   action?: string;
   level?: TelemetryLevel;
+  entityType?: string;
+  entityId?: string;
+  actorId?: string;
+  occurredAt?: Date | string;
+  fields?: TelemetryDetailField[];
 };
 
 export type TaskAssignedInput = {

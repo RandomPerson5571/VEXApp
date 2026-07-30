@@ -228,6 +228,25 @@ const createTaskCommand: SlashCommand = {
         teamId: dbUser.teamId,
         message: `Task created: **${title}**`,
         action: "task.created",
+        entityType: "task",
+        entityId: task.id,
+        actorId: dbUser.id,
+        occurredAt: task.createdAt.toISOString(),
+        fields: [
+          { name: "Title", value: title },
+          { name: "Type", value: taskType },
+          { name: "Priority", value: priority },
+          {
+            name: "Due",
+            value: dueDate
+              ? dueDate.toISOString()
+              : "No due date",
+          },
+          {
+            name: "Description",
+            value: descriptionInput || "None",
+          },
+        ],
       },
     );
 

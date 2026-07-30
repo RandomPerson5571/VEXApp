@@ -12,6 +12,10 @@ import type { User } from "@stlvex/database/types";
 
 import { createAdminClient } from "@/lib/supabase/admin";
 import { logTelemetry } from "@/lib/telemetry/dispatch";
+import {
+  formatTelemetryDateTime,
+  telemetryFields,
+} from "@/lib/telemetry/detail";
 
 function telemetryForAudit(
   event: ModerationAuditPayload,
@@ -53,6 +57,16 @@ function sideEffects() {
         teamId: event.teamId ?? undefined,
         message: mapped.message,
         action: mapped.action,
+        entityType: "user",
+        entityId: event.targetUserId,
+        actorId: event.actorId,
+        occurredAt: new Date(),
+        fields: telemetryFields({
+          Reason: event.reason,
+          "Target user ID": event.targetUserId,
+          Until: event.until ? formatTelemetryDateTime(event.until) : undefined,
+          Action: event.action,
+        }),
       });
     },
   };

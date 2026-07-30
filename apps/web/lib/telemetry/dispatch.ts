@@ -54,11 +54,21 @@ function webhookTypeForCategory(
 }
 
 export async function logTelemetryAsync(input: LogTelemetryInput): Promise<void> {
+  const occurredAt =
+    input.occurredAt instanceof Date
+      ? input.occurredAt.toISOString()
+      : input.occurredAt;
+
   await postBotWebhook(webhookTypeForCategory(input.category), {
     teamId: input.teamId,
     message: input.message,
     action: input.action,
     level: input.level,
+    entityType: input.entityType,
+    entityId: input.entityId,
+    actorId: input.actorId,
+    occurredAt,
+    fields: input.fields,
   });
 }
 
@@ -104,6 +114,20 @@ export async function logEndpointFailureAsync(
     message,
     action: "endpoint.failure",
     level: "error",
+    occurredAt: new Date(),
+    fields: [
+      { name: "Route", value: input.route },
+      { name: "Status", value: String(input.status) },
+      {
+        name: "Error",
+        value:
+          input.error instanceof Error
+            ? input.error.message
+            : input.error
+              ? String(input.error)
+              : "Unknown error",
+      },
+    ],
   });
 }
 

@@ -5,6 +5,11 @@ import type { Event, EventType, Prisma } from "@stlvex/database/types";
 
 import { logTelemetry } from "@/lib/telemetry/dispatch";
 import {
+  formatTelemetryDateTime,
+  telemetryFields,
+  truncateTelemetryValue,
+} from "@/lib/telemetry/detail";
+import {
   eventCreatedMessage,
   eventDeletedMessage,
   eventUpdatedMessage,
@@ -87,6 +92,21 @@ export async function createEventForTeam(
       teamId: input.teamId,
       message: eventCreatedMessage(event.name),
       action: "event.created",
+      entityType: "event",
+      entityId: event.id,
+      actorId: input.createdById ?? undefined,
+      occurredAt: event.createdAt,
+      fields: telemetryFields({
+        Name: event.name,
+        Type: event.type,
+        Location: event.location,
+        Start: formatTelemetryDateTime(event.startDate),
+        End: formatTelemetryDateTime(event.endDate),
+        Description: event.description
+          ? truncateTelemetryValue(event.description)
+          : undefined,
+        "For all teams": input.forAllTeams ? "Yes" : "No",
+      }),
     });
     return event;
   });
@@ -95,6 +115,7 @@ export async function createEventForTeam(
 export type UpdateEventInput = {
   eventId: string;
   teamId: string;
+  actorId?: string;
   name: string;
   description?: string | null;
   location: string;
@@ -148,6 +169,20 @@ export async function updateEventForTeam(
     teamId: input.teamId,
     message: eventUpdatedMessage(event.name),
     action: "event.updated",
+    entityType: "event",
+    entityId: event.id,
+    actorId: input.actorId,
+    occurredAt: event.createdAt,
+    fields: telemetryFields({
+      Name: event.name,
+      Type: event.type,
+      Location: event.location,
+      Start: formatTelemetryDateTime(event.startDate),
+      End: formatTelemetryDateTime(event.endDate),
+      Description: event.description
+        ? truncateTelemetryValue(event.description)
+        : undefined,
+    }),
   });
 
   return event;
@@ -156,6 +191,7 @@ export async function updateEventForTeam(
 export async function deleteEventForTeam(
   eventId: string,
   teamId: string,
+  actorId?: string,
 ): Promise<void> {
   const event = await findTeamEventOrThrow(eventId, teamId);
   await prisma.event.delete({ where: { id: eventId } });
@@ -164,5 +200,16 @@ export async function deleteEventForTeam(
     teamId,
     message: eventDeletedMessage(event.name),
     action: "event.deleted",
+    entityType: "event",
+    entityId: event.id,
+    actorId,
+    occurredAt: new Date(),
+    fields: telemetryFields({
+      Name: event.name,
+      Type: event.type,
+      Location: event.location,
+      Start: formatTelemetryDateTime(event.startDate),
+      End: formatTelemetryDateTime(event.endDate),
+    }),
   });
 }

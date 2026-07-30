@@ -6,6 +6,10 @@ import { getCurrentUser } from "@/lib/auth/current-user";
 import { verifyCurrentUserPermissions } from "@/lib/auth/auth-guards-server";
 import { enforceApiRateLimit } from "@/lib/security/enforce-api-rate-limit";
 import { logTelemetry } from "@/lib/telemetry/dispatch";
+import {
+  formatTelemetryDateTime,
+  telemetryFields,
+} from "@/lib/telemetry/detail";
 import { inviteCreatedMessage } from "@/lib/telemetry/messages";
 
 export async function POST(req: Request) {
@@ -78,7 +82,7 @@ export async function POST(req: Request) {
       maxUses: parsedMaxUses,
       expiresAt: parsedExpiry,
     },
-    select: { id: true },
+    select: { id: true, createdAt: true },
   });
 
   const origin = req.headers.get("origin") || `${req.url?.startsWith("https://") ? "https" : "http"}://${req.headers.get("host")}`;
@@ -89,6 +93,15 @@ export async function POST(req: Request) {
     teamId: team.id,
     message: inviteCreatedMessage(parsedMaxUses),
     action: "invite.created",
+    entityType: "invite",
+    entityId: invite.id,
+    actorId: currentUser.profile.id,
+    occurredAt: invite.createdAt,
+    fields: telemetryFields({
+      "Max uses": parsedMaxUses,
+      Expires: formatTelemetryDateTime(parsedExpiry),
+      Link: link,
+    }),
   });
 
   return NextResponse.json({ inviteId: invite.id, link });

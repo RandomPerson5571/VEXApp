@@ -152,7 +152,7 @@ export async function DELETE(request: Request, context: RouteContext) {
   }
 
   try {
-    await deleteScoutNote(noteId, teamId);
+    await deleteScoutNote(noteId, teamId, currentUser.profile.id);
     return NextResponse.json({ ok: true });
   } catch (error) {
     const message =

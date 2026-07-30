@@ -17,11 +17,21 @@ export type NotificationSendPayload = {
   content: string;
 };
 
+export type TelemetryDetailField = {
+  name: string;
+  value: string;
+};
+
 export type TelemetryLogPayload = {
   teamId?: string;
   message: string;
   action?: string;
   level?: "error" | "warning";
+  entityType?: string;
+  entityId?: string;
+  actorId?: string;
+  occurredAt?: string;
+  fields?: TelemetryDetailField[];
 };
 
 export type TaskAssignedPayload = {
