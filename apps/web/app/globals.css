@@ -110,15 +110,92 @@ html[data-site-theme="custom"] {
   --accent-soft: rgb(var(--site-accent-rgb) / 0.12);
   --accent-softer: rgb(var(--site-accent-rgb) / 0.08);
   --accent-border: rgb(var(--site-accent-rgb) / 0.32);
-  --accent-text: color-mix(in srgb, var(--site-accent) 86%, white 14%);
-  --accent-text-strong: color-mix(in srgb, var(--site-accent) 78%, black 22%);
+  --accent-text: color-mix(in srgb, var(--site-accent) 70%, black 30%);
+  --accent-text-strong: color-mix(in srgb, var(--site-accent) 50%, black 50%);
   --accent-shadow: rgb(var(--site-accent-rgb) / 0.18);
 }
 
 html.dark[data-site-theme="monochrome"],
 html.dark[data-site-theme="custom"] {
-  --accent-text: color-mix(in srgb, var(--site-accent) 78%, white 22%);
-  --accent-text-strong: color-mix(in srgb, var(--site-accent) 88%, white 12%);
+  --accent-text: color-mix(in srgb, var(--site-accent) 75%, white 25%);
+  --accent-text-strong: color-mix(in srgb, var(--site-accent) 60%, white 40%);
+}
+
+html[data-site-theme="monochrome"] [class*="ring-orange"],
+html[data-site-theme="monochrome"] [class*="ring-amber"],
+html[data-site-theme="monochrome"] [class*="ring-yellow"],
+html[data-site-theme="monochrome"] [class*="ring-blue"],
+html[data-site-theme="custom"] [class*="ring-orange"],
+html[data-site-theme="custom"] [class*="ring-amber"],
+html[data-site-theme="custom"] [class*="ring-yellow"],
+html[data-site-theme="custom"] [class*="ring-blue"] {
+  --tw-ring-color: var(--accent-solid) !important;
+}
+
+html[data-site-theme="monochrome"] [class*="shadow-orange"],
+html[data-site-theme="monochrome"] [class*="shadow-amber"],
+html[data-site-theme="monochrome"] [class*="shadow-yellow"],
+html[data-site-theme="monochrome"] [class*="shadow-blue"],
+html[data-site-theme="custom"] [class*="shadow-orange"],
+html[data-site-theme="custom"] [class*="shadow-amber"],
+html[data-site-theme="custom"] [class*="shadow-yellow"],
+html[data-site-theme="custom"] [class*="shadow-blue"] {
+  --tw-shadow-color: var(--accent-solid) !important;
+}
+
+html[data-site-theme="monochrome"] [class*="fill-orange"],
+html[data-site-theme="monochrome"] [class*="fill-amber"],
+html[data-site-theme="monochrome"] [class*="fill-yellow"],
+html[data-site-theme="monochrome"] [class*="fill-blue"],
+html[data-site-theme="custom"] [class*="fill-orange"],
+html[data-site-theme="custom"] [class*="fill-amber"],
+html[data-site-theme="custom"] [class*="fill-yellow"],
+html[data-site-theme="custom"] [class*="fill-blue"] {
+  fill: var(--accent-solid) !important;
+}
+
+html[data-site-theme="monochrome"] [class*="stroke-orange"],
+html[data-site-theme="monochrome"] [class*="stroke-amber"],
+html[data-site-theme="monochrome"] [class*="stroke-yellow"],
+html[data-site-theme="monochrome"] [class*="stroke-blue"],
+html[data-site-theme="custom"] [class*="stroke-orange"],
+html[data-site-theme="custom"] [class*="stroke-amber"],
+html[data-site-theme="custom"] [class*="stroke-yellow"],
+html[data-site-theme="custom"] [class*="stroke-blue"] {
+  stroke: var(--accent-solid) !important;
+}
+
+html[data-site-theme="monochrome"] [class*="from-orange"],
+html[data-site-theme="monochrome"] [class*="from-amber"],
+html[data-site-theme="monochrome"] [class*="from-yellow"],
+html[data-site-theme="monochrome"] [class*="from-blue"],
+html[data-site-theme="custom"] [class*="from-orange"],
+html[data-site-theme="custom"] [class*="from-amber"],
+html[data-site-theme="custom"] [class*="from-yellow"],
+html[data-site-theme="custom"] [class*="from-blue"] {
+  --tw-gradient-from: var(--accent-solid) !important;
+}
+
+html[data-site-theme="monochrome"] [class*="to-orange"],
+html[data-site-theme="monochrome"] [class*="to-amber"],
+html[data-site-theme="monochrome"] [class*="to-yellow"],
+html[data-site-theme="monochrome"] [class*="to-blue"],
+html[data-site-theme="custom"] [class*="to-orange"],
+html[data-site-theme="custom"] [class*="to-amber"],
+html[data-site-theme="custom"] [class*="to-yellow"],
+html[data-site-theme="custom"] [class*="to-blue"] {
+  --tw-gradient-to: var(--accent-solid) !important;
+}
+
+html[data-site-theme="monochrome"] [class*="via-orange"],
+html[data-site-theme="monochrome"] [class*="via-amber"],
+html[data-site-theme="monochrome"] [class*="via-yellow"],
+html[data-site-theme="monochrome"] [class*="via-blue"],
+html[data-site-theme="custom"] [class*="via-orange"],
+html[data-site-theme="custom"] [class*="via-amber"],
+html[data-site-theme="custom"] [class*="via-yellow"],
+html[data-site-theme="custom"] [class*="via-blue"] {
+  --tw-gradient-stops: var(--tw-gradient-from), var(--accent-solid), var(--tw-gradient-to) !important;
 }
 
 /* Industrial Obsidian — dark theme */
