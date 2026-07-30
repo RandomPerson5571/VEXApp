@@ -6,6 +6,8 @@
   "scripts": {
     "predev": "tsx src/deploy-commands.ts",
     "dev": "tsx watch src/index.ts",
+    "build": "pnpm --filter @stlvex/database db:generate",
+    "prestart": "pnpm --filter @stlvex/database db:generate",
     "start": "tsx src/index.ts",
     "register:commands": "tsx src/deploy-commands.ts",
     "check-types": "tsc --noEmit",

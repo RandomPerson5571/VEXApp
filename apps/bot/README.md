@@ -20,6 +20,18 @@ Copy `.env.example` and fill in your values:
 
 On Render (or any PaaS), set these in the service **Environment** tab — a `.env` file is not deployed. Render injects `PORT`; the bot prefers `PORT` over `WEBHOOK_PORT` when both are present.
 
+**Render build/start** (monorepo root as service root):
+
+```bash
+# Build Command
+pnpm install --frozen-lockfile && pnpm --filter @stlvex/database db:generate
+
+# Start Command
+pnpm --filter bot start
+```
+
+`bot start` runs `prestart` (Prisma generate) before `tsx`, so the client exists even if the build step was skipped.
+
 ## 2) Register slash commands
 
 After adding or changing slash commands, register them with Discord:
