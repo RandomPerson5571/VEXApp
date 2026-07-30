@@ -29,6 +29,8 @@ export type TelemetryChannelPayload = {
   teamId: string;
   event: string;
   message: string;
+  /** Guild where the event originated; used when Team.discordServerId is unset. */
+  guildId?: string | null;
 };
 
 export type InventoryLowStockPayload = {

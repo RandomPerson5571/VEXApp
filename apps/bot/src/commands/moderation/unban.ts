@@ -7,6 +7,7 @@ import {
   resolveActor,
   resolveBanTarget,
 } from "../../utils/moderation-resolve.js";
+import { moderationTelemetrySideEffects } from "../../utils/moderation-telemetry.js";
 
 const unbanCommand: SlashCommand = {
   data: new SlashCommandBuilder()
@@ -38,11 +39,14 @@ const unbanCommand: SlashCommand = {
     if (!target) return;
 
     try {
-      await unbanUser({
-        actorId: actor.id,
-        targetUserId: target.id,
-        reason: interaction.options.getString("reason"),
-      });
+      await unbanUser(
+        {
+          actorId: actor.id,
+          targetUserId: target.id,
+          reason: interaction.options.getString("reason"),
+        },
+        moderationTelemetrySideEffects(interaction.client, interaction.guildId),
+      );
       await interaction.editReply({
         content: `✅ Unbanned **${target.firstName} ${target.lastName}** (\`${target.id}\`).`,
       });

@@ -1,4 +1,4 @@
-import { EmbedBuilder } from "discord.js";
+import { EmbedBuilder, type Client } from "discord.js";
 import { prisma } from "@stlvex/database";
 
 import type { WebhookContext } from "../context.js";
@@ -41,9 +41,10 @@ async function sendToTeamAnnouncementsChannel(
 }
 
 async function sendToGuildAdminLogsChannel(
-  context: WebhookContext,
+  client: Client,
   teamId: string,
   embed: EmbedBuilder,
+  guildIdOverride?: string | null,
 ): Promise<void> {
   const team = await prisma.team.findUnique({
     where: { id: teamId },
@@ -59,27 +60,28 @@ async function sendToGuildAdminLogsChannel(
     return;
   }
 
-  if (!team.discordServerId) {
+  const guildId = guildIdOverride ?? team.discordServerId;
+  if (!guildId) {
     console.warn(
-      `[telemetry] team ${team.number} has no discordServerId; skip admin logs`,
+      `[telemetry] team ${team.number} has no guild for admin logs (set /set-team-server or run from a server)`,
     );
     return;
   }
 
   const guildSettings = await prisma.discordGuildSettings.findUnique({
-    where: { guildId: team.discordServerId },
+    where: { guildId },
     select: { adminLogsChannelId: true },
   });
 
   const channelId = guildSettings?.adminLogsChannelId;
   if (!channelId) {
     console.warn(
-      `[telemetry] guild ${team.discordServerId} has no adminLogsChannelId; skip send`,
+      `[telemetry] guild ${guildId} has no adminLogsChannelId; skip send`,
     );
     return;
   }
 
-  const channel = await context.client.channels.fetch(channelId);
+  const channel = await client.channels.fetch(channelId);
   if (!channel?.isSendable()) {
     console.warn(`[telemetry] channel ${channelId} not sendable`);
     return;
@@ -87,6 +89,25 @@ async function sendToGuildAdminLogsChannel(
 
   const mention = team.discordRoleId ? `<@&${team.discordRoleId}>` : "";
   await channel.send({ content: mention, embeds: [embed] });
+}
+
+export async function dispatchSecurityTelemetry(
+  client: Client,
+  payload: TelemetryChannelPayload,
+): Promise<void> {
+  const embed = new EmbedBuilder()
+    .setTitle("Security")
+    .setDescription(payload.message)
+    .setColor(0xdc2626)
+    .setTimestamp(new Date())
+    .setFooter({ text: payload.event });
+
+  await sendToGuildAdminLogsChannel(
+    client,
+    payload.teamId,
+    embed,
+    payload.guildId,
+  );
 }
 
 export async function handleTelemetryActionable(
@@ -117,14 +138,7 @@ export async function handleTelemetrySecurity(
   payload: TelemetryChannelPayload,
 ): Promise<void> {
   try {
-    const embed = new EmbedBuilder()
-      .setTitle("Security")
-      .setDescription(payload.message)
-      .setColor(0xdc2626)
-      .setTimestamp(new Date())
-      .setFooter({ text: payload.event });
-
-    await sendToGuildAdminLogsChannel(context, payload.teamId, embed);
+    await dispatchSecurityTelemetry(context.client, payload);
   } catch (error) {
     console.warn("[telemetry.security] failed:", error);
   }

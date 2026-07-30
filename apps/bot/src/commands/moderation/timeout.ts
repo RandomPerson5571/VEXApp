@@ -7,6 +7,7 @@ import {
   resolveActor,
   resolveTargetFromUserOption,
 } from "../../utils/moderation-resolve.js";
+import { moderationTelemetrySideEffects } from "../../utils/moderation-telemetry.js";
 
 const timeoutCommand: SlashCommand = {
   data: new SlashCommandBuilder()
@@ -42,12 +43,15 @@ const timeoutCommand: SlashCommand = {
     const until = new Date(Date.now() + hours * 3_600_000);
 
     try {
-      await suppressUser({
-        actorId: actor.id,
-        targetUserId: target.dbUser.id,
-        reason,
-        until,
-      });
+      await suppressUser(
+        {
+          actorId: actor.id,
+          targetUserId: target.dbUser.id,
+          reason,
+          until,
+        },
+        moderationTelemetrySideEffects(interaction.client, interaction.guildId),
+      );
       await interaction.editReply({
         content: `✅ Timed out **${target.discordUser.tag}** for ${hours}h.`,
       });

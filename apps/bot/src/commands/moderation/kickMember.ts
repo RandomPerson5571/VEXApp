@@ -7,6 +7,7 @@ import {
   resolveActor,
   resolveTargetFromUserOption,
 } from "../../utils/moderation-resolve.js";
+import { moderationTelemetrySideEffects } from "../../utils/moderation-telemetry.js";
 
 const kickMemberCommand: SlashCommand = {
   data: new SlashCommandBuilder()
@@ -31,11 +32,14 @@ const kickMemberCommand: SlashCommand = {
     if (!target) return;
 
     try {
-      await kickUser({
-        actorId: actor.id,
-        targetUserId: target.dbUser.id,
-        reason: interaction.options.getString("reason"),
-      });
+      await kickUser(
+        {
+          actorId: actor.id,
+          targetUserId: target.dbUser.id,
+          reason: interaction.options.getString("reason"),
+        },
+        moderationTelemetrySideEffects(interaction.client, interaction.guildId),
+      );
       await interaction.editReply({
         content: `✅ Kicked **${target.discordUser.tag}** from their team.`,
       });

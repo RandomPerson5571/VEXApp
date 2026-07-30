@@ -7,6 +7,7 @@ import {
   resolveActor,
   resolveBanTarget,
 } from "../../utils/moderation-resolve.js";
+import { moderationTelemetrySideEffects } from "../../utils/moderation-telemetry.js";
 
 // ponytail: bot bans set bannedAt only — web sessions die on next getCurrentUser;
 // Supabase global signOut runs from the web ban path.
@@ -41,11 +42,14 @@ const banCommand: SlashCommand = {
     if (!target) return;
 
     try {
-      await banUser({
-        actorId: actor.id,
-        targetUserId: target.id,
-        reason: interaction.options.getString("reason"),
-      });
+      await banUser(
+        {
+          actorId: actor.id,
+          targetUserId: target.id,
+          reason: interaction.options.getString("reason"),
+        },
+        moderationTelemetrySideEffects(interaction.client, interaction.guildId),
+      );
       await interaction.editReply({
         content: `✅ Banned **${target.firstName} ${target.lastName}** (\`${target.id}\`).`,
       });

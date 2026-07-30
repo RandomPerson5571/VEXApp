@@ -108,12 +108,24 @@ export async function dispatchTelemetryAsync(
   }
 
   const type = urgency === "security" ? "telemetry.security" : "telemetry.actionable";
-  await postBotWebhook(type, {
+  const payload: Record<string, unknown> = {
     teamId: input.teamId,
     event: input.event,
     message: input.message ?? input.event,
     ...input.extra,
-  });
+  };
+
+  if (urgency === "security") {
+    const team = await prisma.team.findUnique({
+      where: { id: input.teamId },
+      select: { discordServerId: true },
+    });
+    if (team?.discordServerId) {
+      payload.guildId = team.discordServerId;
+    }
+  }
+
+  await postBotWebhook(type, payload);
 }
 
 export type LowStockAlertInput = {

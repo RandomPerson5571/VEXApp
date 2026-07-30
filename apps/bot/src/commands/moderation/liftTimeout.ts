@@ -7,6 +7,7 @@ import {
   resolveActor,
   resolveTargetFromUserOption,
 } from "../../utils/moderation-resolve.js";
+import { moderationTelemetrySideEffects } from "../../utils/moderation-telemetry.js";
 
 const liftTimeoutCommand: SlashCommand = {
   data: new SlashCommandBuilder()
@@ -31,11 +32,14 @@ const liftTimeoutCommand: SlashCommand = {
     if (!target) return;
 
     try {
-      await unsuppressUser({
-        actorId: actor.id,
-        targetUserId: target.dbUser.id,
-        reason: interaction.options.getString("reason"),
-      });
+      await unsuppressUser(
+        {
+          actorId: actor.id,
+          targetUserId: target.dbUser.id,
+          reason: interaction.options.getString("reason"),
+        },
+        moderationTelemetrySideEffects(interaction.client, interaction.guildId),
+      );
       await interaction.editReply({
         content: `✅ Lifted timeout for **${target.discordUser.tag}**.`,
       });
