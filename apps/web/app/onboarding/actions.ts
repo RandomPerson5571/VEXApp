@@ -20,6 +20,8 @@ import {
   getDiscordUsernameFromAuthUser,
   isDiscordAuthUser,
 } from "@/lib/auth/identity";
+import { logTelemetry } from "@/lib/telemetry/dispatch";
+import { telemetryFields } from "@/lib/telemetry/detail";
 import { createClient } from "@/lib/supabase/server";
 
 export type OnboardingState = {
@@ -120,21 +122,21 @@ export async function completeOnboarding(
       : fallbackName.lastName;
 
   try {
-    await prisma.$transaction(async (tx) => {
+    const createdUser = await prisma.$transaction(async (tx) => {
       const existing = await tx.user.findUnique({
         where: { id: user.id },
         select: { id: true },
       });
 
       if (existing) {
-        return existing;
+        return null;
       }
 
       await consumeInvite(tx, invite.id, user.id);
 
       const discordId = discordAuth ? getDiscordIdFromAuthUser(user) : null;
 
-      const created = await tx.user.create({
+      return tx.user.create({
         data: {
           id: user.id,
           email,
@@ -156,9 +158,27 @@ export async function completeOnboarding(
           isVerified: true,
         },
       });
-
-      return created;
     });
+
+    if (createdUser) {
+      logTelemetry({
+        category: "security",
+        teamId: invite.teamId,
+        message: `New account: **${firstName} ${lastName}** (${email})`,
+        action: "user.signup",
+        entityType: "user",
+        entityId: createdUser.id,
+        actorId: createdUser.id,
+        occurredAt: createdUser.createdAt,
+        fields: telemetryFields({
+          Email: email,
+          Name: `${firstName} ${lastName}`,
+          "Verification method": discordAuth ? "Discord" : "Email",
+          "Discord ID": createdUser.discordId ?? undefined,
+          "Invite ID": invite.id,
+        }),
+      });
+    }
   } catch (error) {
     if (
       error instanceof Prisma.PrismaClientKnownRequestError &&

@@ -6,7 +6,7 @@ Guild-scoped Discord log channels for **security**, **info**, and **inventory** 
 
 | Category | Channel setting | What gets logged |
 |----------|-----------------|------------------|
-| **security** | `DiscordGuildSettings.securityLogsChannelId` | Moderation, API 5xx failures, warnings |
+| **security** | `DiscordGuildSettings.securityLogsChannelId` | Moderation, account signups, API 5xx failures, warnings |
 | **info** | `infoLogsChannelId` | Create / update / delete: tasks, events, scouting, knowledge, invites, day plans |
 | **inventory** | `inventoryLogsChannelId` | Inventory item CRUD, sign-outs, returns |
 
